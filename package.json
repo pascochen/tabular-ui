@@ -14,7 +14,7 @@
     "build:demo": "pnpm --filter tabular-ui-demo build",
     "dev": "pnpm build:ui && pnpm --parallel --filter tabular-ui --filter tabular-ui-demo dev",
     "storybook": "pnpm --filter tabular-ui-storybook storybook",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm build:ui && pnpm -r typecheck",
     "lint": "eslint . --max-warnings 0 && stylelint \"packages/ui/src/**/*.css\" --max-warnings 0 && prettier --check .",
     "format": "prettier --write .",
     "test": "pnpm --filter tabular-ui-storybook test",
