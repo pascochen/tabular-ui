@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "types": ["node", "vite/client"],
+    "skipLibCheck": true,
+    /* tests/storybook-port.mjs is plain JS so `node` can run it directly;
+       allowJs lets the Playwright config import it with its inferred types. */
+    "allowJs": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  /* The Playwright specs, the Storybook config and the Vite/Vitest config.
+     Playwright strips types without checking, so without this a broken spec
+     helper surfaced only at run time, if at all. The stories themselves are
+     type-checked by packages/ui, where they live. */
+  "include": [
+    "tests",
+    "tests/*.mjs",
+    "playwright.config.ts",
+    "playwright.visual.config.ts",
+    "vite.config.ts",
+    ".storybook/*.ts",
+    ".storybook/*.tsx",
+    "vitest.shims.d.ts"
+  ]
+}

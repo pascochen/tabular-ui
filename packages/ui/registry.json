@@ -1,0 +1,1187 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "tabular-ui",
+  "homepage": "https://tabularui.com",
+  "items": [
+    {
+      "name": "tokens",
+      "type": "registry:item",
+      "title": "Tokens",
+      "description": "The Riso Ledger token layer, fonts and Base UI state variants, for Tailwind CSS v4.",
+      "categories": ["tokens"],
+      "author": "Pascal Chenier",
+      "dependencies": [
+        "@fontsource-variable/source-code-pro@^5.3.1",
+        "@fontsource-variable/source-sans-3@^5.3.1",
+        "@fontsource-variable/source-serif-4@^5.3.1",
+        "tw-animate-css@^1.4.0"
+      ],
+      "files": [
+        { "path": ".registry/tokens.css", "type": "registry:file", "target": "@components/tabular-ui/tokens.css" },
+        {
+          "path": "src/styles/theme.css",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/styles/theme.css"
+        },
+        {
+          "path": "src/styles/palette.css",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/styles/palette.css"
+        },
+        {
+          "path": "src/styles/shadcn.css",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/styles/shadcn.css"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "A person’s picture or initials. An animated image plays only when asked.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/Avatar/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Avatar/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A static label for a state or a count, in one of six tones.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "class-variance-authority@^0.7.1"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/Badge/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Badge/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Badge/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Badge/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "The action control: default, outline, ghost, danger and inline variants, three sizes.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/danger-variant.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Button/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Button/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Button/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Button/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "A checkbox with checked and indeterminate states.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Checkbox/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Checkbox/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Checkbox/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Checkbox/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "chip",
+      "type": "registry:ui",
+      "title": "Chip",
+      "description": "An interactive token for a selection, optionally dismissible.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Chip/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Chip/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Chip/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Chip/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A filterable Select, with multi-select chips.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/chip.json",
+        "https://tabularui.com/r/input.json",
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Combobox/filter.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Combobox/filter.ts"
+        },
+        {
+          "path": "src/components/foundational/Combobox/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Combobox/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A modal dialog with header, body and footer parts.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Dialog/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Dialog/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "icon-button",
+      "type": "registry:ui",
+      "title": "IconButton",
+      "description": "A square icon-only button. Its label is required and doubles as its tooltip.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/danger-variant.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/tooltip.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/IconButton/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/IconButton/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/IconButton/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/IconButton/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A text field, with numeric and mono variants.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Input/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Input/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Input/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Input/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "menu",
+      "type": "registry:ui",
+      "title": "Menu",
+      "description": "A dropdown menu: items, groups, checkbox and radio items, submenus.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/danger-variant.json",
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/switch.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Menu/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Menu/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "message-scroller",
+      "type": "registry:ui",
+      "title": "MessageScroller",
+      "description": "A message list that keeps its place and scrolls to the latest.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10", "@shadcn/react@0.3.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/motion.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/MessageScroller/hooks.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/MessageScroller/hooks.ts"
+        },
+        {
+          "path": "src/components/foundational/MessageScroller/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/MessageScroller/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "A floating panel anchored to a trigger.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0"],
+      "registryDependencies": [
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Popover/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Popover/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A choice of one option from a list.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Select/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Select/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Select/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Select/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "The working indicator: a square tracer.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/Spinner/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Spinner/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "An on/off toggle.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Switch/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Switch/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Switch/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Switch/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabbed panels, horizontal or vertical.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0", "@phosphor-icons/react@^2.1.10", "class-variance-authority@^0.7.1"],
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Tabs/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Tabs/index.tsx"
+        },
+        {
+          "path": "src/components/foundational/Tabs/variants.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Tabs/variants.ts"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "A multi-line text field that grows with its text.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Textarea/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Textarea/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A short label shown on hover and focus.",
+      "categories": ["foundational"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@base-ui/react@^1.9.0"],
+      "registryDependencies": [
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/foundational/Tooltip/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/Tooltip/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "account-menu",
+      "type": "registry:component",
+      "title": "AccountMenu",
+      "description": "The signed-in user’s menu, with the colour mode choice.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/avatar.json",
+        "https://tabularui.com/r/menu.json",
+        "https://tabularui.com/r/theme-mode.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AccountMenu/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AccountMenu/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "agent-block",
+      "type": "registry:component",
+      "title": "AgentBlock",
+      "description": "Agent-authored content, with its authorship rail and label.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/AgentBlock/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AgentBlock/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "agent-plan",
+      "type": "registry:component",
+      "title": "AgentPlan",
+      "description": "An agent’s plan and each step’s status. Sits inside an AgentBlock.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json",
+        "https://tabularui.com/r/working-label.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AgentPlan/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AgentPlan/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "agent-reasoning",
+      "type": "registry:component",
+      "title": "AgentReasoning",
+      "description": "An agent’s collapsible reasoning, with a working state. Sits inside an AgentBlock.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json",
+        "https://tabularui.com/r/working-label.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AgentReasoning/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AgentReasoning/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "app-bar",
+      "type": "registry:component",
+      "title": "AppBar",
+      "description": "The top bar: brand, navigation and actions.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AppBar/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AppBar/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "app-shell",
+      "type": "registry:component",
+      "title": "AppShell",
+      "description": "The page frame: sidebar, page header, panels and content width.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AppShell/context.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AppShell/context.ts"
+        },
+        {
+          "path": "src/components/product/AppShell/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AppShell/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "attachment-row",
+      "type": "registry:component",
+      "title": "AttachmentRow",
+      "description": "A file in a list: type icon, name, size and status.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/progress-bar.json",
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AttachmentRow/fileTypes.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AttachmentRow/fileTypes.ts"
+        },
+        {
+          "path": "src/components/product/AttachmentRow/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AttachmentRow/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-composer",
+      "type": "registry:component",
+      "title": "ChatComposer",
+      "description": "The message box, with send, attach and stop inside it.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/attachment-row.json",
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/textarea.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/ChatComposer/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ChatComposer/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-starter",
+      "type": "registry:component",
+      "title": "ChatStarter",
+      "description": "Suggested prompts for an empty conversation.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/ChatStarter/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ChatStarter/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-thread",
+      "type": "registry:component",
+      "title": "ChatThread",
+      "description": "A conversation of user and assistant turns.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/agent-block.json",
+        "https://tabularui.com/r/agent-plan.json",
+        "https://tabularui.com/r/agent-reasoning.json",
+        "https://tabularui.com/r/attachment-row.json",
+        "https://tabularui.com/r/message-scroller.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json",
+        "https://tabularui.com/r/working-label.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/ChatThread/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ChatThread/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "code-view",
+      "type": "registry:component",
+      "title": "CodeView",
+      "description": "Read-only SQL and dbt code.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/CodeView/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/CodeView/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "context-switcher",
+      "type": "registry:component",
+      "title": "ContextSwitcher",
+      "description": "A menu for switching the current context, with actions.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/menu.json",
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/ContextSwitcher/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ContextSwitcher/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "count-badge",
+      "type": "registry:component",
+      "title": "CountBadge",
+      "description": "A count beside a label or icon.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/CountBadge/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/CountBadge/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "DataTable",
+      "description": "A sortable, filterable, virtualized table with 28px rows.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": [
+        "@phosphor-icons/react@^2.1.10",
+        "@tanstack/react-table@^8.21.3",
+        "@tanstack/react-virtual@^3.14.17"
+      ],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/DataTable/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:component",
+      "title": "EmptyState",
+      "description": "What a screen shows before it has content.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/EmptyState/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/EmptyState/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:component",
+      "title": "Field",
+      "description": "A label, help text and error, wired to one control.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/Field/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Field/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "filter-chip",
+      "type": "registry:component",
+      "title": "FilterChip",
+      "description": "An active filter that can be removed.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/chip.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/FilterChip/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/FilterChip/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "lineage-tree",
+      "type": "registry:component",
+      "title": "LineageTree",
+      "description": "A nested tree of model dependencies.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/LineageTree/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/LineageTree/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "metric-tile",
+      "type": "registry:component",
+      "title": "MetricTile",
+      "description": "A KPI figure with its label and change.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/MetricTile/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/MetricTile/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "org-switcher",
+      "type": "registry:component",
+      "title": "OrgSwitcher",
+      "description": "Switches between organizations.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/context-switcher.json", "https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/product/OrgSwitcher/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/OrgSwitcher/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress-bar",
+      "type": "registry:component",
+      "title": "ProgressBar",
+      "description": "The progress of a run, in a tone.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/ProgressBar/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ProgressBar/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "project-switcher",
+      "type": "registry:component",
+      "title": "ProjectSwitcher",
+      "description": "Switches between projects.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": ["https://tabularui.com/r/context-switcher.json", "https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/product/ProjectSwitcher/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ProjectSwitcher/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "run-log-row",
+      "type": "registry:component",
+      "title": "RunLogRow",
+      "description": "One pipeline run in a log.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/RunLogRow/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/RunLogRow/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "status-badge",
+      "type": "registry:component",
+      "title": "StatusBadge",
+      "description": "A run or validation status.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/StatusBadge/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/StatusBadge/index.tsx"
+        },
+        {
+          "path": "src/components/product/StatusBadge/statuses.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/StatusBadge/statuses.ts"
+        }
+      ]
+    },
+    {
+      "name": "toolbar",
+      "type": "registry:component",
+      "title": "Toolbar",
+      "description": "A row of controls above a table or view.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
+      "files": [
+        {
+          "path": "src/components/product/Toolbar/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Toolbar/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "truncated-text",
+      "type": "registry:component",
+      "title": "TruncatedText",
+      "description": "Text cut to fit, with the full text in a tooltip.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/tooltip.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/TruncatedText/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/TruncatedText/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "utils",
+      "description": "cn(): joins class names and resolves Tailwind conflicts, aware of the type scale.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "dependencies": ["clsx@^2.1.1", "tailwind-merge@^3.7.0"],
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        { "path": "src/lib/utils.ts", "type": "registry:file", "target": "@components/tabular-ui/lib/utils.ts" }
+      ]
+    },
+    {
+      "name": "theme-mode",
+      "type": "registry:lib",
+      "title": "theme-mode",
+      "description": "useTheme(): sets data-theme on the page, follows the OS if asked, remembers it.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        { "path": "src/lib/theme.ts", "type": "registry:file", "target": "@components/tabular-ui/lib/theme.ts" }
+      ]
+    },
+    {
+      "name": "motion",
+      "type": "registry:lib",
+      "title": "motion",
+      "description": "useReducedMotion(): whether the user asked for less motion.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        { "path": "src/lib/motion.ts", "type": "registry:file", "target": "@components/tabular-ui/lib/motion.ts" }
+      ]
+    },
+    {
+      "name": "elapsed",
+      "type": "registry:lib",
+      "title": "elapsed",
+      "description": "Counts and formats the time a working state has run.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        { "path": "src/lib/elapsed.ts", "type": "registry:file", "target": "@components/tabular-ui/lib/elapsed.ts" }
+      ]
+    },
+    {
+      "name": "control-base",
+      "type": "registry:lib",
+      "title": "control-base",
+      "description": "The classes every control shares: focus ring, disabled fade.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/controlBase.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/controlBase.ts"
+        }
+      ]
+    },
+    {
+      "name": "popup-surface",
+      "type": "registry:lib",
+      "title": "popup-surface",
+      "description": "The surface every popup shares: ground, border, shadow, row inset.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/popupSurface.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/popupSurface.ts"
+        }
+      ]
+    },
+    {
+      "name": "danger-variant",
+      "type": "registry:lib",
+      "title": "danger-variant",
+      "description": "Reads the danger variant and its retired spelling, destructive.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/foundational/dangerVariant.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/foundational/dangerVariant.ts"
+        }
+      ]
+    },
+    {
+      "name": "working-label",
+      "type": "registry:lib",
+      "title": "working-label",
+      "description": "The label a working state shows, with its elapsed time.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/elapsed.json", "https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/product/workingLabel.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/workingLabel.tsx"
+        }
+      ]
+    },
+    {
+      "name": "all",
+      "type": "registry:item",
+      "title": "All of Tabular UI",
+      "description": "Every component, the tokens and the shared modules, with an index to import them from.",
+      "categories": ["all"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/account-menu.json",
+        "https://tabularui.com/r/agent-block.json",
+        "https://tabularui.com/r/agent-plan.json",
+        "https://tabularui.com/r/agent-reasoning.json",
+        "https://tabularui.com/r/app-bar.json",
+        "https://tabularui.com/r/app-shell.json",
+        "https://tabularui.com/r/attachment-row.json",
+        "https://tabularui.com/r/avatar.json",
+        "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/chat-composer.json",
+        "https://tabularui.com/r/chat-starter.json",
+        "https://tabularui.com/r/chat-thread.json",
+        "https://tabularui.com/r/checkbox.json",
+        "https://tabularui.com/r/chip.json",
+        "https://tabularui.com/r/code-view.json",
+        "https://tabularui.com/r/combobox.json",
+        "https://tabularui.com/r/context-switcher.json",
+        "https://tabularui.com/r/control-base.json",
+        "https://tabularui.com/r/count-badge.json",
+        "https://tabularui.com/r/danger-variant.json",
+        "https://tabularui.com/r/data-table.json",
+        "https://tabularui.com/r/dialog.json",
+        "https://tabularui.com/r/elapsed.json",
+        "https://tabularui.com/r/empty-state.json",
+        "https://tabularui.com/r/field.json",
+        "https://tabularui.com/r/filter-chip.json",
+        "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/input.json",
+        "https://tabularui.com/r/lineage-tree.json",
+        "https://tabularui.com/r/menu.json",
+        "https://tabularui.com/r/message-scroller.json",
+        "https://tabularui.com/r/metric-tile.json",
+        "https://tabularui.com/r/motion.json",
+        "https://tabularui.com/r/org-switcher.json",
+        "https://tabularui.com/r/popover.json",
+        "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/progress-bar.json",
+        "https://tabularui.com/r/project-switcher.json",
+        "https://tabularui.com/r/run-log-row.json",
+        "https://tabularui.com/r/select.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/switch.json",
+        "https://tabularui.com/r/tabs.json",
+        "https://tabularui.com/r/textarea.json",
+        "https://tabularui.com/r/theme-mode.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/toolbar.json",
+        "https://tabularui.com/r/tooltip.json",
+        "https://tabularui.com/r/truncated-text.json",
+        "https://tabularui.com/r/utils.json",
+        "https://tabularui.com/r/working-label.json"
+      ],
+      "files": [{ "path": "src/index.ts", "type": "registry:file", "target": "@components/tabular-ui/index.ts" }]
+    }
+  ]
+}

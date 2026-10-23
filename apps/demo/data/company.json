@@ -1,0 +1,18 @@
+{
+  "name": "Kasane",
+  "legalName": "Kasane Corporation",
+  "localName": "株式会社カサネ",
+  "headquarters": "Tokyo",
+  "fiscalYear": "FY2026",
+  "fiscalYearLabel": "April 2026 – March 2027",
+  "reportingCurrency": "JPY",
+  "lastClosedPeriod": "2026-09",
+  "openPeriod": "2026-10",
+  "dataLoadedThrough": "2026-10-15",
+  "entities": 5,
+  "employees": 2788,
+  "installedBase": 221381,
+  "fyPriorNetSales": 69249020113,
+  "consumablesSharePct": 57.5,
+  "persona": { "name": "Mei Tachibana", "title": "Head of FP&A" }
+}

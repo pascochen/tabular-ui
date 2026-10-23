@@ -1,0 +1,62 @@
+# Dependency update PRs. Readiness review, 2026-10-08: nothing proposed
+# updates, and about 19 packages had fallen a minor version behind, Base UI
+# (the primitive layer) among them. See tools.md, "Dependency updates", for
+# how to review one: a Dependabot PR goes through Verify like any other.
+version: 2
+updates:
+  - package-ecosystem: npm # covers pnpm: Dependabot reads pnpm-lock.yaml
+    # The pnpm workspace, read from the root: packages/ui, apps/storybook and
+    # apps/demo resolve through the one lockfile, so they move together.
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Wait a week after a release before proposing it. Broken and
+    # compromised releases are usually caught and pulled within days.
+    cooldown:
+      default-days: 7
+    # Packages that must move together share a group, so one PR updates all
+    # of them: a Vitest helper a version apart from Vitest breaks the story
+    # tests, and Storybook's addons are released in lockstep with it.
+    # Minor and patch only: a major update always arrives as its own PR, so
+    # it is reviewed alone. A package goes in the first group it matches.
+    groups:
+      base-ui:
+        # The primitive layer. Its own PR, because every foundational
+        # component sits on it and its behaviour tests are the review.
+        patterns: ['@base-ui/*']
+        update-types: [minor, patch]
+      react:
+        patterns: [react, react-dom, '@types/react', '@types/react-dom']
+        update-types: [minor, patch]
+      storybook:
+        patterns: [storybook, '@storybook/*', eslint-plugin-storybook, '@chromatic-com/storybook']
+        update-types: [minor, patch]
+      vitest:
+        patterns: [vitest, '@vitest/*']
+        update-types: [minor, patch]
+      playwright:
+        patterns: [playwright, '@playwright/test']
+        update-types: [minor, patch]
+      tailwind:
+        patterns: [tailwindcss, '@tailwindcss/*', tailwind-merge, tw-animate-css]
+        update-types: [minor, patch]
+      lint:
+        patterns: [eslint, '@eslint/*', 'eslint-plugin-*', typescript-eslint, globals, stylelint, 'stylelint-*']
+        update-types: [minor, patch]
+      # Everything else, one PR a week rather than one per package.
+      other:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']

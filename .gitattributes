@@ -1,0 +1,10 @@
+# Kasane data written by data/kasane/generator/ (folders 01–05) and copied into the demo pack by
+# scripts/build-kasane-fixtures.mjs. GitHub folds these in pull-request diffs and leaves them out of
+# the language stats; review the code that writes them instead. The two generated .ts files stay
+# visible on purpose: they hold the copy the stories and the demo show.
+data/kasane/01_master_data/** linguist-generated=true
+data/kasane/02_subledgers/** linguist-generated=true
+data/kasane/03_general_ledger/** linguist-generated=true
+data/kasane/04_planning/** linguist-generated=true
+data/kasane/05_reporting/** linguist-generated=true
+apps/journey/public/kasane-pack/** linguist-generated=true

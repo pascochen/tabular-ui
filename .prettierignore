@@ -1,0 +1,30 @@
+# Prettier formats code and config only: .ts, .tsx, .js, .mjs, .json, .yml.
+
+# Prose is written by hand. Prettier would rewrite the spec's tables and emphasis.
+*.md
+*.mdx
+
+# CSS is Stylelint's. theme.css in particular is edited only by transcribing
+# an approved spec section (CLAUDE.md), never rewritten wholesale.
+*.css
+
+*.html
+pnpm-lock.yaml
+.claude/
+
+# Generated or downloaded
+dist/
+storybook-static/
+test-results/
+playwright-report/
+visual-report/
+visual-results/
+visual-gate/
+coverage/
+apps/storybook/tests/visual.spec.ts-snapshots/
+apps/*/public/
+.registry/
+
+# Changesets writes its own Markdown; the demo's fixtures are generated JSON
+.changeset/
+apps/demo/data/

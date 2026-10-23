@@ -1,0 +1,581 @@
+/* ==========================================================================
+   Tabular UI — token layer
+   Source of truth for VALUES. Rules and rationale: docs/design-system.md.
+
+   GENERATED from docs/design-system.md (scaffold pass 1, Task 3).
+   Do not regenerate wholesale. Change it only by transcribing an approved,
+   already-written spec section, and log the change below. (CLAUDE.md; the
+   commit creating this file carries a one-time exemption.)
+
+   Amendments since: --size-icon-* added from §11.3 (icon library adoption,
+   2026-08-02, user-approved); --pad-page-y from §7.4 (shell design audit,
+   2026-10-07, user-approved); --pad-content-x, --pad-band-y,
+   --gap-nav-group from §7.4 and --w-sidebar, --w-panel from §7.9 (same
+   audit, same day, user-approved); --font-sans and --font-display moved
+   from Inter / Inter Tight to Archivo, with
+   --font-display--font-variation-settings added, from §8.3 (typeface
+   change, 2026-10-08, user-approved); palette change from §1–§4 and §9
+   (same day, user-approved): neutral → olive, interactive blue → emerald,
+   sky returns as the new `info` role (--color-*-info, five tokens), blue
+   stripped; --pad-frame-x, --pad-frame-top, --pad-frame-empty from §7.3
+   "Frame tier", --w-content from §7.9 and --gap-section 16px → 32px from
+   §7.4 (spacing pass, 2026-10-08, user-approved); --pad-popup-list from
+   §7.4 (popup spacing review, same day, user-approved); light-mode
+   --tui-text-warning amber-700 → amber-800 from §4 (readiness review,
+   same day, user-approved); §0 rule 4 recast as lightness bands, and from
+   §2/§4: light --tui-text-interactive and -success emerald-700 → -800,
+   -agent violet-600 → -700, -info sky-700 → -800, dark -warning
+   amber-600 → amber-500 (2026-10-09, user-approved after a side-by-side);
+   --tui-ring added from §4 "Focus ring", light emerald-700 (was
+   --tui-text-interactive, emerald-800), dark emerald-500 unchanged
+   (2026-10-14, user-approved); Riso Ledger palette from §0–§4, §6 and §9
+   (2026-10-16, user-approved): every colour value now points at the
+   generated ramps in palette.css (ledger, sage, vermilion, ochre, federal,
+   orchid, teal) — olive, emerald, red, amber, sky and violet stripped, no
+   #fff left, light surfaces paper on paper, dark raised on ledger-925, light
+   fill-warning ochre-500, chart ramp reordered with vermilion and sage last;
+   then from §1 and §4 (same day, user-approved): the primary fill, its text
+   and the focus ring move from sage to ledger ink, and
+   --color-bg-hover-inverse / --color-bg-active-inverse are added for it;
+   from §8.3: --font-sans → Source Sans 3, --font-display → Source Serif 4,
+   --font-mono → Source Code Pro, --font-heading added (moved here from
+   shadcn.css, now the serif, applied to h1–h6 in the base layer),
+   --font-display--font-variation-settings removed (no wdth axis), and bare
+   code at 0.9em in the base layer (typeface change, same day,
+   user-approved); --font-mono--font-feature-settings added from §8.7,
+   and --font-mono-features deprecated (same day,
+   user-approved); --radius-xs, -sm, -md, -lg 2/4/6/8px → 0px from §7.7,
+   --radius-full unchanged (square corners, same day, user-approved after
+   a side-by-side in Storybook); token prefix renamed to `--tui-`,
+   2026-10-19 (user-approved). Names only; no value changed.
+   --shadow-overlay added from §4 "Elevation", and Tailwind's stock
+   --shadow-*, --inset-shadow-*, --drop-shadow-* and --text-shadow-* scales
+   stripped from §9 (overlay sheet, 2026-10-19, user-approved after a
+   side-by-side in Storybook). The --gap-control-icon comment's word space
+   corrected from Inter's 3.46px to Source Sans 3's 2.60px, from §7.4
+   (comment only, no value changed, 2026-10-21). --tui-ring light
+   ledger-950 → ledger-800, dark ledger-50 → ledger-200, from §4 "Focus
+   ring" (2026-10-22, user-approved after a side-by-side in Storybook).
+   The radius comments moved the switch from --radius-full to --radius-md
+   (track) and --radius-sm (thumb), from §7.7 (comment only, no value
+   changed, 2026-10-23, user-approved after a side-by-side in Storybook).
+   Tokens are added spec-first — write the
+   section in docs/design-system.md, then transcribe here. A token that
+   exists here and nowhere in the spec is a defect.
+
+   Structure (docs/design-system.md §9):
+     1. Hue strip                       — @theme, unused scales → initial
+     2. Mode-independent tokens        — @theme: spacing, radius, type, density
+     3. Raw mode values                — :root (light) / [data-theme="dark"]
+     4. Semantic utility layer         — @theme inline: --color-*, and
+                                         --shadow-overlay, which composes them
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Strip Tailwind's colour scales (§9). All of them, since the Riso Ledger
+   palette (2026-10-16): colour comes only from the seven generated ramps in
+   palette.css — ledger (neutral), sage, vermilion, ochre, federal, orchid and
+   teal (charts only). palette.css is imported AFTER this file, so the teal
+   strip below removes Tailwind's teal and not the Riso one.
+   -------------------------------------------------------------------------- */
+@theme {
+  --color-red-*: initial;
+  --color-orange-*: initial;
+  --color-amber-*: initial;
+  --color-yellow-*: initial;
+  --color-lime-*: initial;
+  --color-green-*: initial;
+  --color-emerald-*: initial;
+  --color-teal-*: initial;
+  --color-cyan-*: initial;
+  --color-sky-*: initial;
+  --color-blue-*: initial;
+  --color-indigo-*: initial;
+  --color-violet-*: initial;
+  --color-purple-*: initial;
+  --color-fuchsia-*: initial;
+  --color-pink-*: initial;
+  --color-rose-*: initial;
+  /* Every grey. mauve, mist and taupe arrived in Tailwind 4.2 and were live
+     utilities until this list named them. */
+  --color-slate-*: initial;
+  --color-gray-*: initial;
+  --color-zinc-*: initial;
+  --color-neutral-*: initial;
+  --color-stone-*: initial;
+  --color-mauve-*: initial;
+  --color-olive-*: initial;
+  --color-mist-*: initial;
+  --color-taupe-*: initial;
+
+  /* §9 — every stock shadow scale. The system has one shadow,
+     --shadow-overlay (section 4). shadow-none is static and survives. */
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+}
+
+/* --------------------------------------------------------------------------
+   2. Mode-independent tokens. `static` forces emission: without it Tailwind
+   tree-shakes unreferenced variables, and whether a token exists at runtime
+   would depend on which names happen to appear in scanned content — a silent
+   failure of exactly the kind this system is built to prevent.
+   -------------------------------------------------------------------------- */
+@theme static {
+  /* §7.2 — single spacing base. Tailwind derives p-1..p-8 etc.
+     Do not hand-declare --space-1 … --space-8. */
+  --spacing: 4px;
+
+  /* §7.7 — radius, declared in px deliberately (not rem, not inherited from
+     Tailwind's rem defaults — see §7.5/§7.7). Every rectangle is square
+     (2026-10-16); round shapes keep --radius-full. The four tiers are roles
+     at one value. Hard ceiling 8px; steps above the ceiling are stripped. */
+  --radius-xs: 0px;   /* status badge, cell focus outline, checkbox */
+  --radius-sm: 0px;   /* a part inset inside a control (segmented tab, switch thumb) */
+  --radius-md: 0px;   /* interactive — input, button, filter chip, tab, switch; card, panel, dropdown, popover */
+  --radius-lg: 0px;   /* modal, drawer */
+  --radius-full: 9999px; /* status dot, count badge, avatar, progress track */
+  --radius-xl: initial;
+  --radius-2xl: initial;
+  --radius-3xl: initial;
+  --radius-4xl: initial;
+
+  /* §7.6 — control heights. px, deliberate (§7.5). Cap 36px. */
+  --h-row-xs: 24px;      /* dense table rows, log lines, activity feed */
+  --h-row-sm: 28px;      /* default table row */
+  --h-control-sm: 24px;  /* control inside a table row — 2px clearance in --h-row-sm */
+  --h-control: 32px;     /* default control — input, button, select */
+  --h-control-lg: 36px;  /* primary action, page-header control — cap */
+
+  /* §11.3 — standalone icon sizes, px per §7.5. Icons INLINE with text keep
+     Phosphor's 1em default instead and scale with their type; these are for
+     icons sized by the grid, not by adjacent text. Which role takes which
+     size: §11.3's "By role" table. */
+  --size-icon-xs: 12px;  /* chip interiors — badge marks are 10px, §11.3 */
+  --size-icon-sm: 14px;  /* popup rows, tabs, dense rows — --h-row-xs, --h-row-sm */
+  --size-icon-md: 16px;  /* icon-only controls, nav and list rows */
+  --size-icon-lg: 20px;  /* --h-control-lg, page-header controls */
+  --size-icon-display: 48px; /* EmptyState only — the one size off the density
+                                grid, and the only one taking `thin` (§11.2) */
+
+  /* §7.8 — border widths. 2px is reserved: agent left rail, focus ring,
+     active tab indicator. */
+  --border-width: 1px;
+  --border-width-2: 2px;
+
+  /* §4 — focus ring geometry. Color is --color-ring in section 4.
+     Rings are outline + outline-offset, never box-shadow. */
+  --ring-width: 2px;
+  --ring-offset: 1px;
+
+  /* §7.4 — semantic density: padding */
+  --pad-cell-x: 8px;       /* table cell horizontal */
+  --pad-cell-y: 6px;       /* table cell vertical */
+  --pad-control-x: 8px;    /* input, button, select */
+  --pad-badge-x: 6px;
+  --pad-badge-y: 2px;
+  --pad-chip-x: 6px;
+  --pad-chip-y: 2px;
+  --pad-sidebar-item: 8px;
+  --pad-card: 12px;
+  --pad-panel: 12px;
+  --pad-popover: 8px;
+  --pad-popup-list: 4px;  /* popup edge or separator to its row stack, §7.4 */
+  --pad-page-x: 16px;      /* shell column gutter — top nav, sidebar, panel */
+  --pad-page-y: 16px;      /* first content below a shell header band */
+  --pad-content-x: 24px;   /* <main>'s side gutter */
+  --pad-band-y: 8px;       /* header band, around its --h-control child */
+
+  /* §7.3 "Frame tier" — the one spacing tier above 32px, capped at 64px.
+     Paid once per page, not per row. Shells only: AppShell, EmptyState, an
+     app's App.tsx (lint-enforced). AppShell applies x and top while <main>
+     is ≥ 672px (@2xl container); below that, --pad-content-x / --pad-page-y. */
+  --pad-frame-x: 48px;     /* main's side gutter, page header and body */
+  --pad-frame-top: 48px;   /* main body's top inset, below the page header band */
+  --pad-frame-empty: 64px; /* vertical air in EmptyState size="page" */
+
+  /* §7.4 — semantic density: gaps */
+  --gap-bonded: 2px;       /* title to its timestamp — ONE unit */
+  --gap-icon-label: 2px;   /* icon to its label inside a badge or chip */
+  --gap-control-icon: 6px; /* icon to its label inside a control — must exceed
+                              the word space (2.60px at --text-base) or the
+                              icon binds tighter than the words do. §7.4 */
+  --gap-chip: 2px;         /* between chips in a filter group */
+  --gap-inline: 8px;       /* between distinct inline controls */
+  --gap-field: 8px;        /* between form fields */
+  --gap-group: 12px;       /* between control groups */
+  --gap-tree-indent: 12px; /* per level in a lineage tree */
+  --gap-section: 32px;     /* between page sections — the component ceiling, §7.4 */
+  --gap-nav-group: 24px;   /* between groups in a sidebar nav */
+
+  /* §7.9 — shell widths. Not density tokens; no cap. */
+  --w-sidebar: 240px;      /* AppShell sidebar, and popups sized to match it */
+  --w-panel: 440px;        /* AppShell trailing panel — the chat drawer */
+  --w-content: 1280px;     /* main's content column, frame gutters included, centred */
+
+  /* §8.3 — families. --font-display is the metric tier; --font-heading is
+     every h1–h6, applied once in the base layer below. Both are the serif.
+     Each stack leads with the 'Variable' name, because that is the family
+     @fontsource-variable/* registers: a stack naming only the plain form
+     falls through to the fallback and renders the wrong face, silently. */
+  --font-sans: 'Source Sans 3 Variable', 'Source Sans 3', system-ui, sans-serif;
+  --font-display: 'Source Serif 4 Variable', 'Source Serif 4', 'Georgia', serif;
+  --font-heading: var(--font-display);
+  --font-mono: 'Source Code Pro Variable', 'Source Code Pro', 'SF Mono', ui-monospace, monospace;
+  /* §8.7 — slashed zero. The `font-mono` utility emits it with the family,
+     and Tailwind passes it to Preflight as --default-mono-font-feature-settings
+     for code, kbd, samp and pre, so no component sets the feature itself. */
+  --font-mono--font-feature-settings: 'zero' 1;
+
+  /* §8.1 — type scale. Type in rem (§7.5). Every size carries its
+     --line-height partner; a size without one inherits ambient line-height
+     and silently changes row height. */
+  --text-2xs: 0.625rem;                    /* 10px — uppercase column headers */
+  --text-2xs--line-height: 0.875rem;       /* 14px */
+  --text-xs: 0.6875rem;                    /* 11px — timestamps, metadata */
+  --text-xs--line-height: 1rem;            /* 16px */
+  --text-sm: 0.75rem;                      /* 12px — table cells, dense labels */
+  --text-sm--line-height: 1rem;            /* 16px */
+  --text-base: 0.8125rem;                  /* 13px — body, default UI text */
+  --text-base--line-height: 1.25rem;       /* 20px */
+  --text-md: 0.875rem;                     /* 14px — section headings */
+  --text-md--line-height: 1.25rem;         /* 20px */
+  --text-lg: 1rem;                         /* 16px — page title */
+  --text-lg--line-height: 1.5rem;          /* 24px */
+  --text-xl: 1.25rem;                      /* 20px — modal titles — rare */
+  --text-xl--line-height: 1.75rem;         /* 28px */
+  /* ─── display boundary (§8.2): metric tier renders in --font-display ─── */
+  --text-metric-sm: 1.5rem;                /* 24px — secondary KPI */
+  --text-metric-sm--line-height: 1.75rem;  /* 28px */
+  --text-metric: 2rem;                     /* 32px — primary KPI, ceiling */
+  --text-metric--line-height: 2.25rem;     /* 36px */
+
+  /* §8.8 — letter spacing. Display tracking is 0 on purpose: Source Serif
+     4's display optical size already does the tightening (§8.4);
+     --tracking-tight on the metric tier double-counts. */
+  --tracking-wide: 0.04em;    /* --text-2xs, uppercase only */
+  --tracking-normal: 0em;     /* --text-xs through --text-md */
+  --tracking-tight: -0.01em;  /* --text-lg, --text-xl */
+  --tracking-display: 0em;    /* metric tier — positive if adjusted, never negative */
+}
+
+/* §8.5, §8.6, §8.7 — declared OUTSIDE @theme on purpose. In @theme, the
+   --font-* namespace is font-FAMILY: `--font-normal: 400` would emit a
+   `font-normal` utility whose value is the family "400", silently — the same
+   trap §4 documents for bare --text-*. Tailwind's built-in font-normal /
+   font-medium / font-semibold utilities already carry 400/500/600, so these
+   exist as reference variables only. Weight never exceeds 600 (§8.5). */
+:root {
+  --font-normal: 400;    /* body, table cells */
+  --font-medium: 500;    /* labels, column headers, emphasis */
+  --font-semibold: 600;  /* headings, active nav, metric figures */
+
+  /* §8.6 — mandatory on every element rendering a number. Set on html in
+     the base layer below and inherited; prose included. */
+  --font-numeric: tabular-nums lining-nums;
+
+  /* §8.7 — DEPRECATED 2026-10-16. The feature now rides on
+     --font-mono--font-feature-settings in @theme above. A declaration that
+     still reads this is redundant; new code does not use it. */
+  --font-mono-features: 'zero' 1;
+}
+
+/* --------------------------------------------------------------------------
+   3. Raw mode values (§9 mode switching). Light on :root,
+   dark on [data-theme="dark"]. The --tui-* layer generates nothing;
+   it exists so section 4 can reference one name per token.
+   Dark and light are not mirrors (§0 rule 4). Every Riso ramp shares one
+   lightness curve, so a role's foreground is one step per mode: 700 in
+   light (L 46), 400 in dark (L 73). Ratios: scripts/check-contrast.mjs.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Native UI follows the mode. Without this the browser paints scrollbars,
+     caret and form controls from its own default scheme, which renders a
+     bright scrollbar on a dark popup — visible on any scrollable surface, and
+     wrong in the canonical mode. Not a token: a property of the mode itself. */
+  color-scheme: light;
+
+  /* §3 — neutral foundation, light. Paper on paper (2026-10-16): canvas,
+     surface and raised are all ledger-50, and a card or popup separates by
+     its border, not by a white fill. Ratios on ledger-50. */
+  --tui-canvas: var(--color-ledger-50);
+  --tui-surface: var(--color-ledger-50);
+  --tui-surface-raised: var(--color-ledger-50);
+  --tui-border: var(--color-ledger-200);
+  --tui-border-strong: var(--color-ledger-300);
+  --tui-text-primary: var(--color-ledger-950);    /* 16.39:1 */
+  --tui-text-body: var(--color-ledger-900);       /* 12.38:1 */
+  --tui-text-secondary: var(--color-ledger-700);  /*  6.64:1 */
+  --tui-text-tertiary: var(--color-ledger-600);   /*  4.89:1 — placeholders and non-text marks only */
+
+  /* §4 — accent map, light. Step 700 for every role's text (§0 rule 4):
+     5.06:1 or more on every ground §4 lists, its own tint included. On
+     canvas: interactive and success 6.23, danger 7.15, warning 6.74, agent
+     7.13, info 6.75. Interactive and success share sage by decision (§1). */
+  --tui-text-interactive: var(--color-sage-700);
+  --tui-text-danger: var(--color-vermilion-700);
+  --tui-text-warning: var(--color-ochre-700);
+  --tui-text-success: var(--color-sage-700);
+  --tui-text-agent: var(--color-orchid-700);
+  --tui-text-info: var(--color-federal-700);
+
+  /* §1 — the accent is ink: the primary fill is ledger-950, 16.39:1 on
+     paper. The focus ring is a step softer, ledger-800, 9.10:1 (§4,
+     2026-10-22). Links and selection (text, bg, border above and below)
+     stay sage. */
+  --tui-fill-interactive: var(--color-ledger-950);
+  --tui-ring: var(--color-ledger-800);
+  --tui-fill-danger: var(--color-vermilion-700);
+  --tui-fill-warning: var(--color-ochre-500);     /* not -400: 2.26:1 on paper, under 3:1 (§4) */
+  --tui-fill-success: var(--color-sage-700);
+  --tui-fill-agent: var(--color-orchid-700);
+  --tui-fill-info: var(--color-federal-700);
+
+  /* Paper, not white (2026-10-16): no #fff remains in the theme. */
+  --tui-on-interactive: var(--color-ledger-50);   /* 16.39:1 on fill */
+  --tui-on-danger: var(--color-ledger-50);        /* 7.15:1 */
+  --tui-on-warning: var(--color-ledger-950);      /* 4.89:1 — paper on ochre-500 is 3.35:1, fails */
+  --tui-on-success: var(--color-ledger-50);       /* 6.23:1 */
+  --tui-on-agent: var(--color-ledger-50);         /* 7.13:1 */
+  --tui-on-info: var(--color-ledger-50);          /* 6.75:1 */
+
+  --tui-bg-interactive: --alpha(var(--color-sage-500) / 8%);
+  --tui-bg-danger: --alpha(var(--color-vermilion-500) / 8%);
+  --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
+  --tui-bg-success: --alpha(var(--color-sage-500) / 8%);
+  --tui-bg-agent: --alpha(var(--color-orchid-500) / 8%);
+  --tui-bg-info: --alpha(var(--color-federal-500) / 8%);
+
+  --tui-border-interactive: --alpha(var(--color-sage-500) / 20%);
+  --tui-border-danger: --alpha(var(--color-vermilion-500) / 20%);
+  --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
+  --tui-border-success: --alpha(var(--color-sage-500) / 20%);
+  --tui-border-agent: --alpha(var(--color-orchid-500) / 20%);
+  --tui-border-info: --alpha(var(--color-federal-500) / 20%);
+
+  /* §4 interaction states — one neutral overlay, not per-role tokens.
+     No --color-bg-selected: selection IS the interactive role. */
+  --tui-bg-hover: --alpha(var(--color-ledger-950) / 6%);
+  --tui-bg-active: --alpha(var(--color-ledger-950) / 10%);
+  /* §4 — the other mode's overlay, for a fill that IS the overlay colour:
+     ink on the ink primary button changes nothing. Paper moves it ΔE 4.19. */
+  --tui-bg-hover-inverse: --alpha(var(--color-ledger-50) / 6%);
+  --tui-bg-active-inverse: --alpha(var(--color-ledger-50) / 10%);
+  --tui-text-disabled: var(--color-ledger-400);   /* 2.22:1 — fails on purpose (WCAG 1.4.3 exempt) */
+
+  /* §6 — chart ramp, light: step 600 of each ramp, 4.59:1 or more on
+     paper. Vermilion and sage, the polarity hues, come last (§6). */
+  --tui-chart-1: var(--color-federal-600);
+  --tui-chart-2: var(--color-ochre-600);
+  --tui-chart-3: var(--color-teal-600);
+  --tui-chart-4: var(--color-orchid-600);
+  --tui-chart-5: var(--color-ledger-600);
+  --tui-chart-6: var(--color-vermilion-600);
+  --tui-chart-7: var(--color-sage-600);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* §3 — neutral foundation, dark (canonical). Canvas and surface are both
+     ledger-950 and separate by borders; raised layers (menus, popovers,
+     dialogs) sit on ledger-925, the ramp's one extra step. Canvas is
+     ledger-950, never #000 (§0 rule 8 — halation). Ratios on canvas. */
+  --tui-canvas: var(--color-ledger-950);
+  --tui-surface: var(--color-ledger-950);
+  --tui-surface-raised: var(--color-ledger-925);
+  --tui-border: var(--color-ledger-800);
+  --tui-border-strong: var(--color-ledger-700);
+  --tui-text-primary: var(--color-ledger-50);     /* 16.39:1 */
+  --tui-text-body: var(--color-ledger-100);       /* 15.01:1 */
+  --tui-text-secondary: var(--color-ledger-300);  /* 10.15:1 */
+  --tui-text-tertiary: var(--color-ledger-400);   /*  7.37:1 — placeholders and non-text marks only */
+
+  /* §4 — accent map, dark. Step 400 for every role's text (§0 rule 4). On
+     canvas: interactive and success 7.84, danger 6.95, warning 7.24, agent
+     6.96, info 7.31. Lowest anywhere: agent on its own tint over a
+     highlighted menu row, 4.66:1 — why raised is ledger-925 (§3). */
+  --tui-text-interactive: var(--color-sage-400);
+  --tui-text-danger: var(--color-vermilion-400);
+  --tui-text-warning: var(--color-ochre-400);
+  --tui-text-success: var(--color-sage-400);
+  --tui-text-agent: var(--color-orchid-400);
+  --tui-text-info: var(--color-federal-400);
+  /* §4 — the ring is a step softer than the paper accent: ledger-200,
+     12.68:1 on the canvas (2026-10-22). */
+  --tui-ring: var(--color-ledger-200);
+
+  --tui-fill-interactive: var(--color-ledger-50);
+  /* Role fills -600, not -700: the 700 fills are about 2.3–2.6:1 against
+     this canvas, under 3:1. Paper on a hovered 600 fill dips to 4.17–4.86:1
+     (§4); no control hovers on one today. */
+  --tui-fill-danger: var(--color-vermilion-600);
+  --tui-fill-warning: var(--color-ochre-400);
+  --tui-fill-success: var(--color-sage-600);
+  --tui-fill-agent: var(--color-orchid-600);
+  --tui-fill-info: var(--color-federal-600);
+
+  --tui-on-interactive: var(--color-ledger-950);  /* 16.39:1 */
+  --tui-on-danger: var(--color-ledger-50);        /* 5.36:1 */
+  --tui-on-warning: var(--color-ledger-950);      /* 7.24:1 */
+  --tui-on-success: var(--color-ledger-50);       /* 4.59:1 */
+  --tui-on-agent: var(--color-ledger-50);         /* 5.30:1 */
+  --tui-on-info: var(--color-ledger-50);          /* 4.97:1 */
+
+  --tui-bg-interactive: --alpha(var(--color-sage-500) / 10%);
+  --tui-bg-danger: --alpha(var(--color-vermilion-500) / 10%);
+  --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
+  --tui-bg-success: --alpha(var(--color-sage-500) / 10%);
+  --tui-bg-agent: --alpha(var(--color-orchid-500) / 10%);
+  --tui-bg-info: --alpha(var(--color-federal-500) / 10%);
+
+  --tui-border-interactive: --alpha(var(--color-sage-500) / 25%);
+  --tui-border-danger: --alpha(var(--color-vermilion-500) / 25%);
+  --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
+  --tui-border-success: --alpha(var(--color-sage-500) / 25%);
+  --tui-border-agent: --alpha(var(--color-orchid-500) / 25%);
+  --tui-border-info: --alpha(var(--color-federal-500) / 25%);
+
+  /* 6%/10%, not 4%/8%: at 4% the hover is invisible on a 28px row.
+     Paper, not #fff, as the overlay colour. */
+  --tui-bg-hover: --alpha(var(--color-ledger-50) / 6%);
+  --tui-bg-active: --alpha(var(--color-ledger-50) / 10%);
+  /* §4 — ink over the paper primary button, ΔE 2.80. */
+  --tui-bg-hover-inverse: --alpha(var(--color-ledger-950) / 6%);
+  --tui-bg-active-inverse: --alpha(var(--color-ledger-950) / 10%);
+  --tui-text-disabled: var(--color-ledger-600);   /* 3.35:1 — exempt, dim on purpose */
+
+  /* §6 — chart ramp, dark: step 400 of each ramp. Same order as light. */
+  --tui-chart-1: var(--color-federal-400);
+  --tui-chart-2: var(--color-ochre-400);
+  --tui-chart-3: var(--color-teal-400);
+  --tui-chart-4: var(--color-orchid-400);
+  --tui-chart-5: var(--color-ledger-400);
+  --tui-chart-6: var(--color-vermilion-400);
+  --tui-chart-7: var(--color-sage-400);
+}
+
+/* --------------------------------------------------------------------------
+   4. Semantic utility layer (§9). `inline` is required — plain @theme would
+   resolve each var() once at build time and break mode switching.
+   Components reference ONLY these names; a raw hue in a component breaks
+   the mode switch and any future hue change silently (§0 rule 10).
+   Utility names double the property word — text-text-danger, bg-bg-danger.
+   Expected; do not "fix" (§4).
+   -------------------------------------------------------------------------- */
+@theme inline static {
+  /* §3 neutrals */
+  --color-canvas: var(--tui-canvas);
+  --color-surface: var(--tui-surface);
+  --color-surface-raised: var(--tui-surface-raised);
+  --color-border: var(--tui-border);
+  --color-border-strong: var(--tui-border-strong);
+  --color-text-primary: var(--tui-text-primary);
+  --color-text-body: var(--tui-text-body);
+  --color-text-secondary: var(--tui-text-secondary);
+  --color-text-tertiary: var(--tui-text-tertiary);
+
+  /* §4 accents — six roles × five properties */
+  --color-text-interactive: var(--tui-text-interactive);
+  --color-text-danger: var(--tui-text-danger);
+  --color-text-warning: var(--tui-text-warning);
+  --color-text-success: var(--tui-text-success);
+  --color-text-agent: var(--tui-text-agent);
+  --color-text-info: var(--tui-text-info);
+
+  --color-fill-interactive: var(--tui-fill-interactive);
+  --color-fill-danger: var(--tui-fill-danger);
+  --color-fill-warning: var(--tui-fill-warning);
+  --color-fill-success: var(--tui-fill-success);
+  --color-fill-agent: var(--tui-fill-agent);
+  --color-fill-info: var(--tui-fill-info);
+
+  --color-on-interactive: var(--tui-on-interactive);
+  --color-on-danger: var(--tui-on-danger);
+  --color-on-warning: var(--tui-on-warning);
+  --color-on-success: var(--tui-on-success);
+  --color-on-agent: var(--tui-on-agent);
+  --color-on-info: var(--tui-on-info);
+
+  --color-bg-interactive: var(--tui-bg-interactive);
+  --color-bg-danger: var(--tui-bg-danger);
+  --color-bg-warning: var(--tui-bg-warning);
+  --color-bg-success: var(--tui-bg-success);
+  --color-bg-agent: var(--tui-bg-agent);
+  --color-bg-info: var(--tui-bg-info);
+
+  --color-border-interactive: var(--tui-border-interactive);
+  --color-border-danger: var(--tui-border-danger);
+  --color-border-warning: var(--tui-border-warning);
+  --color-border-success: var(--tui-border-success);
+  --color-border-agent: var(--tui-border-agent);
+  --color-border-info: var(--tui-border-info);
+
+  /* §4 interaction states */
+  --color-bg-hover: var(--tui-bg-hover);
+  --color-bg-active: var(--tui-bg-active);
+  --color-bg-hover-inverse: var(--tui-bg-hover-inverse);
+  --color-bg-active-inverse: var(--tui-bg-active-inverse);
+  --color-text-disabled: var(--tui-text-disabled);
+
+  /* §4 focus ring — outline color; geometry in section 2 */
+  --color-ring: var(--tui-ring);
+
+  /* §4 elevation — the overlay sheet: the overlay's own surface 4px down
+     and right, edged in its own rule. Inline, so the --tui-* references
+     resolve where it is used. Never pair with a shadow-{colour} utility:
+     Tailwind repaints both layers with it and the sheet goes solid. */
+  --shadow-overlay:
+    4px 4px 0 calc(var(--border-width) * -1) var(--tui-surface-raised),
+    4px 4px 0 0 var(--tui-border-strong);
+
+  /* §6 chart ramp — capped at seven; an eighth series means the chart needs
+     grouping, not another colour. Series 6 and 7 are the polarity hues. */
+  --color-chart-1: var(--tui-chart-1);
+  --color-chart-2: var(--tui-chart-2);
+  --color-chart-3: var(--tui-chart-3);
+  --color-chart-4: var(--tui-chart-4);
+  --color-chart-5: var(--tui-chart-5);
+  --color-chart-6: var(--tui-chart-6);
+  --color-chart-7: var(--tui-chart-7);
+}
+
+/* §8.4 — Source Serif 4 picks its optical size from the font size: the text
+   cut for 13–16px headings, the display cut for the metric tier.
+   §8.6 — tabular, lining figures everywhere, prose included; inherited.
+   §8.3 — headings take --font-heading here, once, so no component sets a
+   heading family. Base UI's Dialog and Popover titles render <h2>.
+   §8.3 — bare code is 0.9em of its context. Plain element selectors, not
+   :where(): Preflight sets `font-size: 1em` on the same elements in this
+   layer, and these must outrank it. A component that sizes mono from the
+   scale (one step down) wins anyway: utilities sit in a later layer. Code
+   inside <pre> inherits the block's size, so the two do not compound. */
+@layer base {
+  html {
+    font-optical-sizing: auto;
+    font-variant-numeric: var(--font-numeric);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-size: 0.9em;
+  }
+
+  pre code,
+  pre kbd,
+  pre samp {
+    font-size: 1em;
+  }
+}

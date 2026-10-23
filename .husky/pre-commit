@@ -1,0 +1,8 @@
+# Formats the staged code files with Prettier before each commit (lint-staged).
+# CI's lint step checks formatting as well, so a commit made where this hook
+# can't run is still caught there.
+if [ -x node_modules/.bin/lint-staged ]; then
+  node_modules/.bin/lint-staged
+else
+  echo "pre-commit: lint-staged isn't installed here, so staged files weren't formatted. Run pnpm install." >&2
+fi

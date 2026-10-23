@@ -1,0 +1,62 @@
+[
+  { "name": "01_kickoff_cfo_2026-10-12.txt", "kind": "transcript", "bytes": 6899 },
+  { "name": "02_interview_fpa_2026-10-13.txt", "kind": "transcript", "bytes": 7356 },
+  { "name": "03_interview_controller_2026-10-13.txt", "kind": "transcript", "bytes": 5264 },
+  { "name": "04_interview_treasury_2026-10-14.txt", "kind": "transcript", "bytes": 4250 },
+  { "name": "05_interview_ar_ap_2026-10-14.txt", "kind": "transcript", "bytes": 4376 },
+  { "name": "06_interview_plant_cost_2026-10-15.txt", "kind": "transcript", "bytes": 4077 },
+  { "name": "company_profile.md", "kind": "document", "bytes": 5899 },
+  { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
+  { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
+  { "name": "close_memo_2026-09.md", "kind": "document", "bytes": 4804 },
+  { "name": "forecast_memo_fy2026_6+6.md", "kind": "document", "bytes": 3702 },
+  {
+    "name": "trial_balance_monthly.csv",
+    "kind": "spreadsheet",
+    "bytes": 564953,
+    "firstLine": "entity_id,period,fiscal_period,period_status,account_id,account_name,statement,opening_balance,period_debits,period_credits,closing_balance,currency"
+  },
+  {
+    "name": "chart_of_accounts.csv",
+    "kind": "spreadsheet",
+    "bytes": 13475,
+    "firstLine": "account_id,account_name,account_class,statement,normal_balance,fs_line,cash_flow_category,plain_language"
+  },
+  {
+    "name": "ar_aging_monthly.csv",
+    "kind": "spreadsheet",
+    "bytes": 690470,
+    "firstLine": "entity_id,period,customer_id,is_intercompany,currency,current,past_due_1_30,past_due_31_60,past_due_61_90,past_due_91_180,past_due_over_180,unapplied_credits,total_open,total_open_jpy,open_invoices,oldest_due_date"
+  },
+  {
+    "name": "budget_forecast_monthly.csv",
+    "kind": "spreadsheet",
+    "bytes": 1369105,
+    "firstLine": "version_id,version_type,version_date,entity_id,fiscal_year,period,fiscal_period,is_actual,measure,account_id,cost_center_id,product_line,value,currency"
+  },
+  {
+    "name": "manual_journal_entries_fy2026_h1.csv",
+    "kind": "spreadsheet",
+    "bytes": 4875,
+    "firstLine": "je_id,line_no,entity_id,posting_date,period,fiscal_period,source,je_type,je_description,document_ref,account_id,account_name,debit,credit,currency,cost_center_id,product_line,customer_id,supplier_id,partner_entity_id,txn_currency,txn_amount,fx_rate,line_memo,created_by,approved_by"
+  },
+  {
+    "name": "supplier_invoices_fy2026_h1.csv",
+    "kind": "spreadsheet",
+    "bytes": 118688,
+    "firstLine": "ap_invoice_id,entity_id,supplier_id,supplier_invoice_number,invoice_date,posting_date,period,due_date,currency,net_amount,tax_amount,gross_amount,expense_account_id,payable_account_id,cost_center_id,description,asset_id,created_by,approved_by,amount_paid,amount_open,status_at_data_cut,published_as"
+  },
+  {
+    "name": "sales_invoices_2026-09.csv",
+    "kind": "spreadsheet",
+    "bytes": 143488,
+    "firstLine": "invoice_id,entity_id,document_type,customer_id,invoice_date,delivery_date,period,due_date,payment_terms,currency,net_amount,tax_amount,gross_amount,fx_rate_to_functional,gross_amount_functional,amount_open,amount_written_off,written_off_date,status_at_data_cut,is_intercompany,contract_id,sales_rep_id,created_by,note,published_as"
+  },
+  {
+    "name": "bank_export_kjp_2026-09.csv",
+    "kind": "spreadsheet",
+    "bytes": 2904,
+    "firstLine": "2026-09-01,RCT-KJP-2609-00006,Intercompany settlement received INV-KJP-2607-00080,,535423123,22214101453"
+  },
+  { "name": "org_chart_finance_2026-10.png", "kind": "image", "bytes": 119615 }
+]

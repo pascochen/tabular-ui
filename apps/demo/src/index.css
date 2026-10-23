@@ -1,0 +1,10 @@
+/* The full Tabular UI stylesheet: Tailwind, fonts (Source Serif 4 via its opsz entry points),
+   the shadcn compatibility layer, and the Tabular UI token layer. One entry so the
+   app cannot recompose the import order wrong. */
+@import 'tabular-ui/styles.css';
+
+/* Tailwind detects sources from the app's own files only. Tabular UI's class
+   strings are in the package's built JavaScript and must be scanned explicitly,
+   or every utility a component uses and the app does not is silently absent
+   from the build. The same line any app installing the package adds. */
+@source '../node_modules/tabular-ui/dist';

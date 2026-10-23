@@ -1,0 +1,134 @@
+{
+  "contradictions": [
+    {
+      "id": "self-approved-entry",
+      "claim": "The controller says every manual journal has a different approver, enforced group-wide.",
+      "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in this material.",
+      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"]
+    },
+    {
+      "id": "revenue-cut-off",
+      "claim": "The controller says the Sep 2026 cut-off was clean.",
+      "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
+      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"]
+    },
+    {
+      "id": "credit-limit",
+      "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
+      "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"]
+    },
+    {
+      "id": "duplicate-payment",
+      "claim": "AP says the system blocks a duplicate supplier invoice number, in every entity.",
+      "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"]
+    },
+    {
+      "id": "close-length",
+      "claim": "The CFO says the group closes in five working days.",
+      "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
+    },
+    {
+      "id": "europe-on-plan",
+      "claim": "FP&A says Europe is on plan in euros.",
+      "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
+    }
+  ],
+  "gaps": [
+    {
+      "id": "inventory-reserve",
+      "text": "No reserve for slow-moving or expired stock, though ink has a shelf life.",
+      "sources": ["06_interview_plant_cost_2026-10-15.txt", "accounting_policies.md"]
+    },
+    {
+      "id": "lease-inventory",
+      "text": "No lease inventory yet, and the new lease standard applies from April 2027.",
+      "sources": ["06_interview_plant_cost_2026-10-15.txt", "accounting_policies.md"]
+    },
+    {
+      "id": "october-open",
+      "text": "Oct 2026 is open: no month-end entries, data through 15 Oct 2026.",
+      "sources": ["03_interview_controller_2026-10-13.txt", "close_calendar.md"]
+    },
+    {
+      "id": "shanghai-mapping",
+      "text": "Shanghai’s local account codes are mapped in a spreadsheet nobody has sent.",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt", "02_interview_fpa_2026-10-13.txt"]
+    },
+    {
+      "id": "cash-forecast",
+      "text": "No 13-week cash forecast inputs: treasury builds it by hand from aging and AP due dates.",
+      "sources": ["04_interview_treasury_2026-10-14.txt"]
+    },
+    {
+      "id": "product-line-tags",
+      "text": "Subsidiaries tag product lines differently, so equipment, consumables and service can drift.",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "chart_of_accounts.csv"]
+    },
+    {
+      "id": "transfer-price-policy",
+      "text": "Quarterly transfer-price resets are under discussion with no decision recorded.",
+      "sources": ["04_interview_treasury_2026-10-14.txt", "accounting_policies.md"]
+    },
+    {
+      "id": "forecast-customers",
+      "text": "The forecast has no customer dimension, so the Great Lakes adjustment sits on a whole entity.",
+      "sources": ["forecast_memo_fy2026_6+6.md", "budget_forecast_monthly.csv"]
+    }
+  ],
+  "followUps": [
+    {
+      "id": "great-lakes-decision",
+      "text": "When does legal decide on Great Lakes, and who approves a write-off of the remaining 40%?",
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "close_memo_2026-09.md"]
+    },
+    {
+      "id": "rate-per-screen",
+      "text": "Which rate should each converted figure show: average, closing or budget?",
+      "sources": ["04_interview_treasury_2026-10-14.txt"]
+    },
+    {
+      "id": "audience",
+      "text": "Who sees the group view, who sees one entity, and what do auditors see?",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt", "org_chart_finance_2026-10.png"]
+    },
+    {
+      "id": "japanese-terms",
+      "text": "Which Japanese finance terms should I recognise in questions?",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt"]
+    },
+    {
+      "id": "approval-limits",
+      "text": "Where are subsidiary approval limits kept, and are they enforced or advisory?",
+      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"]
+    },
+    {
+      "id": "cut-off-evidence",
+      "text": "Is there a delivery confirmation for INV-KJP-2609-00363?",
+      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"]
+    },
+    {
+      "id": "variance-by-product",
+      "text": "Should plant variances split price and usage by product, monthly?",
+      "sources": ["06_interview_plant_cost_2026-10-15.txt"]
+    },
+    {
+      "id": "unexplained-remainder",
+      "text": "How should the bridge show what it cannot explain?",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "forecast_memo_fy2026_6+6.md"]
+    },
+    {
+      "id": "rebate-release",
+      "text": "Should quarterly rebate releases be shown apart from sales?",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "accounting_policies.md"]
+    },
+    {
+      "id": "bank-header",
+      "text": "Can the bank portal export a header row, or is the six-column layout fixed?",
+      "sources": ["04_interview_treasury_2026-10-14.txt", "bank_export_kjp_2026-09.csv"]
+    }
+  ]
+}

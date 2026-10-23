@@ -1,0 +1,9 @@
+/*
+ * A story on a Docs page sits on the product's canvas, as it does in its own
+ * view and in the screenshots, not on Storybook's page colour. Components are
+ * designed against --color-canvas; Storybook's dark grey or white would be a
+ * ground they never meet in the product.
+ */
+.docs-story {
+  background-color: var(--color-canvas);
+}

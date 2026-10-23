@@ -1,0 +1,44 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*storybook.log
+storybook-static
+
+# Test and Storybook artifacts
+storybook-static/
+test-results/
+playwright-report/
+visual-report/
+visual-results/
+visual-gate/
+
+# The shadcn registry is built, never committed: staged sources in
+# packages/ui/.registry, and the JSON Storybook serves from public/r.
+.registry/
+apps/storybook/public/r/
+
+# Visual baselines are Linux-only (apps/storybook/tests/visual.spec.ts); a Mac run writes these
+apps/storybook/tests/visual.spec.ts-snapshots/*-darwin.png
+apps/storybook/tests/visual.spec.ts-snapshots/*-win32.png

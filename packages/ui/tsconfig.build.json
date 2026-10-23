@@ -1,0 +1,16 @@
+{
+  /* Type declarations for the published package: a .d.ts in dist beside
+     each JavaScript file Vite writes. Stories and the Kasane story fixtures are left
+     out, as they are from the JavaScript build. */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    /* No declaration maps: they point at src/, which is not published. */
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.stories.tsx", "src/fixtures", "src/**/fixtures"]
+}

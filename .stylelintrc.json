@@ -1,0 +1,65 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["./lint/stylelint-tui.mjs"],
+  "overrides": [
+    {
+      "files": ["packages/ui/src/styles/theme.css"],
+      "rules": {
+        "custom-property-pattern": null,
+        "no-duplicate-selectors": null,
+        "tui/no-raw-color": null,
+        "declaration-property-value-allowed-list": [
+          { "/^--text-(?!shadow-)/": ["/^[0-9.]+(?:rem|px)$/"], "/^--text-shadow-/": ["initial"] },
+          {
+            "message": "Only font sizes and --line-height partners may live under --text-* in @theme: that namespace emits font-size utilities, so a color declared here silently becomes a font size with no build error. Colors belong under --color-text-*. See docs/design-system.md §4. --text-shadow-* is Tailwind's text-shadow scale, and may only be stripped to initial (§9)."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/ui/src/styles/palette.css"],
+      "rules": {
+        "tui/no-raw-color": null
+      }
+    }
+  ],
+  "rules": {
+    "tui/no-raw-color": true,
+    "tui/no-deep-chromatic-background": true,
+    "tui/dimension-caps": true,
+    "tui/focus-outline-only": true,
+    "declaration-property-value-disallowed-list": [
+      {
+        "/^font-weight$|^--font-weight/": ["/^[7-9]\\d\\d$/", "bold", "bolder"]
+      },
+      {
+        "message": "Font weight above 600: at 13px on a dark canvas, bold weights bloom and reduce legibility rather than increasing emphasis. Use --color-text-primary or --font-semibold, not both plus bold. See docs/design-system.md §8.5."
+      }
+    ],
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "source",
+          "utility",
+          "variant",
+          "custom-variant",
+          "apply",
+          "layer",
+          "config",
+          "plugin",
+          "reference"
+        ]
+      }
+    ],
+    "at-rule-no-deprecated": [true, { "ignoreAtRules": ["apply"] }],
+    "at-rule-prelude-no-invalid": [true, { "ignoreAtRules": ["apply"] }],
+    "nesting-selector-no-missing-scoping-root": [true, { "ignoreAtRules": ["custom-variant"] }],
+    "import-notation": "string",
+    "hue-degree-notation": "number",
+    "custom-property-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "declaration-empty-line-before": null
+  }
+}

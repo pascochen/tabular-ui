@@ -1,0 +1,8 @@
+/* Storybook renders the library from source, so it loads the package's own
+   stylesheet from packages/ui rather than the built copy in dist/.
+
+   Tailwind detects sources from this app's root only. The component class
+   strings live in packages/ui and must be named here, or every utility a
+   component uses that this app does not is silently missing. */
+@import '../../../packages/ui/src/index.css';
+@source '../../../packages/ui/src';

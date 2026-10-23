@@ -1,0 +1,17 @@
+[
+  {
+    "id": "company",
+    "text": "Kasane Corporation is a Tokyo maker of stencil duplicators and inkjet printers. FY2025 net sales were ¥69.2bn, and 58% came from ink and masters, so the 221k machines in the field drive the business.",
+    "sources": ["company_profile.md"]
+  },
+  {
+    "id": "group",
+    "text": "Five companies report to the group in yen: the Tokyo parent, which also makes every product, and sales subsidiaries in the US, Germany, the UK and China. The fiscal year runs April to March, and Sep 2026 closed the first half.",
+    "sources": ["company_profile.md", "close_calendar.md"]
+  },
+  {
+    "id": "brief",
+    "text": "Finance wants the month explained, not only reported: every figure traced to its journal entries, a budget bridge that separates exchange rates from performance, and early warning on customers who pay later each month. I can propose entries; people post them.",
+    "sources": ["01_kickoff_cfo_2026-10-12.txt", "02_interview_fpa_2026-10-13.txt"]
+  }
+]
