@@ -290,7 +290,7 @@ Not configured yet: set it in Settings → Branches once the repository is on Gi
 | `pnpm build:ui` | The package only |
 | `pnpm build:registry` | `registry.json` and the registry JSON in `apps/storybook/public/r` |
 | `pnpm lint` | ESLint + Stylelint + Prettier, failing on any warning. **Run this first.** |
-| `pnpm typecheck` | Every workspace package |
+| `pnpm typecheck` | Builds the package, then type-checks every workspace package (the demo checks against the built declarations) |
 | `pnpm test` | Every story in headless Chromium, both modes, with axe |
 | `pnpm test:watch` | The story tests in watch mode |
 | `pnpm test:playwright` | Playwright browser checks, on this checkout's own Storybook port (see above) |
