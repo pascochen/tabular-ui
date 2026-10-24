@@ -167,13 +167,35 @@ Baselines are Linux-only, because fonts render differently on a Mac, so `pnpm te
 
 ## Merging
 
-- **Squash merge**, so `main` gets one commit per PR, titled "Summary (#123)".
-- **Verify must pass** on the PR's latest commit, with the branch up to date with `main`.
+- **GitHub enforces the gate.** A ruleset on `main` accepts changes only through a pull request, once Verify has passed on its latest commit and the branch is up to date with `main`. If `main` moved while you waited, use "Update branch" and let Verify run again. Nobody can push to `main` directly, the owner included. No approving review is required yet.
+- **Squash merge** (the only method allowed), so `main` gets one commit per PR, titled "Summary (#123)".
 - **Never write GitHub's skip-CI marker** (square brackets around "skip ci") anywhere in a commit message or PR title. A squash merge copies it into `main` and skips CI there too.
 
 ## Releasing
 
-Pending changesets become a version and a `CHANGELOG.md` entry with `pnpm version-packages`; `pnpm release` builds the package and publishes it to npm. Publishing needs the owner's npm login.
+A release is two steps: the version bump goes through a pull request like any change, then the owner publishes from `main`. Publishing needs the owner's npm login.
+
+1. On a new branch, turn pending changesets into a version and a `CHANGELOG.md` entry, then commit and open a PR:
+
+   ```bash
+   git checkout -b release
+   pnpm version-packages
+   git add -A
+   git commit -m "Release tabular-ui <version>"
+   git push -u origin release
+   ```
+
+2. When Verify passes, squash-merge the PR.
+3. Back on `main`, publish and push the release tag:
+
+   ```bash
+   git checkout main
+   git pull
+   pnpm release
+   git push --follow-tags
+   ```
+
+`pnpm release` builds the package and runs `changeset publish`, which publishes every version not yet on npm and tags it (`tabular-ui@<version>`). Check with `npm view tabular-ui version`. While npm is still processing a first publish it can briefly report `0.0.0-stage`, npm's own placeholder.
 
 ## Dependency updates
 
