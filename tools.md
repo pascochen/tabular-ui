@@ -249,12 +249,14 @@ Verify takes about 25–27 minutes and is capped at 45 (raised from 30 on 2026-1
 
 ### Branch protection
 
-Not configured yet: set it in Settings → Branches once the repository is on GitHub. The rules the workflows assume:
+A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-10-24) targets the default branch, with an empty bypass list:
 
 - **Required check: `Verify`, pinned to GitHub Actions** (app 15368), so no other app can satisfy it by posting a check with that name. **If the CI job is ever renamed, update the rule in the same PR**, or nothing can merge.
 - **Up to date with `main` before merging.** When `main` moves, "Update branch" and Verify runs again on the combination.
 - **Pull requests only:** no direct pushes, no force pushes, no deleting the branch, admins included: a rule an admin can skip gets skipped.
+- **Squash merges only.**
 - **No approving review required** while there is one contributor (GitHub doesn't let you approve your own PR). Raise it, and add `CODEOWNERS`, when there's a second.
+- **Releases go through a PR too.** The version bump (`pnpm version-packages`) is committed on a branch and merged like any change; `pnpm release` and pushing the release tag happen afterwards, from `main`, and the ruleset does not cover tags.
 - **Docs-only PRs still pass**: their skipped Verify reports success, which satisfies the rule.
 - **A `Verify` check can come from a job other than `verify`.** The `Visual changes` job creates one on the commit it pushes, which is the verified commit plus that run's screenshots (see "Visual regression"). The up-to-date rule still forces a real run whenever `main` moves.
 
