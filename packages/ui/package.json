@@ -1,6 +1,6 @@
 {
   "name": "tabular-ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Dense React components and design tokens for finance and operations data tools, agentic UI included.",
   "license": "MIT",
   "author": "Pascal Chenier",
