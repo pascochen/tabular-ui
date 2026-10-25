@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -45,26 +46,43 @@ export const Default: Story = {
 
 /**
  * Destructive confirmation. The action is destructive; the dialog is not —
- * only the confirming button carries the hue.
+ * only the confirming button carries the hue. Deleting can't be undone, so
+ * the button waits for the model's name to be typed, not a single click.
  */
 export const Destructive: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger render={<Button variant="danger">Delete model</Button>} />
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete fct_gl_entries?</DialogTitle>
-          <DialogDescription>
-            This cannot be undone. 3 downstream models depend on it and will fail on their next run.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose render={<Button variant="ghost">Cancel</Button>} />
-          <DialogClose render={<Button variant="danger">Delete</Button>} />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
+  render: function DestructiveStory() {
+    const [typed, setTyped] = useState('');
+    return (
+      <Dialog>
+        <DialogTrigger render={<Button variant="danger">Delete model</Button>} />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete fct_gl_entries?</DialogTitle>
+            <DialogDescription>
+              You can&rsquo;t undo this. 3 downstream models will fail on their next run. Type fct_gl_entries to
+              confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            content="mono"
+            value={typed}
+            onChange={(e) => setTyped(e.target.value)}
+            aria-label="Type fct_gl_entries to confirm"
+          />
+          <DialogFooter>
+            <DialogClose render={<Button variant="ghost">Keep model</Button>} />
+            <DialogClose
+              render={
+                <Button variant="danger" disabled={typed !== 'fct_gl_entries'}>
+                  Delete model
+                </Button>
+              }
+            />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  },
 };
 
 /**

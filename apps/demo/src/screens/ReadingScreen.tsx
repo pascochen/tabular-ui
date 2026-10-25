@@ -117,7 +117,7 @@ export function ReadingScreen({ files, onFinished }: ReadingScreenProps) {
           <ProgressBar label="Overall progress" value={progress} showValue />
           <div className="flex items-baseline gap-[var(--gap-inline)]">
             <span className="text-sm tabular-nums text-text-body">
-              {Math.min(filesDone, total)} of {total} files read
+              {Math.min(filesDone, total)} of {total} {total === 1 ? 'file' : 'files'} read
             </span>
             <span className="flex-1" />
             <span

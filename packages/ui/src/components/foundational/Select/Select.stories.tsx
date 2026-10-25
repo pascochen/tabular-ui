@@ -180,7 +180,7 @@ export const States: Story = {
           className="text-text-danger"
           style={{ fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)' }}
         >
-          An environment is required
+          Choose an environment.
         </span>
       </div>
     </div>

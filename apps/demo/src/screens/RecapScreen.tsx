@@ -48,7 +48,7 @@ export function RecapScreen({ outcome, counts, onOpenModeling, onRestart }: Reca
         </h1>
         <p className="text-sm text-text-secondary">
           {outcome.cancelled
-            ? `Cancelled after ${outcome.filesRead} of ${outcome.totalFiles} files. Everything read so far is kept below.`
+            ? `Cancelled after ${outcome.filesRead} of ${outcome.totalFiles} ${outcome.totalFiles === 1 ? 'file' : 'files'}. Everything read so far is kept below.`
             : `Drafted from your material: ${counts.evidenceSheets} evidence ${counts.evidenceSheets === 1 ? 'sheet' : 'sheets'}${counts.flaggedSheets > 0 ? `, ${counts.flaggedSheets} flagged for review` : ''}. Review the findings, then open the model.`}
         </p>
       </header>

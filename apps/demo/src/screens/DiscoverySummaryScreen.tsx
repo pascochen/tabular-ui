@@ -58,7 +58,7 @@ export function DiscoverySummaryScreen({ files, outcome, counts, onRestartAnalys
   const nothingFound = kasaneLoaded
     ? 'The run stopped before it read enough of Kasane’s files to summarise them. Restart the analysis to read the rest.'
     : 'This demo’s agent is scripted for Kasane Corporation’s files, so it has nothing to summarise from these. Load Kasane’s files to see a full summary.';
-  const scope = `I read ${outcome.filesRead} of ${outcome.totalFiles} files. Anything that rests on the others is left out.`;
+  const scope = `I read ${outcome.filesRead} of ${outcome.totalFiles} ${outcome.totalFiles === 1 ? 'file' : 'files'}. Anything that rests on the others is left out.`;
 
   const download = () => {
     const sourced = (sources: readonly string[]) => ` (${sources.join(', ')})`;

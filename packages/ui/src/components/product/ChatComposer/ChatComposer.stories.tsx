@@ -35,7 +35,7 @@ export const Default: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('textbox', { name: 'Message' });
-    const send = canvas.getByRole('button', { name: 'Send' });
+    const send = canvas.getByRole('button', { name: 'Send message' });
     const box = canvasElement.querySelector('[data-slot="chat-composer"]')!;
 
     // Send sits inside the box, at its bottom-right corner, inset by the box's padding.
@@ -100,7 +100,7 @@ export const ClickToSend: Story = {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('textbox', { name: 'Message' });
     await userEvent.type(field, 'Rebuild the revenue model');
-    await userEvent.click(canvas.getByRole('button', { name: 'Send' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Send message' }));
     await expect(args.onSend).toHaveBeenCalledWith('Rebuild the revenue model');
     await expect(field).toHaveFocus();
   },
@@ -115,7 +115,7 @@ export const LongMessage: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('textbox', { name: 'Message' });
-    const send = canvas.getByRole('button', { name: 'Send' });
+    const send = canvas.getByRole('button', { name: 'Send message' });
     const box = canvasElement.querySelector('[data-slot="chat-composer"]')!;
     const lineHeight = px(field, 'line-height');
     const sendFromBottom = rect(box).bottom - rect(send).bottom;
@@ -215,7 +215,7 @@ export const Attach: Story = {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('textbox', { name: 'Message' });
     const attach = canvas.getByRole('button', { name: 'Attach file' });
-    const send = canvas.getByRole('button', { name: 'Send' });
+    const send = canvas.getByRole('button', { name: 'Send message' });
     const box = canvasElement.querySelector('[data-slot="chat-composer"]')!;
 
     // Bottom left, inset by the box's padding, level with Send.
@@ -266,7 +266,7 @@ export const Uploading: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('button', { name: 'Send' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: 'Send message' })).toBeDisabled();
     await expect(canvas.getByRole('progressbar', { name: 'Uploading ap_aging_2026-09.xlsx' })).toBeVisible();
   },
 };
@@ -293,7 +293,7 @@ export const FailedFile: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const send = canvas.getByRole('button', { name: 'Send' });
+    const send = canvas.getByRole('button', { name: 'Send message' });
     await expect(send).toBeDisabled();
     await userEvent.click(canvas.getByRole('button', { name: 'Remove trial_balance_kjp_2026-09.pdf' }));
     await expect(send).toBeEnabled();
@@ -306,13 +306,13 @@ export const Busy: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('textbox', { name: 'Message' });
-    await expect(canvas.queryByRole('button', { name: 'Send' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Send message' })).toBeNull();
 
     await userEvent.type(field, 'And the tax column?{Enter}');
     await expect(args.onSend).not.toHaveBeenCalled();
     await expect(field).toHaveValue('And the tax column?');
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Stop' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Stop responding' }));
     await expect(args.onStop).toHaveBeenCalledTimes(1);
     await expect(field).toHaveFocus();
   },
@@ -322,7 +322,7 @@ export const Busy: Story = {
 export const BusyWithoutStop: Story = {
   args: { busy: true },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByRole('button', { name: 'Send' })).toBeDisabled();
+    await expect(within(canvasElement).getByRole('button', { name: 'Send message' })).toBeDisabled();
   },
 };
 
@@ -331,7 +331,7 @@ export const Disabled: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('textbox', { name: 'Message' })).toBeDisabled();
-    await expect(canvas.getByRole('button', { name: 'Send' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: 'Send message' })).toBeDisabled();
   },
 };
 
@@ -371,6 +371,6 @@ export const InPanel: Story = {
     );
     await expect(canvas.getByText('Why is H1 operating profit under budget?')).toBeVisible();
     await expect(canvas.getByText('Working…')).toBeVisible();
-    await expect(canvas.getByRole('button', { name: 'Stop' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Stop responding' })).toBeVisible();
   },
 };

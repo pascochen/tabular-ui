@@ -308,7 +308,7 @@ function ChatComposer({
         {actions}
         {stopping ? (
           <IconButton
-            aria-label="Stop"
+            aria-label="Stop responding"
             variant="outline"
             type="button"
             className="ml-auto"
@@ -322,7 +322,7 @@ function ChatComposer({
             <StopIcon />
           </IconButton>
         ) : (
-          <IconButton aria-label="Send" variant="default" type="submit" className="ml-auto" disabled={!canSend}>
+          <IconButton aria-label="Send message" variant="default" type="submit" className="ml-auto" disabled={!canSend}>
             <ArrowUpIcon />
           </IconButton>
         )}

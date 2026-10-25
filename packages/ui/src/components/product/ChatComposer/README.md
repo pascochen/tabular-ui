@@ -49,8 +49,8 @@ One `<form>` box, two rows, `--gap-field` (8px) between them.
 | Message | `Textarea` `variant="borderless"`, `minRows={1}`: 20px empty, growing a line at a time to `maxRows`, then scrolling. Hidden lines fade at the edge they hide behind (§4 *Scroll cue*). |
 | Attached files | Above the message, inside the box: one `AttachmentRow` per file (28px, neutral file-type glyph, name in mono, size, upload status or progress, remove). The list is pulled out by the rows' own `--pad-cell-x`, so each glyph lines up with the message text and the hover fill reaches into the box's padding. Added 2026-10-15 after a benchmark: Dropbox Dash, Langdock and ChatGPT all show attached files inside the box, above the text. |
 | Bottom row | The attach button (with `onAttach`), then `actions`, then Send or Stop at the right. |
-| Send | `IconButton` `default` (the interactive fill, the panel's one primary action), 32px, `ArrowUp`: the arrow points into the thread. `--radius-md`, as every control: square since 2026-10-16, like the box. It took 6px first, on 2026-10-13, as an exception to sit closer to the box's then 8px corner; on 2026-10-15 all controls moved to 6px (§7.7), so the exception is gone. |
-| Stop | `IconButton` `outline`, `Stop`, in the same slot. Neutral: stopping a turn is not a danger. |
+| Send | `IconButton` `default` (the interactive fill, the panel's one primary action), 32px, `ArrowUp`: the arrow points into the thread. Named "Send message", which is also its tooltip. `--radius-md`, as every control: square since 2026-10-16, like the box. It took 6px first, on 2026-10-13, as an exception to sit closer to the box's then 8px corner; on 2026-10-15 all controls moved to 6px (§7.7), so the exception is gone. |
+| Stop | `IconButton` `outline`, `Stop`, in the same slot. Named "Stop responding": a bare "Stop" doesn't say what stops. Neutral: stopping a turn is not a danger. |
 
 Empty, the box is 86px (12 + 20 + 8 + 32 + 12, plus the borders), and the footer around it 110px. At six lines it's 186px. The thread above gives up the height, since `ChatThread` is the flex child that shrinks.
 

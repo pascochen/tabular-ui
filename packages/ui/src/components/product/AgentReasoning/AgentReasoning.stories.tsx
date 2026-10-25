@@ -87,7 +87,7 @@ export const DoneOpenWithReply: Story = {
       <AgentReasoning {...args} />
       <div className="whitespace-pre-wrap">
         {mono(
-          '`fct_revenue` now sums `net_amount`, and tax has its own column. The monthly totals still match the ledger.',
+          "`fct_revenue` should sum `net_amount`, with tax in its own column. I haven't checked the totals against the ledger.",
           'text-sm',
         )}
       </div>

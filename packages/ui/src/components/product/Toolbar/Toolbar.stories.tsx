@@ -91,7 +91,7 @@ export const SelectionMode: Story = {
       </Button>
       <Button size="sm" variant="danger">
         <TrashIcon />
-        Delete
+        Delete 3 models
       </Button>
       <ToolbarSpacer />
       <Button size="sm" variant="ghost">

@@ -67,7 +67,7 @@ export const InsideAPanel: Story = {
       <EmptyState
         icon={TableIcon}
         title="No runs in the last 24 hours"
-        description="Scheduled runs will appear here as they execute."
+        description="Scheduled runs show here when they start."
       />
     </div>
   ),

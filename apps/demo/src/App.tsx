@@ -97,7 +97,7 @@ export function App() {
     for (const f of incoming) {
       const kind = classify(f.name);
       if (!kind) {
-        rejections.push({ name: f.name, reason: 'not an accepted file type' });
+        rejections.push({ name: f.name, reason: 'isn’t a supported type. Use .txt, .md, .csv, .jpg or .png.' });
         continue;
       }
       if (f.size > MAX_FILE_BYTES) {
@@ -204,7 +204,9 @@ export function App() {
       setOpening(false);
     })().catch(() => {
       if (stale()) return;
-      setRejected([{ name: 'Kasane’s files', reason: 'could not be loaded for this link' }]);
+      setRejected([
+        { name: 'Kasane’s files', reason: 'couldn’t load from this link. Use Kasane’s files to try again.' },
+      ]);
       setOpening(false);
     });
     return () => {

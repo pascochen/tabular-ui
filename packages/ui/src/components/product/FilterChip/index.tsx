@@ -18,10 +18,13 @@ export type FilterChipProps = Omit<ChipProps, 'children'> & {
  * Neutral, like `Chip`. A filter is not state (§0 rule 1) — a chip filtering
  * for failed runs still carries no hue, because the chip is not itself failing.
  * Selection is the one exception, and it uses the interactive role.
+ *
+ * The dismiss X defaults to "Remove {field} filter". Chip's own default,
+ * "Remove", repeats on every chip in a filter bar and names none of them.
  */
-function FilterChip({ field, value, className, ...props }: FilterChipProps) {
+function FilterChip({ field, value, dismissLabel = `Remove ${field} filter`, className, ...props }: FilterChipProps) {
   return (
-    <Chip className={cn(className)} {...props}>
+    <Chip className={cn(className)} dismissLabel={dismissLabel} {...props}>
       <span className="text-text-secondary">{field}:</span>
       <span className="truncate">{value}</span>
     </Chip>
