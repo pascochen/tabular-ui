@@ -27,7 +27,7 @@ export const Roles: Story = {
           ['success', 100, 'Run complete'],
           ['warning', 84, 'Approaching row-count threshold'],
           ['danger', 96, 'Storage quota nearly exhausted'],
-          ['agent', 40, 'AI rewriting model'],
+          ['agent', 40, 'AI reading attached files'],
         ] as const
       ).map(([tone, value, label]) => (
         <div key={tone} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-bonded)' }}>

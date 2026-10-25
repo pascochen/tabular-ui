@@ -181,7 +181,7 @@ export const WithSelectionAndFilter: Story = {
             className="text-text-secondary"
             style={{ fontSize: 'var(--text-xs)', fontVariantNumeric: 'var(--font-numeric)' }}
           >
-            {count > 0 ? `${count} selected` : `${data.length} models`}
+            {count > 0 ? `${count} selected` : `${data.length} ${data.length === 1 ? 'model' : 'models'}`}
           </span>
         </div>
         <div style={{ flex: 1, minHeight: 0 }}>

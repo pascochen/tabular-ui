@@ -46,7 +46,7 @@ export function PreflightDialog({ open, onOpenChange, files, onConfirm }: Prefli
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Check the material before committing</DialogTitle>
+          <DialogTitle>Check your files before the run</DialogTitle>
           <DialogDescription>
             {files.length} {files.length === 1 ? 'file' : 'files'}, by type. The run reads every file and drafts the
             first evidence sheets.

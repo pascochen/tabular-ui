@@ -18,19 +18,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const rowActions = (
+const rowActions = (name: string) => (
   <>
-    <IconButton aria-label="Download" size="sm">
+    <IconButton aria-label={`Download ${name}`} size="sm">
       <DownloadSimpleIcon />
     </IconButton>
-    <IconButton aria-label="Remove" size="sm">
+    <IconButton aria-label={`Remove ${name}`} size="sm">
       <TrashIcon />
     </IconButton>
   </>
 );
 
 export const Default: Story = {
-  args: { href: '#', actions: rowActions },
+  args: { href: '#', actions: rowActions(meta.args.name) },
 };
 
 /** The glyph comes from the extension, and every one of them is neutral (§0 rule 1). */
@@ -79,7 +79,7 @@ export const EvidenceOnARecord: Story = {
         { name: 'reserve_approval_great_lakes.pdf', attachedBy: 'd.whitfield', timestamp: '1 Oct 16:40' },
         { name: 'bank_export_kjp_2026-09.csv', attachedBy: 'y.matsuda', timestamp: '23 Aug 09:11' },
       ].map((f) => (
-        <AttachmentRow key={f.name} {...f} size="—" href="#" actions={rowActions} />
+        <AttachmentRow key={f.name} {...f} size="—" href="#" actions={rowActions(f.name)} />
       ))}
     </div>
   ),
@@ -101,7 +101,7 @@ export const InAgentBlock: Story = {
         status="agent-proposed"
         href="#"
         actions={
-          <IconButton aria-label="Download" size="sm">
+          <IconButton aria-label="Download unmatched_entries_20260930.csv" size="sm">
             <DownloadSimpleIcon />
           </IconButton>
         }
@@ -133,7 +133,7 @@ export const UploadTarget: Story = {
               size="2.4 MB"
               status="passed"
               actions={
-                <IconButton aria-label="Remove" size="sm" onClick={() => setFile(null)}>
+                <IconButton aria-label={`Remove ${file}`} size="sm" onClick={() => setFile(null)}>
                   <TrashIcon />
                 </IconButton>
               }
@@ -188,7 +188,7 @@ export const Truncation: Story = {
         timestamp="14:02"
         status="passed"
         href="#"
-        actions={rowActions}
+        actions={rowActions('stg_sap__bkpf_bseg_reconciliation_extract_fy26_q3_final_v4.csv')}
       />
     </div>
   ),
@@ -206,7 +206,7 @@ export const Dense: Story = {
         { name: 'stg_sap__bkpf.csv', size: '9.4 MB', status: 'running' as const },
         { name: 'stg_sap__bseg.csv', size: '0 B', status: 'failed' as const },
       ].map((f) => (
-        <AttachmentRow key={f.name} {...f} timestamp="14:02" href="#" actions={rowActions} />
+        <AttachmentRow key={f.name} {...f} timestamp="14:02" href="#" actions={rowActions(f.name)} />
       ))}
     </div>
   ),

@@ -3,7 +3,7 @@
 Product. Composes `Chip`. A chip that names an applied filter.
 
 ```tsx
-<FilterChip field="Owner" value="a.kanzaki" dismissLabel="Remove Owner filter" onDismiss={remove} />
+<FilterChip field="Owner" value="a.kanzaki" onDismiss={remove} />
 ```
 
 ## The field/value split is the point
@@ -20,4 +20,8 @@ Selection is the one exception and uses the interactive role, because selection 
 
 ## Inherited from `Chip`
 
-Border and hover carry interactivity, not radius (§7.7). The dismiss X is its own button, a sibling of the chip's rather than nested in it, and requires `dismissLabel` for its accessible name. See `Chip`'s README.
+Border and hover carry interactivity, not radius (§7.7). The dismiss X is its own button, a sibling of the chip's rather than nested in it. See `Chip`'s README.
+
+## The dismiss label
+
+The X is named "Remove {field} filter" unless `dismissLabel` says otherwise. `Chip`'s own default is a bare "Remove", which repeats on every chip in a filter bar, so a screen reader can't tell them apart. Pass `dismissLabel` only when two chips share a field: "Remove Owner a.kanzaki filter".

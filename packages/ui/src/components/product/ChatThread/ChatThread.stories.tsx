@@ -292,7 +292,9 @@ export const LongThread: Story = {
           status: 'done',
           durationSeconds: 3,
         },
-        text: mono('Done. `dim_accounts` passes all six tests, and `fct_ap_aging` has rebuilt.'),
+        text: mono(
+          "I can't change `dim_accounts`. A dedupe keyed on (`account_id`, `valid_from`) would drop the 412 duplicates.",
+        ),
       },
       ...conversationAt(LAST_STAGE).turns,
     ],
