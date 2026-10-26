@@ -25,7 +25,8 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
   webServer: {
-    command: `pnpm exec vite preview --outDir build/client --port ${port} --strictPort`,
+    // Served as Vercel serves it (tests/serve.mjs), not by vite preview's SPA fallback.
+    command: `node tests/serve.mjs build/client ${port}`,
     url: siteUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

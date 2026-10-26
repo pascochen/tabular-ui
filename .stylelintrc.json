@@ -21,6 +21,23 @@
       "rules": {
         "tui/no-raw-color": null
       }
+    },
+    {
+      "files": ["apps/*/src/**/*.css"],
+      "rules": {
+        "custom-property-pattern": [
+          "^[a-z][a-z0-9]*(-[a-z0-9]+)*(--line-height)?$",
+          {
+            "message": "Custom properties are kebab-case. The one exception is Tailwind's size partner, --text-<name>--line-height, which every size in @theme must declare (docs/design-system.md §8.1)."
+          }
+        ],
+        "declaration-property-value-allowed-list": [
+          { "/^--text-/": ["/^[0-9.]+rem$/"] },
+          {
+            "message": "Only font sizes and their --line-height partners, in rem, may live under --text-* in @theme: that namespace emits font-size utilities, so a colour declared here silently becomes a font size with no build error. Colours belong under --color-text-*. See docs/design-system.md §4 and §7.5."
+          }
+        ]
+      }
     }
   ],
   "rules": {
