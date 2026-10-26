@@ -59,3 +59,58 @@
     --site-section-y: 96px;
   }
 }
+
+/* The hero's ruled sheet (docs/site.md D3, item 3). The outer layer covers the
+   section, softens the rules to 1.16:1 and fades them toward its edges. A mask
+   reads only alpha, so `black` here is opacity, never a painted colour. */
+.site-sheet {
+  opacity: 0.6;
+  mask-image:
+    linear-gradient(to right, transparent, black 12%, black 88%, transparent),
+    linear-gradient(to bottom, transparent, black 20%, black 75%, transparent);
+  mask-composite: intersect;
+}
+
+/* The rules, in the section rules' colour. The layer sits in the rail's content
+   box and reaches one content width plus a gutter past each side: 36 of the
+   rail's columns and gutters. Each column is an element whose left border is
+   the line, because the browser snaps a border to a whole pixel, and a
+   gradient between breakpoints, where the pitch is fractional, drew soft
+   lines. Under 768px every other column is dropped and a track spans two, so
+   a line lands on every other column. Rows are DataTable's row height, a
+   whole pixel, so they stay a gradient, offset to land on the content's top. */
+.site-sheet-rules {
+  left: calc(-100% - var(--site-gap));
+  width: calc(300% + 2 * var(--site-gap));
+  display: grid;
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  column-gap: var(--site-gap);
+  background-image: linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-position: 0 var(--site-section-y);
+  background-size: 100% var(--h-row-sm);
+}
+
+.site-sheet-rules > * {
+  border-left: 1px solid var(--color-border);
+}
+
+.site-sheet-rules > :nth-child(even) {
+  display: none;
+}
+
+@media (width >= 768px) {
+  .site-sheet-rules {
+    grid-template-columns: repeat(36, minmax(0, 1fr));
+  }
+
+  .site-sheet-rules > :nth-child(even) {
+    display: block;
+  }
+}
+
+/* Decoration only: forced colours keep the plate's frame and drop the rules. */
+@media (forced-colors: active) {
+  .site-sheet {
+    display: none;
+  }
+}

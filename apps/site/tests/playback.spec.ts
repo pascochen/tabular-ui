@@ -36,7 +36,7 @@ test.describe('the hero', () => {
 
   test('Replay plays the run back to the proposal, at the same height, and says so once', async ({ page }) => {
     await open(page, '/');
-    const plate = 'section:first-of-type [data-theme="dark"]';
+    const plate = 'section[aria-labelledby="hero-title"] [data-plate]';
     const atRest = await height(page, plate);
     await hero(page).getByRole('button', { name: 'Replay the hero’s run' }).click();
     // Mid-run, the content is busy, so a screen reader doesn't read a half-built frame.
