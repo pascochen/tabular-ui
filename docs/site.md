@@ -63,11 +63,17 @@ The headings also implied that approval hands an entry over to the person. Books
 
 The wireframe's Storybook link, "Proposed, approved and rejected states in Storybook ↗", promises stories that don't exist: AgentBlock's are Default, Awaiting review and Grayscale. Each page links by name instead, for example "Agent block in Storybook ↗", to that component's Docs page.
 
-**D3. Grounds: rules only, or dark plates?** The wireframes draw grey section bands and grey specimen plates. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone. A band or plate tint would need a new token, and lint rejects raw ramp names in `apps/`.
-- *(a) Rules and borders only (recommended for v1).* Sections are separated by a 1px `--color-border` rule and plates by a 1px frame. This is §0 rule 7, "Borders do the work whitespace does elsewhere", and it needs nothing new.
-- *(b) Dark plates.* Each specimen plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']` rather than `:root[…]`, so it works inside a light page, and the components would show in the mode they were designed for (dark-first).
+**D3. Grounds — bands decided 2026-10-25 (owner); plates decided after PR 2.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
-PR 2 builds both on the Home hero for a side-by-side in screenshots, at 1440 and 390, before either spreads.
+1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
+2. **Specimen plates: chosen from screenshots in PR 2.** PR 2 builds the hero and a row of Components cards three ways, with real components, at 1440 and 390:
+   - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
+   - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
+   - *(c) Dark for single specimens:* dark on the hero and the component pages, where one specimen is the subject; paper in the Components and Home grids. The cost is two plate styles to keep consistent.
+
+   To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
+
+**The closing band** is the other dark ground the wireframes draw. It isn't a tint: like option (b), it would be a section set to `data-theme="dark"`, with no new token. Whether it stays dark is decided with the plates, since next to paper plates it would be the page's only dark element.
 
 **D4. Colour mode: light page; both modes on Foundations.** The page itself is light. It does not call `useTheme()`, and `<html data-theme="light">` ships in the prerendered HTML (`tools.md`, "Styling and tokens"). The Color and Typography pages show each sample in both modes side by side, using the same scoping as D3(b). A dark-first system documented only in light would hide the mode the product lives in.
 
@@ -382,7 +388,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 
 0. **This spec**, approved, with D1–D9 and A1–A5 answered.
 1. **Registry forward and a bare site.** Create `apps/site`, add the rewrite, an empty Home and a deploy, and correct `tools.md`. Done when `/r/button.json` on the preview returns the registry item.
-2. **Shell.** Nav, footer, page containers, sections and the specimen frame, plus the `--site-*` tokens, the lint and Stylelint changes with their probe, and Home with static specimens. D3's side-by-side.
+2. **Shell.** Nav, footer, page containers, sections and the specimen frame, plus the `--site-*` tokens, the lint and Stylelint changes with their probe, and Home with static specimens. D3's three-way plate comparison, with the closing band, for the owner to choose from.
 3. **Content read from the repo.** Color, Typography, Constants, the Components index and the computed counts, with the content module and its test.
 4. **Specimens.** The player, the ten specimens, the hero's Post entry, reduced motion and the live region. Needs A5's data export first.
 5. **The rest, and the quality pass.** Principles, the component pages, Vocabulary, Getting started, the 404, §11 and §12 with evidence, and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
