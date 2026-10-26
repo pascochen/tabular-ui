@@ -2,7 +2,7 @@
 
 Source of truth for AI coding assistants working in this repository. Tool and dependency facts live here.
 
-The repository is a pnpm workspace: `packages/ui` is the `tabular-ui` package (components and tokens), `apps/storybook` serves its stories, specs and shadcn registry, and `apps/demo` is the Kasane demo built on the package. Paths below are from the repo root. **Design system rules live in `CLAUDE.md` and `docs/design-system.md` — this file does not restate them.**
+The repository is a pnpm workspace: `packages/ui` is the `tabular-ui` package (components and tokens), `apps/storybook` serves its stories, specs and shadcn registry, `apps/demo` is the Kasane demo built on the package, and `apps/site` is tabularui.com, the public site (`docs/site.md`). Paths below are from the repo root. **Design system rules live in `CLAUDE.md` and `docs/design-system.md` — this file does not restate them.**
 
 ## How AI assistants should use this file
 
@@ -174,6 +174,7 @@ The last rule guards the only failure in this list that produces no error at any
 - `pnpm test` runs axe on every story, and **a violation fails the test** (`a11y.test: 'error'` in `apps/storybook/.storybook/preview.tsx`, since 2026-10-08). A story that cannot pass yet takes a named exception from `packages/ui/src/fixtures/a11y-exceptions.ts` (story data, beside the stories that use it), which turns off one rule on that story and records why. Never lower the mode to get a story green. **Every story runs twice, once per mode** (since 2026-10-09): `apps/storybook/vite.config.ts` has a `storybook (dark)` and a `storybook (light)` Vitest project, each with a setup file (`.storybook/story-theme.{dark,light}.ts`) that names its mode for the preview decorator and fails every story whose page did not render in it. Not Vite's `define`: it is shared across Vitest projects, so with it both projects rendered light and the dark pass silently checked nothing. When changing this, prove it by removing an exemption and checking that only the mode it applies to fails. **Each project also pre-bundles dependencies into its own folder** (`node_modules/.cache/storybook/sb-vitest-{dark,light}`, set by a small `enforce: 'post'` plugin, because Storybook's test plugin overrides `cacheDir` with one folder hashed from the Storybook config). That is a precaution. It was credited with fixing CI failures where the last story files failed to import, which came back unchanged. **Every story file starts with a garbage collection** (`.storybook/story-gc.ts`, since 2026-10-10), and Chromium launches with `--js-flags=--expose-gc` so it can. Playwright's default `--disable-dev-shm-usage` makes Chrome back its shared memory with deleted files in `/tmp`, on the runner's root disk. On CI's two cores each project runs every story file in one page. A removed iframe's share was freed only on a major GC, so Chrome held 11 GB, the disk filled, and the last files failed to load or hung (run 38056871458). `df` sees that space and `du` does not, and it is freed when the browsers close, so no log ever says "No space left on device". If `gc()` is not exposed, every story fails. Do not remove the call to speed the suite up without measuring the disk on CI.
 - The specs, the Storybook config and the Vite and Playwright configs are type-checked by `apps/storybook/tsconfig.json`, and the stories by `packages/ui/tsconfig.json`, where they live: `pnpm typecheck` runs both, and CI runs it.
 - Keep selectors user-facing: role, label, text, accessible name.
+- **The site has its own Playwright suite** (`apps/site/tests/`, `pnpm test:site`, added 2026-10-26). It runs against the prerendered build in `apps/site/build/client`, the files Vercel serves, so build first (`pnpm build:site`). Every route gets the same page-level checks: light mode, `lang`, a title, one `<h1>`, a `<main>`, content in the HTML before JavaScript, and **no axe violation at the WCAG 2.2 AA tags** (`@axe-core/playwright`). A route is covered once it's added to the list in `pages.spec.ts`. Its port is derived from the checkout's path, as Storybook's is, and `SITE_PORT` overrides it (`apps/site/tests/site-port.mjs`). The axe check was proved to fail: an image without `alt` on Home failed it with `image-alt`.
 
 #### Story tests that stop making progress
 
@@ -244,6 +245,7 @@ A cloud session starts on a fresh VM from a fresh clone: no `node_modules`, and 
 
 Verify takes about 25–27 minutes and is capped at 45 (raised from 30 on 2026-10-20, when 22 declared story files ran out of time in the visual step, which renders every changed screenshot again on retry). While the repository is private, its minutes count against the owner's GitHub plan; once public, standard runners are free. If the plan's minutes run out, GitHub stops starting jobs: every check fails in 2–3 seconds with no steps, and the job's annotation names billing or a spending limit. **That is billing, not code**: read the annotation before diagnosing.
 
+- **Site-only PRs skip the library's suites** (since 2026-10-26). When every changed file is under `apps/site/` or is `.md`, the `Scope` step sets `site_only`: the story tests, design system specs and visual regression are skipped, and Verify runs install, lint, type-check, `pnpm build:ui && pnpm build:site` and `pnpm test:site`. Any other non-docs PR runs everything, and `pnpm build` and `pnpm test:site` include the site, because a library change can break a page. `Verify` stays the one required check, whichever steps ran.
 - **Docs-only PRs skip verification.** The `Scope` step in `ci.yml` diffs the PR's merge commit against `main`. If every changed file is `.md`, every later step is skipped and Verify passes in about a minute. `.mdx` is not docs (Storybook loads it). Pushes to `main` and any PR whose file list can't be read run in full. If a test, build or story ever starts reading a `.md` file, remove the skip.
 - **Every re-run is another full run.** Re-run a failed Verify only when the failure is understood. Avoid multi-job experiments on CI unless the question can't be answered locally.
 
@@ -272,11 +274,12 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 - **Build:** `pnpm build:registry` runs `packages/ui/scripts/build-registry.mjs`, which writes `packages/ui/registry.json` from the component folders and their imports (never edit it by hand), then runs `shadcn build` (pinned in the script, run through `pnpm dlx`, never installed) into `apps/storybook/public/r/`. That folder is gitignored and rebuilt by `pnpm build`.
 - **Items:** one per component, one per shared module (`utils`, `theme-mode`, `motion`, `elapsed`, `control-base`, `popup-surface`, `danger-variant`, `working-label`), `tokens` (the stylesheets, with a `tokens.css` that leaves out `@import 'tailwindcss'`), and `all`. Every component depends on `tokens`.
 - **Installed layout:** every file is `registry:file` with a target under `@components/tabular-ui/`, mirroring `packages/ui/src`. shadcn copies a `registry:file` byte for byte, so the relative imports between files resolve as they do here, and an install never replaces the app's own `lib/utils`. Verified 2026-10-23 by installing `all` into a fresh Vite app from a local server: 71 files, byte-identical, and the app built and rendered.
-- **URLs:** `registryDependencies` use `https://tabularui.com/r/<name>.json`, served by a rewrite on the owner's site to `storybook.tabularui.com/r/`. `REGISTRY_URL` overrides the base, e.g. for a local test.
+- **URLs:** `registryDependencies` use `https://tabularui.com/r/<name>.json`, served by a rewrite in `apps/site/vercel.json` to `storybook.tabularui.com/r/`. `REGISTRY_URL` overrides the base, e.g. for a local test.
 
 ### Platform / delivery
 
-- **Hosting:** Vercel, two projects from this repository: `apps/storybook` at `storybook.tabularui.com` (Storybook and the registry under `/r`), and `apps/demo` at `demo.tabularui.com`. `tabularui.com` itself is the owner's private site, which rewrites `/r/*` to Storybook.
+- **Hosting:** Vercel, three projects from this repository: `apps/storybook` at `storybook.tabularui.com` (Storybook and the registry under `/r`), `apps/demo` at `demo.tabularui.com`, and `apps/site` at `tabularui.com` (since 2026-10-26; until then the README's registry URLs had no site behind them and returned 404).
+- **The site's Vercel settings are in `apps/site/vercel.json`**, so the dashboard needs only the Root Directory, `apps/site`. It installs the workspace with the lockfile, builds the package and then the site (`pnpm --filter tabular-ui build && pnpm build`), serves the prerendered `build/client`, and rewrites `/r/*` to Storybook. `framework` is `null` on purpose: the site is static, so no server preset applies.
 - Do not add deployment-specific dependencies.
 - Prefer portable scripts and environment variable names.
 
@@ -287,8 +290,10 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | Command | Purpose |
 |---|---|
 | `pnpm dev` | The demo, with the package rebuilding on change |
+| `pnpm dev:site` | The site, with the package rebuilding on change |
 | `pnpm storybook` | Storybook dev server |
-| `pnpm build` | The package, the registry, Storybook, then the demo |
+| `pnpm build` | The package, the registry, Storybook, the demo, then the site |
+| `pnpm build:site` | The site only: React Router prerenders every route into `apps/site/build/client`. Needs the package built. |
 | `pnpm build:ui` | The package only |
 | `pnpm build:registry` | `registry.json` and the registry JSON in `apps/storybook/public/r` |
 | `pnpm lint` | ESLint + Stylelint + Prettier, failing on any warning. **Run this first.** |
@@ -297,6 +302,7 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | `pnpm test:watch` | The story tests in watch mode |
 | `pnpm test:playwright` | Playwright browser checks, on this checkout's own Storybook port (see above) |
 | `pnpm test:visual` | Screenshot comparison (Linux only; CI) |
+| `pnpm test:site` | The site's page checks and axe, against its built pages, on this checkout's own port |
 | `pnpm changeset` | Record a change to the package for the next release |
 | `pnpm --filter tabular-ui palette` | Regenerate the palette |
 | `pnpm --filter tabular-ui contrast` | Check every colour token's contrast |

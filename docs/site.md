@@ -186,7 +186,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 - `tools.md` and `CLAUDE.md`'s "File structure", updated for the third app and the third Vercel project.
 
 **A3. Lint (§8):**
-- An `eslint.config.js` block for `apps/site/src/**` that lifts only the spacing cap, for `--site-*` tokens, and keeps every other rule, with a probe proving it.
+- An `eslint.config.js` change for `apps/site/src/**`, keeping every rule. As built, no spacing exception was needed, and the block that was needed is for `react-refresh` (§8).
 - Stylelint's glob in `pnpm lint` widens to **`apps/*/src/**/*.css`**, so the demo's CSS is checked too. Until now no app's CSS was linted. No Stylelint rule changes: the spacing cap reads raw `px` values, so `var(--site-section-y)` passes and a raw `padding: 96px` still fails.
 
 **A4. CI (§10):** a `site_only` flag in `ci.yml`'s Scope step. A site-only PR skips the library suites. Every other non-docs PR adds the site build and the site tests. `Verify` stays the one required check, and nothing is renamed.
@@ -418,12 +418,12 @@ Weight never exceeds 600. Each size is declared with its line height. Each is al
 
 `eslint.config.js` already applies the full design gate to `apps/*/src/**`, and allows frame spacing only in `apps/*/src/App.tsx`, capped at 64px. The site's 96px section padding fails it, as it should until this spec is approved.
 
-**The change (A3).**
-- A block for `apps/site/src/**` lifts only the spacing cap, and only to the `--site-*` tokens.
-- It keeps every other rule: raw hues and hex, 900/950 backgrounds, weights over 600, softened corners, shadows, inline styles, hand-made `<button>`, and `tone` not `role`.
-- The config warns that a block which redeclares `no-restricted-syntax` must restate every selector, or it loses the rest of the gate. The block is built by spreading the same arrays.
-- A probe file run through `eslint --stdin` proves the kept rules still fail in `apps/site`. A regex gate fails open, and silence looks like a pass.
-- Stylelint runs on `apps/*/src/**/*.css` with the same rules and no rule change: the caps read raw `px`, so values held in `--site-*` tokens pass and raw ones still fail (A3).
+**The change (A3), as built in PR 1 (2026-10-26).** It turned out smaller than planned:
+- **No spacing exception was needed.** The gate caps named utilities (`p-10`) and bracketed lengths (`py-[96px]`). A value held in a token, `py-[var(--site-section-y)]`, carries no length for it to read. A probe through `eslint --stdin` as `apps/site/src/routes/Probe.tsx` showed the token line passing, with all six deliberate violations failing: a spacing multiplier, a bracketed 96px, a raw hue, a 12px radius, `--pad-frame-x` outside `App.tsx`, and a hand-made `<button>`. A regex gate fails open, and silence looks like a pass, which is why the probe ran.
+- **What the site needed instead was a `react-refresh` block.** React Router route modules export `meta`, `Layout` and other route functions beside the component. `react-refresh/only-export-components` flags those, so a block for `apps/site/src/**/*.tsx` lists them as allowed names.
+- **Route modules live in `src/`** (`appDirectory: 'src'` in `react-router.config.ts`), not React Router's default `app/`. The gate covers `apps/*/src/**`, and route modules in `app/` would have skipped every rule with no error.
+- The generated `apps/site/build` and `apps/site/.react-router` are ignored by ESLint and Prettier.
+- Stylelint runs on `apps/*/src/**/*.css` with the same rules and no rule change: the caps read raw `px`, so values held in `--site-*` tokens pass and raw ones still fail.
 
 **Never change `packages/ui` to make the site work.** If a component is missing something, stop and raise it: a library change is its own decision.
 

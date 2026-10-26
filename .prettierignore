@@ -24,6 +24,8 @@ coverage/
 apps/storybook/tests/visual.spec.ts-snapshots/
 apps/*/public/
 .registry/
+apps/site/build/
+apps/site/.react-router/
 
 # Changesets writes its own Markdown; the demo's fixtures are generated JSON
 .changeset/
