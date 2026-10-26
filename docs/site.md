@@ -103,7 +103,16 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
    - `docs/agent-voice.md` quoted "¥316m of the ¥355m shortfall", the sum of rounded parts. It's corrected to ¥317m.
 4. **The posted entry's journal number is computed, never typed.** `export-fixtures.mjs` derives the next number in KUS's October sequence from `manual_journal_entries_fy2026_h1.csv`, in the format `JE-KUK-2608-00055` uses (A5).
 
-**D6. The hero rests; it does not autoplay.** The wireframe note says the hero "Plays once on load". The hero is the first screen. If it autoplays, the prerendered page shows the decision frame, then JavaScript rewinds it to frame 1 and plays it: a visible jump on the most-viewed frame of the site. The hero's motion is the visitor's own: pressing Post entry. Specimens lower down play once when they scroll into view (§6).
+**D6. The hero rests — decided 2026-10-25 (owner).** The wireframe note (`76:45`) says the hero "Plays once on load". The site is prerendered, so a specimen ships one frozen frame, and that frame is all a crawler, a link preview, a visitor without JavaScript or one with reduced motion sees. If that frame is the resting proposal, autoplay means JavaScript rewinds it to an empty plate and plays forward, on the most-viewed spot of the site. If it's the first frame, every link preview shows a question with no answer.
+
+The headline's claim is that an agent stops. A hero that is already stopped, waiting for the visitor, shows that claim, where an animation would only end on it. The visitor is the person the agent is waiting for.
+
+1. **On load the hero rests on the proposal**: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. Nothing moves.
+2. **The one motion is the visitor's.** Pressing Post entry sets the label to "AI · Posted" and `meta` to "posted by you", removes the actions, and writes the run log row (D1, D2).
+3. **Then a single control appears: Replay.** It plays the whole run (question, answer, proposal) in 5 seconds or less, and stops at the proposal, waiting again.
+4. **The run log row's space is held by a dashed slot** reading "Run log row is written here after Post" (draft copy). Dashed means placeholder (§7.8, "Border style"). The slot keeps the page from jumping when the row arrives, and says what Post will do before it's pressed.
+
+Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
 **D7. Closing band copy.** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components". `demo.tabularui.com` is the onboarding journey: an agent reads Kasane's finance files and reports what it learned and what doesn't add up (`apps/demo/data/discovery.json`, `findings.json`). Neither line is true of it. *Draft:* heading "Watch an agent learn a company's books."; line "Kasane is a fictional printer maker. In the demo, an agent reads its finance files and reports what doesn't add up."; action "Open the demo ↗". To be checked against `docs/agent-voice.md` and the copywriter review.
 
@@ -281,7 +290,12 @@ A test checks that every displayed total in an exact view equals the sum of its 
 - **One announcement.** A polite live region announces the final state once ("Posted"), never each step. It empties after it has been read, as `AgentReasoning` does with its own region.
 - **No randomness, no network, no AI.** A specimen is a script.
 
-**The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row beneath it, `passed` (D1, D2). That is the hero's one sequence, and the visitor starts it. Reset returns it to the proposal.
+**The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. A dashed slot below it holds the run log row's space.
+- Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row into the slot, `passed` (D1, D2).
+- Replay then plays the run from the question back to the waiting proposal, in 5 seconds or less.
+- Edit entry and Don't post are real controls. What each does in the specimen is open: owner copy, settled in PR 4.
+
+On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draws it.
 
 **What each built specimen shows** (proposals; owner copy and D5's data):
 
