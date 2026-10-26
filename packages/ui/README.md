@@ -82,6 +82,12 @@ Then add the tokens after Tailwind in the app's main stylesheet:
 - **The init's font import** (`@fontsource-variable/geist` with the nova preset). Nothing uses it: `tokens.css` loads Source Sans 3, Source Serif 4 and Source Code Pro.
 - **Its `@import 'tw-animate-css'`.** `tokens.css` already imports it.
 
+The init installed the `shadcn` and Geist packages only for those imports, so remove them too. Keep `tw-animate-css`, which `tokens.css` uses:
+
+```bash
+pnpm remove shadcn @fontsource-variable/geist
+```
+
 `useTheme()` and `TooltipProvider` are needed as above. Without `all`, they come from their own items:
 
 ```bash
