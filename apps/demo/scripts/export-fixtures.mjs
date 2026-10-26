@@ -14,6 +14,7 @@
 //   apps/demo/data/company.json          the company and the visitor's persona
 //   apps/demo/data/discovery.json        what the agent says it learned, and from which files
 //   apps/demo/data/findings.json         contradictions, gaps and follow-ups, and their files
+//   apps/site/data/kasane.json           the public site's specimen records (docs/site.md §5)
 //
 // Only what the demo's screens read is written: no file contents, no rows.
 // Re-running it on an unchanged dataset produces no diff.
@@ -23,7 +24,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as prettier from 'prettier';
 
-// The repo root: this script writes into apps/demo and packages/ui.
+// The repo root: this script writes into apps/demo, apps/site and packages/ui.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 if (!process.env.KASANE_DATA_DIR) {
   throw new Error('Set KASANE_DATA_DIR to the root of the Kasane dataset. It is not in this repository.');
@@ -862,6 +863,40 @@ await writeJson('apps/demo/data/findings.json', {
   contradictions: contradictions.map(curlyCopy),
   gaps: gaps.map(curlyCopy),
   followUps: followUps.map(curlyCopy),
+});
+
+// The public site (apps/site, docs/site.md §5 and D5): exactly the records its specimens show, and
+// nothing it would have to type. The hero proposes reversing the duplicate supplier invoice; once a
+// person posts it, the entry takes the next journal number in that entity's open month. Numbers run
+// per entity per month (JE-KUK-2608-00055), so the next one is computed from the journal, never assumed.
+const JE_ID = /^JE-[A-Z]{3}-\d{4}-\d{5}$/;
+must(
+  journal.some((l) => JE_ID.test(l.je_id)),
+  'journal entry IDs in the JE-<entity>-<YYMM>-<number> form',
+);
+const jePrefix = `JE-${dup[0].entity_id}-${OPEN.period.slice(2, 4)}${OPEN.period.slice(5, 7)}-`;
+const openNumbers = journal.filter((l) => l.je_id.startsWith(jePrefix)).map((l) => Number(l.je_id.slice(-5)));
+await writeJson('apps/site/data/kasane.json', {
+  company: {
+    name: fixtures.company.name,
+    legalName: fixtures.company.legalName,
+    lastClosedPeriod: fixtures.company.lastClosedPeriod,
+    openPeriod: fixtures.company.openPeriod,
+    persona: { name: people.fpa.name, title: people.fpa.title },
+  },
+  pack: pack.map(({ name, kind, bytes }) => ({ name, kind, bytes })),
+  findings: { contradictions: contradictions.length, gaps: gaps.length, followUps: followUps.length },
+  duplicatePayment: {
+    entity: dup[0].entity_id,
+    supplierInvoice: dup[0].supplier_invoice_number,
+    entries: dup.map((d) => d.ap_invoice_id),
+    amount: num(dup[0].gross_amount),
+    currency: dup[0].currency,
+    paid: dupPaid,
+    sources: [T.arap, P.supplierInvoices],
+    nextJournalId: `${jePrefix}${String(Math.max(0, ...openNumbers) + 1).padStart(5, '0')}`,
+  },
+  operatingBridge: fixtures.operatingBridge,
 });
 
 console.log(

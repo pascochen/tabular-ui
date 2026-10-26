@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25. The specimen plates in D3 are still chosen from screenshots in PR 2. The approvals A1–A5 are given. Nothing in `apps/site` exists yet.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 and 2 of §13 are built: `apps/site` is live at tabularui.com.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -14,7 +14,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 |---|---|---|
 | D1 | Status words | From the components; principle 3 reworded; "AI working"; "AI · Posted" for a posted entry |
 | D2 | Before/after pair | No plate headings; the posted block keeps its rail and adds "posted by you"; a pair on every component page |
-| D3 | Grounds | Bands: rules only. Plates: from PR 2's screenshots |
+| D3 | Grounds | Bands: rules only. Plates: dark for single specimens (hero, component pages), paper in grids. Closing band dark |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after |
@@ -75,17 +75,17 @@ The headings also implied that approval hands an entry over to the person. Books
 
 The wireframe's Storybook link, "Proposed, approved and rejected states in Storybook ↗", promises stories that don't exist: AgentBlock's are Default, Awaiting review and Grayscale. Each page links by name instead, for example "Agent block in Storybook ↗", to that component's Docs page.
 
-**D3. Grounds — bands decided 2026-10-25 (owner); plates decided after PR 2.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
+**D3. Grounds — bands decided 2026-10-25, plates and the closing band 2026-10-26 (owner): (c), dark for single specimens.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
 1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
-2. **Specimen plates: chosen from screenshots in PR 2.** PR 2 builds the hero and a row of Components cards three ways, with real components, at 1440 and 390:
+2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
    - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
    - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
    - *(c) Dark for single specimens:* dark on the hero and the component pages, where one specimen is the subject; paper in the Components and Home grids. The cost is two plate styles to keep consistent.
 
    To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
 
-**The closing band** is the other dark ground the wireframes draw. It isn't a tint: like option (b), it would be a section set to `data-theme="dark"`, with no new token. Whether it stays dark is decided with the plates, since next to paper plates it would be the page's only dark element.
+**The closing band is dark**, decided with the plates. It isn't a tint: it's a section set to `data-theme="dark"`, with no new token, and it sets its own ground and text colour.
 
 **D4. Colour mode — decided 2026-10-25 (owner).** Page mode and specimen mode are separate axes: `[data-theme='dark']` scopes to any element, so a light page can hold dark specimens. D3 decides specimen mode from PR 2's screenshots. This decides the page.
 
@@ -113,7 +113,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
    - Rounded separately, the bridge's two FX steps show as ¥41m and ¥275m, which add to ¥316m. Their exact sum rounds to ¥317m. A total that doesn't match its displayed parts is a footing error, and finance readers distrust the whole screen when they see one.
    - So a sentence says "¥317m", while a lineage tree or a table shows exact yen (¥316,748,831 beside ¥41,415,809 and ¥275,333,022), and its parts always add up.
    - `docs/agent-voice.md` quoted "¥316m of the ¥355m shortfall", the sum of rounded parts. It's corrected to ¥317m.
-4. **The posted entry's journal number is computed, never typed.** `export-fixtures.mjs` derives the next number in KUS's October sequence from `manual_journal_entries_fy2026_h1.csv`, in the format `JE-KUK-2608-00055` uses (A5).
+4. **The posted entry's journal number is computed, never typed.** `export-fixtures.mjs` derives the next number in KUS's October sequence from the general ledger's journal, in the format `JE-KUK-2608-00055` uses (A5). As generated on 2026-10-26 it is `JE-KUS-2610-00040`: October already holds 39 KUS entries, because the data runs to 15 Oct.
 
 **D6. The hero rests — decided 2026-10-25 (owner).** The wireframe note (`76:45`) says the hero "Plays once on load". The site is prerendered, so a specimen ships one frozen frame, and that frame is all a crawler, a link preview, a visitor without JavaScript or one with reduced motion sees. If that frame is the resting proposal, autoplay means JavaScript rewinds it to an empty plate and plays forward, on the most-viewed spot of the site. If it's the first frame, every link preview shows a question with no answer.
 
@@ -192,7 +192,8 @@ Specimens below the first screen play once as they scroll into view, from a fram
 **A4. CI (§10):** a `site_only` flag in `ci.yml`'s Scope step. A site-only PR skips the library suites. Every other non-docs PR adds the site build and the site tests. `Verify` stays the one required check, and nothing is renamed.
 
 **A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5): the two duplicate entries, the operating bridge, the pack's file names and sizes, the persona, and the next KUS October journal number.
-- Entries are numbered per entity per month (`JE-KUK-2608-00055`), and October has no entries yet (`findings.json`, `october-open`), so the number is `JE-KUS-2610-00001`. The script checks the dataset holds no October KUS entry before writing it, and stops if it finds one.
+- Entries are numbered per entity per month (`JE-KUK-2608-00055`). The script takes the highest number in KUS's open month from the journal and adds one, and stops if the journal's IDs no longer follow that form. *Corrected 2026-10-26:* this spec first assumed October had no entries yet, so `JE-KUS-2610-00001`. The `october-open` gap means October has no month-end entries; its daily entries run to 15 Oct, 39 of them for KUS, so the first export wrote `JE-KUS-2610-00040`. Assuming would have shipped a number that already exists.
+- The export needs the full dataset, `onboarding/` included: a copy without the interview transcripts stops at its first check. Run against the right copy, the export reproduces every file already in the repo byte for byte. That is the check that the dataset is the one the repo was generated from.
 - It reads the full Kasane dataset, which lives outside the repo, so the owner runs it, once the change lands and before PR 4.
 
 ---
@@ -431,7 +432,7 @@ Weight never exceeds 600. Each size is declared with its line height. Each is al
 
 A third Vercel project, `apps/site`, at `tabularui.com`, with `www.tabularui.com` redirecting to it. The owner creates the project and attaches the domain.
 
-- **Today** `tabularui.com` resolves to Vercel and answers `DEPLOYMENT_NOT_FOUND`. If the domain is still attached to another project, detach it there first.
+- **Live since 2026-10-26.** `tabularui.com` is the `tabular-ui-site` project's production domain, in the same Vercel team as Storybook and the demo, with `www.tabularui.com` redirecting to it (308). The domain was bought through Vercel and uses Vercel DNS, so no registrar change was needed. It had never been attached to a project, which is why it answered `DEPLOYMENT_NOT_FOUND` before.
 - **`apps/site/vercel.json`** rewrites `/r/:path*` to `https://storybook.tabularui.com/r/:path*`. It ships in the first deploy. It makes the README's install commands and every `registryDependencies` URL work (`tools.md`, "shadcn registry"); today they return 404.
 - **`tools.md`** "Platform / delivery" calls tabularui.com "the owner's private site". The first site PR corrects it to three projects.
 - **Preview deployments** sit behind Vercel's login by default. Check `/r/button.json` on a preview in a logged-in browser; a plain `curl` gets 401.
@@ -469,7 +470,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places.
 - ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it.
-- Contrast is measured on the ground the text sits on, including dark plates if D3(b) is chosen.
+- Contrast is measured on the ground the text sits on, including the dark hero plate, the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 
 **Manual, by the owner:** a VoiceOver pass in Safari on Home, Components and one component page, following a written 10-step script delivered with the final PR.
@@ -492,5 +493,13 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 3. **Content read from the repo.** Color, Typography, Density, the Components index and the computed counts, with the content module and its test.
 4. **Specimens.** The player, the ten specimens, the hero's Post entry, reduced motion and the live region. Needs A5's data export first.
 5. **The rest, and the quality pass.** Principles, the component pages, Vocabulary, Getting started, the 404, §11 and §12 with evidence, and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
+
+**Step 2, as built (2026-10-26):**
+- `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids.
+- A link to a page that isn't built yet is left out (`pages` in `src/content.ts`, each with `live`), so the site never links to a 404 while it grows page by page. The nav shows only its external links, the outline's "15 components" jumps to the moments, and the footer drops empty columns.
+- The hero's question is a plain line above the block, not a `ChatThread` user turn. `ChatThread`'s assistant turn takes no actions, and the proposal can't be a second block inside it (one `AgentBlock` per turn). That's a library gap, raised rather than worked around.
+- The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`.
+- The outline's three links are sans, not the wireframe's serif: they are links, and only a heading element goes serif (§8.3 of the design system).
+- The site's test server is `tests/serve.mjs`, which serves files as Vercel does. `vite preview` answered `/plates` with the Home page's HTML, React hydrated `/plates` over it, and every element rendered twice with no error. A test now checks that each route's HTML is its own.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

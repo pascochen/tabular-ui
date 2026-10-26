@@ -30,3 +30,4 @@ apps/site/.react-router/
 # Changesets writes its own Markdown; the demo's fixtures are generated JSON
 .changeset/
 apps/demo/data/
+apps/site/data/

@@ -1,0 +1,54 @@
+{
+  "company": {
+    "name": "Kasane",
+    "legalName": "Kasane Corporation",
+    "lastClosedPeriod": "2026-09",
+    "openPeriod": "2026-10",
+    "persona": { "name": "Mei Tachibana", "title": "Head of FP&A" }
+  },
+  "pack": [
+    { "name": "01_kickoff_cfo_2026-10-12.txt", "kind": "transcript", "bytes": 6899 },
+    { "name": "02_interview_fpa_2026-10-13.txt", "kind": "transcript", "bytes": 7356 },
+    { "name": "03_interview_controller_2026-10-13.txt", "kind": "transcript", "bytes": 5264 },
+    { "name": "04_interview_treasury_2026-10-14.txt", "kind": "transcript", "bytes": 4250 },
+    { "name": "05_interview_ar_ap_2026-10-14.txt", "kind": "transcript", "bytes": 4376 },
+    { "name": "06_interview_plant_cost_2026-10-15.txt", "kind": "transcript", "bytes": 4077 },
+    { "name": "company_profile.md", "kind": "document", "bytes": 5899 },
+    { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
+    { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
+    { "name": "close_memo_2026-09.md", "kind": "document", "bytes": 4804 },
+    { "name": "forecast_memo_fy2026_6+6.md", "kind": "document", "bytes": 3702 },
+    { "name": "trial_balance_monthly.csv", "kind": "spreadsheet", "bytes": 564953 },
+    { "name": "chart_of_accounts.csv", "kind": "spreadsheet", "bytes": 13475 },
+    { "name": "ar_aging_monthly.csv", "kind": "spreadsheet", "bytes": 690470 },
+    { "name": "budget_forecast_monthly.csv", "kind": "spreadsheet", "bytes": 1369105 },
+    { "name": "manual_journal_entries_fy2026_h1.csv", "kind": "spreadsheet", "bytes": 4875 },
+    { "name": "supplier_invoices_fy2026_h1.csv", "kind": "spreadsheet", "bytes": 118688 },
+    { "name": "sales_invoices_2026-09.csv", "kind": "spreadsheet", "bytes": 143488 },
+    { "name": "bank_export_kjp_2026-09.csv", "kind": "spreadsheet", "bytes": 2904 },
+    { "name": "org_chart_finance_2026-10.png", "kind": "image", "bytes": 119615 }
+  ],
+  "findings": { "contradictions": 6, "gaps": 8, "followUps": 10 },
+  "duplicatePayment": {
+    "entity": "KUS",
+    "supplierInvoice": "MFL-58821",
+    "entries": ["API-KUS-2607-00007", "API-KUS-2607-00011"],
+    "amount": 48216.4,
+    "currency": "USD",
+    "paid": [true, true],
+    "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"],
+    "nextJournalId": "JE-KUS-2610-00040"
+  },
+  "operatingBridge": {
+    "budget": 2547970754,
+    "steps": [
+      { "id": "fx-subsidiaries", "label": "Exchange rates: subsidiary profits worth fewer yen", "value": -41415809 },
+      { "id": "fx-intercompany", "label": "Exchange rates: KJP margin on intercompany sales", "value": -275333022 },
+      { "id": "bad-debt", "label": "Great Lakes Duplicating Supply reserve (US)", "value": -112654251 },
+      { "id": "vacancy", "label": "Seventh-floor vacancy (real estate)", "value": -37800000 },
+      { "id": "personnel", "label": "Personnel costs (hiring freeze)", "value": 417533766 },
+      { "id": "other", "label": "Gross profit at constant rates and other", "value": -305523245 }
+    ],
+    "actual": 2192778193
+  }
+}
