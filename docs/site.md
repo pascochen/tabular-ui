@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25. The specimen plates in D3 are still chosen from screenshots in PR 2. The approvals A1–A5 are given. Nothing in `apps/site` exists yet.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 and 2 of §13 are built: `apps/site` is live at tabularui.com.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -14,7 +14,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 |---|---|---|
 | D1 | Status words | From the components; principle 3 reworded; "AI working"; "AI · Posted" for a posted entry |
 | D2 | Before/after pair | No plate headings; the posted block keeps its rail and adds "posted by you"; a pair on every component page |
-| D3 | Grounds | Bands: rules only. Plates: from PR 2's screenshots |
+| D3 | Grounds | Bands: rules only. Plates: dark for single specimens (hero, component pages), paper in grids. Closing band dark |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after |
@@ -75,17 +75,17 @@ The headings also implied that approval hands an entry over to the person. Books
 
 The wireframe's Storybook link, "Proposed, approved and rejected states in Storybook ↗", promises stories that don't exist: AgentBlock's are Default, Awaiting review and Grayscale. Each page links by name instead, for example "Agent block in Storybook ↗", to that component's Docs page.
 
-**D3. Grounds — bands decided 2026-10-25 (owner); plates decided after PR 2.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
+**D3. Grounds — bands decided 2026-10-25, plates and the closing band 2026-10-26 (owner): (c), dark for single specimens.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
 1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
-2. **Specimen plates: chosen from screenshots in PR 2.** PR 2 builds the hero and a row of Components cards three ways, with real components, at 1440 and 390:
+2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
    - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
    - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
    - *(c) Dark for single specimens:* dark on the hero and the component pages, where one specimen is the subject; paper in the Components and Home grids. The cost is two plate styles to keep consistent.
 
    To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
 
-**The closing band** is the other dark ground the wireframes draw. It isn't a tint: like option (b), it would be a section set to `data-theme="dark"`, with no new token. Whether it stays dark is decided with the plates, since next to paper plates it would be the page's only dark element.
+**The closing band is dark**, decided with the plates. It isn't a tint: it's a section set to `data-theme="dark"`, with no new token, and it sets its own ground and text colour.
 
 **D4. Colour mode — decided 2026-10-25 (owner).** Page mode and specimen mode are separate axes: `[data-theme='dark']` scopes to any element, so a light page can hold dark specimens. D3 decides specimen mode from PR 2's screenshots. This decides the page.
 
@@ -470,7 +470,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places.
 - ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it.
-- Contrast is measured on the ground the text sits on, including dark plates if D3(b) is chosen.
+- Contrast is measured on the ground the text sits on, including the dark hero plate, the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 
 **Manual, by the owner:** a VoiceOver pass in Safari on Home, Components and one component page, following a written 10-step script delivered with the final PR.
@@ -495,7 +495,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 5. **The rest, and the quality pass.** Principles, the component pages, Vocabulary, Getting started, the 404, §11 and §12 with evidence, and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 
 **Step 2, as built (2026-10-26):**
-- `/plates` holds D3's comparison: the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c). It is prerendered, unlinked and `noindex`, and is removed once the owner chooses. Until then every ground is `defaultGround`, paper, in `src/components/specimen.tsx`.
+- `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids.
 - A link to a page that isn't built yet is left out (`pages` in `src/content.ts`, each with `live`), so the site never links to a 404 while it grows page by page. The nav shows only its external links, the outline's "15 components" jumps to the moments, and the footer drops empty columns.
 - The hero's question is a plain line above the block, not a `ChatThread` user turn. `ChatThread`'s assistant turn takes no actions, and the proposal can't be a second block inside it (one `AgentBlock` per turn). That's a library gap, raised rather than worked around.
 - The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`.

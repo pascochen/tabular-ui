@@ -1,29 +1,24 @@
 import { buttonVariants } from 'tabular-ui';
 
 import { ExternalMark, Rail, Section, SectionHeader } from './components/layout';
-import { ComponentCard, ComponentTag, defaultGround, type Ground, SpecimenFrame } from './components/specimen';
+import { ComponentTag, SpecimenFrame } from './components/specimen';
 import { components, external, moments, pages, principles } from './content';
 import { kasane } from './data';
 import { cn } from './lib/cn';
 import { focusRing } from './lib/styles';
 import { HeroSpecimen } from './specimens';
 
-/**
- * Home's sections (wireframe `76:23`, mobile `77:96`), as parts the plate
- * comparison at /plates reuses with each ground.
- */
+/** Home's sections (wireframe `76:23`, mobile `77:96`). */
 
-export function HeroSection({ ground = defaultGround, as: Heading = 'h1' }: { ground?: Ground; as?: 'h1' | 'h2' }) {
+/** The hero's one specimen sits on a dark plate (D3, decided (c)). */
+export function HeroSection() {
   return (
     <Section rule={false} labelledBy="hero-title">
       <Rail className="grid grid-cols-1 items-start gap-[var(--site-gap)] lg:grid-cols-12">
         <div className="flex flex-col gap-[var(--site-gap)] lg:col-span-5">
-          <Heading
-            id="hero-title"
-            className="text-site-display-sm font-semibold text-text-primary md:text-site-display"
-          >
+          <h1 id="hero-title" className="text-site-display-sm font-semibold text-text-primary md:text-site-display">
             An agent stops before anything that posts to the ledger.
-          </Heading>
+          </h1>
           <p className="text-site-lead text-text-secondary">
             Proposals are cheap. Journal entries are not. Only a person can release one.
           </p>
@@ -39,7 +34,7 @@ export function HeroSection({ ground = defaultGround, as: Heading = 'h1' }: { gr
             ) : null}
           </div>
         </div>
-        <SpecimenFrame ground={ground} className="lg:col-span-7">
+        <SpecimenFrame ground="dark" className="lg:col-span-7">
           <HeroSpecimen />
         </SpecimenFrame>
       </Rail>
@@ -172,14 +167,15 @@ export function MomentsSection() {
   );
 }
 
-/** The closing band (D7): Home only. Its ground is decided with the plates (D3). */
-export function ClosingBand({ ground = defaultGround }: { ground?: Ground }) {
+/**
+ * The closing band (D7): Home only, and dark (D3, decided (c)): a section set to
+ * data-theme="dark", so every token recomputes inside it, with its own ground
+ * and text colour. No tint, no new token.
+ */
+export function ClosingBand() {
   return (
     <Section labelledBy="closing-title" className="p-0">
-      <div
-        data-theme={ground === 'dark' ? 'dark' : undefined}
-        className="bg-canvas py-[var(--site-section-y)] text-text-body"
-      >
+      <div data-theme="dark" className="bg-canvas py-[var(--site-section-y)] text-text-body">
         <Rail size="reading" className="flex flex-col items-center gap-[var(--site-gap)] text-center">
           <h2 id="closing-title" className="text-site-heading-sm font-semibold text-text-primary md:text-site-heading">
             Give an agent a finance team’s files.
@@ -196,21 +192,5 @@ export function ClosingBand({ ground = defaultGround }: { ground?: Ground }) {
         </Rail>
       </div>
     </Section>
-  );
-}
-
-/** One row of Components cards, for the plate comparison (D3): the Thinking moment. */
-export function CardRow({ ground, children }: { ground: Ground; children: Record<string, React.ReactNode> }) {
-  const row = components.filter((c) => c.moment === 'thinking');
-  return (
-    <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
-      {row.map((c) => (
-        <li key={c.name}>
-          <ComponentCard component={c} ground={ground}>
-            {children[c.name]}
-          </ComponentCard>
-        </li>
-      ))}
-    </ul>
   );
 }

@@ -2,12 +2,11 @@ import type { SiteComponent } from '../content';
 import { cn } from '../lib/cn';
 
 /**
- * Where a specimen's plate sits (docs/site.md D3). The owner chooses between
- * paper and dark plates from the comparison at /plates; until then the site
- * uses `defaultGround`.
+ * Where a specimen's plate sits (docs/site.md D3, decided (c) on 2026-10-26):
+ * dark where one specimen is the subject (the hero, each component page),
+ * paper in the grids (the Components cards).
  */
 export type Ground = 'paper' | 'dark';
-export const defaultGround: Ground = 'paper';
 
 /**
  * The frame and plate every specimen sits in (wireframe `76:45`).
@@ -21,7 +20,7 @@ export const defaultGround: Ground = 'paper';
  * means placeholder (§7.8), and colour or shape is never the only signal.
  */
 export function SpecimenFrame({
-  ground = defaultGround,
+  ground = 'paper',
   placeholder = false,
   className,
   children,
