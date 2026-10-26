@@ -88,7 +88,11 @@ function conversationAt(stage: number): { turns: ChatTurn[]; busy: boolean } {
         : { text: reasoningText, status: 'done', durationSeconds: 2 };
   }
   if (stage >= 3) {
+    // The agent can't change models yet, so it says so and offers the steps,
+    // with no Run plan (docs/agent-voice.md, *Fixed strings*).
+    answer.text = "I can't change models. A rebuild takes these steps:";
     answer.plan = {
+      showActions: false,
       title: 'Rebuild revenue model',
       description: mono('Switch revenue to `net_amount` and check the monthly totals still reconcile.', 'xs'),
       steps: steps.slice(0, Math.min(stage - 3, steps.length)),
@@ -152,9 +156,10 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * A business analyst asks for the revenue model to be rebuilt after a source
- * table changed. The assistant thinks briefly, then streams a four-step plan,
- * over about six seconds. Replay runs it again. Under reduced motion, the
- * finished conversation shows at once.
+ * table changed. The assistant thinks briefly, says it can't change models,
+ * then streams the four steps a rebuild takes, with no Run plan, over about
+ * six seconds. Replay runs it again. Under reduced motion, the finished
+ * conversation shows at once.
  */
 export const ScriptedConversation: Story = {
   render: function Render() {
@@ -178,7 +183,8 @@ export const ScriptedConversation: Story = {
     await expect(canvas.getByRole('heading', { name: 'Rebuild revenue model' })).toBeVisible();
     await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
     await expect(canvas.getByRole('button', { name: 'Thought for 2s' })).toHaveAttribute('aria-expanded', 'false');
-    await expect(canvas.getByRole('button', { name: 'Run plan' })).toBeEnabled();
+    await expect(canvas.getByText("I can't change models. A rebuild takes these steps:")).toBeVisible();
+    await expect(canvas.queryByRole('button', { name: 'Run plan' })).toBeNull();
   },
 };
 
@@ -198,7 +204,7 @@ export const PlanStreaming: Story = {
     await expect(canvas.getByRole('log')).toHaveAttribute('aria-busy', 'true');
     await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
     await expect(canvas.getByText('Drafting step 3…')).toBeVisible();
-    await expect(canvas.getByRole('button', { name: 'Run plan' })).toBeDisabled();
+    await expect(canvas.queryByRole('button', { name: 'Run plan' })).toBeNull();
   },
 };
 

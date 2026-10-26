@@ -41,6 +41,8 @@ The list caps at 18rem and scrolls. Base UI gives Combobox no scroll arrows (Sel
 
 The chips container carries the `Input` treatment and grows with its contents, with `focus-within` driving the ring.
 
+Each chip's X is named "Remove {children}" when the chip's content is text, so a screen reader tells one chip's X from the next. Pass `removeLabel` when the content is a node. Until 2026-10-26 every X was a bare "Remove" and couldn't be renamed (finding 11, `docs/reviews/copy-review-2026-10-24.md`).
+
 ## Empty state
 
 `ComboboxEmpty` is not optional. A list that silently renders zero rows reads as a bug; say that nothing matched, and echo the query.

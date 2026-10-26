@@ -34,6 +34,11 @@ export type AgentPlanProps = {
   startedAt?: number;
   onRun?: () => void;
   onEdit?: () => void;
+  /**
+   * `false` leaves out Run plan and Edit, for a plan the agent can't carry
+   * out: today it changes nothing (`docs/agent-voice.md`, *Fixed strings*).
+   */
+  showActions?: boolean;
   className?: string;
 };
 
@@ -48,7 +53,17 @@ export type AgentPlanProps = {
  * While streaming, the section is `aria-busy`, so a screen reader can wait
  * for the finished plan rather than hear it step by step.
  */
-function AgentPlan({ title, description, steps, status, startedAt, onRun, onEdit, className }: AgentPlanProps) {
+function AgentPlan({
+  title,
+  description,
+  steps,
+  status,
+  startedAt,
+  onRun,
+  onEdit,
+  showActions = true,
+  className,
+}: AgentPlanProps) {
   const titleId = useId();
   const streaming = status === 'streaming';
 
@@ -97,14 +112,16 @@ function AgentPlan({ title, description, steps, status, startedAt, onRun, onEdit
         ) : null}
       </div>
 
-      <div className="flex justify-end gap-[var(--gap-inline)]">
-        <Button size="sm" variant="ghost" disabled={streaming} onClick={onEdit}>
-          Edit
-        </Button>
-        <Button size="sm" disabled={streaming} onClick={onRun}>
-          Run plan
-        </Button>
-      </div>
+      {showActions ? (
+        <div className="flex justify-end gap-[var(--gap-inline)]">
+          <Button size="sm" variant="ghost" disabled={streaming} onClick={onEdit}>
+            Edit
+          </Button>
+          <Button size="sm" disabled={streaming} onClick={onRun}>
+            Run plan
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

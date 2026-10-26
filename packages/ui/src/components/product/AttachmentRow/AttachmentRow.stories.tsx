@@ -88,6 +88,10 @@ export const EvidenceOnARecord: Story = {
 /**
  * Agent-authored files render *inside* `AgentBlock`. There is no agent variant
  * of this row — the authorship signal belongs to `AgentBlock` alone.
+ *
+ * Exporting a file is planned, not built: today the agent reads files and
+ * changes nothing. This story shows the layout for when it can, so no
+ * conversation should show it yet (`docs/agent-voice.md`, *Fixed strings*).
  */
 export const InAgentBlock: Story = {
   render: () => (

@@ -1,6 +1,6 @@
 # Copy review, 2026-10-24
 
-Report only. No source file was changed.
+Written as a report only. The fixes came after, by approval: see Status.
 
 Sources, in order of precedence: `docs/agent-voice.md`, owner decisions in component READMEs, the tabular-ui-copywriter guide ("the guide"), and the Microcopy pass method. Tone follows `agent-voice.md`, not Microcopy pass's "warmer".
 
@@ -8,13 +8,13 @@ Scope: component defaults, `statuses.ts`, fixed strings, stories, the Kasane fix
 
 ## Status
 
-Updated 2026-10-24, after approval of the Blocker and Fix findings that need no foundational change, Option A.
+Updated 2026-10-26, after the owner settled conflicts C1–C3 and approved the foundational change for finding 11.
 
-- **Applied:** 1, 2, 3, 5, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 21.
-- **Waiting on a conflict:** 6 (C2), 7 (C1), 13 (C3).
-- **Needs a foundational change:** 11 (`Combobox`).
-- **Held:** 4. Option A puts a file the user attached inside an `AgentBlock`, marked "proposed". That contradicts the story's purpose, which is to show agent-authored files. It waits on open question 2.
-- **Not started:** every Polish finding.
+- **Applied 2026-10-24 (PR #3):** 1, 2, 3, 5, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 21.
+- **Applied 2026-10-26:** 6, 7, 11 and 13, with C1–C3 settled in `docs/agent-voice.md` as recommended below. Plans in a conversation leave out Run plan and Edit, using `AgentPlan`'s new `showActions={false}`. C2 has one addition: a component's own stories may still show a planned action, if their description says so. Otherwise `AgentPlan`'s and `AgentBlock`'s stories couldn't document their buttons.
+- **Settled 2026-10-26:** 4, with Option B. The story keeps its copy, and its description says exporting is planned, not built.
+- **Already applied on main:** 23, as "AI working" (PR #4).
+- **Not started:** the other Polish findings.
 
 ## Summary
 
@@ -89,17 +89,17 @@ Option A is the one to ship. ⚑ marks an option that changes what the string pr
 
 ## Conflicts
 
-**C1. "I can add…" as the model sentence.**
+**C1. "I can add…" as the model sentence.** *Settled 2026-10-26 as recommended.*
 - `docs/agent-voice.md:149`: "I can add a dedupe step keyed on (account_id, valid_from)." (also `:40`, `:69`)
 - `docs/agent-voice.md:94`: "It doesn't change anything."
 - Recommendation: until the agent can change models, rewrite the example as "A dedupe step keyed on (account_id, valid_from) would remove them." It keeps principle 3's point without promising an action.
 
-**C2. Action buttons the agent can't carry out.**
+**C2. Action buttons the agent can't carry out.** *Settled 2026-10-26 as recommended.*
 - `docs/agent-voice.md:135`: "Action button | Verb first, two words at most where possible | Run plan · Edit · Accept · Reject"
 - `docs/agent-voice.md:94`: "It doesn't change anything."
 - Recommendation: keep the components, since the library ships ahead of the product. Add one line to `agent-voice.md`: stories and demos show these actions only for capabilities that exist.
 
-**C3. Accept / Reject.**
+**C3. Accept / Reject.** *Settled 2026-10-26 as recommended.*
 - `docs/agent-voice.md:135` approves "Accept · Reject". `AgentPlan/README.md:39` cites "`AgentBlock`'s Reject / Accept pair".
 - Guide, *Voice*: "Avoid bare 'OK', 'Submit', 'Confirm', 'Approve' or 'Yes'." Layer 4 §3: "Not 'OK' / 'Cancel', 'Yes' / 'No' or 'Approve' / 'Reject'."
 - Neither README marks the pair as an owner decision.
