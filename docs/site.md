@@ -129,7 +129,19 @@ Specimens below the first screen play once as they scroll into view, from a fram
 - **The band closes Home only**, where "the duplicate payment above" is true. Other pages end at the footer.
 - The copy was reviewed with the Tabular UI copywriter rules: no banned words, and each sentence 15 words or fewer.
 
-**D8. A solid nav.** The wireframes' v3 notes call for a floating nav at 80% white. Text over whatever scrolls behind it has no fixed contrast to measure. And a fixed bar that covers a focused element fails WCAG 2.2's 2.4.11 Focus Not Obscured (Minimum), which is AA. *Recommendation:* solid `--color-canvas` with a 1px `--color-border` bottom rule, and `scroll-padding-top` on `<html>` equal to the nav's height, so anchor jumps and keyboard focus land below it.
+**D8. The nav — decided 2026-10-25 (owner).** The wireframes draw a floating bar (`75:25`): inset 32px from the sides and 16px from the top, 56px tall, with a 1px rule all round. Mobile (`75:46`) is a 48px bar, inset 8px, holding the wordmark and a "Menu" button.
+
+1. **A site-built nav, in `apps/site`, drawn to the wireframe.** The library's `AppBar` was considered and not used: it's a full-width sticky band. The site nav still follows what `AppBar`'s README records, because each item there is a failure that already happened once:
+   - Links are real `<a>` elements styled with `buttonVariants`, never Base UI's `Button`, which would announce a link as a button.
+   - The list carries `role="list"`, because Safari drops list semantics from an unstyled list.
+   - The current page gets `aria-current="page"` and weight, styled with the bracketed `data-[active]:` form, not the shorthand.
+   - The landmark is one `<header>`, holding a `<nav aria-label="Main">`.
+2. **It is inset and scrolls away; it doesn't stick.**
+   - Nothing scrolls under it, so its fill is solid `--color-canvas`, with a 1px `--color-border` rule on all four sides. Translucency would have nothing to show.
+   - A bar that scrolls away can't cover a focused element (WCAG 2.4.11), so no `scroll-padding-top` is needed.
+   - Long pages rely on their own navigation once the bar is gone: the Components jump index, the component jump menu, and the footer.
+3. **Demo ↗ is 36px, not the wireframe's 40px.** Controls are capped at 36px (`CLAUDE.md` rule 6), so it's `buttonVariants` at `size="lg"`. The bar's 56px height is space around controls, not a control, and stays.
+4. **Mobile: composed in `apps/site`.** Below the breakpoint, the links hide and a "Menu" button opens the library's `Menu`, listing every nav link and the three external ones. The trigger is the library's `Button`, since lint rejects a `<button>` outside `foundational/`. `AppBar` still has no responsive collapse (its README, "Not implemented"). If a second consumer needs one, this pattern is the candidate to promote into the library.
 
 **D9. Page set.** The wireframes' Foundations tabs are Color, Typography and Constants, with elevation and shape folded into Constants. This spec follows them: there is no Depth page. It adds one page with no wireframe, **Getting started**: the README's install commands need a public page to point to (§3).
 
@@ -207,7 +219,7 @@ Every route is prerendered to static HTML at build time.
 
 Layout comes from each wireframe frame. This section records what the frames don't: where each part's content comes from, and where the frame changes.
 
-**Shared.** The nav holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary). It has no search. The footer has columns Guide, Foundations and Try it, the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
+**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide, Foundations and Try it, the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
 
 **Home** (`76:23`, `77:96`):
 - The hero: heading, lead, two actions, and the live specimen (D5, D6).
@@ -408,7 +420,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - At 320px wide the document doesn't scroll sideways. A data table may scroll inside its own container (1.4.10 exempts two-dimensional data).
 - Every target is at least 24×24px, or has the spacing 2.5.8 allows. Stacked footer links need checking.
 - With reduced motion, no element animates.
-- A focused element is never fully hidden under the nav (2.4.11; D8).
+- Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned.
 - In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4).
 
 **Keyboard and focus (scripted):**
