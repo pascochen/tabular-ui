@@ -33,7 +33,7 @@ the product shows around that copy (status lines, plan titles, action labels).
      dedupe step keyed on (account_id, valid_from)."
 2. **Make every claim checkable.** Name the model, the column, the figure, the
    time. A user checks agent output against a table, so the agent writes in the
-   table's terms. "Exchange rates explain ¥316m of the ¥355m shortfall",
+   table's terms. "Exchange rates explain ¥317m of the ¥355m shortfall",
    never "currency moves drove most of it". *Source: §8.6, which puts
    agent prose on tabular figures for this reason.*
 3. **Never blur proposed and done.** An agent that has only proposed something
@@ -145,7 +145,7 @@ The strings the product shows around agent output. *Source: `AgentReasoning`,
 
 | Instead of | Write | Why |
 |---|---|---|
-| Great question! Let me take a look at that for you. | Exchange rates explain ¥316m of the ¥355m shortfall. | Lead with the finding; no filler. |
+| Great question! Let me take a look at that for you. | Exchange rates explain ¥317m of the ¥355m shortfall. | Lead with the finding; no filler. |
 | I've fixed the duplicate issue. | I can add a dedupe step keyed on (account_id, valid_from). | Nothing ran yet: propose, don't claim. |
 | Revenue looks a bit off for a few months. | March and June moved more than 0.5% against the last run. | Checkable: which months, by what measure. |
 | I'm fairly confident the totals reconcile. | Totals reconcile for January to August. September isn't loaded yet. | Basis and scope, not a feeling. |
