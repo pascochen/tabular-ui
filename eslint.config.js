@@ -278,6 +278,9 @@ export default defineConfig([
     '**/visual-gate',
     '**/.registry',
     'apps/storybook/public/r',
+    // React Router's prerendered build and generated route types (apps/site).
+    'apps/site/build',
+    'apps/site/.react-router',
   ]),
   {
     files: ['**/*.{ts,tsx}'],
@@ -289,6 +292,37 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+  },
+  {
+    // React Router route modules export route functions beside the component
+    // (meta, links, Layout, ErrorBoundary). React Router's Vite plugin keeps
+    // fast refresh working for these names, so react-refresh is told about them
+    // rather than flagging every route in apps/site.
+    files: ['apps/site/src/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': [
+        'error',
+        {
+          allowConstantExport: true,
+          allowExportNames: [
+            'meta',
+            'links',
+            'headers',
+            'handle',
+            'loader',
+            'clientLoader',
+            'action',
+            'clientAction',
+            'middleware',
+            'clientMiddleware',
+            'shouldRevalidate',
+            'Layout',
+            'ErrorBoundary',
+            'HydrateFallback',
+          ],
+        },
+      ],
     },
   },
   {

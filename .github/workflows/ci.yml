@@ -49,17 +49,31 @@ jobs:
       # PR whose file list can't be read. Skipped, not cancelled: Verify still
       # reports pass, so a required check is satisfied (2026-10-10, after the
       # month's Actions minutes ran out).
+      #
+      # A PR that changes only apps/site (and Markdown) is site_only: it skips
+      # the library's story tests, design system specs and visual regression,
+      # which cover nothing it changed, and runs lint, type-check, the site
+      # build and the site tests (docs/site.md §10). Any change outside
+      # apps/site, the package included, runs everything plus the site.
       - name: Scope
         id: scope
         run: |
           docs_only=false
+          site_only=false
           if [ "${{ github.event_name }}" = "pull_request" ] && files=$(git diff --name-only HEAD^1 HEAD 2>/dev/null) && [ -n "$files" ]; then
             echo "Changed files:"; echo "$files"
-            if ! echo "$files" | grep -qvE '\.md$'; then docs_only=true; fi
+            if ! echo "$files" | grep -qvE '\.md$'; then
+              docs_only=true
+            elif ! echo "$files" | grep -qvE '(^apps/site/|\.md$)'; then
+              site_only=true
+            fi
           fi
           echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+          echo "site_only=$site_only" >> "$GITHUB_OUTPUT"
           if [ "$docs_only" = true ]; then
             echo "Docs-only change: every changed file is Markdown, so install, lint, tests and builds are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
+          elif [ "$site_only" = true ]; then
+            echo "Site-only change: every changed file is in apps/site or Markdown, so the library's story tests, specs and screenshots are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "Full verification."
           fi
@@ -101,22 +115,30 @@ jobs:
         run: pnpm typecheck
 
       - name: Story tests
-        if: steps.scope.outputs.docs_only != 'true'
+        if: steps.scope.outputs.docs_only != 'true' && steps.scope.outputs.site_only != 'true'
         run: pnpm test
 
       # In order: the package (JavaScript, types, CSS), the shadcn registry
       # into Storybook's public/r, Storybook, then the demo. The demo builds
       # against the package's dist/ and its published declarations, as any
       # consuming app does: a PR that drops a name from src/index.ts or
-      # changes a component's props fails here, not in someone's app.
+      # changes a component's props fails here, not in someone's app. The site
+      # builds last, the same way.
       - name: Build
-        if: steps.scope.outputs.docs_only != 'true'
+        id: build
+        if: steps.scope.outputs.docs_only != 'true' && steps.scope.outputs.site_only != 'true'
         run: pnpm build
+
+      # A site-only change needs the package's dist/ and the site, nothing else.
+      - name: Build (site only)
+        id: build-site
+        if: steps.scope.outputs.site_only == 'true'
+        run: pnpm build:ui && pnpm build:site
 
       # The two checks tools.md reserves for a real browser: focus-ring
       # clipping inside overflow:hidden, and computed OKLCH contrast.
       - name: Design system specs
-        if: steps.scope.outputs.docs_only != 'true'
+        if: steps.scope.outputs.docs_only != 'true' && steps.scope.outputs.site_only != 'true'
         id: specs
         run: pnpm test:playwright
 
@@ -136,7 +158,7 @@ jobs:
       - name: Visual regression (screenshots)
         id: visual
         # Still runs when only the specs above failed, so one PR shows both.
-        if: ${{ steps.scope.outputs.docs_only != 'true' && (success() || (failure() && steps.specs.outcome == 'failure')) }}
+        if: ${{ steps.scope.outputs.docs_only != 'true' && steps.scope.outputs.site_only != 'true' && (success() || (failure() && steps.specs.outcome == 'failure')) }}
         env:
           VISUAL_GATE: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]' && 'pr' || 'off' }}
           PR_BODY: ${{ github.event.pull_request.body }}
@@ -152,6 +174,14 @@ jobs:
           fi
           node apps/storybook/scripts/visual-gate.mjs
 
+      # The site's pages, prerendered, in a real browser: page structure and
+      # axe at WCAG 2.2 AA (docs/site.md §11). Runs whenever a build succeeded,
+      # even if the specs or screenshots above failed, so one run shows both.
+      - name: Site tests
+        id: site
+        if: ${{ !cancelled() && (steps.build.outcome == 'success' || steps.build-site.outcome == 'success') }}
+        run: pnpm test:site
+
       - name: Upload visual gate
         if: ${{ !cancelled() && steps.visual.outputs.gate == 'true' }}
         uses: actions/upload-artifact@v7
@@ -166,6 +196,14 @@ jobs:
         with:
           name: playwright-report
           path: apps/storybook/playwright-report/
+          retention-days: 7
+
+      - name: Upload site test report
+        if: ${{ failure() && steps.site.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-playwright-report
+          path: apps/site/playwright-report/
           retention-days: 7
 
       # Open index.html: each changed story shows expected, actual and a diff.

@@ -1,0 +1,8 @@
+/* The full Tabular UI stylesheet: Tailwind, fonts, the shadcn compatibility layer
+   and the token layer, as packages/ui/README.md sets it up for any app. */
+@import 'tabular-ui/styles.css';
+
+/* Tailwind scans the app's own files only. The package's class strings are in
+   its built JavaScript and must be scanned explicitly, or every utility a
+   component uses and the site does not is silently absent from the build. */
+@source '../node_modules/tabular-ui/dist';

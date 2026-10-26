@@ -50,7 +50,7 @@ Violating any of these fails review.
 
 ## File structure
 
-A pnpm workspace. The library is `packages/ui`, published to npm as `tabular-ui` and copied into apps by the shadcn registry; `apps/storybook` and `apps/demo` consume it. Paths below are in `packages/ui` unless they say otherwise.
+A pnpm workspace. The library is `packages/ui`, published to npm as `tabular-ui` and copied into apps by the shadcn registry; `apps/storybook`, `apps/demo` and `apps/site` consume it. Paths below are in `packages/ui` unless they say otherwise.
 
 - `src/styles/palette.css` — the Riso Ledger ramps, **generated** by `scripts/generate-palette.mjs` (with `docs/palette.md` and `docs/palette.json` at the repo root). Never edit it by hand: change the script and run it. Imported after `theme.css`, so theme.css's strip of Tailwind's `teal` cannot erase the Riso one.
 - `scripts/check-contrast.mjs` — WCAG check of every colour token in `theme.css`, both modes, every ground. Fails on any colour that is not a palette reference.
@@ -63,6 +63,7 @@ A pnpm workspace. The library is `packages/ui`, published to npm as `tabular-ui`
 - `scripts/build-registry.mjs` — writes `registry.json` and the shadcn registry into `apps/storybook/public/r/`. Every component needs a one-line description there.
 - `apps/storybook/` (repo root) — Storybook's config, the Playwright specs in `tests/`, and the screenshot baselines. It reads the stories from `packages/ui/src`.
 - `apps/demo/` (repo root) — the Kasane onboarding demo. It imports the package as any app would, never by path into `packages/ui/src`, and its data is generated JSON in `data/`.
+- `apps/site/` (repo root) — tabularui.com, the public site, prerendered with React Router. It imports the package as any app would. Its spec is `docs/site.md`, and its route modules live in `src/`, so the lint gate covers them.
 - `docs/design-system.md` — the full spec: measured values, rules, rationale
 - `docs/components.md` — component inventory. Check here before building anything.
 - `docs/agent-voice.md` — voice rules for copy the product's agents generate at runtime
