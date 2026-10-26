@@ -222,7 +222,7 @@ test.describe('docked — at and above the 1280px floor', () => {
     await gotoStory(page, 'product-appshell--expanded');
     const numeric = await page
       .locator('[data-slot="agent-block"]')
-      .getByText('¥316m', { exact: false })
+      .getByText('¥317m', { exact: false })
       .evaluate((el) => getComputedStyle(el).fontVariantNumeric);
     expect(numeric).toContain('tabular-nums');
   });

@@ -166,7 +166,7 @@ function AssistantTurn({ turn }: { turn: ChatAssistantTurn }) {
     <AgentBlock authorship={turn.authorship ?? 'AI'} meta={turn.meta}>
       <div className="flex flex-col gap-[var(--gap-group)]">
         {/*
-          Nothing has arrived yet. §5 "agent working": an activity indicator,
+          Nothing has arrived yet. §5 "AI working": an activity indicator,
           in the block the answer will fill, so the answer grows in place
           rather than a block appearing later and shifting the thread. Same
           size, colour and spinner as AgentReasoning's "Thinking…" row, which
