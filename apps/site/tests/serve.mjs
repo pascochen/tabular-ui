@@ -1,6 +1,6 @@
 /**
  * Serves the prerendered build the way Vercel serves static files, for the
- * Playwright suite: the exact file, else `<path>/index.html`, else 404.
+ * Playwright suite: the exact file, else `<path>/index.html`, else the 404 page.
  *
  * Not `vite preview`. Its SPA fallback answers /plates with the Home page's
  * HTML, React then hydrates /plates over Home's markup, and the page renders
@@ -38,7 +38,12 @@ createServer((req, res) => {
   }
   const file = [target, join(target, 'index.html')].find(isFile);
   if (!file) {
-    res.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
+    // Vercel serves the root 404.html, with a 404 status, for any path it has no file for.
+    const notFound = join(root, '404.html');
+    if (isFile(notFound)) {
+      res.writeHead(404, { 'content-type': types['.html'] });
+      createReadStream(notFound).pipe(res);
+    } else res.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
     return;
   }
   res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' });

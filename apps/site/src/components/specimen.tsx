@@ -65,7 +65,18 @@ export function ComponentCard({
         )}
       </SpecimenFrame>
       <div className="flex flex-col gap-[var(--gap-control-icon)]">
-        <h3 className="text-site-title-sm font-semibold text-text-primary">{component.title}</h3>
+        <h3 className="text-site-title-sm font-semibold text-text-primary">
+          {component.built ? (
+            <a
+              href={`${pages.components.href}/${component.name}`}
+              className={cn('underline underline-offset-2', focusRing)}
+            >
+              {component.title}
+            </a>
+          ) : (
+            component.title
+          )}
+        </h3>
         <p className="text-site-small text-text-secondary">{component.decision}</p>
       </div>
     </article>
@@ -74,14 +85,14 @@ export function ComponentCard({
 
 /**
  * A component's name as a tag (wireframe `76:98`, "Carried by"). Solid when
- * built, and then a link to its card; dashed and labelled in words when not.
+ * built, and then a link to its page; dashed and labelled in words when not.
  */
 export function ComponentTag({ component }: { component: SiteComponent }) {
   const base = 'inline-flex items-center rounded-xs border px-2 py-0.5 text-site-small';
   if (component.built && pages.components.live) {
     return (
       <a
-        href={`${pages.components.href}#${component.name}`}
+        href={`${pages.components.href}/${component.name}`}
         className={cn(base, 'border-border-strong text-text-body hover:bg-bg-hover', focusRing)}
       >
         {component.title}
@@ -100,5 +111,29 @@ export function ComponentTag({ component }: { component: SiteComponent }) {
       {component.title}
       {component.built ? null : <span className="sr-only">, to build</span>}
     </span>
+  );
+}
+
+/**
+ * A component's before/after pair (docs/site.md D2): two states in one frame,
+ * each on a dark plate (D3), with no headings. Each state's own label carries
+ * it, and one caption beneath says what changed. Static: no Replay.
+ */
+export function Pair({ before, after, caption }: { before: React.ReactNode; after: React.ReactNode; caption: string }) {
+  return (
+    <figure className="flex flex-col gap-[var(--gap-group)]">
+      <div className="grid grid-cols-1 gap-2 border border-border-strong p-2 md:grid-cols-2">
+        {[before, after].map((state, i) => (
+          <div
+            key={i}
+            data-theme="dark"
+            className="flex flex-col justify-center bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
+          >
+            {state}
+          </div>
+        ))}
+      </div>
+      <figcaption className="text-site-small text-text-secondary">{caption}</figcaption>
+    </figure>
   );
 }

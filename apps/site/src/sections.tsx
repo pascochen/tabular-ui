@@ -5,7 +5,7 @@ import { ComponentTag, SpecimenFrame } from './components/specimen';
 import { components, external, moments, pages, principles } from './content';
 import { kasane } from './data';
 import { cn } from './lib/cn';
-import { focusRing } from './lib/styles';
+import { focusRing, textLink } from './lib/styles';
 import { HeroSpecimen } from './specimens';
 
 /** Home's sections (wireframe `76:23`, mobile `77:96`). */
@@ -89,6 +89,13 @@ export function PrinciplesSection() {
           id="principles-title"
           title={`${principles.length} principles`}
           lead="Every component follows them."
+          action={
+            pages.principles.live ? (
+              <a href={pages.principles.href} className={textLink}>
+                Why these three
+              </a>
+            ) : null
+          }
         />
         <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
           {principles.map((principle) => (
@@ -129,6 +136,13 @@ export function MomentsSection() {
           id="moments-title"
           title={`${moments.length} moments`}
           lead={`The life of one agent run. ${components.length} components sit inside them.`}
+          action={
+            pages.components.live ? (
+              <a href={pages.components.href} className={textLink}>
+                See all {components.length} components
+              </a>
+            ) : null
+          }
         />
         <ol role="list" className="grid grid-cols-1 gap-[var(--site-gap-tight)] md:grid-cols-5">
           {moments.map((moment) => {

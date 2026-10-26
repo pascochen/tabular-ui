@@ -5,7 +5,31 @@ import { expect, test } from '@playwright/test';
  * Page-level checks every route must pass (docs/site.md §11). Routes are added
  * here as they are built.
  */
-const routes = ['/', '/components', '/foundations/color', '/foundations/typography', '/foundations/density'];
+const componentPages = [
+  'chat-starter',
+  'chat-composer',
+  'agent-reasoning',
+  'agent-plan',
+  'lineage-tree',
+  'attachment-row',
+  'agent-block',
+  'chat-thread',
+  'run-log-row',
+  'status-badge',
+].map((name) => `/components/${name}`);
+
+const routes = [
+  '/',
+  '/principles',
+  '/components',
+  ...componentPages,
+  '/vocabulary',
+  '/foundations/color',
+  '/foundations/typography',
+  '/foundations/density',
+  '/getting-started',
+  '/404',
+];
 
 // WCAG 2.2 AA, every level up to it. No rule is disabled: an exception needs
 // the owner's approval and a written reason.
@@ -84,3 +108,39 @@ for (const route of routes) {
     }
   });
 }
+
+test.describe('a path with no page', () => {
+  test('answers 404 with the 404 page, rendered once', async ({ page, request }) => {
+    const response = await request.get('/no-such-page');
+    expect(response.status()).toBe(404);
+    expect(await response.text()).toContain('Page not found');
+    await page.goto('/no-such-page');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
+    await expect(page.locator('a[href="#main"]')).toHaveCount(1);
+  });
+});
+
+test.describe('getting started', () => {
+  test('shows the README’s own commands', async ({ page }) => {
+    await page.goto('/getting-started');
+    await expect(page.getByText('pnpm add tabular-ui @phosphor-icons/react')).toBeVisible();
+    await expect(page.getByText("@import './components/tabular-ui/tokens.css';")).toBeVisible();
+  });
+});
+
+test.describe('component pages', () => {
+  for (const route of componentPages) {
+    // A pair whose two plates read the same shows no change at all. The lineage
+    // pair shipped that way once: LineageTree expands everything when
+    // defaultExpanded is omitted, so its "before" was already open.
+    test(`${route}: the before and after plates differ`, async ({ page }) => {
+      await page.goto(route);
+      await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+      const plates = page.locator('#pair-title ~ figure [data-theme="dark"]');
+      await expect(plates).toHaveCount(2);
+      const [before, after] = await plates.allInnerTexts();
+      expect(before).not.toBe(after);
+    });
+  }
+});
