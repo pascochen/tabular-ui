@@ -243,10 +243,13 @@ function TopNav() {
   );
 }
 
-/** Figures in millions as the board pack rounds them, so the parts add up to the total they explain. */
-const millions = (value: number) => Math.round(value / 1e6) * 1e6;
-const step = (id: string) => millions(operatingBridge.steps.find((s) => s.id === id)?.value ?? 0);
-const shortfall = millions(operatingBridge.budget) - millions(operatingBridge.actual);
+/**
+ * Exact yen, rounded once by `money()` when shown. Rounding the parts before
+ * adding them gives a total that doesn't foot: the two exchange-rate steps
+ * round to ¥41m and ¥275m, but they sum to ¥316,748,831, which is ¥317m.
+ */
+const step = (id: string) => operatingBridge.steps.find((s) => s.id === id)?.value ?? 0;
+const shortfall = operatingBridge.budget - operatingBridge.actual;
 const fxTotal = step('fx-subsidiaries') + step('fx-intercompany');
 
 const summary = `H1 operating profit closed at ${money(operatingBridge.actual)}, ${money(shortfall)} under budget. Exchange rates explain ${money(-fxTotal)} of the gap: transfer prices are fixed at budget rates, so a stronger yen moved margin out of Japan. A bad-debt reserve in the US and an empty floor in the head office took the rest, offset by the hiring freeze.`;
