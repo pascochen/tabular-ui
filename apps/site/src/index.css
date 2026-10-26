@@ -59,3 +59,41 @@
     --site-section-y: 96px;
   }
 }
+
+/* The hero's ruled sheet (docs/site.md D3, item 3). The outer layer covers the
+   section and fades the rules toward its edges. A mask reads only alpha, so
+   `black` here is opacity, never a painted colour. */
+.site-sheet {
+  mask-image:
+    linear-gradient(to right, transparent, black 12%, black 88%, transparent),
+    linear-gradient(to bottom, transparent, black 20%, black 75%, transparent);
+  mask-composite: intersect;
+}
+
+/* The rules, in the section rules' colour. The layer sits in the rail's content
+   box and reaches one content width plus a gutter past each side, so its width
+   is 36 column pitches and a line lands on every column's left edge. Rows are
+   DataTable's row height, offset so one lands on the content's top edge.
+   Under 768px a tile is two pitches, so a line lands on every other column. */
+.site-sheet-rules {
+  left: calc(-100% - var(--site-gap));
+  width: calc(300% + 2 * var(--site-gap));
+  background-image:
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-position: 0 var(--site-section-y);
+  background-size: calc((100% + var(--site-gap)) / 18) var(--h-row-sm);
+}
+
+@media (width >= 768px) {
+  .site-sheet-rules {
+    background-size: calc((100% + var(--site-gap)) / 36) var(--h-row-sm);
+  }
+}
+
+/* Decoration only: forced colours keep the plate's frame and drop the rules. */
+@media (forced-colors: active) {
+  .site-sheet {
+    display: none;
+  }
+}

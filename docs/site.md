@@ -14,7 +14,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 |---|---|---|
 | D1 | Status words | From the components; principle 3 reworded; "AI working"; "AI · Posted" for a posted entry |
 | D2 | Before/after pair | No plate headings; the posted block keeps its rail and adds "posted by you"; a pair on every component page |
-| D3 | Grounds | Bands: rules only. Plates: dark for single specimens (hero, component pages), paper in grids. Closing band dark |
+| D3 | Grounds | Bands: rules only; the hero alone is ruled as a sheet. Plates: paper on the hero and in grids, dark on component pages. Closing band dark |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after |
@@ -84,6 +84,12 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
    - *(c) Dark for single specimens:* dark on the hero and the component pages, where one specimen is the subject; paper in the Components and Home grids. The cost is two plate styles to keep consistent.
 
    To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
+3. **The hero: a paper plate on a ruled sheet. Revised 2026-10-26 (owner), as a prototype for review on the preview.** On the live hero, the dark plate read first and the headline second in a squint test. Its ground is the headline's own ink, 16.39:1 against the page, over about 756×386px. The orchid rail and the "AI · Awaiting review" label disappeared inside it, and its 1.62:1 frame couldn't be seen beside it. A dark block on paper also reads as a hole in the page rather than a sheet on it. (a) had been turned down for paper on paper on paper. A ruled hero removes that risk, because the plate is the one place in the hero without rules:
+   - **The sheet.** The hero is ruled like a spreadsheet: 1px lines in `--color-border` (1.29:1), the colour of the section rules, so no token is added. Rows are `--h-row-sm` (28px), `DataTable`'s row height. Columns are the 12-column grid's pitch, aligned to the rail, so a column line runs down the left edge of every column. Under 768px a line runs down every other column, 6 across: twelve 30px columns on a phone ruled near-square cells, which read as graph paper and crowded the lead, while every other column gives cells about 61×28, the shape of a spreadsheet's. The lines fade out toward the hero's edges, so the sheet has no hard border against the rule-only bands below.
+   - **The plate** is paper, opaque over the rules, in a 1px frame drawn in `--color-text-primary`, the headline's ink. `--color-border-strong` (1.62:1) is too close to the rules to read as an edge.
+   - **Only the hero is ruled.** On the other pages a ruled band would compete with the section rules.
+   - **The rules are decoration.** They're CSS backgrounds, `aria-hidden`, and they drop out in forced colours, where the plate's frame still draws its edge (D4, §11).
+   - Component pages keep their dark plates, so the site still shows the components in dark mode, the mode they were designed for.
 
 **The closing band is dark**, decided with the plates. It isn't a tint: it's a section set to `data-theme="dark"`, with no new token, and it sets its own ground and text colour.
 
@@ -395,7 +401,7 @@ The site is a reading page, not dense product UI, so it keeps a few values of it
 - A 1040px reading column for Principles and component pages, and 680px prose blocks.
 - Cards span 4 columns (432px), the hero splits 5/7, and the five moments are their own 5-up row with 16px gaps.
 
-**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule.
+**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule. The hero is ruled as a sheet in the same colour: 28px rows, columns on the 12-column pitch, every other column under 768px (D3, item 3).
 
 **Tokens.** These are the site's only custom properties. The `--site-` prefix keeps them apart from the library's names, so none can shadow a library token:
 
@@ -478,7 +484,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places.
 - ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it.
-- Contrast is measured on the ground the text sits on, including the dark hero plate, the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
+- Contrast is measured on the ground the text sits on, including the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 
 **Manual, by the owner:** a VoiceOver pass in Safari on Home, Components and one component page, following a written 10-step script delivered with the final PR.
@@ -505,7 +511,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 
 **Step 2, as built (2026-10-26):**
-- `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids.
+- `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids. The hero moved to a paper plate on a ruled sheet the same day (D3, item 3).
 - A link to a page that isn't built yet is left out (`pages` in `src/content.ts`, each with `live`), so the site never links to a 404 while it grows page by page. The nav shows only its external links, the outline's "15 components" jumps to the moments, and the footer drops empty columns.
 - The hero's question is a plain line above the block, not a `ChatThread` user turn. `ChatThread`'s assistant turn takes no actions, and the proposal can't be a second block inside it (one `AgentBlock` per turn). That's a library gap, raised rather than worked around.
 - The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`.
