@@ -9,7 +9,11 @@ export type AgentBlockProps = {
    */
   authorship: string;
   children: React.ReactNode;
-  /** Accept / reject / edit controls. Rendered in the header, trailing. */
+  /**
+   * Controls that act on the content, in the header, trailing. Each names its
+   * change ("Add dedupe step" / "Don't add it"), never a bare Accept /
+   * Reject (`docs/agent-voice.md`, *Fixed strings*).
+   */
   actions?: React.ReactNode;
   /** Timestamp or model reference, beside the authorship label. */
   meta?: React.ReactNode;

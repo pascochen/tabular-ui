@@ -36,13 +36,17 @@ While streaming the section is `aria-busy`, so a screen reader can wait for the 
 | Description | `--text-sm`, `--color-text-secondary`, `--gap-bonded` below the title. Wraps; one sentence is a copy rule, not a truncation. |
 | Steps | `<ol role="list">`. The number is an `aria-hidden` span in a 16px column (`w-4`, primitive: no token fits), right-aligned, secondary. Labels are `--text-base` body. `--gap-field` between steps. |
 | `label` | A node, so identifiers can be set in `--font-mono` one step smaller (§8.3). |
-| Actions | Right-aligned. Edit is `ghost`, Run plan is `default`, both `size="sm"`, matching `AgentBlock`'s Reject / Accept pair. `Button` has no "secondary" variant. |
+| Actions | Right-aligned. Edit is `ghost`, Run plan is `default`, both `size="sm"`, matching the action pair in `AgentBlock`'s AwaitingReview story. Left out when `showActions` is `false`. `Button` has no "secondary" variant. |
 
 Groups are `--gap-group` (12px) apart.
 
 ## Copy
 
 Follows `docs/agent-voice.md`, whose *Fixed strings* table sets the forms used here: the title is a verb phrase with no period, the description one sentence, each step an imperative with one action, and the buttons are verbs ("Run plan", "Edit"). "Drafting step N…" is the in-progress status form.
+
+## Actions only where they exist
+
+Run plan and Edit assume the agent can change models. Today it can't (`docs/agent-voice.md`, *Vague and out-of-scope requests*). So a conversation passes `showActions={false}`, and the reply before the plan says what can't be done: "I can't change models. A rebuild takes these steps:". The plan then reads as steps for a person to take. This component's own stories keep the buttons, to document them for when that changes (`docs/agent-voice.md`, *Fixed strings*, decided 2026-10-26).
 
 ## Not here
 

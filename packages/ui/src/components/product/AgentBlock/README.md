@@ -3,7 +3,7 @@
 Product. **A category of one, on purpose.**
 
 ```tsx
-<AgentBlock authorship="AI · Awaiting review" meta="proposed 14:22" actions={<><Button size="sm" variant="ghost">Reject</Button><Button size="sm">Accept</Button></>}>
+<AgentBlock authorship="AI · Awaiting review" meta="proposed 14:22" actions={<><Button size="sm" variant="ghost">Don't add it</Button><Button size="sm">Add dedupe step</Button></>}>
   {proposal}
 </AgentBlock>
 ```

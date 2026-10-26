@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
+import { expect, within } from 'storybook/test';
 
 import {
   Combobox,
@@ -173,6 +174,10 @@ export const MultiSelect: Story = {
         </Combobox>
       </Field>
     );
+  },
+  play: async ({ canvasElement }) => {
+    // Each chip's X is named for its chip, not a bare "Remove" repeated on every one.
+    await expect(within(canvasElement).getByRole('button', { name: 'Remove fct_gl_entries' })).toBeVisible();
   },
 };
 

@@ -69,7 +69,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Complete: four steps, both actions live. */
+/**
+ * Complete: four steps, both actions live. Running a plan is planned, not
+ * built: today the agent changes nothing, so a conversation leaves the
+ * actions out (WithoutActions; `docs/agent-voice.md`, *Fixed strings*).
+ */
 export const Ready: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -97,6 +101,19 @@ export const Streaming: Story = {
 /** Title and sentence are in, no steps yet. */
 export const StreamingNoSteps: Story = {
   args: { status: 'streaming', steps: [] },
+};
+
+/**
+ * The plan as a conversation shows it today: steps for a person to take, with
+ * no Run plan or Edit, because the agent can't change models yet.
+ */
+export const WithoutActions: Story = {
+  args: { showActions: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
+    await expect(canvas.queryByRole('button')).toBeNull();
+  },
 };
 
 /** Ten steps: the number column holds two digits on one right edge. */

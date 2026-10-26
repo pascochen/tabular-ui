@@ -303,7 +303,21 @@ function ComboboxChips({ className, ...props }: ComboboxPrimitive.Chips.Props) {
  * behaviour here — it is not our `Chip` component, which is a `<button>` with
  * its own dismiss handling — but it must not look like a second kind of chip.
  */
-function ComboboxChip({ className, children, ...props }: ComboboxPrimitive.Chip.Props) {
+function ComboboxChip({
+  className,
+  children,
+  removeLabel,
+  ...props
+}: ComboboxPrimitive.Chip.Props & {
+  /**
+   * Names the X. Defaults to "Remove {children}" when the chip's content is
+   * text. A bare "Remove" repeats on every chip, so a screen reader can't
+   * tell them apart: pass one when the content is a node.
+   */
+  removeLabel?: string;
+}) {
+  const label =
+    removeLabel ?? (typeof children === 'string' || typeof children === 'number' ? `Remove ${children}` : 'Remove');
   return (
     <ComboboxPrimitive.Chip
       data-slot="combobox-chip"
@@ -312,7 +326,7 @@ function ComboboxChip({ className, children, ...props }: ComboboxPrimitive.Chip.
     >
       {children}
       <ComboboxPrimitive.ChipRemove
-        aria-label="Remove"
+        aria-label={label}
         className={cn(
           'relative z-10 -mr-[2px] inline-flex items-center justify-center rounded-xs',
           'text-text-secondary outline-none hover:text-text-body',
