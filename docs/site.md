@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: draft, 2026-10-25.** D1–D9 are decided (owner, 2026-10-25), except the specimen plates in D3, which are chosen from screenshots in PR 2. The approvals A1–A5 are given. Nothing in `apps/site` exists yet.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25. The specimen plates in D3 are still chosen from screenshots in PR 2. The approvals A1–A5 are given. Nothing in `apps/site` exists yet.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
