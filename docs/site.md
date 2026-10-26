@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 and 2 of §13 are built: `apps/site` is live at tabularui.com.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 3 of §13 are built: `apps/site` is live at tabularui.com.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -241,7 +241,7 @@ Every route is prerendered to static HTML at build time.
 
 **`<name>` is the registry item name** in `packages/ui/registry.json`: `agent-block`, `chat-thread` and so on. A component page exists only when the registry has the item, so a to-build component has a card but no page. Previous and next follow run order.
 
-**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one shell with `Tabs` from the library, linking between routes. Each tab is a real link to a prerendered page.
+**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab.
 
 ## 4. Pages
 
@@ -501,5 +501,17 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`.
 - The outline's three links are sans, not the wireframe's serif: they are links, and only a heading element goes serif (§8.3 of the design system).
 - The site's test server is `tests/serve.mjs`, which serves files as Vercel does. `vite preview` answered `/plates` with the Home page's HTML, React hydrated `/plates` over it, and every element rendered twice with no error. A test now checks that each route's HTML is its own.
+
+**Step 3, as built (2026-10-26):**
+- **The Foundations pages read the tokens at build time.** `src/tokens-parse.ts` reads `theme.css` as the package ships it (`tabular-ui/theme.css`) and `docs/palette.json`. It resolves each role's step per mode, computes contrast on each mode's canvas, and takes each scale token's value and its own comment from `theme.css`. `tests/tokens.spec.ts` pins the parser to figures the design spec states (`sage-700` at 6.23:1, `ledger-50` at 16.39:1, `ochre-500 / 10%`, `ledger-925`), so a parser reading the wrong block fails the build.
+- **Swatches paint the real token utilities** (`bg-fill-danger`, `text-text-warning`). The ramps alone paint `palette.json`'s measured hex, because no token names a raw step.
+- **`text-disabled` is a swatch, not a text sample.** It's for disabled labels, which WCAG exempts. As readable text on the page it failed 1.4.3 (2.22:1 light), which axe caught.
+- **Density lists the frame tier** with two line-level lint disables, each with its reason: the page names the tokens and draws each at its size, and spaces nothing with them.
+- **The Components page** has the jump index, a `Tabs` filter (segmented, a view switch on one page) with the prerendered HTML on "All", and all ten built specimens at rest. The jump index's links sit 6px apart, because at 2px they missed WCAG 2.5.8's 24px target spacing (axe again).
+- **Specimen data:**
+  - The Run log row's failure is real: the bank export has no header row (`findings.json`, `bank-header`). The rows carry no times or durations, because the data has none.
+  - The Lineage tree shows the bridge in exact yen, and a test checks that budget plus its steps equals the actual.
+  - The Chat thread's scroller is bounded by an aspect ratio, not a height, which keeps it inside the control-height cap.
+- **Components and Foundations are live** in the nav, footer and outline, and a principle's built component tags link to their cards.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

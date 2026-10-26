@@ -1,4 +1,5 @@
-import type { SiteComponent } from '../content';
+import { pages, type SiteComponent } from '../content';
+import { focusRing } from '../lib/styles';
 import { cn } from '../lib/cn';
 
 /**
@@ -73,14 +74,27 @@ export function ComponentCard({
 
 /**
  * A component's name as a tag (wireframe `76:98`, "Carried by"). Solid when
- * built, dashed and labelled in words when not.
+ * built, and then a link to its card; dashed and labelled in words when not.
  */
 export function ComponentTag({ component }: { component: SiteComponent }) {
+  const base = 'inline-flex items-center rounded-xs border px-2 py-0.5 text-site-small';
+  if (component.built && pages.components.live) {
+    return (
+      <a
+        href={`${pages.components.href}#${component.name}`}
+        className={cn(base, 'border-border-strong text-text-body hover:bg-bg-hover', focusRing)}
+      >
+        {component.title}
+      </a>
+    );
+  }
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-xs border px-2 py-0.5 text-site-small text-text-body',
-        component.built ? 'border-border-strong' : 'border-dashed border-border-strong text-text-secondary',
+        base,
+        component.built
+          ? 'border-border-strong text-text-body'
+          : 'border-dashed border-border-strong text-text-secondary',
       )}
     >
       {component.title}

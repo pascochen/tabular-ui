@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
  * Page-level checks every route must pass (docs/site.md §11). Routes are added
  * here as they are built.
  */
-const routes = ['/'];
+const routes = ['/', '/components', '/foundations/color', '/foundations/typography', '/foundations/density'];
 
 // WCAG 2.2 AA, every level up to it. No rule is disabled: an exception needs
 // the owner's approval and a written reason.
