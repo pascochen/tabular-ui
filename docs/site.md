@@ -22,7 +22,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 
-### Design
+### The decisions in full
 
 **D1. Status words — decided 2026-10-25 (owner).** The wireframes' "Status words" table ("Needs your review", "Needs your answer", "Thinking…", "Searched 3 files", "Posted") mixes three vocabularies, and each already has an owner in the library:
 
