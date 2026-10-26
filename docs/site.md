@@ -75,7 +75,19 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **The closing band** is the other dark ground the wireframes draw. It isn't a tint: like option (b), it would be a section set to `data-theme="dark"`, with no new token. Whether it stays dark is decided with the plates, since next to paper plates it would be the page's only dark element.
 
-**D4. Colour mode: light page; both modes on Foundations.** The page itself is light. It does not call `useTheme()`, and `<html data-theme="light">` ships in the prerendered HTML (`tools.md`, "Styling and tokens"). The Color and Typography pages show each sample in both modes side by side, using the same scoping as D3(b). A dark-first system documented only in light would hide the mode the product lives in.
+**D4. Colour mode — decided 2026-10-25 (owner).** Page mode and specimen mode are separate axes: `[data-theme='dark']` scopes to any element, so a light page can hold dark specimens. D3 decides specimen mode from PR 2's screenshots. This decides the page.
+
+1. **The page is light only.**
+   - `<html data-theme="light">` ships in the prerendered HTML. The site never calls `useTheme()` and never reads the OS preference (`tools.md`, "Styling and tokens").
+   - The product is dark-first because of multi-hour working sessions (§0 rule 8). A site visit is minutes of reading, and the art direction is ink on paper.
+   - Following the OS would double every check. It would also need a blocking script in `<head>` to avoid a flash, and it would tangle with D3, since a dark plate disappears on a dark page.
+2. **Wherever a value differs by mode, Foundations shows both, side by side.** Dark and light are not mirrors (§0 rule 4), so one mode documents half the system:
+   - All of Color.
+   - Typography's text colour samples. Sizes don't change by mode and appear once.
+   - Constants' borders and the overlay sheet: paper on paper drawn by a rule in light, the `ledger-925` step in dark (§4 "Elevation").
+
+   Side by side, not a switch: the comparison is the content. Each dark sample is a container set to `data-theme="dark"` that sets its own ground and text colour.
+3. **The site must read in forced colours** (Windows high contrast), which removes backgrounds and shadows. Borders carry the structure (§0 rule 7). The check is in §11.
 
 **D5. The hero story, and every figure in it.** None of the wireframes' figures are in the data. There is no ¥184m gap, no ¥121m Tsukuba variance, no account 5900 and no ¥12.6m rebate accrual. September operating profit was ¥819m against a ¥794m budget, ahead rather than behind (`lastMonth` in `packages/ui/src/fixtures/kasane.ts`). The wireframe Lineage tree's "Operating profit, Sep, ¥312m" isn't in the data either. Two stories the data does support:
 - *(a) The September cut-off (recommended for the hero and Agent block).* `apps/demo/data/findings.json`, `revenue-cut-off`: invoice INV-KJP-2609-00363, ¥42.7m net, is dated 30 Sep 2026 but was delivered 2 Oct 2026, so the revenue belongs in October. The controller said the cut-off was clean. Question: "Was the September cut-off clean?" The answer cites the two source files the finding names. The proposed entry moves that revenue from 2026-09 to 2026-10. A person posts it.
@@ -360,6 +372,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - Every target is at least 24×24px, or has the spacing 2.5.8 allows. Stacked footer links need checking.
 - With reduced motion, no element animates.
 - A focused element is never fully hidden under the nav (2.4.11; D8).
+- In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4).
 
 **Keyboard and focus (scripted):**
 - After a client-side route change, focus moves to the new page's `<h1>` and the new title is announced. React Router does not do this.
