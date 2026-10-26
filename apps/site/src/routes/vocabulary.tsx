@@ -35,7 +35,7 @@ const waits = [
     name: 'agent-block',
     needs: 'Review of a change that would post to the books.',
     can: 'Approve, edit, or reject the exact entry.',
-    example: `Reverse duplicate invoice ${duplicatePayment.reverse}, ${duplicatePayment.amountLabel}`,
+    example: `Reverse the duplicate payment of ${duplicatePayment.amountLabel}`,
   },
 ];
 
@@ -69,8 +69,8 @@ export default function Vocabulary() {
         <Rail className="flex flex-col gap-[var(--gap-group)]">
           <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Vocabulary</h1>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-            Agent interfaces have no shared words yet. Shipping products say “pending approval”, “waiting for your
-            input” and “awaiting review” for overlapping things. These are the words Tabular uses.
+            The words Tabular uses when an agent is working, waiting for you, or done. Each word names one state, so a
+            label never means two things.
           </p>
         </Rail>
       </Section>

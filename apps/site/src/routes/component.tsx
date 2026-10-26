@@ -3,7 +3,7 @@ import { Button, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
-import { components, pages, storybookDocs } from '../content';
+import { componentPage, components, pages, storybookDocs } from '../content';
 import { textLink } from '../lib/styles';
 import { ComponentPair } from '../specimens';
 import NotFound from './not-found';
@@ -45,7 +45,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           />
           <MenuContent>
             {built.map((b) => (
-              <MenuItem key={b.name} render={<a href={`${pages.components.href}/${b.name}`} />}>
+              <MenuItem key={b.name} render={<a href={componentPage(b.name)} />}>
                 {b.title}
               </MenuItem>
             ))}
@@ -85,7 +85,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           className="flex justify-between gap-[var(--site-gap)] border-t border-border pt-[var(--site-gap)]"
         >
           {previous ? (
-            <a href={`${pages.components.href}/${previous.name}`} className={`${textLink} flex flex-col no-underline`}>
+            <a href={componentPage(previous.name)} className={`${textLink} flex flex-col no-underline`}>
               <span className="text-site-small text-text-secondary">Previous</span>
               <span className="text-site-title font-semibold text-text-primary underline">{previous.title}</span>
             </a>
@@ -94,7 +94,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           )}
           {next ? (
             <a
-              href={`${pages.components.href}/${next.name}`}
+              href={componentPage(next.name)}
               className={`${textLink} flex flex-col items-end text-right no-underline`}
             >
               <span className="text-site-small text-text-secondary">Next</span>

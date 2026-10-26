@@ -5,7 +5,7 @@ import { external, pages } from '../content';
 import { cn } from '../lib/cn';
 import { ExternalMark } from './layout';
 
-const internal = [pages.components, pages.vocabulary, pages.foundations].filter((page) => page.live);
+const internal = [pages.components, pages.principles, pages.vocabulary, pages.foundations].filter((page) => page.live);
 const elsewhere = [external.storybook, external.github];
 
 /**
@@ -22,7 +22,10 @@ const elsewhere = [external.storybook, external.github];
  */
 export function SiteNav() {
   const { pathname } = useLocation();
-  const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isCurrent = (page: (typeof internal)[number]) => {
+    const base = 'current' in page ? page.current : page.href;
+    return pathname === base || pathname.startsWith(`${base}/`);
+  };
 
   return (
     <header className="px-2 pt-2 md:px-4 min-[1200px]:px-8 min-[1200px]:pt-4">
@@ -46,8 +49,8 @@ export function SiteNav() {
               <li key={page.href}>
                 <a
                   href={page.href}
-                  aria-current={isCurrent(page.href) ? 'page' : undefined}
-                  data-active={isCurrent(page.href) ? '' : undefined}
+                  aria-current={isCurrent(page) ? 'page' : undefined}
+                  data-active={isCurrent(page) ? '' : undefined}
                   className={cn(
                     buttonVariants({ variant: 'ghost' }),
                     'text-text-secondary data-[active]:font-semibold data-[active]:text-text-primary',

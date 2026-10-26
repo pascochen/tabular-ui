@@ -1,4 +1,5 @@
-import { ClosingBand, HeroSection, MomentsSection, OutlineSection, PrinciplesSection } from '../sections';
+import { ComponentsSection } from '../component-grid';
+import { ClosingBand, HeroSection } from '../sections';
 import type { Route } from './+types/home';
 
 export const meta: Route.MetaFunction = () => [
@@ -9,14 +10,17 @@ export const meta: Route.MetaFunction = () => [
   },
 ];
 
-/** Home (wireframe `76:23`, mobile `77:96`): one moment, 3 principles, 5 moments, one closing band. */
+/**
+ * Home (wireframe `76:23`, mobile `77:96`): the hero, the component grid, and the
+ * closing band. The outline, principles and moments sections were removed
+ * 2026-10-26 (owner): the outline mixed in-page anchors with a link to another
+ * page, and the grid shows the moments and principles' components itself.
+ */
 export default function Home() {
   return (
     <>
       <HeroSection />
-      <OutlineSection />
-      <PrinciplesSection />
-      <MomentsSection />
+      <ComponentsSection />
       <ClosingBand />
     </>
   );

@@ -1,4 +1,4 @@
-import { pages, type SiteComponent } from '../content';
+import { componentPage, type SiteComponent } from '../content';
 import { focusRing } from '../lib/styles';
 import { cn } from '../lib/cn';
 
@@ -65,18 +65,16 @@ export function ComponentCard({
         )}
       </SpecimenFrame>
       <div className="flex flex-col gap-[var(--gap-control-icon)]">
-        <h3 className="text-site-title-sm font-semibold text-text-primary">
+        {/* An <h4>: the card sits under its moment's <h3>, in Home's Components section. */}
+        <h4 className="text-site-title-sm font-semibold text-text-primary">
           {component.built ? (
-            <a
-              href={`${pages.components.href}/${component.name}`}
-              className={cn('underline underline-offset-2', focusRing)}
-            >
+            <a href={componentPage(component.name)} className={cn('underline underline-offset-2', focusRing)}>
               {component.title}
             </a>
           ) : (
             component.title
           )}
-        </h3>
+        </h4>
         <p className="text-site-small text-text-secondary">{component.decision}</p>
       </div>
     </article>
@@ -89,10 +87,10 @@ export function ComponentCard({
  */
 export function ComponentTag({ component }: { component: SiteComponent }) {
   const base = 'inline-flex items-center rounded-xs border px-2 py-0.5 text-site-small';
-  if (component.built && pages.components.live) {
+  if (component.built) {
     return (
       <a
-        href={`${pages.components.href}/${component.name}`}
+        href={componentPage(component.name)}
         className={cn(base, 'border-border-strong text-text-body hover:bg-bg-hover', focusRing)}
       >
         {component.title}

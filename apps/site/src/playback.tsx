@@ -27,6 +27,11 @@ export function ReplayButton({ title, onClick }: { title: string; onClick: () =>
  * plate at the bottom right (wireframe `78:191`). The content is aria-busy while
  * it plays, so a screen reader doesn't read a half-built frame, and a Replay
  * says once that it has finished.
+ *
+ * While it plays, the rest frame sits invisibly in the same grid cell, so the
+ * plate keeps its rest height and Replay never makes the page jump (owner,
+ * 2026-10-26, on the Chat starter card). `invisible` also takes it out of the
+ * accessibility tree and the tab order.
  */
 export function Specimen({
   title,
@@ -41,8 +46,13 @@ export function Specimen({
   const { announce, message } = useAnnouncer();
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
-      <div aria-busy={playing || undefined} className="flex-1">
-        {children(frame)}
+      <div aria-busy={playing || undefined} className="grid flex-1 grid-cols-1">
+        <div className="col-start-1 row-start-1">{children(frame)}</div>
+        {frame < frames - 1 ? (
+          <div aria-hidden="true" className="invisible col-start-1 row-start-1">
+            {children(frames - 1)}
+          </div>
+        ) : null}
       </div>
       <div className="flex justify-end">
         <ReplayButton title={title} onClick={() => play(() => announce(`${title} replayed.`))} />
