@@ -20,15 +20,23 @@ export { storybookDocs } from './component-list';
  * is built page by page (docs/site.md §13).
  */
 export const pages = {
-  components: { href: '/components', label: 'Components', live: true },
-  vocabulary: { href: '/vocabulary', label: 'Vocabulary', live: true },
-  foundations: { href: '/foundations/color', label: 'Foundations', live: true },
+  // The component grid is on Home since 2026-10-26 (owner); /components redirects
+  // there (vercel.json). `current` is the path under which the nav marks it as
+  // the page you're on: the component pages.
+  components: { href: '/#components', label: 'Components', live: true, current: '/components' },
   principles: { href: '/principles', label: 'Principles', live: true },
+  vocabulary: { href: '/vocabulary', label: 'Vocabulary', live: true },
+  foundations: { href: '/foundations/color', label: 'Foundations', live: true, current: '/foundations' },
   gettingStarted: { href: '/getting-started', label: 'Getting started', live: true },
   color: { href: '/foundations/color', label: 'Color', live: true },
   typography: { href: '/foundations/typography', label: 'Typography', live: true },
   density: { href: '/foundations/density', label: 'Density', live: true },
 } as const;
+
+/** A built component's own page (docs/site.md §3). */
+export function componentPage(name: string): string {
+  return `/components/${name}`;
+}
 
 export const external = {
   storybook: { href: 'https://storybook.tabularui.com', label: 'Storybook' },

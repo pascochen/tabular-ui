@@ -17,7 +17,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D3 | Grounds | Bands: rules only. Plates: dark for single specimens (hero, component pages), paper in grids. Closing band dark |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
-| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after |
+| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live |
 | D7 | Closing band | "Give an agent a finance team's files."; Home only |
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
@@ -106,6 +106,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/findings.json`, `duplicate-payment`).
    - AP says the system blocks a duplicate supplier invoice number in every entity. KUS entered supplier invoice MFL-58821 twice, as API-KUS-2607-00007 and API-KUS-2607-00011, $48,216.40 each, and paid both. The sources are `05_interview_ar_ap_2026-10-14.txt` and `supplier_invoices_fy2026_h1.csv`.
    - The agent proposes reversing API-KUS-2607-00011, so the supplier owes the amount back. A person posts it.
+   - *Changed 2026-10-26 (owner review):* the question is "Did we pay any invoice twice?" ("this half" assumed the reader knows fiscal halves). The answer leads in plain words, "Invoice MFL-58821 was entered twice and paid twice, $48,216.40 each time", and the entry ID moves to the smaller source line. The proposed entry reads "Reverse the duplicate payment". The entity code and the first entry's ID no longer show, and the source line cites the invoice file only.
    - Why this story: the figure is exact, and the correction posts in October, which is open. The risk is plain, since money left the company. And the finding contradicts a person's claim, which is why a person decides.
    - The September cut-off (`revenue-cut-off`) was the first proposal and was set aside. September was locked on 8 Oct 2026 (`close-length`), so its correction would need explaining.
 2. **Lineage tree, Agent reasoning and Chat thread tell the H1 gap.** H1 operating profit was ¥2.2bn against a ¥2.5bn budget, ¥355m under. `operatingBridge` splits the gap into six named steps, and exchange rates account for ¥317m of it (the two FX steps, summed in code). Together the two stories cover both halves of the product's promise: explain the numbers, and stop before changing the books.
@@ -123,6 +124,8 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 2. **The one motion is the visitor's.** Pressing Post entry sets the label to "AI · Posted" and `meta` to "posted by you", removes the actions, and writes the run log row (D1, D2).
 3. **Then a single control appears: Replay.** It plays the whole run (question, answer, proposal) in 5 seconds or less, and stops at the proposal, waiting again.
 4. **The run log row's space is held by a dashed slot** reading "Run log row is written here after Post" (draft copy). Dashed means placeholder (§7.8, "Border style"). The slot keeps the page from jumping when the row arrives, and says what Post will do before it's pressed.
+
+*Changed 2026-10-26 (owner review):* the hero is a teaser. Website heroes are rarely interactive, and visitors miss it. It rests on the waiting proposal with no buttons, and Replay, always shown, plays the run back to it. Post entry, Edit entry and Don't post (items 1–3) stay on the Agent block card. The dashed slot (item 4) is removed everywhere, because readers didn't understand it.
 
 Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
@@ -229,7 +232,7 @@ Every route is prerendered to static HTML at build time.
 |---|---|---|
 | `/` | Home | `76:23` desktop, `77:96` mobile |
 | `/principles` | Principles | `77:230` |
-| `/components` | Components | `78:191` |
+| `/components` | Redirects (308, `vercel.json`) to `/#components`, Home's component grid, since 2026-10-26 | `78:191` |
 | `/components/<name>` | One page per **built** component | `78:595` (Agent block) |
 | `/vocabulary` | Vocabulary | `79:345` |
 | `/foundations/color` | Color | `79:537` |
@@ -247,20 +250,18 @@ Every route is prerendered to static HTML at build time.
 
 Layout comes from each wireframe frame. This section records what the frames don't: where each part's content comes from, and where the frame changes.
 
-**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide (3 principles, 5 moments, 15 components, Vocabulary, Getting started), Foundations (Color, Typography, Density) and Try it (Demo ↗, Storybook ↗, GitHub ↗). "5 moments" goes to Home's moments section. Beside them sit the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
+**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components (`/#components`), Principles, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide (3 principles, 15 components, Vocabulary, Getting started), Foundations (Color, Typography, Density) and Try it (Demo ↗, Storybook ↗, GitHub ↗). *Changed 2026-10-26:* Principles joined the nav, and "5 moments" left the footer with Home's moments section. Beside them sit the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
 
-**Home** (`76:23`, `77:96`):
-- The hero: heading, lead, two actions, and the live specimen (D5, D6).
-- The outline: "3 principles", "5 moments" and "15 components", each jumping to its section or page and moving focus there.
-- The 3 principles as cards, each with its Check line and the chips of the components that carry it.
-- The 5 moments, each with its built count.
+**Home** (`76:23`, `77:96`), changed 2026-10-26 (owner review):
+- The hero: heading, lead, two actions, and the teaser specimen (D5, D6).
+- The component grid, the Components page's content below (`#components`).
 - The closing band (D7).
 
-Counts are computed from the component list (§5), never typed. On mobile the outline moves under the hero's actions.
+The outline ("3 principles", "5 moments", "15 components"), the principles cards and the moments section were removed. The outline mixed two in-page anchors with a link to another page, and the grid already groups the components by moment. The principles keep their page, now in the nav. Counts are computed from the component list (§5), never typed.
 
 **Principles** (`77:230`). The three rules, each with its why, its Check line and the components that carry it. A to-build component's chip is dashed, and its label carries the state as text, since the dash alone is a visual signal (§0 rule 1; `docs/design-system.md` §7.8, "Border style"). The wireframe marks the Check lines as drafts; they are owner copy.
 
-**Components** (`78:191`). A title and lead, a filter for All, Built and To build, and a jump index grouped by moment. Then one section per moment, holding a card per component: the specimen in its frame, the name, and the decision line. A to-build card has a dashed frame and the text "Not built yet". "Try each one with data from Kasane, a fictional printer maker" stays in the lead.
+**Components** (`78:191`), a section of Home since 2026-10-26, under an `<h2>` "15 components", with each moment an `<h3>` and each card an `<h4>`. A title and lead, a filter for All, Built and To build, and a jump index grouped by moment. Then one section per moment, holding a card per component: the specimen in its frame, the name, and the decision line. A to-build card has a dashed frame and the text "Not built yet". "Try each one with data from Kasane, a fictional printer maker" stays in the lead.
 
 **Component page** (`78:595`):
 - A jump menu, built with the library's `Menu`.
@@ -354,12 +355,12 @@ A test checks that every displayed total in an exact view equals the sum of its 
 - **One announcement.** A polite live region announces the final state once ("Posted"), never each step. It empties after it has been read, as `AgentReasoning` does with its own region.
 - **No randomness, no network, no AI.** A specimen is a script.
 
-**The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. A dashed slot below it holds the run log row's space.
-- Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row into the slot, `passed` (D1, D2).
+**The hero** (D5, D6) is a teaser since 2026-10-26: it rests on the question and the waiting proposal, with no buttons and no slot, and Replay plays the run back to it. Everything below describes the **Agent block card**, which keeps the decision. (Until then it described the hero, and a dashed slot held the run log row's space.)
+- Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row beneath it, `passed` (D1, D2).
 - Replay then plays the run from the question back to the waiting proposal, in 5 seconds or less.
 - **Don't post** (decided 2026-10-26, owner) declines as Post accepts:
   - The label becomes "AI · Not posted", with `meta` "declined by you".
-  - The buttons go, and a `skipped` run log row naming the invoice fills the slot: nothing reached the books.
+  - The buttons go, and a `skipped` run log row naming the invoice appears: nothing reached the books.
   - It is announced once ("Not posted."), and Replay appears.
 - **Edit entry** (decided 2026-10-26, owner) turns the entry's memo and period into the library's `Field` and `Input`, with Done and Cancel.
   - Done returns to the proposal showing the change, still waiting for Post.
@@ -539,6 +540,12 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - a card rewinding unseen and playing on scroll;
   - a card's Replay and its announcement;
   - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
+
+**Owner review of Home and Vocabulary, as built (2026-10-26):**
+- **The hero is a teaser** (D6, changed): no buttons, no dashed slot, Replay always shown. The Agent block card in the grid keeps Post entry, Edit entry and Don't post.
+- **Home is the hero, the component grid and the closing band.** `/components` redirects to `/#components` with a 308 in `vercel.json`. The route is gone, so the build no longer prerenders it. Component pages stay at `/components/<name>` (`componentPage()` in `src/content.ts`).
+- **A specimen holds its rest height while it plays.** The hero hides the parts of the run not reached yet, so they hold their space. A card puts its rest frame, invisible, in the same grid cell as the frame playing. Replay used to rewind to the first frame, so the plate shrank and the page jumped: the hero after Post, and the Agent plan card from 430px to 366px at desktop. `tests/playback.spec.ts` measures every card's height on the first frame of a Replay, at 1280px and 390px, and the hero's mid-run. It was proved to fail without the change.
+- **Copy, from a microcopy pass:** the hero question and answer (D5), and Vocabulary's lead, "The words Tabular uses when an agent is working, waiting for you, or done. Each word names one state, so a label never means two things.", which replaces a claim about what other products say. The ten pair captions, Getting started and the 404 are approved as written.
 
 **Step 5a, as built (2026-10-26):**
 - **The 404.** React Router prerenders `/404`, and the build copies it to `build/client/404.html`, which Vercel serves with a 404 status for any path it has no file for. The catch-all route renders the same page, so a client-side navigation to a missing path shows it too. `tests/serve.mjs` serves `404.html` the same way, and a test checks the status, the page, and one skip link after hydration.

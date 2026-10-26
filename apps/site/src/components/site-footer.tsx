@@ -16,7 +16,6 @@ const columns: { title: string; links: FooterLink[] }[] = [
     title: 'Guide',
     links: [
       { href: pages.principles.href, label: '3 principles', live: pages.principles.live },
-      { href: '/#moments', label: '5 moments', live: true },
       { href: pages.components.href, label: '15 components', live: pages.components.live },
       { href: pages.vocabulary.href, label: pages.vocabulary.label, live: pages.vocabulary.live },
       { href: pages.gettingStarted.href, label: pages.gettingStarted.label, live: pages.gettingStarted.live },

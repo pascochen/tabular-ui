@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
@@ -21,7 +23,6 @@ const componentPages = [
 const routes = [
   '/',
   '/principles',
-  '/components',
   ...componentPages,
   '/vocabulary',
   '/foundations/color',
@@ -143,4 +144,17 @@ test.describe('component pages', () => {
       expect(before).not.toBe(after);
     });
   }
+});
+
+test.describe('the component grid', () => {
+  // On Home since 2026-10-26 (owner). Vercel answers /components with a 308 to
+  // it; the test server serves files only, so the redirect is checked in vercel.json.
+  test('is on Home, and /components redirects there', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#components').getByRole('heading', { level: 2 })).toHaveText('15 components');
+    const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
+      redirects: { source: string; destination: string; permanent: boolean }[];
+    };
+    expect(vercel.redirects).toContainEqual({ source: '/components', destination: '/#components', permanent: true });
+  });
 });

@@ -30,8 +30,8 @@ import { LiveRegion, ReplayButton, Specimen } from './playback';
  * HTML shows.
  */
 
-/** The question the hero and the chat specimens answer (D5). Draft copy. */
-const question = 'Did we pay any supplier twice this half?';
+/** The question the hero and the chat specimens answer (D5). Owner copy, 2026-10-26. */
+const question = 'Did we pay any invoice twice?';
 
 const noop = () => {};
 
@@ -43,8 +43,10 @@ type Outcome = 'waiting' | 'editing' | 'posted' | 'declined';
 type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
 
 /**
- * The agent's proposal, live. It stops and waits; the visitor is the person it
- * waits for (D6).
+ * The agent's proposal. In the hero it's a teaser (owner, 2026-10-26): it rests
+ * on the waiting proposal with no buttons, and Replay plays the run back to it.
+ * On the Agent block card it's live: it stops and waits, and the visitor is the
+ * person it waits for (D6).
  * - **Post entry** sets the label to "AI · Posted" and meta to "posted by you",
  *   and writes a passed run log row with the entry's journal number (D1, D2).
  * - **Don't post** sets "AI · Not posted", "declined by you", and a skipped row:
@@ -63,8 +65,11 @@ type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
  */
 function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' | 'posted' }) {
   const d = duplicatePayment;
-  const [first, second] = d.entries;
-  const defaults = { period: kasane.company.openPeriod, memo: `Reverse duplicate invoice ${d.reverse}` };
+  const invoices = d.sources.find((s) => s.endsWith('.csv'));
+  if (!invoices) throw new Error('kasane.json’s duplicate payment cites no invoice file');
+  const defaults = { period: kasane.company.openPeriod, memo: 'Reverse the duplicate payment' };
+  // The hero is a teaser, and a fixed proposal is a pair's plate: neither takes a decision.
+  const live = !hero && !fixed;
 
   // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
   const { ref, frame, playing, play } = usePlayback({ frames: 4, autoplay: !hero && !fixed });
@@ -98,7 +103,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
     setDraft(defaults);
     setFocusTarget(null);
     play(() => {
-      setFocusTarget('post');
+      if (live) setFocusTarget('post');
       announce('Awaiting review.');
     });
   };
@@ -116,20 +121,20 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
             <span className="font-medium text-text-body">Question:</span> {question}
           </p>
         ) : null}
-        {frame >= 1 || !hero ? (
+        {/* A part the run hasn't reached yet is hidden, not absent, so the plate
+            keeps its rest height while it plays and Replay never makes it jump. */}
+        <div {...unreached(frame < 1 && hero)}>
           <AgentBlock authorship={authorship} meta={meta}>
             <div className="flex flex-col gap-[var(--gap-group)]">
               <p>
-                Yes. {d.entity} entered supplier invoice <code>{d.supplierInvoice}</code> twice, as <code>{first}</code>{' '}
-                and <code>{second}</code>, {d.amountLabel} each, and {d.paid.every(Boolean) ? 'paid both' : 'paid one'}.
+                Yes. Invoice <code>{d.supplierInvoice}</code> was entered twice and{' '}
+                {d.paid.every(Boolean) ? 'paid twice' : 'paid once'}, {d.amountLabel} each time.
               </p>
-              {frame >= 2 ? (
-                <p className="text-text-secondary">
-                  From <code>{packFile(d.sources[0])}</code> and <code>{packFile(d.sources[1])}</code>. I can reverse{' '}
-                  <code>{d.reverse}</code>, so the supplier owes the amount back.
-                </p>
-              ) : null}
-              {frame >= 3 ? (
+              <p className="text-text-secondary" {...unreached(frame < 2)}>
+                Found in <code>{packFile(invoices)}</code>. I can reverse the second entry, <code>{d.reverse}</code>, so
+                the supplier owes it back.
+              </p>
+              <div {...unreached(frame < 3)}>
                 <div className="flex flex-col gap-[var(--gap-bonded)] border border-border p-[var(--pad-card)]">
                   <p className="text-xs font-medium text-text-secondary">
                     {outcome === 'posted' ? 'Journal entry' : 'Proposed journal entry'}
@@ -157,7 +162,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                         )}
                       </Field>
                       <p className="text-text-secondary">
-                        {d.entity}, {d.amountLabel}. The amount is the duplicate’s, and can’t be changed here.
+                        {d.amountLabel}. The amount is the duplicate’s, and can’t be changed here.
                       </p>
                       <div className="flex flex-wrap gap-[var(--gap-inline)]">
                         <Button
@@ -187,7 +192,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                     <>
                       <p className="font-medium text-text-primary">{entry.memo}</p>
                       <p className="text-text-secondary">
-                        {d.entity}, {d.amountLabel}, period {entry.period}
+                        {d.amountLabel}, period {entry.period}
                         {outcome === 'posted' ? (
                           <>
                             , <code>{d.nextJournalId}</code>
@@ -196,7 +201,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                       </p>
                     </>
                   )}
-                  {outcome === 'waiting' && !fixed ? (
+                  {outcome === 'waiting' && live ? (
                     <div className="mt-2 flex flex-wrap gap-[var(--gap-inline)]">
                       <Button size="sm" ref={postRef} onClick={() => decide('posted')}>
                         Post entry
@@ -219,22 +224,19 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                     </div>
                   ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
           </AgentBlock>
-        ) : null}
-        {/* The run log row's slot (D6): dashed while it waits, filled once a person decides. */}
+        </div>
+        {/* The run log row, written once a person decides (D6). Nothing holds its
+            place before then: the dashed slot was removed (owner, 2026-10-26). */}
         {outcome === 'posted' ? (
           <RunLogRow status="passed" name={d.nextJournalId} />
         ) : outcome === 'declined' ? (
           <RunLogRow status="skipped" name={d.reverse} />
-        ) : frame >= 3 && !fixed ? (
-          <p className="border border-dashed border-border-strong px-[var(--pad-card)] py-2 text-sm text-text-secondary">
-            Run log row is written here after Post.
-          </p>
         ) : null}
       </div>
-      {decided && !fixed ? (
+      {hero || (decided && live) ? (
         <div ref={replayRef} className="flex justify-end">
           <ReplayButton title={hero ? 'the hero’s run' : 'Agent block'} onClick={replay} />
         </div>
@@ -242,6 +244,11 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
       <LiveRegion message={message} />
     </div>
   );
+}
+
+/** Hides a part the run hasn't reached: invisible, so it holds its space, and out of the accessibility tree. */
+function unreached(hidden: boolean) {
+  return hidden ? { className: 'invisible', 'aria-hidden': true as const } : {};
 }
 
 export function HeroSpecimen() {
