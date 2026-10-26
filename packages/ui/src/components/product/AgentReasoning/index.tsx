@@ -166,7 +166,7 @@ function AgentReasoning({
           <span className="tabular-nums">{summary(status, durationSeconds)}</span>
         )}
         {/*
-          §5 "agent working": the Spinner. Same colour as its label (§11.1);
+          §5 "AI working": the Spinner. Same colour as its label (§11.1);
           the AgentBlock around it already says "agent". Under reduced motion
           it stands still and the figure keeps counting.
         */}
