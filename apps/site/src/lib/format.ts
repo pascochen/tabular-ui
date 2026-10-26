@@ -34,3 +34,10 @@ export function exactMoney(value: number, currency: Currency = 'JPY'): string {
   const sign = value < 0 ? '-' : '';
   return `${sign}${SYMBOL[currency]}${abs.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
+
+/** A file's size, as the demo shows it (apps/demo/src/lib/files.ts): `552 KB`, `1.3 MB`. */
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${bytes} B`;
+}

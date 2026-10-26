@@ -15,14 +15,14 @@ import registry from '../../../packages/ui/registry.json';
  * is built page by page (docs/site.md §13).
  */
 export const pages = {
-  components: { href: '/components', label: 'Components', live: false },
+  components: { href: '/components', label: 'Components', live: true },
   vocabulary: { href: '/vocabulary', label: 'Vocabulary', live: false },
-  foundations: { href: '/foundations/color', label: 'Foundations', live: false },
+  foundations: { href: '/foundations/color', label: 'Foundations', live: true },
   principles: { href: '/principles', label: 'Principles', live: false },
   gettingStarted: { href: '/getting-started', label: 'Getting started', live: false },
-  color: { href: '/foundations/color', label: 'Color', live: false },
-  typography: { href: '/foundations/typography', label: 'Typography', live: false },
-  density: { href: '/foundations/density', label: 'Density', live: false },
+  color: { href: '/foundations/color', label: 'Color', live: true },
+  typography: { href: '/foundations/typography', label: 'Typography', live: true },
+  density: { href: '/foundations/density', label: 'Density', live: true },
 } as const;
 
 export const external = {
