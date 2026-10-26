@@ -20,14 +20,50 @@ const HUE_RE = new RegExp(`\\b(?:${alternation(BANNED_SCALES)})-(?:${alternation
 const HEX_RE = /#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/i;
 const CHROMATIC_DEEP_RE = new RegExp(`\\b(?:${alternation(CHROMATIC_SCALES)})-9(?:00|25|50)\\b`);
 
+// CSS Color 4's 148 named colours. `transparent` and `currentcolor` are not
+// on the list, and neither are the CSS-wide keywords, so those stay allowed.
+// `orchid` and `teal` are also Riso ramp names: bare, they are the browser's
+// colours, not ours.
+const NAMED_COLORS = (
+  'aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood ' +
+  'cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod ' +
+  'darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon ' +
+  'darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray ' +
+  'dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green ' +
+  'greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon ' +
+  'lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon ' +
+  'lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen ' +
+  'magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue ' +
+  'mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy ' +
+  'oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip ' +
+  'peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown ' +
+  'seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal ' +
+  'thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen'
+).split(' ');
+// A whole word only: `--color-white`, `white-space` and `ledger-950` are not
+// keywords. Strings and url() are blanked first, since a name inside them is text.
+const NAMED_COLOR_RE = new RegExp(`(?<![\\w-])(?:${NAMED_COLORS.join('|')})(?![\\w-])`, 'i');
+const QUOTED_OR_URL_RE = /"[^"]*"|'[^']*'|\burl\([^)]*\)/gi;
+// Properties whose values are names, never colours (`font-family: Red Hat`,
+// `animation-name: tomato`), after Stylelint's own color-named rule.
+const CUSTOM_IDENT_PROP_RE =
+  /^(?:font|font-family|animation|animation-name|counter-(?:increment|reset|set)|grid-(?:row|column|area)|list-style(?:-type)?|transition(?:-property)?|will-change)$/i;
+// A mask sets opacity and never paints a colour, so `black 12%` in a mask gradient
+// is an opacity stop (apps/site's ruled sheet). Named colours are allowed
+// there; hex and ramp names are not.
+const MASK_PROP_RE = /^(?:-webkit-)?mask(?:-|$)/i;
+
 const docsUrl = 'docs/design-system.md';
 
-/* Rule 1 (CSS half) — no raw hex, no raw scale names outside theme.css and
-   palette.css. File scoping happens in .stylelintrc.json overrides. */
+/* Rule 1 (CSS half) — no raw hex, no raw scale names and no named colour
+   keywords outside theme.css and palette.css. File scoping happens in
+   .stylelintrc.json overrides. */
 const noRawColorName = 'tui/no-raw-color';
 const noRawColorMessages = ruleMessages(noRawColorName, {
   rejected: (value) =>
     `Raw color "${value}" outside theme.css. Raw hues and hex break mode switching and any future hue change, silently. Reach for the semantic layer: --color-text-danger, bg-bg-danger. See ${docsUrl} §9 "Naming" and CLAUDE.md rule 10.`,
+  named: (value) =>
+    `Named color "${value}" outside theme.css. A keyword is a raw colour: it does not switch with the mode, and §0 rule 9 bans pure black outright. Reach for the semantic layer: var(--color-canvas), var(--color-text-primary). transparent, currentcolor, inherit, initial and unset are allowed, and so is a keyword in a mask property (mask, mask-image), which sets opacity and never paints a colour. See ${docsUrl} §9 "Naming" and CLAUDE.md rule 10.`,
 });
 const noRawColor = (primary) => (root, result) => {
   if (!validateOptions(result, noRawColorName, { actual: primary, possible: [true] })) return;
@@ -40,6 +76,18 @@ const noRawColor = (primary) => (root, result) => {
         message: noRawColorMessages.rejected(bad[0]),
         node: decl,
         word: bad[0],
+      });
+      return;
+    }
+    if (MASK_PROP_RE.test(decl.prop) || CUSTOM_IDENT_PROP_RE.test(decl.prop)) return;
+    const named = decl.value.replace(QUOTED_OR_URL_RE, (m) => ' '.repeat(m.length)).match(NAMED_COLOR_RE);
+    if (named) {
+      report({
+        result,
+        ruleName: noRawColorName,
+        message: noRawColorMessages.named(named[0]),
+        node: decl,
+        word: named[0],
       });
     }
   });
