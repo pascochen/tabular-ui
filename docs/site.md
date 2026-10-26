@@ -89,13 +89,19 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
    Side by side, not a switch: the comparison is the content. Each dark sample is a container set to `data-theme="dark"` that sets its own ground and text colour.
 3. **The site must read in forced colours** (Windows high contrast), which removes backgrounds and shadows. Borders carry the structure (§0 rule 7). The check is in §11.
 
-**D5. The hero story, and every figure in it.** None of the wireframes' figures are in the data. There is no ¥184m gap, no ¥121m Tsukuba variance, no account 5900 and no ¥12.6m rebate accrual. September operating profit was ¥819m against a ¥794m budget, ahead rather than behind (`lastMonth` in `packages/ui/src/fixtures/kasane.ts`). The wireframe Lineage tree's "Operating profit, Sep, ¥312m" isn't in the data either. Two stories the data does support:
-- *(a) The September cut-off (recommended for the hero and Agent block).* `apps/demo/data/findings.json`, `revenue-cut-off`: invoice INV-KJP-2609-00363, ¥42.7m net, is dated 30 Sep 2026 but was delivered 2 Oct 2026, so the revenue belongs in October. The controller said the cut-off was clean. Question: "Was the September cut-off clean?" The answer cites the two source files the finding names. The proposed entry moves that revenue from 2026-09 to 2026-10. A person posts it.
-- *(b) The H1 operating profit gap (recommended for Lineage tree and Agent reasoning).* `kasane.ts`: H1 operating profit was ¥2.2bn against a ¥2.5bn budget, ¥355m under, and `operatingBridge` splits that gap into six named steps. Exchange rates account for ¥317m of it (the two FX steps, summed in code).
+**D5. The stories and their figures — decided 2026-10-25 (owner).** None of the wireframes' figures are in the data: no ¥184m gap, no ¥121m Tsukuba variance, no account 5900, no ¥12.6m rebate accrual, and no "Operating profit, Sep, ¥312m". September operating profit was ¥819m against a ¥794m budget, ahead rather than behind (`lastMonth` in `packages/ui/src/fixtures/kasane.ts`). A site whose second principle is "Every number opens down to the entry behind it" opens with figures that have entries behind them.
 
-  Two figures still need a source:
-  - The posted entry's journal number. The site may not invent one. The export script can compute the next number in the KJP October sequence from `manual_journal_entries_fy2026_h1.csv`, in the format `JE-KUK-2608-00055` uses.
-  - `money()` in `packages/ui/src/fixtures/format.ts` rounds amounts of ¥10m or more to whole millions, so the invoice shows as "¥43m", not the finding's "¥42.7m". Pick one rule. I'd keep the formatter's.
+1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/findings.json`, `duplicate-payment`).
+   - AP says the system blocks a duplicate supplier invoice number in every entity. KUS entered supplier invoice MFL-58821 twice, as API-KUS-2607-00007 and API-KUS-2607-00011, $48,216.40 each, and paid both. The sources are `05_interview_ar_ap_2026-10-14.txt` and `supplier_invoices_fy2026_h1.csv`.
+   - The agent proposes reversing API-KUS-2607-00011, so the supplier owes the amount back. A person posts it.
+   - Why this story: the figure is exact, and the correction posts in October, which is open. The risk is plain, since money left the company. And the finding contradicts a person's claim, which is why a person decides.
+   - The September cut-off (`revenue-cut-off`) was the first proposal and was set aside. September was locked on 8 Oct 2026 (`close-length`), so its correction would need explaining.
+2. **Lineage tree, Agent reasoning and Chat thread tell the H1 gap.** H1 operating profit was ¥2.2bn against a ¥2.5bn budget, ¥355m under. `operatingBridge` splits the gap into six named steps, and exchange rates account for ¥317m of it (the two FX steps, summed in code). Together the two stories cover both halves of the product's promise: explain the numbers, and stop before changing the books.
+3. **Prose is compact; parts beside their total are exact.**
+   - Rounded separately, the bridge's two FX steps show as ¥41m and ¥275m, which add to ¥316m. Their exact sum rounds to ¥317m. A total that doesn't match its displayed parts is a footing error, and finance readers distrust the whole screen when they see one.
+   - So a sentence says "¥317m", while a lineage tree or a table shows exact yen (¥316,748,831 beside ¥41,415,809 and ¥275,333,022), and its parts always add up.
+   - `docs/agent-voice.md` quoted "¥316m of the ¥355m shortfall", the sum of rounded parts. It's corrected to ¥317m.
+4. **The posted entry's journal number is computed, never typed.** `export-fixtures.mjs` derives the next number in KUS's October sequence from `manual_journal_entries_fy2026_h1.csv`, in the format `JE-KUK-2608-00055` uses (A5).
 
 **D6. The hero rests; it does not autoplay.** The wireframe note says the hero "Plays once on load". The hero is the first screen. If it autoplays, the prerendered page shows the decision frame, then JavaScript rewinds it to frame 1 and plays it: a visible jump on the most-viewed frame of the site. The hero's motion is the visitor's own: pressing Post entry. Specimens lower down play once when they scroll into view (§6).
 
@@ -205,7 +211,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 
 **Vocabulary** (`79:345`):
 - The 5 moments, compact.
-- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. The wireframe marks these definitions as drafts.
+- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. The wireframe marks these definitions as drafts. Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
 - Status words, as the three vocabularies of D1, each in its own table:
   - Statuses are read from `runStatuses` and rendered as real `StatusBadge`s.
   - Activity lines are rendered by `AgentReasoning` and `ChatThread` in their working and finished states, so the words on the page are the component's own.
@@ -253,11 +259,15 @@ The site has three kinds of content, and each has one source.
 
 A test fails if a name in it is neither a registry item nor marked as to build.
 
-**Kasane data.** Every figure, ID, file name and date in a specimen comes from data. The site never imports `packages/ui/src/fixtures/kasane.ts`: fixtures are story data and are not in the package's `dist` (`tools.md`, "Package and releases"). `apps/demo/data/*.json` belongs to the demo. Instead, `export-fixtures.mjs` writes `apps/site/data/*.json` with exactly the records the specimens use (A5): the cut-off invoice, the operating bridge, the pack's file names and sizes, and the next journal number. It is the one generator for all three consumers.
+**Kasane data.** Every figure, ID, file name and date in a specimen comes from data. The site never imports `packages/ui/src/fixtures/kasane.ts`: fixtures are story data and are not in the package's `dist` (`tools.md`, "Package and releases"). `apps/demo/data/*.json` belongs to the demo. Instead, `export-fixtures.mjs` writes `apps/site/data/*.json` with exactly the records the specimens use (A5): the duplicate supplier invoice and its two entries, the operating bridge, the pack's file names and sizes, and the next KUS October journal number. It is the one generator for all three consumers.
 
 A test scans `apps/site/src` for currency figures and long digit runs outside `data/`, so a typed figure fails the build instead of passing silently.
 
-**Formatting** goes through one formatter. Format strings belong in the export, or in a copy of `format.ts`'s rules kept in `apps/site` with a test against the same inputs.
+**Formatting** goes through one formatter. Format strings belong in the export, or in a copy of `format.ts`'s rules kept in `apps/site` with a test against the same inputs. Two forms (D5):
+- *Compact* in prose and single figures (`¥355m`, `$48,216.40`).
+- *Exact* wherever parts sit beside their total: a lineage tree, a table, a bridge.
+
+A test checks that every displayed total in an exact view equals the sum of its displayed parts.
 
 ## 6. Specimens
 
@@ -279,11 +289,11 @@ A test scans `apps/site/src` for currency figures and long digit runs outside `d
 |---|---|---|
 | Chat starter | Suggested questions; a pick fills the composer and never sends | Written questions, no figures |
 | Chat composer | A file attaching, Send held until it uploads | A file name and size from the pack |
-| Agent reasoning | Folded summary; open, it lists the files read | Pack file names; the gap and FX figures |
+| Agent reasoning | Folded summary of the H1 gap; open, it lists the files read | Pack file names; the gap and FX figures, compact |
 | Agent plan | A plan's steps, ticking through | Pack file names |
-| Lineage tree | H1 operating profit down to the bridge's six steps | `operatingBridge` |
+| Lineage tree | H1 operating profit down to the bridge's six steps | `operatingBridge`, exact yen |
 | Attachment row | Three source files, name as link | The pack |
-| Agent block | The cut-off entry, proposed | `revenue-cut-off` |
+| Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
 | Run log row | The run's steps, one failed and opened | **Open:** the stories use dbt model names, which aren't Kasane data. The export should produce the run's steps from what the agent read. |
 | Status badge | Each status in `runStatuses` | The library |
