@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 3 of §13 are built: `apps/site` is live at tabularui.com.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 3 of §13 are built and step 4 is in review: `apps/site` is live at tabularui.com.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -357,7 +357,15 @@ A test checks that every displayed total in an exact view equals the sum of its 
 **The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. A dashed slot below it holds the run log row's space.
 - Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row into the slot, `passed` (D1, D2).
 - Replay then plays the run from the question back to the waiting proposal, in 5 seconds or less.
-- Edit entry and Don't post are real controls. What each does in the specimen is open: owner copy, settled in PR 4.
+- **Don't post** (decided 2026-10-26, owner) declines as Post accepts:
+  - The label becomes "AI · Not posted", with `meta` "declined by you".
+  - The buttons go, and a `skipped` run log row naming the invoice fills the slot: nothing reached the books.
+  - It is announced once ("Not posted."), and Replay appears.
+- **Edit entry** (decided 2026-10-26, owner) turns the entry's memo and period into the library's `Field` and `Input`, with Done and Cancel.
+  - Done returns to the proposal showing the change, still waiting for Post.
+  - The amount stays read-only, with a line saying why: it is the duplicate's, from data.
+  - Focus goes to the period field on Edit, and back to Edit entry on Done or Cancel.
+- After Post or Don't post, focus moves to Replay. After Replay finishes, focus moves to Post entry and "Awaiting review." is announced. Focus is never dropped on the page.
 
 On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draws it.
 
@@ -513,5 +521,21 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - The Lineage tree shows the bridge in exact yen, and a test checks that budget plus its steps equals the actual.
   - The Chat thread's scroller is bounded by an aspect ratio, not a height, which keeps it inside the control-height cap.
 - **Components and Foundations are live** in the nav, footer and outline, and a principle's built component tags link to their cards.
+
+**Step 4, as built (2026-10-26):**
+- **One player for every card** (`src/lib/playback.ts`, `src/playback.tsx`):
+  - Each specimen is a list of frames, and the last is the rest frame the prerendered HTML shows.
+  - A card that is out of view after the page loads rewinds unseen, and plays once when half of it has scrolled in. A card already on screen at load stays at rest.
+  - Steps are 900ms apart, or closer, so every sequence fits in 5 seconds.
+  - Reduced motion never rewinds, and Replay jumps straight to rest.
+- **While a card plays, its content is `aria-busy`.** A card's Replay says once that it finished ("Agent plan replayed."). Each Replay button is named for its specimen ("Replay Agent plan"), and its visible text, "Replay", is part of that name (WCAG 2.5.3).
+- **The proposal is one stateful component**, shared by the hero (which never autoplays, D6) and the Agent block card (which does).
+- **The Lineage tree and the failed Run log row remount to open.** Both take their open state only on mount.
+- **`data-hydrated` on `<html>`** marks when React has hydrated the prerendered page. The tests wait for it before pressing anything.
+- **`tests/playback.spec.ts` covers:**
+  - the hero's Post entry, Replay, Don't post and Edit entry, with each announcement and where focus goes;
+  - a card rewinding unseen and playing on scroll;
+  - a card's Replay and its announcement;
+  - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

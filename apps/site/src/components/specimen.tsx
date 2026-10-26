@@ -35,7 +35,7 @@ export function SpecimenFrame({
     <div className={cn('flex flex-col border border-border-strong p-2', placeholder && 'border-dashed', className)}>
       <div
         data-theme={ground === 'dark' ? 'dark' : undefined}
-        className="flex-1 bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
+        className="flex flex-1 flex-col bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
       >
         {children}
       </div>
