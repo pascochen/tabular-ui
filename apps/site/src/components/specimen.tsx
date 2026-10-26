@@ -15,7 +15,8 @@ export type Ground = 'paper' | 'dark';
  * A dark plate sets `data-theme="dark"`: theme.css scopes dark mode as
  * `[data-theme='dark']`, so every token recomputes inside it and the components
  * draw in the mode they were designed for. It sets its own ground and text
- * colour, because inherited text comes from the light page (D4).
+ * colour, because inherited text comes from the light page (D4). `data-plate`
+ * names the plate on either ground, so a test can find it without assuming one.
  *
  * A component that isn't built has a dashed frame, and says so in words: dashed
  * means placeholder (§7.8), and colour or shape is never the only signal.
@@ -35,6 +36,7 @@ export function SpecimenFrame({
     <div className={cn('flex flex-col border border-border-strong p-2', placeholder && 'border-dashed', className)}>
       <div
         data-theme={ground === 'dark' ? 'dark' : undefined}
+        data-plate={ground}
         className="flex flex-1 flex-col bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
       >
         {children}
