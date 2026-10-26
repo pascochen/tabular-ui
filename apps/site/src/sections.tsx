@@ -11,17 +11,24 @@ import { HeroSpecimen } from './specimens';
 /** Home's sections (wireframe `76:23`, mobile `77:96`). */
 
 /**
- * The hero's one specimen sits on a paper plate, framed in ink, on a sheet
- * ruled like a spreadsheet (D3, item 3). The rules are a decorative layer
- * behind the content, in index.css.
+ * The hero's one specimen sits on a paper plate on a sheet ruled like a
+ * spreadsheet (D3, item 3). The rules are a decorative layer behind the
+ * content, styled in index.css: one empty element per column, whose border
+ * is the column's line.
  */
+const sheetColumns = Array.from({ length: 36 }, (_, i) => i);
+
 export function HeroSection() {
   return (
     <Section rule={false} labelledBy="hero-title" className="relative isolate">
       <div aria-hidden="true" className="site-sheet pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <Rail className="h-full">
           <div className="relative h-full">
-            <div className="site-sheet-rules absolute inset-y-0" />
+            <div className="site-sheet-rules absolute inset-y-0">
+              {sheetColumns.map((i) => (
+                <div key={i} />
+              ))}
+            </div>
           </div>
         </Rail>
       </div>
@@ -45,7 +52,7 @@ export function HeroSection() {
             ) : null}
           </div>
         </div>
-        <SpecimenFrame className="border-text-primary bg-canvas lg:col-span-7">
+        <SpecimenFrame className="bg-canvas lg:col-span-7">
           <HeroSpecimen />
         </SpecimenFrame>
       </Rail>
