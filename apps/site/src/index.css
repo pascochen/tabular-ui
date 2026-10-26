@@ -6,3 +6,56 @@
    its built JavaScript and must be scanned explicitly, or every utility a
    component uses and the site does not is silently absent from the build. */
 @source '../node_modules/tabular-ui/dist';
+
+/* The site's reading sizes (docs/site.md §7). The library's scale stops at 32px
+   because it is for dense product UI; a reading page needs larger type. Sizes
+   only: weight, family and colour come from the library. Every size carries its
+   --line-height partner, and each one is taught to the site's cn()
+   (src/lib/cn.ts), or tailwind-merge reads it as a colour. In rem, as type is
+   (docs/design-system.md §7.5). */
+@theme {
+  --text-site-display: 4rem; /* 64px, the hero heading */
+  --text-site-display--line-height: 4.25rem;
+  --text-site-display-sm: 2.5rem; /* 40px, the hero heading on a phone */
+  --text-site-display-sm--line-height: 2.75rem;
+  --text-site-heading: 2.75rem; /* 44px, section headings */
+  --text-site-heading--line-height: 3.25rem;
+  --text-site-heading-sm: 1.875rem; /* 30px */
+  --text-site-heading-sm--line-height: 2.25rem;
+  --text-site-title: 1.25rem; /* 20px, card titles */
+  --text-site-title--line-height: 1.75rem;
+  --text-site-title-sm: 1.125rem; /* 18px */
+  --text-site-title-sm--line-height: 1.75rem;
+  --text-site-lead: 1.125rem; /* 18px */
+  --text-site-lead--line-height: 1.75rem;
+  --text-site-body: 1rem; /* 16px */
+  --text-site-body--line-height: 1.5rem;
+  --text-site-small: 0.875rem; /* 14px */
+  --text-site-small--line-height: 1.25rem;
+}
+
+/* The site's layout values (docs/site.md §7): its only custom properties, under
+   --site- so none can shadow a library token. Space and width only. */
+:root {
+  --site-pad-x: 16px;
+  --site-section-y: 48px;
+  --site-gap: 24px;
+  --site-gap-tight: 16px;
+  --site-w-wide: 1344px;
+  --site-w-reading: 1040px;
+  --site-w-prose: 680px;
+}
+
+@media (width >= 768px) {
+  :root {
+    --site-pad-x: 32px;
+    --site-section-y: 64px;
+  }
+}
+
+@media (width >= 1200px) {
+  :root {
+    --site-pad-x: 48px;
+    --site-section-y: 96px;
+  }
+}
