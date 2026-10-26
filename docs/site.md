@@ -114,7 +114,20 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 
 Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
-**D7. Closing band copy.** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components". `demo.tabularui.com` is the onboarding journey: an agent reads Kasane's finance files and reports what it learned and what doesn't add up (`apps/demo/data/discovery.json`, `findings.json`). Neither line is true of it. *Draft:* heading "Watch an agent learn a company's books."; line "Kasane is a fictional printer maker. In the demo, an agent reads its finance files and reports what doesn't add up."; action "Open the demo ↗". To be checked against `docs/agent-voice.md` and the copywriter review.
+**D7. Closing band copy — decided 2026-10-25 (owner).** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components".
+- `demo.tabularui.com` is a five-step onboarding journey (`apps/demo/README.md`). The visitor plays Kasane's Head of FP&A and loads 20 files. A scripted agent reads them, then lists what it understood, the contradictions, the gaps, and questions to ask.
+- It uses 4 of the 10 built agent components, proposes no entries, and runs no September close. Neither wireframe line is true of it.
+- The duplicate payment the hero shows (D5) is one of the contradictions the demo finds, so the band links the two.
+
+| Slot | Copy | Source of each specific |
+|---|---|---|
+| Heading | Give an agent a finance team's files. | — |
+| Line | Kasane is a fictional printer maker. You play its Head of FP&A while a scripted agent reads 20 of its files. The duplicate payment above is one of the contradictions it finds. | The title from `apps/demo/data/company.json` (`persona.title`); "20" computed from `pack.json`; the finding from `findings.json` (`duplicate-payment`) |
+| Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo" |
+
+- **"Scripted" stays.** A visitor's own files get no findings, so copy that only says "an agent reads" would promise analysis the demo doesn't do.
+- **The band closes Home only**, where "the duplicate payment above" is true. Other pages end at the footer.
+- The copy was reviewed with the Tabular UI copywriter rules: no banned words, and each sentence 15 words or fewer.
 
 **D8. A solid nav.** The wireframes' v3 notes call for a floating nav at 80% white. Text over whatever scrolls behind it has no fixed contrast to measure. And a fixed bar that covers a focused element fails WCAG 2.2's 2.4.11 Focus Not Obscured (Minimum), which is AA. *Recommendation:* solid `--color-canvas` with a 1px `--color-border` bottom rule, and `scroll-padding-top` on `<html>` equal to the nav's height, so anchor jumps and keyboard focus land below it.
 
