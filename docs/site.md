@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 3 of §13 are built and step 4 is in review: `apps/site` is live at tabularui.com.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 4 of §13 are built and step 5a is in review: `apps/site` is live at tabularui.com.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -277,7 +277,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 - "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. The wireframe marks these definitions as drafts. Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
 - Status words, as the three vocabularies of D1, each in its own table:
   - Statuses are read from `runStatuses` and rendered as real `StatusBadge`s.
-  - Activity lines are rendered by `AgentReasoning` and `ChatThread` in their working and finished states, so the words on the page are the component's own.
+  - Activity lines are rendered by the components in their working state, so the words on the page are the component's own. *Changed in step 5a:* this named `ChatThread` and finished states. It is `AgentReasoning` and `AgentPlan`, streaming, in three columns rather than tables (§13).
   - Authorship labels are the forms `docs/agent-voice.md` defines.
 
   The "Instead of" and "Seen in shipping products" columns are owner copy. The Use column is not tinted, because colour for emphasis is hierarchy (§0 rule 1). It's distinguished by being first and by weight.
@@ -500,7 +500,9 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 2. **Shell.** Nav, footer, page containers, sections and the specimen frame, plus the `--site-*` tokens, the lint and Stylelint changes with their probe, and Home with static specimens. D3's three-way plate comparison, with the closing band, for the owner to choose from.
 3. **Content read from the repo.** Color, Typography, Density, the Components index and the computed counts, with the content module and its test.
 4. **Specimens.** The player, the ten specimens, the hero's Post entry, reduced motion and the live region. Needs A5's data export first.
-5. **The rest, and the quality pass.** Principles, the component pages, Vocabulary, Getting started, the 404, §11 and §12 with evidence, and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
+5. **The rest, and the quality pass**, split in two PRs on 2026-10-26 (owner):
+   - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
+   - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 
 **Step 2, as built (2026-10-26):**
 - `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids.
@@ -537,5 +539,20 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - a card rewinding unseen and playing on scroll;
   - a card's Replay and its announcement;
   - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
+
+**Step 5a, as built (2026-10-26):**
+- **The 404.** React Router prerenders `/404`, and the build copies it to `build/client/404.html`, which Vercel serves with a 404 status for any path it has no file for. The catch-all route renders the same page, so a client-side navigation to a missing path shows it too. `tests/serve.mjs` serves `404.html` the same way, and a test checks the status, the page, and one skip link after hydration.
+- **The component pages** are prerendered from `packages/ui/registry.json` (`react-router.config.ts`), so only a built component has one. An unbuilt name renders the 404 page. The component list moved from `src/content.ts` to `src/component-list.ts`, which the config can import without Vite.
+- **The pairs** (`ComponentPair` in `src/specimens.tsx`) reuse each card's data, in two dark plates under one caption. Agent block's pair is the hero's proposal fixed at waiting and at posted, with no buttons and no Replay. A test checks that each pair's two plates read differently: Lineage tree's "before" first shipped already open, because `LineageTree` expands everything when `defaultExpanded` is omitted.
+- **Each pair sits under a visually hidden `<h2>`, "Before and after".** Agent plan's title is an `<h3>`, which followed the page's `<h1>` with a level skipped (axe).
+- **The Storybook link** goes to `/docs/product-<name without hyphens>--docs`, Storybook's id for a story file titled `Product/<Name>`.
+- **The install command** has a copy button that says "Copied", and announces it once, after the clipboard write succeeds.
+- **Getting started reads its code from `packages/ui/README.md`** at build time, by `##` section, so the page and the README can't give different commands. A section renamed or left without code fails the build. The prose around the code is the site's own. It adds the README's "Use" step to the three in §4.
+- **Vocabulary**, changed from §4:
+  - Status words sit in three columns, not three tables: a list of badges with their tones, the activity lines, and the four authorship labels in real `AgentBlock`s.
+  - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
+  - Question and Confirmation carry a "Draft definition" tag, as the wireframe marks them.
+- **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
+- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' definitions and examples, and Getting started's prose.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

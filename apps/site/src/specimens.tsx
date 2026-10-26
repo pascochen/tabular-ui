@@ -20,6 +20,7 @@ import {
 import { duplicatePayment, h1Gap, kasane, packFile } from './data';
 import { exactMoney, formatBytes, money } from './lib/format';
 import { useAnnouncer, usePlayback } from './lib/playback';
+import { Pair } from './components/specimen';
 import { LiveRegion, ReplayButton, Specimen } from './playback';
 
 /**
@@ -60,15 +61,15 @@ type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
  * ChatThread's assistant turn takes no actions, and the proposal can't be a
  * second block inside it. A library gap, raised in PR 2.
  */
-function Proposal({ hero = false }: { hero?: boolean }) {
+function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' | 'posted' }) {
   const d = duplicatePayment;
   const [first, second] = d.entries;
   const defaults = { period: kasane.company.openPeriod, memo: `Reverse duplicate invoice ${d.reverse}` };
 
   // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
-  const { ref, frame, playing, play } = usePlayback({ frames: 4, autoplay: !hero });
+  const { ref, frame, playing, play } = usePlayback({ frames: 4, autoplay: !hero && !fixed });
   const { announce, message } = useAnnouncer();
-  const [outcome, setOutcome] = useState<Outcome>('waiting');
+  const [outcome, setOutcome] = useState<Outcome>(fixed ?? 'waiting');
   const [entry, setEntry] = useState(defaults);
   const [draft, setDraft] = useState(defaults);
   const [focusTarget, setFocusTarget] = useState<FocusTarget>(null);
@@ -195,7 +196,7 @@ function Proposal({ hero = false }: { hero?: boolean }) {
                       </p>
                     </>
                   )}
-                  {outcome === 'waiting' ? (
+                  {outcome === 'waiting' && !fixed ? (
                     <div className="mt-2 flex flex-wrap gap-[var(--gap-inline)]">
                       <Button size="sm" ref={postRef} onClick={() => decide('posted')}>
                         Post entry
@@ -227,13 +228,13 @@ function Proposal({ hero = false }: { hero?: boolean }) {
           <RunLogRow status="passed" name={d.nextJournalId} />
         ) : outcome === 'declined' ? (
           <RunLogRow status="skipped" name={d.reverse} />
-        ) : frame >= 3 ? (
+        ) : frame >= 3 && !fixed ? (
           <p className="border border-dashed border-border-strong px-[var(--pad-card)] py-2 text-sm text-text-secondary">
             Run log row is written here after Post.
           </p>
         ) : null}
       </div>
-      {decided ? (
+      {decided && !fixed ? (
         <div ref={replayRef} className="flex justify-end">
           <ReplayButton title={hero ? 'the hero’s run' : 'Agent block'} onClick={replay} />
         </div>
@@ -429,6 +430,8 @@ export function ThreadSpecimen() {
   );
 }
 
+const runFailure = 'No header row, so its six columns can’t be matched to fields. Skipped; the other files were read.';
+
 const runFiles = ['trial_balance_monthly.csv', 'supplier_invoices_fy2026_h1.csv', 'bank_export_kjp_2026-09.csv'];
 
 /**
@@ -446,13 +449,7 @@ export function RunLogSpecimen() {
             const last = i === names.length - 1;
             const status: RunStatus = i < f ? (last ? 'failed' : 'passed') : 'running';
             return status === 'failed' ? (
-              <RunLogRow
-                key={`${name}-failed`}
-                status="failed"
-                name={name}
-                defaultOpen
-                detail="No header row, so its six columns can’t be matched to fields. Skipped; the other files were read."
-              />
+              <RunLogRow key={`${name}-failed`} status="failed" name={name} defaultOpen detail={runFailure} />
             ) : (
               <RunLogRow key={name} status={status} name={name} />
             );
@@ -480,4 +477,179 @@ export function StatusSpecimen() {
       )}
     </Specimen>
   );
+}
+
+// ---------------------------------------------------------------------------
+// The before/after pairs (docs/site.md D2): two states that prove each decision
+// ---------------------------------------------------------------------------
+
+/** One composition per built component: its two states and the caption beneath. Captions are draft copy. */
+type PairParts = { before: React.ReactNode; after: React.ReactNode; caption: string };
+
+function chatStarterPair(): PairParts {
+  return {
+    before: (
+      <ChatStarter
+        description={`Ask about ${kasane.company.name}’s books, from the files it shared.`}
+        suggestions={suggestions}
+        onSelect={noop}
+      />
+    ),
+    after: <ChatComposer value={question} onValueChange={noop} onSend={noop} />,
+    caption: 'A pick fills the box and nothing is sent, so the question can still change.',
+  };
+}
+
+function composerPair(): PairParts {
+  const file = kasane.pack.find((f) => f.name === packFile('trial_balance_monthly.csv'))!;
+  const attachment = (status: RunStatus) => [{ id: file.name, name: file.name, size: formatBytes(file.bytes), status }];
+  return {
+    before: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('running')} />,
+    after: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('passed')} />,
+    caption: 'Send waits while the file uploads, and is ready once it has.',
+  };
+}
+
+function reasoningPair(): PairParts {
+  return {
+    before: (
+      <AgentBlock authorship="AI">
+        <AgentReasoning status="streaming" text={reasoningText} />
+      </AgentBlock>
+    ),
+    after: (
+      <AgentBlock authorship="AI">
+        <div className="flex flex-col gap-[var(--gap-group)]">
+          <AgentReasoning status="done" text={reasoningText} defaultOpen />
+          <p>
+            H1 operating profit is {money(h1Gap.shortfall)} under budget. Exchange rates explain{' '}
+            {money(h1Gap.exchangeRates)} of it.
+          </p>
+        </div>
+      </AgentBlock>
+    ),
+    caption: 'The thinking stays folded until you open it.',
+  };
+}
+
+function planPair(): PairParts {
+  const plan = (status: 'streaming' | 'ready', count: number) => (
+    <AgentBlock authorship="AI">
+      <AgentPlan
+        title="Explain the H1 gap"
+        description={`Split the ${money(h1Gap.shortfall)} between exchange rates and performance, and trace each part to its entries.`}
+        status={status}
+        steps={planSteps.slice(0, count)}
+      />
+    </AgentBlock>
+  );
+  return {
+    before: plan('streaming', 2),
+    after: plan('ready', planSteps.length),
+    caption: 'The plan is written where you can see it, and can only run once it is ready.',
+  };
+}
+
+function lineagePair(): PairParts {
+  const bridge = kasane.operatingBridge;
+  const nodes = [
+    {
+      id: 'actual',
+      name: 'H1 operating profit',
+      meta: exactMoney(bridge.actual),
+      children: [
+        { id: 'budget', name: 'Budget', meta: exactMoney(bridge.budget) },
+        ...bridge.steps.map((step) => ({ id: step.id, name: step.label, meta: exactMoney(step.value) })),
+      ],
+    },
+  ];
+  return {
+    before: <LineageTree defaultExpanded={[]} nodes={nodes} />,
+    after: <LineageTree defaultExpanded={['actual']} nodes={nodes} />,
+    caption: 'The figure opens down to what it is built from, in exact yen that add up.',
+  };
+}
+
+function attachmentPair(): PairParts {
+  const files = attachmentFiles.map((name) => kasane.pack.find((f) => f.name === packFile(name))!);
+  const rows = (statusAt: (i: number) => RunStatus) => (
+    <div className="flex flex-col">
+      {files.map((file, i) => (
+        <AttachmentRow key={file.name} name={file.name} size={formatBytes(file.bytes)} status={statusAt(i)} />
+      ))}
+    </div>
+  );
+  return {
+    before: rows((i) => (i === 0 ? 'running' : 'queued')),
+    after: rows(() => 'passed'),
+    caption: 'Each file shows its own state, and its name stays text you can select and copy.',
+  };
+}
+
+function agentBlockPair(): PairParts {
+  return {
+    before: <Proposal fixed="waiting" />,
+    after: <Proposal fixed="posted" />,
+    caption: 'The same entry, before and after a person posts it.',
+  };
+}
+
+function threadPair(): PairParts {
+  const answer = `Yes. ${duplicatePayment.entity} paid supplier invoice ${duplicatePayment.supplierInvoice} twice, ${duplicatePayment.amountLabel} each.`;
+  const thread = (text?: string) => (
+    <div className="flex aspect-video flex-col">
+      <ChatThread
+        turns={[
+          { id: 'q', role: 'user', text: question },
+          { id: 'a', role: 'assistant', text },
+        ]}
+      />
+    </div>
+  );
+  return {
+    before: thread(),
+    after: thread(answer),
+    caption: 'The answer’s space appears when you ask, and the answer grows in it.',
+  };
+}
+
+function runLogPair(): PairParts {
+  const names = runFiles.map(packFile);
+  const rows = (open: boolean) => (
+    <div className="flex flex-col">
+      <RunLogRow status="passed" name={names[0]} />
+      <RunLogRow status="passed" name={names[1]} />
+      <RunLogRow status="failed" name={names[2]} defaultOpen={open} detail={runFailure} />
+    </div>
+  );
+  return { before: rows(false), after: rows(true), caption: 'A failed row opens to its error in place.' };
+}
+
+function statusPair(): PairParts {
+  return {
+    before: <StatusBadge status="agent-working" />,
+    after: <StatusBadge status="agent-proposed" />,
+    caption: 'The label names the state. Where the actor matters, the role tag says who.',
+  };
+}
+
+/** Each built component's pair, by registry name. */
+const pairs: Record<string, () => PairParts> = {
+  'chat-starter': chatStarterPair,
+  'chat-composer': composerPair,
+  'agent-reasoning': reasoningPair,
+  'agent-plan': planPair,
+  'lineage-tree': lineagePair,
+  'attachment-row': attachmentPair,
+  'agent-block': agentBlockPair,
+  'chat-thread': threadPair,
+  'run-log-row': runLogPair,
+  'status-badge': statusPair,
+};
+
+/** A built component's before/after pair, on dark plates (D2, D3). */
+export function ComponentPair({ name }: { name: string }) {
+  const parts = pairs[name]?.();
+  if (!parts) throw new Error(`No before/after pair for ${name}`);
+  return <Pair {...parts} />;
 }

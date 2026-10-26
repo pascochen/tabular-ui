@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "build": "react-router build",
+    "build": "react-router build && cp build/client/404/index.html build/client/404.html",
     "typecheck": "react-router typegen && tsc -p tsconfig.json",
     "test": "playwright test"
   },
