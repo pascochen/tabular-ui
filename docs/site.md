@@ -35,8 +35,33 @@ Three decisions:
    - The run log row written after posting uses `passed` for the step that ran.
    - The library still has no lifecycle for an entry. If a screen ever needs "posted" or "rejected" as badges, that's a new library decision.
 
-**D2. The before/after pair: drop "Agent mark" and "Person mark".** The Agent block wireframe (`78:595`) heads its two plates "Agent mark" (orchid) and "Person mark" (sage). The library gives no colour to a person, and sage already means success and links (`docs/design-system.md` §1). Those two colours are the wordmark's, which §1 "Brand assets" says nothing may be derived from.
-*Recommendation:* the plates differ by state only. The left is the proposal: `AgentBlock` with its orchid rail and its authorship label, "AI · Awaiting review" (`docs/agent-voice.md`). The right is the same block once a person has posted it, labelled "AI · Posted" (D1). Neither plate carries a heading naming an actor.
+**D2. The before/after pair — decided 2026-10-25 (owner).** The Agent block wireframe (`78:595`) heads its two plates "Agent mark" (orchid) and "Person mark" (sage). The library gives no colour to a person, and sage already means success and links (`docs/design-system.md` §1). The two colours are the wordmark's, which §1 "Brand assets" says nothing may be derived from.
+
+The headings also implied that approval hands an entry over to the person. Books record both the preparer and the approver, and keeping them apart is the control. Kasane's own data has the failure: JE-KUK-2608-00055 was created and approved by one person (`apps/demo/data/findings.json`, `self-approved-entry`). Authorship doesn't wash off when a person approves.
+
+1. **No plate headings.** Each block's own label carries its state. One caption under the pair, for example "The same entry, before and after a person posts it." Screen readers tell the plates apart by the labels.
+2. **The posted block shows both people.**
+   - The orchid rail and "AI · Posted" stay: the preparer.
+   - `meta` reads "posted by you": the approver.
+   - `actions` is gone, so the block can't be posted twice.
+   - Beneath it sits the run log row for the posting step, `passed`. The green appears only there, where something true happened.
+   - It needs no library change.
+3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves all ten. The draft pairs below are owner copy to review:
+
+| Component | Before | After |
+|---|---|---|
+| Chat starter | Suggestions listed | One picked: the composer is filled, nothing sent |
+| Chat composer | File uploading, Send held | Uploaded, Send ready |
+| Agent reasoning | "Thinking…", folded | Done, opened to its steps |
+| Agent plan | Drafting a step, actions disabled | Ready, Run plan enabled |
+| Lineage tree | The figure | Opened down to its entries |
+| Attachment row | Uploading | Ready; the name is the link |
+| Agent block | AI · Awaiting review | AI · Posted, posted by you |
+| Chat thread | Question asked, "Working…" | The answer grown in the same place |
+| Run log row | Failed row, closed | Opened to its error |
+| Status badge | AI working | proposed |
+
+The wireframe's Storybook link, "Proposed, approved and rejected states in Storybook ↗", promises stories that don't exist: AgentBlock's are Default, Awaiting review and Grayscale. Each page links by name instead, for example "Agent block in Storybook ↗", to that component's Docs page.
 
 **D3. Grounds: rules only, or dark plates?** The wireframes draw grey section bands and grey specimen plates. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone. A band or plate tint would need a new token, and lint rejects raw ramp names in `apps/`.
 - *(a) Rules and borders only (recommended for v1).* Sections are separated by a 1px `--color-border` rule and plates by a 1px frame. This is §0 rule 7, "Borders do the work whitespace does elsewhere", and it needs nothing new.
@@ -154,11 +179,11 @@ Counts are computed from the component list (§5), never typed. On mobile the ou
 **Component page** (`78:595`):
 - A jump menu, built with the library's `Menu`.
 - The name as `<h1>`, and the decision line.
-- The before/after pair in one frame (D2).
-- A link to that component's stories in Storybook.
+- The before/after pair in one frame, with one caption beneath it (D2).
+- A link named for the component, to its Docs page in Storybook.
 - Previous and next.
 
-The pair is static. It shows two states, not a sequence.
+The pair is static. It shows two states, not a sequence, and has no Replay.
 
 **Vocabulary** (`79:345`):
 - The 5 moments, compact.
@@ -228,7 +253,7 @@ A test scans `apps/site/src` for currency figures and long digit runs outside `d
 - **One announcement.** A polite live region announces the final state once ("Posted"), never each step. It empties after it has been read, as `AgentReasoning` does with its own region.
 - **No randomness, no network, no AI.** A specimen is a script.
 
-**The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. Pressing Post entry changes the block's label to "AI · Posted", removes its actions, and writes a run log row beneath it, `passed` (D1). That is the hero's one sequence, and the visitor starts it. Reset returns it to the proposal.
+**The hero** (D5, D6) rests on the proposal: the question, the cited answer, and the `AgentBlock` with Post entry, Edit entry and Don't post. Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row beneath it, `passed` (D1, D2). That is the hero's one sequence, and the visitor starts it. Reset returns it to the proposal.
 
 **What each built specimen shows** (proposals; owner copy and D5's data):
 
