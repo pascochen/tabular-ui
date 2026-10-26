@@ -54,21 +54,40 @@ Every component, its props and its states are in [Storybook](https://storybook.t
 
 ## Or copy the source with shadcn
 
-Every component is also in a shadcn registry, for apps that want the source in their own repository:
+Every component is also in a shadcn registry, for apps that want the source in their own repository. The app must already be a shadcn project: Tailwind 4, the `@/` alias and a `components.json` from `shadcn init`, as in [shadcn's installation guide](https://ui.shadcn.com/docs/installation).
 
 ```bash
 pnpm dlx shadcn@latest add https://tabularui.com/r/button.json
 pnpm dlx shadcn@latest add https://tabularui.com/r/all.json   # everything
 ```
 
-Files land in one folder under the app's components alias, `components/tabular-ui/`, in the package's own layout, and the app's own `lib/utils` is never replaced. `all` adds an index, so imports read `@/components/tabular-ui`. Then add the tokens after Tailwind in the app's main stylesheet:
+Files land in one folder under the app's components alias, `components/tabular-ui/`, in the package's own layout, and the app's own `lib/utils` is never replaced. `all` adds an index, so imports read `@/components/tabular-ui`. A single item has no index, so import it from its own folder:
+
+```tsx
+import { AgentBlock } from '@/components/tabular-ui/components/product/AgentBlock';
+```
+
+Then add the tokens after Tailwind in the app's main stylesheet:
 
 ```css
 @import 'tailwindcss';
 @import './components/tabular-ui/tokens.css';
 ```
 
-`tokens.css` defines shadcn's variable names (`--background`, `--primary` and the rest) mapped onto Tabular UI's tokens, and switches dark mode on `data-theme` rather than a `.dark` class. In a project set up with `shadcn init`, delete the `:root`, `.dark`, `@theme inline` and `@custom-variant dark` blocks the init wrote, so there is one definition of each. `useTheme()` and `TooltipProvider` are needed as above.
+`tokens.css` defines shadcn's variable names (`--background`, `--primary` and the rest) mapped onto Tabular UI's tokens, and switches dark mode on `data-theme` rather than a `.dark` class. It also brings the fonts, `tw-animate-css`, Base UI's state variants and a base layer. `shadcn init` wrote its own copy of each of these into the same stylesheet, so delete what it wrote:
+
+- **The `:root`, `.dark`, `@theme inline` and `@custom-variant dark` blocks**, so there is one definition of each.
+- **The `@layer base` block.** Its `* { @apply border-border outline-ring/50 }` halves the focus ring's alpha on every control. `tokens.css` sets the same rule at full strength, along with the page's ground and font.
+- **`@import 'shadcn/tailwind.css'`.** Its Base UI state variants are already in `tokens.css`, and Tabular UI left out the rest of that stylesheet on purpose: it accounted for 26 of the 44 findings in the repository's 2026-10-09 audit.
+- **The init's font import** (`@fontsource-variable/geist` with the nova preset). Nothing uses it: `tokens.css` loads Source Sans 3, Source Serif 4 and Source Code Pro.
+- **Its `@import 'tw-animate-css'`.** `tokens.css` already imports it.
+
+`useTheme()` and `TooltipProvider` are needed as above. Without `all`, they come from their own items:
+
+```bash
+pnpm dlx shadcn@latest add https://tabularui.com/r/theme-mode.json   # useTheme, from @/components/tabular-ui/lib/theme
+pnpm dlx shadcn@latest add https://tabularui.com/r/tooltip.json      # TooltipProvider, from @/components/tabular-ui/components/foundational/Tooltip
+```
 
 ## License
 
