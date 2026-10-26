@@ -1,14 +1,26 @@
 # tabularui.com — site spec
 
-**Status: draft, 2026-10-25. Not approved.** Nothing in `apps/site` exists yet, and nothing here is built until the decisions below are settled.
+**Status: draft, 2026-10-25.** D1–D9 are decided (owner, 2026-10-25), except the specimen plates in D3, which are chosen from screenshots in PR 2. The approvals A1–A5 are still open. Nothing in `apps/site` exists yet.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
+**Library changes these decisions led to**, each its own PR: "AI working" (D1, pascochen/tabular-ui#4), and the AppShell story's FX sum (D5, pascochen/tabular-ui#5).
+
 ---
 
-## Decisions needed
+## Decisions
 
-Each decision has a recommendation. The sections below are written as if each recommendation is accepted, and say where a different answer would change them.
+| | Decision | Outcome |
+|---|---|---|
+| D1 | Status words | From the components; principle 3 reworded; "AI working"; "AI · Posted" for a posted entry |
+| D2 | Before/after pair | No plate headings; the posted block keeps its rail and adds "posted by you"; a pair on every component page |
+| D3 | Grounds | Bands: rules only. Plates: from PR 2's screenshots |
+| D4 | Colour mode | Page light only; Foundations shows both modes side by side |
+| D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
+| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after |
+| D7 | Closing band | "Give an agent a finance team's files."; Home only |
+| D8 | Nav | Site-built, inset, scrolls away |
+| D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 
 ### Design
 
@@ -84,7 +96,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 2. **Wherever a value differs by mode, Foundations shows both, side by side.** Dark and light are not mirrors (§0 rule 4), so one mode documents half the system:
    - All of Color.
    - Typography's text colour samples. Sizes don't change by mode and appear once.
-   - Constants' borders and the overlay sheet: paper on paper drawn by a rule in light, the `ledger-925` step in dark (§4 "Elevation").
+   - Color's surfaces and overlay sheet: paper on paper drawn by a rule in light, the `ledger-925` step in dark (§4 "Elevation"), and Density's border samples.
 
    Side by side, not a switch: the comparison is the content. Each dark sample is a container set to `data-theme="dark"` that sets its own ground and text colour.
 3. **The site must read in forced colours** (Windows high contrast), which removes backgrounds and shadows. Borders carry the structure (§0 rule 7). The check is in §11.
@@ -143,7 +155,18 @@ Specimens below the first screen play once as they scroll into view, from a fram
 3. **Demo ↗ is 36px, not the wireframe's 40px.** Controls are capped at 36px (`CLAUDE.md` rule 6), so it's `buttonVariants` at `size="lg"`. The bar's 56px height is space around controls, not a control, and stays.
 4. **Mobile: composed in `apps/site`.** Below the breakpoint, the links hide and a "Menu" button opens the library's `Menu`, listing every nav link and the three external ones. The trigger is the library's `Button`, since lint rejects a `<button>` outside `foundational/`. `AppBar` still has no responsive collapse (its README, "Not implemented"). If a second consumer needs one, this pattern is the candidate to promote into the library.
 
-**D9. Page set.** The wireframes' Foundations tabs are Color, Typography and Constants, with elevation and shape folded into Constants. This spec follows them: there is no Depth page. It adds one page with no wireframe, **Getting started**: the README's install commands need a public page to point to (§3).
+**D9. Page set — decided 2026-10-25 (owner).** Home, Principles, Components, a page per built component (from the registry), Vocabulary, three Foundations pages, Getting started and a 404 (§3).
+
+1. **Each Foundations page maps to one section of `docs/design-system.md`**, so each has one source to render from. The wireframe's "Constants" becomes **Density**: that's the spec's own name for its §7, and the idea the system is built on ("the cap is the design"). Elevation moves to Color, beside the surfaces it's made of (§4).
+
+   | Page | Spec | Contents |
+   |---|---|---|
+   | Color | §1–§6 | Roles, neutral, ramps, surfaces and elevation |
+   | Typography | §8 | Scale, families, display boundary, numerals |
+   | Density | §7 | Spacing tiers and caps, control and row heights, shape, borders, shell widths |
+
+2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. **Getting started** (no wireframe) covers the package setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
+3. **Not in v1:** an Icons page for §11. It would be a fourth Foundations tab later.
 
 ### Approvals, collected once
 
@@ -206,7 +229,7 @@ Every route is prerendered to static HTML at build time.
 | `/vocabulary` | Vocabulary | `79:345` |
 | `/foundations/color` | Color | `79:537` |
 | `/foundations/typography` | Typography | none; same shell as Color |
-| `/foundations/constants` | Constants: spacing tiers, control heights, shape, elevation | none; same shell as Color |
+| `/foundations/density` | Density (§7): spacing tiers, control and row heights, shape, borders, shell widths | none; same shell as Color |
 | `/getting-started` | Install, set up the stylesheet, set up the app root | none (D9) |
 | `/r/*` | Rewrite to `storybook.tabularui.com/r/*`, the shadcn registry | — |
 | anything else | 404 | none |
@@ -219,7 +242,7 @@ Every route is prerendered to static HTML at build time.
 
 Layout comes from each wireframe frame. This section records what the frames don't: where each part's content comes from, and where the frame changes.
 
-**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide, Foundations and Try it, the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
+**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide (3 principles, 5 moments, 15 components, Vocabulary, Getting started), Foundations (Color, Typography, Density) and Try it (Demo ↗, Storybook ↗, GitHub ↗). "5 moments" goes to Home's moments section. Beside them sit the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
 
 **Home** (`76:23`, `77:96`):
 - The hero: heading, lead, two actions, and the live specimen (D5, D6).
@@ -238,6 +261,7 @@ Counts are computed from the component list (§5), never typed. On mobile the ou
 - A jump menu, built with the library's `Menu`.
 - The name as `<h1>`, and the decision line.
 - The before/after pair in one frame, with one caption beneath it (D2).
+- Its install command, one line with a copy button, built from the registry name, with "Set up the package first" linking to Getting started (D9).
 - A link named for the component, to its Docs page in Storybook.
 - Previous and next.
 
@@ -253,16 +277,26 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 
   The "Instead of" and "Seen in shipping products" columns are owner copy. The Use column is not tinted, because colour for emphasis is hierarchy (§0 rule 1). It's distinguished by being first and by weight.
 
-**Color** (`79:537`, content replaced). Three sections:
+**Color** (`79:537`, content replaced; spec §1–§6). Four sections:
 - *Roles:* the six roles of §1 (interactive, danger, warning, success, agent, info), each as text, fill and tint, in both modes (D4). Every swatch paints the real token (`bg-fill-danger`, not a copied value). Each label names the ramp step and its contrast on the canvas, read from `docs/palette.json`.
 - *Neutral:* the `ledger` roles of §3, canvas to tertiary text, both modes.
+- *Surfaces and elevation:* the three tiers of §4, "Elevation" (inline, raised, overlay, with the overlay sheet), both modes (D9).
 - *Ramps:* all seven ramps from `palette.json`, with `teal` marked as chart-only.
 
 The wireframe's Surface 2, Rule, Text muted, Person mark, Inverse and State swatches are not carried over: their names aren't tokens, and the colours shown are the wordmark's.
 
 **Typography.** Rendered from the tokens: the §8.1 scale with each size's line height, the three families of §8.3, the display boundary (§8.2), and numerals with `tabular-nums` (§8.6). It also states the site's own reading sizes, and that they are site-only (§7).
 
-**Constants.** Rendered from the tokens: the spacing tiers and their caps (§7.3), control heights (§7.6), shape (square corners, `--radius-full` for round marks, §7.7), border widths (§7.8) and elevation (§4, the overlay sheet).
+**Density** (D9). Rendered from the tokens, following §7:
+- The three naming layers (§7.1).
+- The spacing tiers and their caps, including the frame tier (§7.3).
+- The role tokens (§7.4).
+- Control and row heights (§7.6).
+- Shape: square corners, and `--radius-full` for round marks (§7.7).
+- Border widths, and dashed as placeholder (§7.8).
+- Shell widths (§7.9).
+
+It also states that the site's own layout values are site-only (§7 of this spec).
 
 **Getting started.** The README's three steps, quoted from `packages/ui/README.md`: install, set up the stylesheet, set up the app root. Then the registry commands in the URL form the README uses (`pnpm dlx shadcn@latest add https://tabularui.com/r/agent-block.json`), which works without the user configuring anything.
 
@@ -451,7 +485,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 0. **This spec**, approved, with D1–D9 and A1–A5 answered.
 1. **Registry forward and a bare site.** Create `apps/site`, add the rewrite, an empty Home and a deploy, and correct `tools.md`. Done when `/r/button.json` on the preview returns the registry item.
 2. **Shell.** Nav, footer, page containers, sections and the specimen frame, plus the `--site-*` tokens, the lint and Stylelint changes with their probe, and Home with static specimens. D3's three-way plate comparison, with the closing band, for the owner to choose from.
-3. **Content read from the repo.** Color, Typography, Constants, the Components index and the computed counts, with the content module and its test.
+3. **Content read from the repo.** Color, Typography, Density, the Components index and the computed counts, with the content module and its test.
 4. **Specimens.** The player, the ten specimens, the hero's Post entry, reduced motion and the live region. Needs A5's data export first.
 5. **The rest, and the quality pass.** Principles, the component pages, Vocabulary, Getting started, the 404, §11 and §12 with evidence, and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 
