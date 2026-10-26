@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: draft, 2026-10-25.** D1–D9 are decided (owner, 2026-10-25), except the specimen plates in D3, which are chosen from screenshots in PR 2. The approvals A1–A5 are still open. Nothing in `apps/site` exists yet.
+**Status: draft, 2026-10-25.** D1–D9 are decided (owner, 2026-10-25), except the specimen plates in D3, which are chosen from screenshots in PR 2. The approvals A1–A5 are given. Nothing in `apps/site` exists yet.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -168,28 +168,32 @@ Specimens below the first screen play once as they scroll into view, from a fram
 2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. **Getting started** (no wireframe) covers the package setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
 3. **Not in v1:** an Icons page for §11. It would be a fourth Foundations tab later.
 
-### Approvals, collected once
+### Approvals — given 2026-10-25 (owner)
 
-`CLAUDE.md` requires a yes before each of these. They are listed together so one answer covers them.
+`CLAUDE.md` requires a yes before each of these. All five were approved together.
 
-**A1. Dependencies, all for `apps/site`:**
-- The same as `apps/demo/package.json`.
-- `react-router` and `@react-router/dev`, for prerendering.
-- `@playwright/test`, already used by `apps/storybook`.
-- `@axe-core/playwright`, for page-level accessibility checks. Storybook's a11y addon runs on stories, not on pages.
+**A1. Packages for `apps/site`:**
+- `react-router` and `@react-router/dev` **8.4.0**, for prerendering (`ssr: false` with `prerender`). v8, not v7, as the retired prompt assumed. 8.5.0 was 6 days old, under the 7-day wait in `tools.md`, "Dependency updates"; Dependabot raises it later.
+- `@axe-core/playwright` 4.14.0, for page-level accessibility checks. Storybook's a11y addon runs on stories, not pages.
+- `tailwind-merge` and `clsx` at the library's ranges (`^3.7.0`, `^2.1.1`, already in the lockfile). The site needs its own `cn()` that knows its reading sizes. The library's would read `text-site-display` as a colour and drop the text colour (failure log, `text-metric`).
+- The stack the other apps already use, at their ranges: React, Vite, Tailwind, TypeScript, `@phosphor-icons/react`, `@playwright/test`.
 
 **A2. Configuration:**
-- `apps/site/package.json` and the lockfile.
-- Root scripts `dev:site` and `build:site`, with `build` extended to build the site.
-- `apps/site/vercel.json` (§9).
+- In `apps/site/`: `package.json` (`tabular-ui-site`, private), `react-router.config.ts`, `vite.config.ts`, `tsconfig.json`, `playwright.config.ts` and `vercel.json` (§9).
+- In the root `package.json`, scripts `dev:site` and `build:site`, with `build` extended to build the site. `typecheck` already covers every workspace package.
+- `pnpm-lock.yaml`, written by `pnpm install`.
+- A `site` entry in `.claude/launch.json` that names `pnpm`, never a machine path (failure log).
+- `tools.md` and `CLAUDE.md`'s "File structure", updated for the third app and the third Vercel project.
 
 **A3. Lint (§8):**
-- An `eslint.config.js` block for `apps/site/src/**` that lifts the spacing cap to the site's tokens and keeps every other rule.
-- Stylelint extended to `apps/site/src/**/*.css`. Today `pnpm lint` runs Stylelint on `packages/ui/src/**/*.css` only, so app CSS, including a raw hex, is not checked.
+- An `eslint.config.js` block for `apps/site/src/**` that lifts only the spacing cap, for `--site-*` tokens, and keeps every other rule, with a probe proving it.
+- Stylelint's glob in `pnpm lint` widens to **`apps/*/src/**/*.css`**, so the demo's CSS is checked too. Until now no app's CSS was linted. No Stylelint rule changes: the spacing cap reads raw `px` values, so `var(--site-section-y)` passes and a raw `padding: 96px` still fails.
 
-**A4. CI (§10):** a `site_only` flag in `ci.yml`'s Scope step, and site steps inside the existing `Verify` job.
+**A4. CI (§10):** a `site_only` flag in `ci.yml`'s Scope step. A site-only PR skips the library suites. Every other non-docs PR adds the site build and the site tests. `Verify` stays the one required check, and nothing is renamed.
 
-**A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5). It reads the full Kasane dataset, which lives outside the repo, so the owner runs it.
+**A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5): the two duplicate entries, the operating bridge, the pack's file names and sizes, the persona, and the next KUS October journal number.
+- Entries are numbered per entity per month (`JE-KUK-2608-00055`), and October has no entries yet (`findings.json`, `october-open`), so the number is `JE-KUS-2610-00001`. The script checks the dataset holds no October KUS entry before writing it, and stops if it finds one.
+- It reads the full Kasane dataset, which lives outside the repo, so the owner runs it, once the change lands and before PR 4.
 
 ---
 
@@ -419,7 +423,7 @@ Weight never exceeds 600. Each size is declared with its line height. Each is al
 - It keeps every other rule: raw hues and hex, 900/950 backgrounds, weights over 600, softened corners, shadows, inline styles, hand-made `<button>`, and `tone` not `role`.
 - The config warns that a block which redeclares `no-restricted-syntax` must restate every selector, or it loses the rest of the gate. The block is built by spreading the same arrays.
 - A probe file run through `eslint --stdin` proves the kept rules still fail in `apps/site`. A regex gate fails open, and silence looks like a pass.
-- Stylelint runs on `apps/site/src/**/*.css` with the same rules, and the frame cap is raised only for `--site-*`.
+- Stylelint runs on `apps/*/src/**/*.css` with the same rules and no rule change: the caps read raw `px`, so values held in `--site-*` tokens pass and raw ones still fail (A3).
 
 **Never change `packages/ui` to make the site work.** If a component is missing something, stop and raise it: a library change is its own decision.
 
@@ -438,7 +442,7 @@ A third Vercel project, `apps/site`, at `tabularui.com`, with `www.tabularui.com
 
 - **The Scope step** sets `site_only` when every changed file is under `apps/site/` or is Markdown.
 - **Site-only PR:** install, lint, type-check, build the site, run the site's Playwright tests. The story tests, visual regression and design system specs are skipped. Target: under 6 minutes, against 25–27 for the full run.
-- **Any other PR:** the full run as today, plus the site build. The site consumes the package, so a library change can break it.
+- **Any other non-docs PR:** the full run as today, plus the site build and the site tests, about 3 minutes more. The site consumes the package, so a library change can break a page.
 - **Off the PR gate:** external link checks and Lighthouse. Both depend on other servers and fail for reasons that aren't the PR. Run them on demand and before a release.
 
 **Site tests run on their own port**, derived from the checkout's path as `apps/storybook/tests/storybook-port.mjs` does. Otherwise a run in one worktree can test another checkout's server (failure log, 2026-10-08).
