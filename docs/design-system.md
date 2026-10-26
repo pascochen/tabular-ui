@@ -398,9 +398,11 @@ Map product concepts onto the six roles. Do not introduce new hues here.
 | Failed | danger | `--color-text-danger` + `--color-bg-danger` row tint |
 | Degraded / stale | warning | `--color-text-warning` |
 | Needs review | warning | `--color-text-warning` + `--color-border-warning` |
-| Agent working | agent | `--color-text-agent` + `Spinner` (§11.5) |
+| AI working | agent | `--color-text-agent` + `Spinner` (§11.5) |
 | Agent proposed | agent | `--color-bg-agent` ground + 2px left rail in solid `--color-text-agent`, the rail `AgentBlock` draws (below) |
 | Skipped / disabled | neutral | neutral `StatusBadge` (`--color-text-secondary`); a *disabled control* takes `--color-text-disabled` |
+
+**"AI working", not "agent working" — decided 2026-10-25 (owner).** `docs/agent-voice.md` gives the agent role one word, "AI". Since `running` and this state share the `Spinner` (§11.5), the label is the badge's only non-colour authorship signal, so it keeps the actor and names it the same way. The status key stays `agent-working`.
 
 ### Financial polarity
 
@@ -1193,9 +1195,9 @@ Two things override that principle, and both are optical rather than aesthetic. 
 
 **Still frame.** Under reduced motion, and as frame 0 of the animation, the segment is centred on the top-right corner, with the gap at the bottom left. That frame is what a reduced-motion user sees for as long as the work runs, and what screenshot tests record (Playwright resets an infinite animation to frame 0). It reads as a notch, not as an empty square, which is a checkbox.
 
-**Where it ships.** The `ChatThread` turn before its first token, `AgentReasoning` while it streams, `AgentPlan` while it drafts a step, `StatusBadge` `running` and `agent working`, and `apps/demo`'s `StageTracker`. It takes the colour of its label (§11.1) and the size of the icon it replaces (§11.3): `1em` inline, 10px as a badge mark, `--size-icon-xs` in the plan's number column.
+**Where it ships.** The `ChatThread` turn before its first token, `AgentReasoning` while it streams, `AgentPlan` while it drafts a step, `StatusBadge` `running` and `AI working`, and `apps/demo`'s `StageTracker`. It takes the colour of its label (§11.1) and the size of the icon it replaces (§11.3): `1em` inline, 10px as a badge mark, `--size-icon-xs` in the plan's number column.
 
-**`running` and `agent working` share the mark (owner decision, 2026-10-20).** Until then `agent working` spun Phosphor's robot, which tumbled: a rotating glyph that is not radially symmetric reads as falling, not working. Every working state now moves the same way. The cost, accepted: in a badge, the two differ only by hue and label. In dark mode a deuteranope sees federal and orchid at about 3 (§1), so the label ("running", "agent working") is what tells them apart. In a row, the agent rail still carries it (§5).
+**`running` and `AI working` share the mark (owner decision, 2026-10-20).** Until then `agent-working` spun Phosphor's robot, which tumbled: a rotating glyph that is not radially symmetric reads as falling, not working. Every working state now moves the same way. The cost, accepted: in a badge, the two differ only by hue and label. In dark mode a deuteranope sees federal and orchid at about 3 (§1), so the label ("running", "AI working") is what tells them apart. In a row, the agent rail still carries it (§5).
 
 **Decorative by default.** The mark is `aria-hidden`; the label beside it says what is happening. A `Spinner` given an `aria-label` becomes `role="status"`, for the rare place with no visible label.
 

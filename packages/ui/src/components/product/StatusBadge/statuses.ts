@@ -57,7 +57,8 @@ const entries: Record<RunStatus, Omit<RunStatusEntry, 'role' | 'spin'>> = {
   stale: { label: 'stale', tone: 'warning', icon: WarningIcon },
   'needs-review': { label: 'needs review', tone: 'warning', icon: EyeIcon },
   // Spinner, as running (§11.5, 2026-10-20). The robot spun here until then and tumbled.
-  'agent-working': { label: 'agent working', tone: 'agent', icon: RobotIcon, working: true },
+  // "AI", agent-voice's word for the role: with the mark shared, the label is the badge's authorship signal (2026-10-25).
+  'agent-working': { label: 'AI working', tone: 'agent', icon: RobotIcon, working: true },
   'agent-proposed': { label: 'proposed', tone: 'agent', icon: SparkleIcon },
   skipped: { label: 'skipped', tone: 'neutral', icon: MinusCircleIcon },
 };

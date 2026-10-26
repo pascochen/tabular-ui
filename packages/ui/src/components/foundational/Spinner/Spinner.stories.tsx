@@ -132,7 +132,7 @@ const STATES = Object.keys(runStatuses) as RunStatus[];
  * §10's grayscale gate, and what a reduced-motion user sees: the still
  * frame, among every other status mark. Each of those is a circle or a
  * figure, so the square stays distinct with the hue gone (right).
- * `running` and `agent working` share it; their labels tell them apart (§11.5).
+ * `running` and `AI working` share it; their labels tell them apart (§11.5).
  */
 export const AmongStatuses: Story = {
   render: () => {
