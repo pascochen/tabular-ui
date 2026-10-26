@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import { buttonVariants, TooltipProvider } from 'tabular-ui';
 
@@ -39,6 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 // tooltips share their timing through the provider (packages/ui/README.md).
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
+  // Marks the page interactive, for the tests: the HTML is prerendered, so a test
+  // that clicks before React has hydrated would click a button with no handler.
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = 'true';
+  }, []);
   return (
     <TooltipProvider>
       {/* The first focusable element (§11). Parked above the viewport rather
