@@ -23,10 +23,12 @@ function folder(name: string): string {
 function importsFor(code: string): string {
   const unique = (found: Iterable<string>) => [...new Set(found)].sort();
   const hooks = unique(code.match(/\buse(?:Ref|State|Effect|Memo|Callback)\b/g) ?? []);
-  const tags = unique([...code.matchAll(/<([A-Z]\w*)/g)].map((m) => m[1]));
+  const handles = unique(code.match(/\b[A-Z]\w*Handle\b/g) ?? []);
+  // `<Name` also matches a generic, `useRef<ChatComposerHandle>`: handles are types, imported once, as types.
+  const tags = unique([...code.matchAll(/<([A-Z]\w*)/g)].map((m) => m[1])).filter((t) => !handles.includes(t));
   const icons = tags.filter((t) => t.endsWith('Icon'));
   const ui = tags.filter((t) => !t.endsWith('Icon'));
-  const types = unique(code.match(/\b[A-Z]\w*Handle\b/g) ?? []).map((t) => `type ${t}`);
+  const types = handles.map((t) => `type ${t}`);
   return [
     hooks.length ? `import { ${hooks.join(', ')} } from 'react';` : null,
     icons.length ? `import { ${icons.join(', ')} } from '@phosphor-icons/react';` : null,

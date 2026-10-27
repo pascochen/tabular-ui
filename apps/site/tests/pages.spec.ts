@@ -216,6 +216,14 @@ test.describe('a component page', () => {
       expect(await top(use)).toBeLessThan(pairTop);
       const usage = page.locator('pre').last();
       await expect(usage).toContainText("from 'tabular-ui';");
+      // Each name is imported once. Chat starter's first import line listed
+      // ChatComposerHandle twice: its generic matched the JSX-tag pattern.
+      const imported = (await usage.innerText())
+        .split('\n')
+        .filter((line) => line.startsWith('import {'))
+        .flatMap((line) => line.replace(/^import \{ | \} from .*$/g, '').split(', '))
+        .map((name) => name.replace(/^type /, ''));
+      expect(imported.length).toBe(new Set(imported).size);
     });
   }
 
