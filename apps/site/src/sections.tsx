@@ -33,11 +33,14 @@ export function HeroSection() {
       </div>
       <Rail className="grid grid-cols-1 items-start gap-[var(--site-gap)] lg:grid-cols-12">
         <div className="flex flex-col gap-[var(--site-gap)] lg:col-span-5">
-          <h1 id="hero-title" className="text-site-display-sm font-semibold text-text-primary md:text-site-display">
-            An agent stops before anything that posts to the ledger.
+          <h1
+            id="hero-title"
+            className="text-site-display-sm font-semibold text-balance text-text-primary md:text-site-display"
+          >
+            A design system for the human in the loop
           </h1>
           <p className="text-site-lead text-text-secondary">
-            Proposals are cheap. Journal entries are not. Only a person can release one.
+            Components that show how the agent reasoned, what it proposes and what a person approved.
           </p>
           <div className="flex flex-wrap gap-[var(--gap-inline)]">
             <DemoAction label="Open the demo" />
