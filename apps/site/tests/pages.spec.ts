@@ -167,11 +167,9 @@ test.describe('Components in the nav', () => {
     const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
       redirects: { source: string; destination: string; permanent: boolean }[];
     };
-    expect(vercel.redirects).toContainEqual({
-      source: '/components',
-      destination: '/components/chat-starter',
-      permanent: false,
-    });
+    for (const source of ['/components', '/components/']) {
+      expect(vercel.redirects).toContainEqual({ source, destination: '/components/chat-starter', permanent: false });
+    }
     await page.goto('/components/chat-starter');
     await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
   });
@@ -334,11 +332,11 @@ test.describe('the Foundations pages', () => {
     const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
       redirects: { source: string; destination: string; permanent: boolean }[];
     };
-    expect(vercel.redirects).toContainEqual({
-      source: '/foundations',
-      destination: '/foundations/color',
-      permanent: false,
-    });
+    // Both spellings: Vercel matches a redirect's source exactly, so on the
+    // preview /foundations/ still answered 404 with only /foundations listed.
+    for (const source of ['/foundations', '/foundations/']) {
+      expect(vercel.redirects).toContainEqual({ source, destination: '/foundations/color', permanent: false });
+    }
   });
 });
 
