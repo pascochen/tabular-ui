@@ -251,7 +251,7 @@ Every route is prerendered to static HTML at build time.
 
 **`<name>` is the registry item name** in `packages/ui/registry.json`: `agent-block`, `chat-thread` and so on. A component page exists only when the registry has the item, so a to-build component has a card but no page. Previous and next follow run order.
 
-**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab.
+**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab. *Changed again 2026-10-27 (owner, option A of a navigation critique):* each page opens with the section's name, "Foundations", then its three pages as links at 16px with the current one underlined (2px ink, the active-tab width of §7.8, `aria-current`), then the page's own title and lead. Built in the site at reading size: `AppBarNav`'s 13px suits the product, and beside a 64px title most visitors missed the links. `/foundations` redirects (307) to Color, where it had been a 404. "Density" keeps its name for now.
 
 ## 4. Pages
 
