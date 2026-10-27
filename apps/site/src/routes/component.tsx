@@ -34,7 +34,7 @@ function Copy({ text }: { text: string }) {
 /**
  * The principles a component carries, on its own page (owner, 2026-10-27):
  * each rule beside the component that keeps it, with the check a reviewer can
- * run. The Principles page keeps all three, linked from here and the footer.
+ * run. The Principles page keeps all three, linked from here only (2026-10-27).
  */
 function RulesFollowed({ name }: { name: string }) {
   const followed = principles.filter((p) => p.carriedBy.some((c) => c.name === name));

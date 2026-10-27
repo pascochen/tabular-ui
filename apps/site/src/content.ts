@@ -54,8 +54,8 @@ export const external = {
   demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: false as boolean },
   github: { href: 'https://github.com/pascochen/tabular-ui', label: 'GitHub' },
   license: { href: 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE', label: 'MIT license' },
-  // The footer's closing line names the author (owner, 2026-10-27).
-  author: { href: 'https://www.linkedin.com/in/pascal-chenier/', label: 'Pascal' },
+  // The footer's About column names the author (owner, 2026-10-27).
+  author: { href: 'https://www.linkedin.com/in/pascal-chenier/', label: 'By Pascal' },
 } as const;
 
 /** The demo's label while it isn't ready (owner, 2026-10-26). */

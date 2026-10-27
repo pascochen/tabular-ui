@@ -174,29 +174,60 @@ test.describe('Components in the nav', () => {
     await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
   });
 
-  test('is followed by Get started, and the footer uses the nav’s names', async ({ page }) => {
+  // Owner, 2026-10-27: the system on the left, then Storybook, GitHub and Get
+  // started on the right. Get started is a page of this site, so no arrow. The
+  // footer's Guide keeps the nav's names, destinations and order.
+  test('the system on the left, Get started on the right, and the footer in the same order', async ({ page }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Main' });
-    await expect(nav.getByRole('listitem')).toHaveText([
-      'Components',
-      'Get started',
-      'Vocabulary',
-      'Foundations',
-      /Storybook/,
-      /GitHub/,
-      /Demo/,
-    ]);
+    const [left, right] = await nav.getByRole('list').all();
+    await expect(left.getByRole('listitem')).toHaveText(['Components', 'Foundations', 'Vocabulary']);
+    await expect(right.getByRole('listitem')).toHaveText([/^Storybook/, /^GitHub/, 'Get started']);
+    await expect(right.getByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/getting-started');
+    await expect(right.getByRole('link', { name: 'Get started' })).not.toContainText('↗');
     const guide = page.getByRole('contentinfo').getByRole('list', { name: 'Guide' });
-    await expect(guide.getByRole('link')).toHaveText(['Components', 'Get started', 'Principles', 'Vocabulary']);
-    // Principles is in the footer only since 2026-10-27; it keeps its own page.
-    await expect(guide.getByRole('link', { name: 'Principles' })).toHaveAttribute('href', '/principles');
-    for (const name of ['Components', 'Get started', 'Vocabulary']) {
+    await expect(guide.getByRole('link')).toHaveText(['Components', 'Vocabulary', 'Get started']);
+    for (const name of ['Components', 'Vocabulary', 'Get started']) {
       // One name, one place: the footer goes where the nav does.
       await expect(guide.getByRole('link', { name })).toHaveAttribute(
         'href',
         (await nav.getByRole('link', { name }).getAttribute('href'))!,
       );
     }
+    await page.goto('/getting-started');
+    await expect(right.getByRole('link', { name: 'Get started' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('on a phone, the menu has the same links in the same order, and no demo', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Menu' }).click();
+    await expect(page.getByRole('menuitem')).toHaveText([
+      'Components',
+      'Foundations',
+      'Vocabulary',
+      /^Storybook/,
+      /^GitHub/,
+      'Get started',
+    ]);
+  });
+
+  // At 768px, where the bar first shows its links, everything sits inside its
+  // border: with the demo button it needed 849px, and without it a 28px wordmark
+  // still ran 25px over.
+  test('fits the page at 768px', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 800 });
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    const box = (await nav.boundingBox())!;
+    const right = await nav.evaluate((el) =>
+      Math.max(...[...el.querySelectorAll('*')].map((child) => child.getBoundingClientRect().right)),
+    );
+    // Inside the 1px border and the 16px padding, not just the page.
+    expect(right).toBeLessThanOrEqual(box.x + box.width - 17);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(768);
   });
 });
 
@@ -281,14 +312,15 @@ test.describe('the wordmark', () => {
 
 test.describe('the demo, while it is not ready', () => {
   // Owner, 2026-10-26: every demo action reads "Demo (soon)" and is disabled,
-  // and no page links to demo.tabularui.com.
-  test('is a disabled "Demo (soon)" in the nav, the hero and the closing band, and a link nowhere', async ({
+  // and no page links to demo.tabularui.com. Since 2026-10-27 the nav has none.
+  test('is a disabled "Demo (soon)" in the hero and the closing band, absent from the nav, and a link nowhere', async ({
     page,
   }) => {
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    await expect(page.getByRole('navigation', { name: 'Main' })).not.toContainText('Demo');
     const soon = page.getByRole('button', { name: 'Demo (soon)' });
-    await expect(soon).toHaveCount(3);
+    await expect(soon).toHaveCount(2);
     for (const button of await soon.all()) await expect(button).toBeDisabled();
     await expect(page.locator('a[href*="demo.tabularui.com"]')).toHaveCount(0);
     await expect(page.getByRole('contentinfo').getByText('Demo (soon)')).toBeVisible();
@@ -376,25 +408,59 @@ test.describe('the jump index', () => {
 });
 
 test.describe('the footer', () => {
-  // Owner, 2026-10-27: a new tagline, and one closing line in place of the row
-  // with the byline, the version and the changelog.
-  test('carries the tagline and one closing line, and no version or changelog', async ({ page }) => {
+  // Owner, 2026-10-27: four link columns beside the brand, About in place of the
+  // closing line, and Principles out of the footer (it keeps its page).
+  test('has Guide, Foundations, Try it and About, and no closing line', async ({ page }) => {
     await page.goto('/');
     const footer = page.getByRole('contentinfo');
     await expect(footer).toContainText('Components for agent-written, human-verified work.');
-    // The ↗ after each link is aria-hidden but still in the text.
-    await expect(footer).toContainText(/Open source under the MIT license\s*↗?, made by Pascal\s*↗?\./);
-    await expect(footer.getByRole('link', { name: 'MIT license' })).toHaveAttribute(
-      'href',
-      'https://github.com/pascochen/tabular-ui/blob/main/LICENSE',
-    );
-    await expect(footer.getByRole('link', { name: 'Pascal' })).toHaveAttribute(
-      'href',
-      'https://www.linkedin.com/in/pascal-chenier/',
-    );
+    const column = (name: string) => footer.getByRole('list', { name });
+    await expect(column('Guide').getByRole('listitem')).toHaveText(['Components', 'Vocabulary', 'Get started']);
+    await expect(column('Foundations').getByRole('listitem')).toHaveText(['Color', 'Typography', 'Density']);
+    await expect(column('Try it').getByRole('listitem')).toHaveText(['Demo (soon)', /^Storybook/]);
+    await expect(column('About').getByRole('listitem')).toHaveText([/^By Pascal/, /^MIT license/, /^GitHub/]);
+    const about = column('About');
+    for (const [name, href] of [
+      ['By Pascal', 'https://www.linkedin.com/in/pascal-chenier/'],
+      ['MIT license', 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE'],
+      ['GitHub', 'https://github.com/pascochen/tabular-ui'],
+    ]) {
+      await expect(about.getByRole('link', { name })).toHaveAttribute('href', href);
+    }
+    await expect(footer.getByRole('link', { name: 'Principles' })).toHaveCount(0);
+    await expect(footer).not.toContainText('Open source under');
     await expect(footer.getByRole('link', { name: /Changelog/ })).toHaveCount(0);
     await expect(footer).not.toContainText(/v\d+\.\d+\.\d+/);
   });
+
+  // Five across from lg; at tablet width the brand takes its own row above four
+  // link columns, and a phone stacks them.
+  for (const [width, columns, brandOwnRow] of [
+    [1280, 5, false],
+    [768, 4, true],
+    [390, 1, true],
+  ] as const) {
+    test(`at ${width}px: ${columns} across`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/');
+      const footer = page.getByRole('contentinfo');
+      const tops = await Promise.all(
+        ['Guide', 'Foundations', 'Try it', 'About'].map(async (name) =>
+          Math.round((await footer.getByRole('list', { name }).boundingBox())!.y),
+        ),
+      );
+      expect(new Set(tops).size).toBe(columns === 1 ? 4 : 1);
+      // A column's title sits above its list, so the brand shares a row with the
+      // columns when it starts above the first title's bottom.
+      const brand = (await footer.getByRole('img', { name: 'Tabular UI' }).boundingBox())!;
+      const title = (await footer.getByText('Guide', { exact: true }).boundingBox())!;
+      expect(brand.y + brand.height <= title.y).toBe(brandOwnRow);
+      const right = await footer.evaluate((el) =>
+        Math.max(...[...el.querySelectorAll('*')].map((child) => child.getBoundingClientRect().right)),
+      );
+      expect(right).toBeLessThanOrEqual(width);
+    });
+  }
 });
 
 test.describe('standalone links', () => {
