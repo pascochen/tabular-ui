@@ -182,7 +182,6 @@ test.describe('Components in the nav', () => {
     await expect(nav.getByRole('listitem')).toHaveText([
       'Components',
       'Get started',
-      'Principles',
       'Vocabulary',
       'Foundations',
       /Storybook/,
@@ -191,7 +190,9 @@ test.describe('Components in the nav', () => {
     ]);
     const guide = page.getByRole('contentinfo').getByRole('list', { name: 'Guide' });
     await expect(guide.getByRole('link')).toHaveText(['Components', 'Get started', 'Principles', 'Vocabulary']);
-    for (const name of ['Components', 'Get started', 'Principles', 'Vocabulary']) {
+    // Principles is in the footer only since 2026-10-27; it keeps its own page.
+    await expect(guide.getByRole('link', { name: 'Principles' })).toHaveAttribute('href', '/principles');
+    for (const name of ['Components', 'Get started', 'Vocabulary']) {
       // One name, one place: the footer goes where the nav does.
       await expect(guide.getByRole('link', { name })).toHaveAttribute(
         'href',
@@ -227,6 +228,23 @@ test.describe('a component page', () => {
       expect(imported.length).toBe(new Set(imported).size);
     });
   }
+
+  // Owner, 2026-10-27: each principle sits on the pages of the components
+  // that carry it, with its check. A component that carries none shows nothing.
+  test('shows the principles it carries, with their checks', async ({ page }) => {
+    await page.goto('/components/agent-block');
+    const rules = page.getByRole('region', { name: 'The rules it follows' });
+    await expect(rules.getByRole('listitem')).toHaveCount(2);
+    await expect(rules).toContainText('An agent stops before anything that posts to the ledger.');
+    await expect(rules).toContainText('Check: Nothing reaches the books until a person presses Post.');
+    await expect(rules.getByRole('link', { name: 'All 3 principles' })).toHaveAttribute('href', '/principles');
+
+    await page.goto('/components/lineage-tree');
+    await expect(page.getByRole('region', { name: 'The rule it follows' }).getByRole('listitem')).toHaveCount(1);
+
+    await page.goto('/components/chat-starter');
+    await expect(page.getByRole('heading', { name: /rules? it follows/ })).toHaveCount(0);
+  });
 
   test('reads its usage from the component’s README', async ({ page }) => {
     await page.goto('/components/run-log-row');
