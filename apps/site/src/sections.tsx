@@ -3,7 +3,7 @@ import { buttonVariants } from 'tabular-ui';
 import { DemoAction } from './components/demo-action';
 import { Rail, Section } from './components/layout';
 import { SpecimenFrame } from './components/specimen';
-import { pages } from './content';
+import { componentGrid, pages } from './content';
 import { kasane } from './data';
 import { HeroSpecimen } from './specimens';
 
@@ -42,7 +42,7 @@ export function HeroSection() {
           <div className="flex flex-wrap gap-[var(--gap-inline)]">
             <DemoAction label="Open the demo" />
             {pages.components.live ? (
-              <a href={pages.components.href} className={buttonVariants({ size: 'lg', variant: 'outline' })}>
+              <a href={componentGrid} className={buttonVariants({ size: 'lg', variant: 'outline' })}>
                 Browse components
               </a>
             ) : null}

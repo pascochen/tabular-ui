@@ -1,6 +1,6 @@
 import { Rail, Section } from '../components/layout';
 import { ComponentTag } from '../components/specimen';
-import { components, moments, pages, principles } from '../content';
+import { componentGrid, components, moments, principles } from '../content';
 import { standaloneLink } from '../lib/styles';
 import type { Route } from './+types/principles';
 
@@ -54,7 +54,7 @@ export default function Principles() {
       <Section>
         <Rail size="reading" className="flex flex-wrap items-baseline justify-between gap-[var(--site-gap)]">
           <p className="text-site-body text-text-secondary">Each component’s own decision sits on its card.</p>
-          <a href={pages.components.href} className={`${standaloneLink} text-site-body text-text-body`}>
+          <a href={componentGrid} className={`${standaloneLink} text-site-body text-text-body`}>
             See the {moments.length} moments and {components.length} components
           </a>
         </Rail>

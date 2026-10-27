@@ -1,10 +1,11 @@
 import { CaretDownIcon } from '@phosphor-icons/react';
-import { Button, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
+import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
 import { componentPage, components, pages, storybookDocs } from '../content';
 import { focusRing, standaloneLink } from '../lib/styles';
+import { usage } from '../component-usage';
 import { ComponentPair } from '../specimens';
 import NotFound from './not-found';
 import type { Route } from './+types/component';
@@ -17,6 +18,36 @@ const neighbour = `group ${focusRing}`;
 const neighbourTitle = 'text-site-title font-semibold text-text-primary group-hover:text-text-interactive';
 const find = (name?: string) => built.find((c) => c.name === name);
 
+/** A line of copy, with `code` in backticks set as code (mono, one step smaller, §8.3). */
+function Copy({ text }: { text: string }) {
+  return text.split(/(`[^`]+`)/).map((part, i) =>
+    part.startsWith('`') ? (
+      <code key={i} className="font-mono text-site-small">
+        {part.slice(1, -1)}
+      </code>
+    ) : (
+      part
+    ),
+  );
+}
+
+function WhenList({ id, title, lines }: { id: string; title: string; lines: readonly string[] }) {
+  return (
+    <div className="flex flex-col gap-[var(--gap-group)] border-t border-border pt-[var(--gap-group)]">
+      <h2 id={id} className="text-site-title font-semibold text-text-primary">
+        {title}
+      </h2>
+      <ul role="list" aria-labelledby={id} className="flex list-disc flex-col gap-[var(--gap-inline)] pl-5">
+        {lines.map((line) => (
+          <li key={line} className="text-site-body text-text-body">
+            <Copy text={line} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export const meta: Route.MetaFunction = ({ params }) => {
   const c = find(params.name);
   return c
@@ -25,13 +56,15 @@ export const meta: Route.MetaFunction = ({ params }) => {
 };
 
 /**
- * One page per built component (wireframe `78:595`): the jump menu, the name
- * and its decision, the before/after pair (D2), its install command (D9), its
- * Storybook page, and the components either side in run order.
+ * One page per built component (wireframe `78:595`), decision first (owner,
+ * 2026-10-27): the jump menu, the name and its decision, when to use it and
+ * when not, the before/after pair (D2), its install command (D9) and usage
+ * snippet, its Storybook page, and the components either side in run order.
  */
 export default function ComponentPage({ params }: Route.ComponentProps) {
   const c = find(params.name);
   if (!c) return <NotFound />;
+  if (!c.useWhen || !c.avoidWhen) throw new Error(`${c.name} is built but has no useWhen / avoidWhen copy`);
   const i = built.indexOf(c);
   const previous = built[i - 1];
   const next = built[i + 1];
@@ -62,6 +95,11 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">{c.decision}</p>
         </div>
 
+        <div className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-2">
+          <WhenList id="use-when" title="Use it when" lines={c.useWhen} />
+          <WhenList id="avoid-when" title="Don’t use it when" lines={c.avoidWhen} />
+        </div>
+
         <section aria-labelledby="pair-title">
           {/* Hidden, not absent: a component's own heading inside the pair (AgentPlan's
               <h3>) must not follow the page's <h1> with a level skipped. */}
@@ -74,6 +112,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
         <div className="flex flex-col gap-[var(--gap-group)]">
           <h2 className="text-site-title font-semibold text-text-primary">Install</h2>
           <CopyCommand command={`pnpm dlx shadcn@latest add https://tabularui.com/r/${c.name}.json`} />
+          <h3 className="pt-[var(--gap-inline)] text-site-small font-semibold text-text-primary">Usage</h3>
+          <CodeView language="tsx" label={`${c.title} usage`}>
+            {usage(c.name)}
+          </CodeView>
           <p className="flex flex-wrap gap-x-[var(--site-gap)] gap-y-[var(--gap-inline)] text-site-small text-text-secondary">
             <a href={pages.gettingStarted.href} className={`${standaloneLink} text-text-body`}>
               Set up the package first

@@ -147,15 +147,98 @@ test.describe('component pages', () => {
 });
 
 test.describe('the component grid', () => {
-  // On Home since 2026-10-26 (owner). Vercel answers /components with a 308 to
-  // it; the test server serves files only, so the redirect is checked in vercel.json.
-  test('is on Home, and /components redirects there', async ({ page }) => {
+  // On Home since 2026-10-26 (owner): the overview, reached from the hero.
+  test('is on Home, reached from the hero', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#components').getByRole('heading', { level: 2 })).toHaveText('15 components');
+    await expect(page.getByRole('link', { name: 'Browse components' })).toHaveAttribute('href', '/#components');
+  });
+});
+
+test.describe('Components in the nav', () => {
+  // Owner, 2026-10-27: Components opens the run at its first component, and
+  // previous and next walk it. Vercel answers /components with a 307 there;
+  // the test server serves files only, so the redirect is checked in vercel.json.
+  test('opens the first component, and /components redirects to it', async ({ page }) => {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/components/chat-starter');
     const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
       redirects: { source: string; destination: string; permanent: boolean }[];
     };
-    expect(vercel.redirects).toContainEqual({ source: '/components', destination: '/#components', permanent: true });
+    expect(vercel.redirects).toContainEqual({
+      source: '/components',
+      destination: '/components/chat-starter',
+      permanent: false,
+    });
+    await page.goto('/components/chat-starter');
+    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('is followed by Get started, and the footer uses the nav’s names', async ({ page }) => {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await expect(nav.getByRole('listitem')).toHaveText([
+      'Components',
+      'Get started',
+      'Principles',
+      'Vocabulary',
+      'Foundations',
+      /Storybook/,
+      /GitHub/,
+      /Demo/,
+    ]);
+    const guide = page.getByRole('contentinfo').getByRole('list', { name: 'Guide' });
+    await expect(guide.getByRole('link')).toHaveText(['Components', 'Get started', 'Principles', 'Vocabulary']);
+    for (const name of ['Components', 'Get started', 'Principles', 'Vocabulary']) {
+      // One name, one place: the footer goes where the nav does.
+      await expect(guide.getByRole('link', { name })).toHaveAttribute(
+        'href',
+        (await nav.getByRole('link', { name }).getAttribute('href'))!,
+      );
+    }
+  });
+});
+
+test.describe('a component page', () => {
+  // Decision first (owner, 2026-10-27): when to use it and when not, before the
+  // pair, and the README's own example under the install command.
+  for (const route of componentPages) {
+    test(`${route}: says when to use it and when not, then shows its usage`, async ({ page }) => {
+      await page.goto(route);
+      const use = page.getByRole('list', { name: 'Use it when', exact: true });
+      const avoid = page.getByRole('list', { name: 'Don’t use it when', exact: true });
+      await expect(use.getByRole('listitem')).toHaveCount(2);
+      await expect(avoid.getByRole('listitem')).toHaveCount(2);
+      // The lists come before the pair.
+      const top = (l: typeof use) => l.evaluate((el) => el.getBoundingClientRect().top);
+      const pairTop = await page.locator('#pair-title ~ figure').evaluate((el) => el.getBoundingClientRect().top);
+      expect(await top(use)).toBeLessThan(pairTop);
+      const usage = page.locator('pre').last();
+      await expect(usage).toContainText("from 'tabular-ui';");
+      // Each name is imported once. Chat starter's first import line listed
+      // ChatComposerHandle twice: its generic matched the JSX-tag pattern.
+      const imported = (await usage.innerText())
+        .split('\n')
+        .filter((line) => line.startsWith('import {'))
+        .flatMap((line) => line.replace(/^import \{ | \} from .*$/g, '').split(', '))
+        .map((name) => name.replace(/^type /, ''));
+      expect(imported.length).toBe(new Set(imported).size);
+    });
+  }
+
+  test('reads its usage from the component’s README', async ({ page }) => {
+    await page.goto('/components/run-log-row');
+    const readme = readFileSync(
+      new URL('../../../packages/ui/src/components/product/RunLogRow/README.md', import.meta.url),
+      'utf8',
+    );
+    const example = readme
+      .match(/```tsx\n([\s\S]*?)```/)![1]
+      .trim()
+      .split('\n')[0];
+    await expect(page.locator('pre').last()).toContainText(example);
+    await expect(page.locator('pre').last()).toContainText("import { RunLogRow } from 'tabular-ui';");
   });
 });
 

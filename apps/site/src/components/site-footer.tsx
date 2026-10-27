@@ -15,10 +15,11 @@ const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Guide',
     links: [
-      { href: pages.principles.href, label: '3 principles', live: pages.principles.live },
-      { href: pages.components.href, label: '15 components', live: pages.components.live },
-      { href: pages.vocabulary.href, label: pages.vocabulary.label, live: pages.vocabulary.live },
+      // The nav's labels and destinations (owner, 2026-10-27): one name per place.
+      { href: pages.components.href, label: pages.components.label, live: pages.components.live },
       { href: pages.gettingStarted.href, label: pages.gettingStarted.label, live: pages.gettingStarted.live },
+      { href: pages.principles.href, label: pages.principles.label, live: pages.principles.live },
+      { href: pages.vocabulary.href, label: pages.vocabulary.label, live: pages.vocabulary.live },
     ]
       .filter((link) => link.live)
       .map(({ href, label }) => ({ href, label })),

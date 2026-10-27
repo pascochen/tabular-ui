@@ -19,15 +19,24 @@ export { storybookDocs } from './component-list';
  * page that isn't live is left out, so the site never links to a 404 while it
  * is built page by page (docs/site.md §13).
  */
+/** The first built component in run order: where Components opens the run. */
+const firstBuilt = entries.find((entry) => registry.items.some((item) => item.name === entry.name));
+if (!firstBuilt) throw new Error('No component in the run is in registry.json');
+
+/** Home's component grid, the overview: the hero's "Browse components" and Principles' onward link. */
+export const componentGrid = '/#components';
+
 export const pages = {
-  // The component grid is on Home since 2026-10-26 (owner); /components redirects
-  // there (vercel.json). `current` is the path under which the nav marks it as
-  // the page you're on: the component pages.
-  components: { href: '/#components', label: 'Components', live: true, current: '/components' },
+  // Components opens the run at its first component, and previous and next walk
+  // it (owner, 2026-10-27); /components redirects there too (vercel.json). Until
+  // then it went to Home's grid, so it read as a link to the page you were on.
+  // `current` is the path under which the nav marks it as the page you're on.
+  components: { href: componentPage(firstBuilt.name), label: 'Components', live: true, current: '/components' },
+  // "Get started" in the nav and the footer (owner, 2026-10-27); the page's own title stays "Getting started".
+  gettingStarted: { href: '/getting-started', label: 'Get started', live: true },
   principles: { href: '/principles', label: 'Principles', live: true },
   vocabulary: { href: '/vocabulary', label: 'Vocabulary', live: true },
   foundations: { href: '/foundations/color', label: 'Foundations', live: true, current: '/foundations' },
-  gettingStarted: { href: '/getting-started', label: 'Getting started', live: true },
   color: { href: '/foundations/color', label: 'Color', live: true },
   typography: { href: '/foundations/typography', label: 'Typography', live: true },
   density: { href: '/foundations/density', label: 'Density', live: true },

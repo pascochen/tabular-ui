@@ -7,7 +7,9 @@ import { focusRing } from '../lib/styles';
 import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
-const internal = [pages.components, pages.principles, pages.vocabulary, pages.foundations].filter((page) => page.live);
+const internal = [pages.components, pages.gettingStarted, pages.principles, pages.vocabulary, pages.foundations].filter(
+  (page) => page.live,
+);
 const elsewhere = [external.storybook, external.github];
 
 /**
