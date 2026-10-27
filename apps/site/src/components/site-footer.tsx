@@ -1,11 +1,11 @@
 import { useId } from 'react';
 import pkg from 'tabular-ui/package.json';
 
-import { external, pages } from '../content';
+import { demoSoonLabel, external, pages } from '../content';
 import { textLink } from '../lib/styles';
 import { ExternalMark, Rail } from './layout';
 
-type FooterLink = { href: string; label: string; external?: boolean };
+type FooterLink = { href: string; label: string; external?: boolean; soon?: boolean };
 
 /**
  * The footer's columns (docs/site.md §4, "Shared"). A link to a page that
@@ -31,11 +31,13 @@ const columns: { title: string; links: FooterLink[] }[] = [
   },
   {
     title: 'Try it',
-    links: [external.demo, external.storybook, external.github].map(({ href, label }) => ({
-      href,
-      label,
-      external: true,
-    })),
+    links: [
+      // While the demo isn't ready, its entry is text, not a link (owner, 2026-10-26).
+      external.demo.ready
+        ? { href: external.demo.href, label: external.demo.label, external: true }
+        : { href: external.demo.href, label: demoSoonLabel, soon: true },
+      ...[external.storybook, external.github].map(({ href, label }) => ({ href, label, external: true })),
+    ],
   },
 ].filter((column) => column.links.length > 0);
 
@@ -49,10 +51,14 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
       <ul role="list" aria-labelledby={id} className="flex flex-col gap-[var(--gap-control-icon)]">
         {links.map((link) => (
           <li key={link.href}>
-            <a href={link.href} className={`${textLink} text-site-small text-text-body no-underline hover:underline`}>
-              {link.label}
-              {link.external ? <ExternalMark /> : null}
-            </a>
+            {link.soon ? (
+              <span className="text-site-small text-text-secondary">{link.label}</span>
+            ) : (
+              <a href={link.href} className={`${textLink} text-site-small text-text-body no-underline hover:underline`}>
+                {link.label}
+                {link.external ? <ExternalMark /> : null}
+              </a>
+            )}
           </li>
         ))}
       </ul>

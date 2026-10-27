@@ -29,7 +29,8 @@ test.describe('the hero', () => {
     await expect(hero(page).getByText('Did we pay any invoice twice?')).toBeVisible();
     await expect(hero(page).getByText('AI · Awaiting review')).toBeVisible();
     // No decision to take, and no dashed placeholder (owner, 2026-10-26).
-    await expect(hero(page).getByRole('button')).toHaveCount(1);
+    // The specimen's only button is Replay. (The section's own Demo action is not the specimen's.)
+    await expect(hero(page).getByRole('button').filter({ hasNotText: 'Demo' })).toHaveCount(1);
     await expect(hero(page).getByRole('button', { name: 'Replay the hero’s run' })).toBeVisible();
     await expect(hero(page).getByText('Run log row', { exact: false })).toHaveCount(0);
   });

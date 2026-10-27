@@ -158,3 +158,39 @@ test.describe('the component grid', () => {
     expect(vercel.redirects).toContainEqual({ source: '/components', destination: '/#components', permanent: true });
   });
 });
+
+test.describe('the wordmark', () => {
+  // It's a brand mark, used unchanged (CLAUDE.md, "Brand assets"). As a ghost
+  // button it took the button's hover overlay, a grey wash over the mark
+  // (owner, 2026-10-26). Hover now paints nothing.
+  test('paints nothing over the mark on hover', async ({ page }) => {
+    await page.goto('/');
+    const home = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Tabular UI' });
+    await home.hover();
+    const painted = await home.evaluate((el) => {
+      const after = getComputedStyle(el, '::after');
+      return {
+        background: getComputedStyle(el).backgroundColor,
+        after: after.content === 'none' ? 'none' : after.backgroundColor,
+        image: getComputedStyle(el.querySelector('img')!).opacity,
+      };
+    });
+    expect(painted).toEqual({ background: 'rgba(0, 0, 0, 0)', after: 'none', image: '1' });
+  });
+});
+
+test.describe('the demo, while it is not ready', () => {
+  // Owner, 2026-10-26: every demo action reads "Demo (soon)" and is disabled,
+  // and no page links to demo.tabularui.com.
+  test('is a disabled "Demo (soon)" in the nav, the hero and the closing band, and a link nowhere', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    const soon = page.getByRole('button', { name: 'Demo (soon)' });
+    await expect(soon).toHaveCount(3);
+    for (const button of await soon.all()) await expect(button).toBeDisabled();
+    await expect(page.locator('a[href*="demo.tabularui.com"]')).toHaveCount(0);
+    await expect(page.getByRole('contentinfo').getByText('Demo (soon)')).toBeVisible();
+  });
+});
