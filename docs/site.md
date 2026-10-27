@@ -239,7 +239,7 @@ Every route is prerendered to static HTML at build time.
 |---|---|---|
 | `/` | Home | `76:23` desktop, `77:96` mobile |
 | `/principles` | Principles | `77:230` |
-| `/components` | Redirects (308, `vercel.json`) to `/#components`, Home's component grid, since 2026-10-26 | `78:191` |
+| `/components` | Redirects (307, `vercel.json`) to `/components/chat-starter`, the first component in run order, since 2026-10-27. From 2026-10-26 it went to `/#components`, Home's grid. | `78:191` |
 | `/components/<name>` | One page per **built** component | `78:595` (Agent block) |
 | `/vocabulary` | Vocabulary | `79:345` |
 | `/foundations/color` | Color | `79:537` |
@@ -257,7 +257,7 @@ Every route is prerendered to static HTML at build time.
 
 Layout comes from each wireframe frame. This section records what the frames don't: where each part's content comes from, and where the frame changes.
 
-**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components (`/#components`), Principles, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide (3 principles, 15 components, Vocabulary, Getting started), Foundations (Color, Typography, Density) and Try it (Demo ↗, Storybook ↗, GitHub ↗). *Changed 2026-10-26:* Principles joined the nav, and "5 moments" left the footer with Home's moments section. *Changed 2026-10-27:* the wordmark is a plain link with no hover effect (as a ghost button it laid a grey overlay on the mark), and until the demo is ready every demo action reads "Demo (soon)": a disabled button in the nav, the hero and the closing band, a disabled menu item on a phone, and plain text in the footer. One flag, `external.demo.ready` in `src/content.ts`, turns them back into links. Beside them sit the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
+**Shared.** The nav (D8) holds the wordmark (`brand/tabular-wordmark.svg`, as an `<img>`, unchanged), then Components (the first component page, `/components/chat-starter`), Get started, Principles, Vocabulary and Foundations; on the right, Storybook ↗, GitHub ↗ and Demo ↗ (primary, 36px). It has no search, and it scrolls with the page. The footer has columns Guide (Components, Get started, Principles, Vocabulary, with the nav's names and destinations: one name, one place), Foundations (Color, Typography, Density) and Try it (Demo ↗, Storybook ↗, GitHub ↗). *Changed 2026-10-26:* Principles joined the nav, and "5 moments" left the footer with Home's moments section. *Changed 2026-10-27:* the wordmark is a plain link with no hover effect (as a ghost button it laid a grey overlay on the mark), and until the demo is ready every demo action reads "Demo (soon)": a disabled button in the nav, the hero and the closing band, a disabled menu item on a phone, and plain text in the footer. One flag, `external.demo.ready` in `src/content.ts`, turns them back into links. Beside them sit the byline "By Pascal Chenier ↗" linking to pascalchenier.com, and a row with the version (from `packages/ui/package.json`), the license (MIT, `LICENSE`) and Changelog ↗ (`packages/ui/CHANGELOG.md` on GitHub). The favicon is `brand/favicon.svg`. A skip link to `<main>` is the first focusable element.
 
 **Home** (`76:23`, `77:96`), changed 2026-10-26 (owner review):
 - The hero: heading, lead, two actions, and the teaser specimen (D5, D6).
@@ -270,13 +270,14 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 
 **Components** (`78:191`), a section of Home since 2026-10-26, under an `<h2>` "15 components", with each moment an `<h3>` and each card an `<h4>`. A title and lead, and a jump index grouped by moment. *Changed 2026-10-27:* the All, Built and To build filter is removed, since the to-build components are days from shipping, and each moment's line now says what it holds ("Suggestions to start from, and the box you type in.") rather than restating its title ("A person asks."). Vocabulary shows the same lines. Then one section per moment, holding a card per component: the specimen in its frame, the name, and the decision line. A to-build card has a dashed frame and the text "Not built yet". "Try each one with data from Kasane, a fictional printer maker" stays in the lead.
 
-**Component page** (`78:595`):
+**Component page** (`78:595`), decision first since 2026-10-27 (owner):
 - A jump menu, built with the library's `Menu`.
 - The name as `<h1>`, and the decision line.
+- **Use it when** and **Don't use it when**, side by side, two lines each (`useWhen` and `avoidWhen` in `src/component-list.ts`, owner copy). Each "don't" names the component to use instead, so a no still moves the visitor on. On a phone they stack.
 - The before/after pair in one frame, with one caption beneath it (D2).
-- Its install command, one line with a copy button, built from the registry name, with "Set up the package first" linking to Getting started (D9).
-- A link named for the component, to its Docs page in Storybook.
-- Previous and next.
+- Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27.
+- "Set up the package first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
+- Previous and next, which walk the run in order. Components in the nav opens the run at its first component.
 
 The pair is static. It shows two states, not a sequence, and has no Replay.
 
@@ -547,6 +548,8 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - a card rewinding unseen and playing on scroll;
   - a card's Replay and its announcement;
   - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
+
+**Component pages, decision first, as built (2026-10-27, owner):** from a navigation critique, How Might We questions and eight rough takes. Components in the nav had gone to Home's own grid, so it read as a link to the page you were on. Now it opens the first component page, and `/components` redirects there with a 307 (a 308 is cached by browsers, and the first component could change). Home's grid stays the overview, reached from the hero's "Browse components" and Principles' onward link. Get started joined the nav after Components, and the footer's Guide uses the nav's names and destinations. Each component page leads with when to use it and when not, and shows its README's usage example under the install command. The draft was reviewed as `docs/site-component-pages.md` and approved as written. Tests check the nav route and its redirect, the nav and footer labels, both lists before the pair on every component page, and that the usage comes from the README.
 
 **Links, as built (2026-10-27, owner):** two rules. A link inside a sentence is sage and always underlined (`textLink`). A link that stands alone is ink at rest, in its context's colour, and sage on hover, with no underline (`standaloneLink` in `src/lib/styles.ts`). A 1px underline was tried first: it's the thinnest line that renders the same on every screen, and it was still too heavy. Standalone links include the footer, card titles, the jump index, a component page's links and its previous and next, and the links on Principles and the 404. The nav keeps its ghost buttons: they're buttons, not text links (owner, after trying them as text links). Buttons (the hero's actions, Replay) and the component tags keep their own styles. `tests/pages.spec.ts` checks the rest and hover styles on a card, jump-index and footer link against a text link's sage.
 
