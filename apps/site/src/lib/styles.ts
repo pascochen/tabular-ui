@@ -10,3 +10,12 @@ export const focusRing = [
 
 /** A link in running text: sage, always underlined, so it isn't told apart by colour alone. */
 export const textLink = `text-text-interactive underline underline-offset-2 ${focusRing}`;
+
+/**
+ * A link that stands alone, not inside a sentence: the nav, the footer, card
+ * titles, the jump index, previous and next (owner, 2026-10-27). Ink by
+ * default, in the colour its context sets, so a grid of headings doesn't read
+ * as a wall of green; on hover, sage with a thin underline. Nothing around it
+ * is running text, so colour alone doesn't have to tell it apart (WCAG 1.4.1).
+ */
+export const standaloneLink = `decoration-1 underline-offset-4 hover:text-text-interactive hover:underline ${focusRing}`;

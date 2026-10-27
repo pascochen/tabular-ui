@@ -194,3 +194,38 @@ test.describe('the demo, while it is not ready', () => {
     await expect(page.getByRole('contentinfo').getByText('Demo (soon)')).toBeVisible();
   });
 });
+
+test.describe('standalone links', () => {
+  // Owner, 2026-10-27: a link that stands alone (nav, footer, card title) is ink
+  // at rest, and on hover turns the sage of a text link with a thin underline.
+  // A link inside a sentence stays sage and underlined.
+  test('are ink at rest, and sage with a 1px underline on hover', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    const sage = await page.locator('#components p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
+    const links = [
+      page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Principles' }),
+      page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Vocabulary' }),
+    ];
+    for (const link of links) {
+      const style = () =>
+        link.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { color: s.color, line: s.textDecorationLine, thickness: s.textDecorationThickness };
+        });
+      await page.mouse.move(0, 0);
+      const rest = await style();
+      expect(rest.color).not.toBe(sage);
+      expect(rest.line).toBe('none');
+      await link.hover();
+      await expect.poll(style).toEqual({ color: sage, line: 'underline', thickness: '1px' });
+    }
+  });
+
+  test('Home has no All / Built / To build filter', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#components').getByRole('tablist')).toHaveCount(0);
+    await expect(page.locator('#components').getByRole('heading', { level: 4 })).toHaveCount(15);
+  });
+});

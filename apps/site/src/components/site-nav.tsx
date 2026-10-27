@@ -1,9 +1,9 @@
 import { useLocation } from 'react-router';
-import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
+import { Button, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
 import { demoSoonLabel, external, pages } from '../content';
 import { cn } from '../lib/cn';
-import { focusRing } from '../lib/styles';
+import { focusRing, standaloneLink } from '../lib/styles';
 import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
@@ -14,14 +14,21 @@ const elsewhere = [external.storybook, external.github];
  * The site's nav (docs/site.md D8): an inset bar with a 1px rule all round,
  * solid paper, scrolling with the page. Built in the site rather than with the
  * library's AppBar, which is a full-width sticky band, but on what AppBar's
- * README records: links are real <a> elements styled with buttonVariants
- * (Base UI's Button would announce them as buttons), lists carry role="list"
+ * README records: links are real <a> elements (Base UI's Button would
+ * announce them as buttons), standalone links per lib/styles since
+ * 2026-10-27 rather than ghost buttons, lists carry role="list"
  * (Safari drops it from an unstyled list), and the current page takes
  * aria-current with the bracketed data-[active] form.
  *
  * The bar sits 16px outside the content column on each side, with 16px inside,
  * so the wordmark lines up with the content below it at every width.
  */
+/** A nav link: a standalone link at the control's height, so its target stays 36px tall. */
+const navLink = cn(
+  'inline-flex h-[var(--h-control)] items-center px-[var(--pad-control-x)] text-base font-medium',
+  standaloneLink,
+);
+
 export function SiteNav() {
   const { pathname } = useLocation();
   const isCurrent = (page: (typeof internal)[number]) => {
@@ -56,10 +63,7 @@ export function SiteNav() {
                   href={page.href}
                   aria-current={isCurrent(page) ? 'page' : undefined}
                   data-active={isCurrent(page) ? '' : undefined}
-                  className={cn(
-                    buttonVariants({ variant: 'ghost' }),
-                    'text-text-secondary data-[active]:font-semibold data-[active]:text-text-primary',
-                  )}
+                  className={cn(navLink, 'text-text-body data-[active]:font-semibold data-[active]:text-text-primary')}
                 >
                   {page.label}
                 </a>
@@ -71,7 +75,7 @@ export function SiteNav() {
         <ul role="list" className="ml-auto hidden items-center gap-[var(--gap-inline)] md:flex">
           {elsewhere.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className={buttonVariants({ variant: 'ghost' })}>
+              <a href={link.href} className={cn(navLink, 'text-text-body')}>
                 {link.label}
                 <ExternalMark />
               </a>
