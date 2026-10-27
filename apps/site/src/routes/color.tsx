@@ -2,7 +2,17 @@ import { FoundationsHeader, ModePair, TokenLabel } from '../components/foundatio
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { pages } from '../content';
 import { cn } from '../lib/cn';
-import { contrast, onCanvas, rampNames, rampSteps, type Role, roles, stepLabel, tokenStep } from '../tokens';
+import {
+  contrast,
+  onCanvas,
+  rampNames,
+  rampSteps,
+  type RampStep,
+  type Role,
+  roles,
+  stepLabel,
+  tokenStep,
+} from '../tokens';
 import type { Route } from './+types/color';
 
 export const meta: Route.MetaFunction = () => [
@@ -116,28 +126,30 @@ function RoleRow({ role }: { role: Role }) {
   );
 }
 
-/** The steps every ramp has. A step outside this set belongs to one ramp alone. */
+/**
+ * The steps every ramp has, the only ones the page shows (owner, 2026-10-27).
+ * Ledger's extra step, 925, the dark raised surface, stays in palette.json,
+ * theme.css and docs/design-system.md §3: this is a showcase, and a twelfth
+ * step in one ramp drew more attention than it repaid.
+ */
 const sharedSteps = new Set(
   rampSteps(rampNames[0])
     .map((s) => s.step)
     .filter((step) => rampNames.every((ramp) => rampSteps(ramp).some((s) => s.step === step))),
 );
 
-/** What a ramp's extra step is for, read from theme.css: ledger-925 is the dark raised surface (§3). */
-function extraUse(ramp: string, step: string): string {
-  const raised = tokenStep('surface-raised', 'dark');
-  if (raised.ramp === ramp && raised.step === step) return 'Dark raised surface';
-  throw new Error(`${ramp}-${step} is in no ramp but ${ramp}, and theme.css gives it no role the page can name`);
+/** A token's step, as the spec writes it, when it's a step the page shows. */
+function shownStepLabel(step: RampStep): string | undefined {
+  return sharedSteps.has(step.step) ? stepLabel(step) : undefined;
 }
 
-function Swatch({ step, hex, use }: { step: string; hex: string; use?: string }) {
+function Swatch({ step, hex }: { step: string; hex: string }) {
   return (
     <li className="flex flex-col gap-[var(--gap-bonded)]">
       {/* The measured hex from palette.json, read at build time: painting
           the palette is this page's one job that no token can do. */}
       <span aria-hidden="true" className="h-8 border border-border" style={{ background: hex }} />
       <code className="text-2xs text-text-secondary">{step}</code>
-      {use ? <span className="text-2xs text-text-secondary">{use}</span> : null}
     </li>
   );
 }
@@ -181,7 +193,9 @@ export default function Color() {
                         aria-hidden="true"
                         className={cn('size-8 shrink-0 border border-border-strong', s.className)}
                       />
-                      <TokenLabel name={s.token} detail={stepLabel(tokenStep(s.token, mode))} />
+                      {/* The swatch paints the real token. Its step is named only when the
+                          page shows it: dark raised is ledger-925, left off this page. */}
+                      <TokenLabel name={s.token} detail={shownStepLabel(tokenStep(s.token, mode))} />
                     </li>
                   ))}
                 </ul>
@@ -235,53 +249,26 @@ export default function Color() {
             lead="The Riso Ledger palette: seven ramps on one shared lightness curve, so a step number means the same contrast in every hue. Generated, never typed."
           />
           <ul role="list" className="flex flex-col gap-[var(--site-gap-tight)]">
-            {rampNames.map((ramp) => {
-              const steps = rampSteps(ramp);
-              const extras = steps.filter((s) => !sharedSteps.has(s.step));
-              return (
-                <li key={ramp} className="flex flex-col gap-[var(--gap-control-icon)]">
-                  <p className="text-site-small font-semibold text-text-primary capitalize">
-                    {ramp}
-                    {ramp === 'teal' ? (
-                      <span className="font-normal normal-case text-text-secondary"> (chart series only)</span>
-                    ) : null}
-                    {ramp === 'ledger' ? (
-                      <span className="font-normal normal-case text-text-secondary">
-                        {' '}
-                        (the neutral, with one extra step)
-                      </span>
-                    ) : null}
-                  </p>
-                  {/* The steps every ramp shares sit on one 11-column grid, so a step
-                      number lines up down the page. A step only one ramp has (ledger's
-                      925) sits apart in a twelfth slot, labelled with what it's for,
-                      rather than pushing that ramp's 950 a column out of line. */}
-                  <div className="flex flex-col gap-[var(--gap-group)] md:flex-row md:gap-[var(--gap-bonded)]">
-                    <ol role="list" className="grid grid-cols-6 gap-[var(--gap-bonded)] md:w-11/12 md:grid-cols-11">
-                      {steps
-                        .filter((s) => sharedSteps.has(s.step))
-                        .map((s) => (
-                          <Swatch key={s.step} step={s.step} hex={s.hex} />
-                        ))}
-                    </ol>
-                    {extras.length > 0 ? (
-                      <ol
-                        role="list"
-                        aria-label={`${ramp}’s extra step`}
-                        className="grid grid-cols-6 gap-[var(--gap-bonded)] md:w-1/12 md:grid-cols-1"
-                      >
-                        {extras.map((s) => (
-                          <Swatch key={s.step} step={s.step} hex={s.hex} use={extraUse(ramp, s.step)} />
-                        ))}
-                      </ol>
-                    ) : (
-                      // The same slot, empty, so every ramp's grid is the same width.
-                      <div className="hidden md:block md:w-1/12" />
-                    )}
-                  </div>
-                </li>
-              );
-            })}
+            {rampNames.map((ramp) => (
+              <li key={ramp} className="flex flex-col gap-[var(--gap-control-icon)]">
+                <p className="text-site-small font-semibold text-text-primary capitalize">
+                  {ramp}
+                  {ramp === 'teal' ? (
+                    <span className="font-normal normal-case text-text-secondary"> (chart series only)</span>
+                  ) : null}
+                  {ramp === 'ledger' ? (
+                    <span className="font-normal normal-case text-text-secondary"> (the neutral)</span>
+                  ) : null}
+                </p>
+                <ol role="list" className="grid grid-cols-6 gap-[var(--gap-bonded)] md:grid-cols-11">
+                  {rampSteps(ramp)
+                    .filter((s) => sharedSteps.has(s.step))
+                    .map((s) => (
+                      <Swatch key={s.step} step={s.step} hex={s.hex} />
+                    ))}
+                </ol>
+              </li>
+            ))}
           </ul>
         </Rail>
       </Section>

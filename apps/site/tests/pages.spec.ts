@@ -196,10 +196,11 @@ test.describe('the demo, while it is not ready', () => {
 });
 
 test.describe('the Color page’s ramps', () => {
-  // Ledger has a twelfth step, 925, the dark raised surface. On a shared
-  // 12-column grid it pushed ledger's 950 a column right of every other
-  // ramp's (owner, 2026-10-27). 925 now sits apart, labelled.
-  test('line up step by step, with ledger-925 set apart and labelled', async ({ page }) => {
+  // The page shows the eleven steps every ramp shares (owner, 2026-10-27).
+  // Ledger's extra step, 925, the dark raised surface, stays in the palette,
+  // theme.css and the spec, but not on this showcase page: on a shared
+  // 12-column grid it had also pushed ledger's 950 out of line.
+  test('line up step by step, and leave ledger-925 off the page', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/foundations/color');
     const ramps = page.locator('#ramps-title').locator('xpath=ancestor::section[1]');
@@ -210,13 +211,10 @@ test.describe('the Color page’s ramps', () => {
         .first()
         .evaluate((el) => Math.round(el.getBoundingClientRect().left));
     for (const step of ['50', '500', '900', '950']) expect(await x('ledger', step)).toBe(await x('sage', step));
-    const extra = ramps.getByRole('list', { name: 'ledger’s extra step' });
-    await expect(extra.locator('code')).toHaveText('925');
-    await expect(extra).toContainText('Dark raised surface');
-    expect(await x('ledger', '925')).toBeGreaterThan(await x('ledger', '950'));
+    await expect(page.locator('main')).not.toContainText('925');
     // The ramp's name is capitalised; its note in brackets is not.
     // (getByText reads the DOM, not the rendered case, so check the computed style.)
-    await expect(ramps.getByText('(the neutral, with one extra step)')).toHaveCSS('text-transform', 'none');
+    await expect(ramps.getByText('(the neutral)')).toHaveCSS('text-transform', 'none');
   });
 });
 
