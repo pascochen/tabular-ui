@@ -1,8 +1,9 @@
 import { buttonVariants } from 'tabular-ui';
 
-import { ExternalMark, Rail, Section } from './components/layout';
+import { DemoAction } from './components/demo-action';
+import { Rail, Section } from './components/layout';
 import { SpecimenFrame } from './components/specimen';
-import { external, pages } from './content';
+import { pages } from './content';
 import { kasane } from './data';
 import { HeroSpecimen } from './specimens';
 
@@ -39,10 +40,7 @@ export function HeroSection() {
             Proposals are cheap. Journal entries are not. Only a person can release one.
           </p>
           <div className="flex flex-wrap gap-[var(--gap-inline)]">
-            <a href={external.demo.href} className={buttonVariants({ size: 'lg' })}>
-              Open the demo
-              <ExternalMark />
-            </a>
+            <DemoAction label="Open the demo" />
             {pages.components.live ? (
               <a href={pages.components.href} className={buttonVariants({ size: 'lg', variant: 'outline' })}>
                 Browse components
@@ -76,10 +74,7 @@ export function ClosingBand() {
             scripted agent reads {kasane.pack.length} of its files. The duplicate payment above is one of the
             contradictions it finds.
           </p>
-          <a href={external.demo.href} className={buttonVariants({ size: 'lg' })}>
-            Open the demo
-            <ExternalMark />
-          </a>
+          <DemoAction label="Open the demo" />
         </Rail>
       </div>
     </Section>

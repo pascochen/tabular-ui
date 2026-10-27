@@ -40,7 +40,9 @@ export function componentPage(name: string): string {
 
 export const external = {
   storybook: { href: 'https://storybook.tabularui.com', label: 'Storybook' },
-  demo: { href: 'https://demo.tabularui.com', label: 'Demo' },
+  // Not ready yet (owner, 2026-10-26): every demo action shows "Demo (soon)",
+  // disabled, until this is true.
+  demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: false as boolean },
   github: { href: 'https://github.com/pascochen/tabular-ui', label: 'GitHub' },
   changelog: {
     href: 'https://github.com/pascochen/tabular-ui/blob/main/packages/ui/CHANGELOG.md',
@@ -49,6 +51,9 @@ export const external = {
   license: { href: 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE', label: 'MIT license' },
   byline: { href: 'https://pascalchenier.com', label: 'By Pascal Chenier' },
 } as const;
+
+/** The demo's label while it isn't ready (owner, 2026-10-26). */
+export const demoSoonLabel = `${external.demo.label} (soon)`;
 
 // ---------------------------------------------------------------------------
 // Components

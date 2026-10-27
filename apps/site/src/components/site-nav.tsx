@@ -1,8 +1,10 @@
 import { useLocation } from 'react-router';
 import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
-import { external, pages } from '../content';
+import { demoSoonLabel, external, pages } from '../content';
 import { cn } from '../lib/cn';
+import { focusRing } from '../lib/styles';
+import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
 const internal = [pages.components, pages.principles, pages.vocabulary, pages.foundations].filter((page) => page.live);
@@ -33,7 +35,10 @@ export function SiteNav() {
         aria-label="Main"
         className="mx-auto flex max-w-[calc(var(--site-w-wide)+32px)] items-center gap-[var(--site-gap)] border border-border bg-canvas px-2 py-[7px] md:px-4 md:py-[9px]"
       >
-        <a href="/" className={cn('shrink-0', buttonVariants({ variant: 'ghost' }), 'h-auto px-0')}>
+        {/* A plain link, not a ghost button: the button's hover overlay laid a grey
+            wash over the brand mark (owner, 2026-10-26). No hover effect at all;
+            the pointer is the cue, and keyboard focus keeps the ring. */}
+        <a href="/" className={cn('shrink-0', focusRing)}>
           <img
             src="/tabular-wordmark.svg"
             alt="Tabular UI"
@@ -73,10 +78,7 @@ export function SiteNav() {
             </li>
           ))}
           <li>
-            <a href={external.demo.href} className={buttonVariants({ size: 'lg' })}>
-              {external.demo.label}
-              <ExternalMark />
-            </a>
+            <DemoAction />
           </li>
         </ul>
 
@@ -91,7 +93,8 @@ export function SiteNav() {
                   {page.label}
                 </MenuItem>
               ))}
-              {[external.demo, ...elsewhere].map((link) => (
+              {external.demo.ready ? null : <MenuItem disabled>{demoSoonLabel}</MenuItem>}
+              {[...(external.demo.ready ? [external.demo] : []), ...elsewhere].map((link) => (
                 <MenuItem key={link.href} render={<a href={link.href} />}>
                   {link.label}
                   <ExternalMark />
