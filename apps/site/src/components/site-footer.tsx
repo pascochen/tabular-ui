@@ -1,7 +1,7 @@
 import { useId } from 'react';
 
 import { demoSoonLabel, external, pages } from '../content';
-import { standaloneLink, textLink } from '../lib/styles';
+import { standaloneLink } from '../lib/styles';
 import { ExternalMark, Rail } from './layout';
 
 type FooterLink = { href: string; label: string; external?: boolean; soon?: boolean };
@@ -9,18 +9,17 @@ type FooterLink = { href: string; label: string; external?: boolean; soon?: bool
 /**
  * The footer's columns (docs/site.md §4, "Shared"). A link to a page that
  * isn't built yet is left out, and a column with nothing live is too.
+ *
+ * Owner, 2026-10-27: Principles left the footer (the page stays, linked from
+ * each component page that carries a principle), GitHub moved from Try it to
+ * About, and About replaced the closing line that named the license and author.
  */
 const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Guide',
-    links: [
-      // The nav's labels and destinations (owner, 2026-10-27): one name per place.
-      { href: pages.components.href, label: pages.components.label, live: pages.components.live },
-      { href: pages.gettingStarted.href, label: pages.gettingStarted.label, live: pages.gettingStarted.live },
-      { href: pages.principles.href, label: pages.principles.label, live: pages.principles.live },
-      { href: pages.vocabulary.href, label: pages.vocabulary.label, live: pages.vocabulary.live },
-    ]
-      .filter((link) => link.live)
+    // The nav's labels and destinations (owner, 2026-10-27): one name per place.
+    links: [pages.components, pages.gettingStarted, pages.vocabulary]
+      .filter((page) => page.live)
       .map(({ href, label }) => ({ href, label })),
   },
   {
@@ -36,8 +35,16 @@ const columns: { title: string; links: FooterLink[] }[] = [
       external.demo.ready
         ? { href: external.demo.href, label: external.demo.label, external: true }
         : { href: external.demo.href, label: demoSoonLabel, soon: true },
-      ...[external.storybook, external.github].map(({ href, label }) => ({ href, label, external: true })),
+      { href: external.storybook.href, label: external.storybook.label, external: true },
     ],
+  },
+  {
+    title: 'About',
+    links: [external.author, external.license, external.github].map(({ href, label }) => ({
+      href,
+      label,
+      external: true,
+    })),
   },
 ].filter((column) => column.links.length > 0);
 
@@ -69,38 +76,17 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border pt-[calc(var(--site-section-y)/2)] pb-8">
-      <Rail className="flex flex-col gap-[var(--site-gap)]">
-        <div className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-4">
-          <div className="flex flex-col gap-[var(--gap-group)]">
-            <img
-              src="/tabular-wordmark.svg"
-              alt="Tabular UI"
-              width={153}
-              height={26}
-              className="h-7 w-auto self-start"
-            />
-            <p className="text-site-small text-text-secondary">Components for agent-written, human-verified work.</p>
-          </div>
-          {columns.map((column) => (
-            <FooterColumn key={column.title} {...column} />
-          ))}
+      {/* One column on a phone. At tablet width the brand takes its own row above
+          four link columns, which at five across were about 130px wide; five
+          across from lg. */}
+      <Rail className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-4 lg:grid-cols-5">
+        <div className="flex flex-col gap-[var(--gap-group)] md:col-span-4 lg:col-span-1">
+          <img src="/tabular-wordmark.svg" alt="Tabular UI" width={153} height={26} className="h-7 w-auto self-start" />
+          <p className="text-site-small text-text-secondary">Components for agent-written, human-verified work.</p>
         </div>
-        {/* One closing line (owner, 2026-10-27). It replaced a row with the byline, the
-            version and the changelog: a small project whose version and changelog won't
-            be kept current. Its links sit in a sentence, so they're text links. */}
-        <p className="border-t border-border pt-[var(--site-gap-tight)] text-site-small text-text-secondary">
-          Open source under the{' '}
-          <a href={external.license.href} className={textLink}>
-            {external.license.label}
-            <ExternalMark />
-          </a>
-          , made by{' '}
-          <a href={external.author.href} className={textLink}>
-            {external.author.label}
-            <ExternalMark />
-          </a>
-          .
-        </p>
+        {columns.map((column) => (
+          <FooterColumn key={column.title} {...column} />
+        ))}
       </Rail>
     </footer>
   );

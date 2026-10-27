@@ -8,7 +8,8 @@ import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
 // Principles left the nav 2026-10-27 (owner): too little on the page to earn a
-// top-level place. It stays in the footer's Guide.
+// top-level place. It left the footer the same day, and is linked from each
+// component page that carries a principle.
 const internal = [pages.components, pages.gettingStarted, pages.vocabulary, pages.foundations].filter(
   (page) => page.live,
 );
