@@ -63,7 +63,8 @@ for (const route of routes) {
       await expect(page.locator('header')).toHaveCount(1);
       await expect(page.locator('main')).toHaveCount(1);
       await expect(page.locator('footer')).toHaveCount(1);
-      for (const nav of await page.locator('nav').all()) await expect(nav).toHaveAttribute('aria-label', /\S/);
+      // Every nav has a name, from aria-label or from visible text it points at (aria-labelledby).
+      for (const nav of await page.locator('nav').all()) await expect(nav).toHaveAccessibleName(/\S/);
     });
 
     test('the skip link is the first focusable element and lands on main', async ({ page }) => {
@@ -298,6 +299,46 @@ test.describe('the Color page’s ramps', () => {
     // The ramp's name is capitalised; its note in brackets is not.
     // (getByText reads the DOM, not the rendered case, so check the computed style.)
     await expect(ramps.getByText('(the neutral)')).toHaveCSS('text-transform', 'none');
+  });
+});
+
+test.describe('the Foundations pages', () => {
+  // Owner, 2026-10-27 (option A of a navigation critique): the section's name,
+  // then its three pages at reading size, then the page's title. The links had
+  // sat under the lead at 13px beside a 64px title, and most visitors missed them.
+  for (const [route, current] of [
+    ['/foundations/color', 'Color'],
+    ['/foundations/typography', 'Typography'],
+    ['/foundations/density', 'Density'],
+  ] as const) {
+    test(`${route}: names the section, and its pages come before the title, at 16px`, async ({ page }) => {
+      await page.goto(route);
+      const nav = page.getByRole('navigation', { name: 'Foundations' });
+      await expect(nav.getByRole('link')).toHaveText(['Color', 'Typography', 'Density']);
+      await expect(nav.getByRole('link', { name: current })).toHaveAttribute('aria-current', 'page');
+      await expect(nav.locator('[aria-current]')).toHaveCount(1);
+      for (const link of await nav.getByRole('link').all()) {
+        await expect(link).toHaveCSS('font-size', '16px');
+        expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(36);
+      }
+      const top = async (l: ReturnType<typeof page.locator>) => (await l.boundingBox())!.y;
+      const h1 = page.getByRole('heading', { level: 1 });
+      await expect(h1).toHaveText(current);
+      expect(await top(page.getByText('Foundations', { exact: true }).first())).toBeLessThan(await top(nav));
+      expect(await top(nav)).toBeLessThan(await top(h1));
+    });
+  }
+
+  test('/foundations redirects to Color', async () => {
+    // Vercel answers it with a 307; the test server serves files only.
+    const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
+      redirects: { source: string; destination: string; permanent: boolean }[];
+    };
+    expect(vercel.redirects).toContainEqual({
+      source: '/foundations',
+      destination: '/foundations/color',
+      permanent: false,
+    });
   });
 });
 

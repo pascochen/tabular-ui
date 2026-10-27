@@ -4,6 +4,9 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter tabular-ui build && pnpm build",
   "outputDirectory": "build/client",
-  "redirects": [{ "source": "/components", "destination": "/components/chat-starter", "permanent": false }],
+  "redirects": [
+    { "source": "/components", "destination": "/components/chat-starter", "permanent": false },
+    { "source": "/foundations", "destination": "/foundations/color", "permanent": false }
+  ],
   "rewrites": [{ "source": "/r/:path*", "destination": "https://storybook.tabularui.com/r/:path*" }]
 }
