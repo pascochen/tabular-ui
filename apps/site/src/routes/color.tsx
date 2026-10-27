@@ -2,7 +2,17 @@ import { FoundationsHeader, ModePair, TokenLabel } from '../components/foundatio
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { pages } from '../content';
 import { cn } from '../lib/cn';
-import { contrast, onCanvas, rampNames, rampSteps, type Role, roles, stepLabel, tokenStep } from '../tokens';
+import {
+  contrast,
+  onCanvas,
+  rampNames,
+  rampSteps,
+  type RampStep,
+  type Role,
+  roles,
+  stepLabel,
+  tokenStep,
+} from '../tokens';
 import type { Route } from './+types/color';
 
 export const meta: Route.MetaFunction = () => [
@@ -116,6 +126,34 @@ function RoleRow({ role }: { role: Role }) {
   );
 }
 
+/**
+ * The steps every ramp has, the only ones the page shows (owner, 2026-10-27).
+ * Ledger's extra step, 925, the dark raised surface, stays in palette.json,
+ * theme.css and docs/design-system.md §3: this is a showcase, and a twelfth
+ * step in one ramp drew more attention than it repaid.
+ */
+const sharedSteps = new Set(
+  rampSteps(rampNames[0])
+    .map((s) => s.step)
+    .filter((step) => rampNames.every((ramp) => rampSteps(ramp).some((s) => s.step === step))),
+);
+
+/** A token's step, as the spec writes it, when it's a step the page shows. */
+function shownStepLabel(step: RampStep): string | undefined {
+  return sharedSteps.has(step.step) ? stepLabel(step) : undefined;
+}
+
+function Swatch({ step, hex }: { step: string; hex: string }) {
+  return (
+    <li className="flex flex-col gap-[var(--gap-bonded)]">
+      {/* The measured hex from palette.json, read at build time: painting
+          the palette is this page's one job that no token can do. */}
+      <span aria-hidden="true" className="h-8 border border-border" style={{ background: hex }} />
+      <code className="text-2xs text-text-secondary">{step}</code>
+    </li>
+  );
+}
+
 export default function Color() {
   return (
     <>
@@ -155,7 +193,9 @@ export default function Color() {
                         aria-hidden="true"
                         className={cn('size-8 shrink-0 border border-border-strong', s.className)}
                       />
-                      <TokenLabel name={s.token} detail={stepLabel(tokenStep(s.token, mode))} />
+                      {/* The swatch paints the real token. Its step is named only when the
+                          page shows it: dark raised is ledger-925, left off this page. */}
+                      <TokenLabel name={s.token} detail={shownStepLabel(tokenStep(s.token, mode))} />
                     </li>
                   ))}
                 </ul>
@@ -214,19 +254,18 @@ export default function Color() {
                 <p className="text-site-small font-semibold text-text-primary capitalize">
                   {ramp}
                   {ramp === 'teal' ? (
-                    <span className="font-normal text-text-secondary"> (chart series only)</span>
+                    <span className="font-normal normal-case text-text-secondary"> (chart series only)</span>
                   ) : null}
-                  {ramp === 'ledger' ? <span className="font-normal text-text-secondary"> (the neutral)</span> : null}
+                  {ramp === 'ledger' ? (
+                    <span className="font-normal normal-case text-text-secondary"> (the neutral)</span>
+                  ) : null}
                 </p>
-                <ol role="list" className="grid grid-cols-6 gap-[var(--gap-bonded)] md:grid-cols-12">
-                  {rampSteps(ramp).map((s) => (
-                    <li key={s.step} className="flex flex-col gap-[var(--gap-bonded)]">
-                      {/* The measured hex from palette.json, read at build time: painting
-                          the palette is this page's one job that no token can do. */}
-                      <span aria-hidden="true" className="h-8 border border-border" style={{ background: s.hex }} />
-                      <code className="text-2xs text-text-secondary">{s.step}</code>
-                    </li>
-                  ))}
+                <ol role="list" className="grid grid-cols-6 gap-[var(--gap-bonded)] md:grid-cols-11">
+                  {rampSteps(ramp)
+                    .filter((s) => sharedSteps.has(s.step))
+                    .map((s) => (
+                      <Swatch key={s.step} step={s.step} hex={s.hex} />
+                    ))}
                 </ol>
               </li>
             ))}

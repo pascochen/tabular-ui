@@ -294,7 +294,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 - *Roles:* the six roles of §1 (interactive, danger, warning, success, agent, info), each as text, fill and tint, in both modes (D4). Every swatch paints the real token (`bg-fill-danger`, not a copied value). Each label names the ramp step and its contrast on the canvas, read from `docs/palette.json`.
 - *Neutral:* the `ledger` roles of §3, canvas to tertiary text, both modes.
 - *Surfaces and elevation:* the three tiers of §4, "Elevation" (inline, raised, overlay, with the overlay sheet), both modes (D9).
-- *Ramps:* all seven ramps from `palette.json`, with `teal` marked as chart-only.
+- *Ramps:* all seven ramps from `palette.json`, with `teal` marked as chart-only. *Changed 2026-10-27 (owner):* the page shows only the eleven steps every ramp shares, on one grid, so a step lines up down the page. Ledger's extra step, 925, the dark raised surface, is left off: this is a showcase, and the extra step drew attention without helping a visitor. It stays in `palette.json`, `theme.css` and `docs/design-system.md` §3. In *Neutral*, the dark raised surface still paints the real token, but its label names no step. (On the old twelve-column grid, 925 had also pushed ledger's 950 a column out of line.)
 
 The wireframe's Surface 2, Rule, Text muted, Person mark, Inverse and State swatches are not carried over: their names aren't tokens, and the colours shown are the wordmark's.
 

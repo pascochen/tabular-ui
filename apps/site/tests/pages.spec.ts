@@ -195,6 +195,29 @@ test.describe('the demo, while it is not ready', () => {
   });
 });
 
+test.describe('the Color page’s ramps', () => {
+  // The page shows the eleven steps every ramp shares (owner, 2026-10-27).
+  // Ledger's extra step, 925, the dark raised surface, stays in the palette,
+  // theme.css and the spec, but not on this showcase page: on a shared
+  // 12-column grid it had also pushed ledger's 950 out of line.
+  test('line up step by step, and leave ledger-925 off the page', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/foundations/color');
+    const ramps = page.locator('#ramps-title').locator('xpath=ancestor::section[1]');
+    const x = (ramp: string, step: string) =>
+      ramps
+        .locator('li', { has: page.locator('p', { hasText: new RegExp(`^${ramp}`, 'i') }) })
+        .locator('li', { has: page.locator(`code:text-is("${step}")`) })
+        .first()
+        .evaluate((el) => Math.round(el.getBoundingClientRect().left));
+    for (const step of ['50', '500', '900', '950']) expect(await x('ledger', step)).toBe(await x('sage', step));
+    await expect(page.locator('main')).not.toContainText('925');
+    // The ramp's name is capitalised; its note in brackets is not.
+    // (getByText reads the DOM, not the rendered case, so check the computed style.)
+    await expect(ramps.getByText('(the neutral)')).toHaveCSS('text-transform', 'none');
+  });
+});
+
 test.describe('standalone links', () => {
   // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
   // index) is ink at rest and turns the sage of a text link on hover, with no
