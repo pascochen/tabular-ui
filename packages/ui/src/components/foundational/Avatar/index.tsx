@@ -101,7 +101,8 @@ function AvatarImage({ className, animatedSrc, animate = false, ...props }: Avat
 
 /**
  * Shown until the image loads, and if it never does. Initials, neutral — an
- * avatar is identity, not state, so it takes no hue (§0 rule 1).
+ * avatar is identity, not state, so it takes no hue (§0 rule 1). shadcn's
+ * type as it ships: `text-sm`, `text-xs` at `sm`, regular weight, as typed.
  */
 function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props) {
   return (
@@ -109,8 +110,7 @@ function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props)
       data-slot="avatar-fallback"
       className={cn(
         'flex size-full items-center justify-center rounded-full bg-surface-raised',
-        'font-medium uppercase text-text-secondary',
-        'text-xs group-data-[size=sm]/avatar:text-2xs',
+        'text-sm text-text-secondary group-data-[size=sm]/avatar:text-xs',
         className,
       )}
       {...props}
