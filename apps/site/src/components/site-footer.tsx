@@ -1,8 +1,7 @@
 import { useId } from 'react';
-import pkg from 'tabular-ui/package.json';
 
 import { demoSoonLabel, external, pages } from '../content';
-import { standaloneLink } from '../lib/styles';
+import { standaloneLink, textLink } from '../lib/styles';
 import { ExternalMark, Rail } from './layout';
 
 type FooterLink = { href: string; label: string; external?: boolean; soon?: boolean };
@@ -80,33 +79,28 @@ export function SiteFooter() {
               height={26}
               className="h-7 w-auto self-start"
             />
-            <p className="text-site-small text-text-secondary">Agent components for finance and data teams.</p>
+            <p className="text-site-small text-text-secondary">Components for agent-written, human-verified work.</p>
           </div>
           {columns.map((column) => (
             <FooterColumn key={column.title} {...column} />
           ))}
         </div>
-        <div className="flex flex-col gap-[var(--gap-group)] border-t border-border pt-[var(--site-gap-tight)] text-site-small text-text-secondary md:flex-row md:items-center md:justify-between">
-          <a href={external.byline.href} className={`${standaloneLink} text-text-body`}>
-            {external.byline.label}
+        {/* One closing line (owner, 2026-10-27). It replaced a row with the byline, the
+            version and the changelog: a small project whose version and changelog won't
+            be kept current. Its links sit in a sentence, so they're text links. */}
+        <p className="border-t border-border pt-[var(--site-gap-tight)] text-site-small text-text-secondary">
+          Open source under the{' '}
+          <a href={external.license.href} className={textLink}>
+            {external.license.label}
             <ExternalMark />
           </a>
-          <ul role="list" className="flex flex-wrap gap-[var(--site-gap-tight)]">
-            <li>v{pkg.version}</li>
-            <li>
-              <a href={external.license.href} className={`${standaloneLink} text-text-body`}>
-                {external.license.label}
-                <ExternalMark />
-              </a>
-            </li>
-            <li>
-              <a href={external.changelog.href} className={`${standaloneLink} text-text-body`}>
-                {external.changelog.label}
-                <ExternalMark />
-              </a>
-            </li>
-          </ul>
-        </div>
+          , made by{' '}
+          <a href={external.author.href} className={textLink}>
+            {external.author.label}
+            <ExternalMark />
+          </a>
+          .
+        </p>
       </Rail>
     </footer>
   );
