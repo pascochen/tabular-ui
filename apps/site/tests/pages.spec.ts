@@ -181,7 +181,6 @@ test.describe('Components in the nav', () => {
     await expect(nav.getByRole('listitem')).toHaveText([
       'Components',
       'Get started',
-      'Principles',
       'Vocabulary',
       'Foundations',
       /Storybook/,
@@ -190,7 +189,9 @@ test.describe('Components in the nav', () => {
     ]);
     const guide = page.getByRole('contentinfo').getByRole('list', { name: 'Guide' });
     await expect(guide.getByRole('link')).toHaveText(['Components', 'Get started', 'Principles', 'Vocabulary']);
-    for (const name of ['Components', 'Get started', 'Principles', 'Vocabulary']) {
+    // Principles is in the footer only since 2026-10-27; it keeps its own page.
+    await expect(guide.getByRole('link', { name: 'Principles' })).toHaveAttribute('href', '/principles');
+    for (const name of ['Components', 'Get started', 'Vocabulary']) {
       // One name, one place: the footer goes where the nav does.
       await expect(guide.getByRole('link', { name })).toHaveAttribute(
         'href',
