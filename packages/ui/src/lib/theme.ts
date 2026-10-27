@@ -63,12 +63,14 @@ export function resolveTheme(preference: ThemePreference, osPrefersDark: boolean
 /**
  * The one place an app sets its colour mode. Call it once, in the app's root
  * component; it owns `data-theme` on `<html>` from then on. Returns the mode
- * in effect, the user's preference, and a setter, which is what
- * `AccountMenu`'s `theme` / `onThemeChange` take.
+ * in effect (`theme`), the user's preference, and a setter. The preference
+ * and the setter are what `AccountMenu`'s `theme` / `onThemeChange` take:
+ * passing the mode in effect would check Dark or Light while the user has
+ * System chosen.
  *
  * ```tsx
- * const { theme, setPreference } = useTheme();
- * <AccountMenu theme={theme} onThemeChange={setPreference} … />
+ * const { preference, setPreference } = useTheme();
+ * <AccountMenu theme={preference} onThemeChange={setPreference} … />
  * ```
  */
 export function useTheme({ defaultPreference = 'dark', storageKey = 'tui-theme' }: UseThemeOptions = {}) {

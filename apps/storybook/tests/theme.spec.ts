@@ -34,7 +34,7 @@ for (const mode of ['dark', 'light'] as const) {
   test(`starts in the mode it is given (${mode})`, async ({ page }) => {
     await gotoStory(page, STORY, mode);
     expect(await applied(page)).toBe(mode);
-    await expect(page.getByTestId('mode-in-effect')).toHaveText(`Mode in effect: ${mode}`);
+    await expect(page.getByTestId('mode-in-effect')).toHaveText(`The page is in ${mode} mode.`);
   });
 }
 
