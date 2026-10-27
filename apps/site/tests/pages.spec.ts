@@ -358,6 +358,23 @@ test.describe('the Foundations pages', () => {
   });
 });
 
+test.describe('the jump index', () => {
+  // Owner, 2026-10-27: each moment's name labels its group, as the footer's
+  // column titles do. Only the components are links.
+  test('labels each moment in words, and links only the components', async ({ page }) => {
+    await page.goto('/');
+    const index = page.getByRole('navigation', { name: 'Components by moment' });
+    for (const moment of ['Asking', 'Thinking', 'Showing', 'Waiting', 'Recording']) {
+      await expect(index.getByRole('link', { name: moment, exact: true })).toHaveCount(0);
+      await expect(index.getByRole('list', { name: moment, exact: true })).toBeVisible();
+    }
+    await expect(index.getByRole('list', { name: 'Asking', exact: true }).getByRole('link')).toHaveText([
+      'Chat starter',
+      'Chat composer',
+    ]);
+  });
+});
+
 test.describe('the footer', () => {
   // Owner, 2026-10-27: a new tagline, and one closing line in place of the row
   // with the byline, the version and the changelog.
