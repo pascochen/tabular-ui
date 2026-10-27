@@ -2,7 +2,7 @@ import { useId } from 'react';
 import pkg from 'tabular-ui/package.json';
 
 import { demoSoonLabel, external, pages } from '../content';
-import { textLink } from '../lib/styles';
+import { standaloneLink } from '../lib/styles';
 import { ExternalMark, Rail } from './layout';
 
 type FooterLink = { href: string; label: string; external?: boolean; soon?: boolean };
@@ -54,7 +54,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
             {link.soon ? (
               <span className="text-site-small text-text-secondary">{link.label}</span>
             ) : (
-              <a href={link.href} className={`${textLink} text-site-small text-text-body no-underline hover:underline`}>
+              <a href={link.href} className={`${standaloneLink} text-site-small text-text-body`}>
                 {link.label}
                 {link.external ? <ExternalMark /> : null}
               </a>
@@ -86,20 +86,20 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="flex flex-col gap-[var(--gap-group)] border-t border-border pt-[var(--site-gap-tight)] text-site-small text-text-secondary md:flex-row md:items-center md:justify-between">
-          <a href={external.byline.href} className={textLink}>
+          <a href={external.byline.href} className={`${standaloneLink} text-text-body`}>
             {external.byline.label}
             <ExternalMark />
           </a>
           <ul role="list" className="flex flex-wrap gap-[var(--site-gap-tight)]">
             <li>v{pkg.version}</li>
             <li>
-              <a href={external.license.href} className={textLink}>
+              <a href={external.license.href} className={`${standaloneLink} text-text-body`}>
                 {external.license.label}
                 <ExternalMark />
               </a>
             </li>
             <li>
-              <a href={external.changelog.href} className={textLink}>
+              <a href={external.changelog.href} className={`${standaloneLink} text-text-body`}>
                 {external.changelog.label}
                 <ExternalMark />
               </a>

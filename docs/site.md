@@ -268,7 +268,7 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 
 **Principles** (`77:230`). The three rules, each with its why, its Check line and the components that carry it. A to-build component's chip is dashed, and its label carries the state as text, since the dash alone is a visual signal (§0 rule 1; `docs/design-system.md` §7.8, "Border style"). The wireframe marks the Check lines as drafts; they are owner copy.
 
-**Components** (`78:191`), a section of Home since 2026-10-26, under an `<h2>` "15 components", with each moment an `<h3>` and each card an `<h4>`. A title and lead, a filter for All, Built and To build, and a jump index grouped by moment. Then one section per moment, holding a card per component: the specimen in its frame, the name, and the decision line. A to-build card has a dashed frame and the text "Not built yet". "Try each one with data from Kasane, a fictional printer maker" stays in the lead.
+**Components** (`78:191`), a section of Home since 2026-10-26, under an `<h2>` "15 components", with each moment an `<h3>` and each card an `<h4>`. A title and lead, and a jump index grouped by moment. *Changed 2026-10-27:* the All, Built and To build filter is removed, since the to-build components are days from shipping, and each moment's line now says what it holds ("Suggestions to start from, and the box you type in.") rather than restating its title ("A person asks."). Vocabulary shows the same lines. Then one section per moment, holding a card per component: the specimen in its frame, the name, and the decision line. A to-build card has a dashed frame and the text "Not built yet". "Try each one with data from Kasane, a fictional printer maker" stays in the lead.
 
 **Component page** (`78:595`):
 - A jump menu, built with the library's `Menu`.
@@ -547,6 +547,8 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - a card rewinding unseen and playing on scroll;
   - a card's Replay and its announcement;
   - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
+
+**Links, as built (2026-10-27, owner):** two rules. A link inside a sentence is sage and always underlined (`textLink`). A link that stands alone is ink at rest, in its context's colour, and sage on hover, with no underline (`standaloneLink` in `src/lib/styles.ts`). A 1px underline was tried first: it's the thinnest line that renders the same on every screen, and it was still too heavy. Standalone links include the footer, card titles, the jump index, a component page's links and its previous and next, and the links on Principles and the 404. The nav keeps its ghost buttons: they're buttons, not text links (owner, after trying them as text links). Buttons (the hero's actions, Replay) and the component tags keep their own styles. `tests/pages.spec.ts` checks the rest and hover styles on a card, jump-index and footer link against a text link's sage.
 
 **Owner review of Home and Vocabulary, as built (2026-10-26):**
 - **The hero is a teaser** (D6, changed): no buttons, no dashed slot, Replay always shown. The Agent block card in the grid keeps Post entry, Edit entry and Don't post.

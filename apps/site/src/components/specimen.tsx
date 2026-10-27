@@ -1,5 +1,5 @@
 import { componentPage, type SiteComponent } from '../content';
-import { focusRing } from '../lib/styles';
+import { focusRing, standaloneLink } from '../lib/styles';
 import { cn } from '../lib/cn';
 
 /**
@@ -70,7 +70,7 @@ export function ComponentCard({
         {/* An <h4>: the card sits under its moment's <h3>, in Home's Components section. */}
         <h4 className="text-site-title-sm font-semibold text-text-primary">
           {component.built ? (
-            <a href={componentPage(component.name)} className={cn('underline underline-offset-2', focusRing)}>
+            <a href={componentPage(component.name)} className={standaloneLink}>
               {component.title}
             </a>
           ) : (
