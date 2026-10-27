@@ -1,17 +1,21 @@
 import { useLocation } from 'react-router';
 import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
-import { demoSoonLabel, external, pages } from '../content';
+import { external, pages } from '../content';
 import { cn } from '../lib/cn';
 import { focusRing } from '../lib/styles';
-import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
-// Principles left the nav 2026-10-27 (owner): too little on the page to earn a
-// top-level place. It stays in the footer's Guide.
-const internal = [pages.components, pages.gettingStarted, pages.vocabulary, pages.foundations].filter(
-  (page) => page.live,
-);
+type Page = (typeof pages)[keyof typeof pages];
+
+// The system on the left, then on the right what takes you off to use it
+// (owner, 2026-10-27): Storybook, GitHub, and Get started, the one page of this
+// site there, with no arrow. Principles left the nav and the footer the same
+// day; each component page that carries a principle links to it. The disabled
+// "Demo (soon)" button left the nav too: where the demo goes when it's ready
+// is still to decide. The hero and the closing band keep their demo action.
+const system = [pages.components, pages.foundations, pages.vocabulary].filter((page) => page.live);
+const setUp: Page[] = [pages.gettingStarted].filter((page) => page.live);
 const elsewhere = [external.storybook, external.github];
 
 /**
@@ -28,10 +32,24 @@ const elsewhere = [external.storybook, external.github];
  */
 export function SiteNav() {
   const { pathname } = useLocation();
-  const isCurrent = (page: (typeof internal)[number]) => {
+  const isCurrent = (page: Page) => {
     const base = 'current' in page ? page.current : page.href;
     return pathname === base || pathname.startsWith(`${base}/`);
   };
+
+  const pageLink = (page: Page) => (
+    <a
+      href={page.href}
+      aria-current={isCurrent(page) ? 'page' : undefined}
+      data-active={isCurrent(page) ? '' : undefined}
+      className={cn(
+        buttonVariants({ variant: 'ghost' }),
+        'text-text-secondary data-[active]:font-semibold data-[active]:text-text-primary',
+      )}
+    >
+      {page.label}
+    </a>
+  );
 
   return (
     <header className="px-2 pt-2 md:px-4 min-[1200px]:px-8 min-[1200px]:pt-4">
@@ -41,33 +59,23 @@ export function SiteNav() {
       >
         {/* A plain link, not a ghost button: the button's hover overlay laid a grey
             wash over the brand mark (owner, 2026-10-26). No hover effect at all;
-            the pointer is the cue, and keyboard focus keeps the ring. */}
+            the pointer is the cue, and keyboard focus keeps the ring. The mark
+            keeps its phone size until lg: at 28px the bar needed 728px of
+            content at 768px, where it has 703px. */}
         <a href="/" className={cn('shrink-0', focusRing)}>
           <img
             src="/tabular-wordmark.svg"
             alt="Tabular UI"
             width={153}
             height={26}
-            className="h-[22px] w-auto md:h-7"
+            className="h-[22px] w-auto lg:h-7"
           />
         </a>
 
-        {internal.length > 0 ? (
+        {system.length > 0 ? (
           <ul role="list" className="hidden items-center md:flex">
-            {internal.map((page) => (
-              <li key={page.href}>
-                <a
-                  href={page.href}
-                  aria-current={isCurrent(page) ? 'page' : undefined}
-                  data-active={isCurrent(page) ? '' : undefined}
-                  className={cn(
-                    buttonVariants({ variant: 'ghost' }),
-                    'text-text-secondary data-[active]:font-semibold data-[active]:text-text-primary',
-                  )}
-                >
-                  {page.label}
-                </a>
-              </li>
+            {system.map((page) => (
+              <li key={page.href}>{pageLink(page)}</li>
             ))}
           </ul>
         ) : null}
@@ -81,9 +89,9 @@ export function SiteNav() {
               </a>
             </li>
           ))}
-          <li>
-            <DemoAction />
-          </li>
+          {setUp.map((page) => (
+            <li key={page.href}>{pageLink(page)}</li>
+          ))}
         </ul>
 
         {/* Below md the links fold into the library's Menu (D8), composed here:
@@ -92,16 +100,21 @@ export function SiteNav() {
           <Menu>
             <MenuTrigger render={<Button variant="outline">Menu</Button>} />
             <MenuContent align="end">
-              {internal.map((page) => (
+              {/* The desktop order: the system, then Storybook, GitHub and Get started. */}
+              {system.map((page) => (
                 <MenuItem key={page.href} render={<a href={page.href} />}>
                   {page.label}
                 </MenuItem>
               ))}
-              {external.demo.ready ? null : <MenuItem disabled>{demoSoonLabel}</MenuItem>}
-              {[...(external.demo.ready ? [external.demo] : []), ...elsewhere].map((link) => (
+              {elsewhere.map((link) => (
                 <MenuItem key={link.href} render={<a href={link.href} />}>
                   {link.label}
                   <ExternalMark />
+                </MenuItem>
+              ))}
+              {setUp.map((page) => (
+                <MenuItem key={page.href} render={<a href={page.href} />}>
+                  {page.label}
                 </MenuItem>
               ))}
             </MenuContent>
