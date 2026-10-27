@@ -2,6 +2,8 @@
 
 Foundational, added 2026-10-07 (approved). Adopted from shadcn/ui (Base UI, `base-mira`) and retokenized.
 
+**Styling on hold (2026-10-27).** A restyle is planned. Until it lands, the fallback is back to shadcn's default type and the stories are shadcn's demo, initials only: `Default` (with a size control) and `Sizes`. `animatedSrc` is unchanged; `AccountMenu` shows it.
+
 ```tsx
 <Avatar size="sm">
   <AvatarImage src={user.avatar} alt="Mei Tachibana" />
@@ -24,7 +26,7 @@ Primitive scale (`size-6`, `size-8`): there are no avatar size tokens. If a thir
 
 - **Shape:** `--radius-full`. §7.7 lists the avatar among the inherently round shapes.
 - **Rim:** a 1px `--color-border` rim drawn as an `::after` over the image, blended (`darken` in light mode, `lighten` in dark). It reads as a light rim against any image in both modes without changing the 24/32px footprint.
-- **Fallback:** initials, neutral (`--color-surface-raised`, `--color-text-secondary`). An avatar is identity, not state, so it takes no hue (§0 rule 1).
+- **Fallback:** initials, neutral (`--color-surface-raised`, `--color-text-secondary`). An avatar is identity, not state, so it takes no hue (§0 rule 1). Type is shadcn's as it ships: `--text-sm`, `--text-xs` at `sm`, regular weight, in the case the caller passes.
 
 ## Animation: `animatedSrc` and `animate`
 
@@ -44,4 +46,4 @@ The animated layer is `alt=""` and `aria-hidden`. The still image carries the `a
 
 ## Fallback timing
 
-Base UI shows `AvatarFallback` until the image has loaded, and keeps it if loading fails. See the `BrokenImage` story.
+Base UI shows `AvatarFallback` until the image has loaded, and keeps it if loading fails.
