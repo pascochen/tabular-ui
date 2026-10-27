@@ -3,7 +3,7 @@ import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabu
 
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
-import { componentPage, components, pages, storybookDocs } from '../content';
+import { componentPage, components, pages, principles, storybookDocs } from '../content';
 import { focusRing, standaloneLink } from '../lib/styles';
 import { usage } from '../component-usage';
 import { ComponentPair } from '../specimens';
@@ -28,6 +28,37 @@ function Copy({ text }: { text: string }) {
     ) : (
       part
     ),
+  );
+}
+
+/**
+ * The principles a component carries, on its own page (owner, 2026-10-27):
+ * each rule beside the component that keeps it, with the check a reviewer can
+ * run. The Principles page keeps all three, linked from here and the footer.
+ */
+function RulesFollowed({ name }: { name: string }) {
+  const followed = principles.filter((p) => p.carriedBy.some((c) => c.name === name));
+  if (followed.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="rules-title"
+      className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]"
+    >
+      <h2 id="rules-title" className="text-site-title font-semibold text-text-primary">
+        {followed.length === 1 ? 'The rule it follows' : 'The rules it follows'}
+      </h2>
+      <ul role="list" className="flex flex-col gap-[var(--gap-group)]">
+        {followed.map((p) => (
+          <li key={p.title} className="flex flex-col gap-[var(--gap-bonded)]">
+            <p className="text-site-body font-semibold text-text-primary">{p.title}</p>
+            <p className="text-site-small text-text-secondary">Check: {p.check}</p>
+          </li>
+        ))}
+      </ul>
+      <a href={pages.principles.href} className={`${standaloneLink} self-start text-site-small text-text-body`}>
+        All {principles.length} principles
+      </a>
+    </section>
   );
 }
 
@@ -58,8 +89,9 @@ export const meta: Route.MetaFunction = ({ params }) => {
 /**
  * One page per built component (wireframe `78:595`), decision first (owner,
  * 2026-10-27): the jump menu, the name and its decision, when to use it and
- * when not, the before/after pair (D2), its install command (D9) and usage
- * snippet, its Storybook page, and the components either side in run order.
+ * when not, the principles it carries, the before/after pair (D2), its install
+ * command (D9) and usage snippet, its Storybook page, and the components either
+ * side in run order.
  */
 export default function ComponentPage({ params }: Route.ComponentProps) {
   const c = find(params.name);
@@ -99,6 +131,8 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           <WhenList id="use-when" title="Use it when" lines={c.useWhen} />
           <WhenList id="avoid-when" title="Don’t use it when" lines={c.avoidWhen} />
         </div>
+
+        <RulesFollowed name={c.name} />
 
         <section aria-labelledby="pair-title">
           {/* Hidden, not absent: a component's own heading inside the pair (AgentPlan's
