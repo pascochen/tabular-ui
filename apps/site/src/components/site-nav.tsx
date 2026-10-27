@@ -7,7 +7,9 @@ import { focusRing } from '../lib/styles';
 import { DemoAction } from './demo-action';
 import { ExternalMark } from './layout';
 
-const internal = [pages.components, pages.gettingStarted, pages.principles, pages.vocabulary, pages.foundations].filter(
+// Principles left the nav 2026-10-27 (owner): too little on the page to earn a
+// top-level place. It stays in the footer's Guide.
+const internal = [pages.components, pages.gettingStarted, pages.vocabulary, pages.foundations].filter(
   (page) => page.live,
 );
 const elsewhere = [external.storybook, external.github];
