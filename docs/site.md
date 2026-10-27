@@ -274,6 +274,7 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 - A jump menu, built with the library's `Menu`.
 - The name as `<h1>`, and the decision line.
 - **Use it when** and **Don't use it when**, side by side, two lines each (`useWhen` and `avoidWhen` in `src/component-list.ts`, owner copy). Each "don't" names the component to use instead, so a no still moves the visitor on. On a phone they stack.
+- **The rules it follows** (owner, 2026-10-27): each principle the component carries (`carriedBy` in `src/content.ts`), with its check, and a link to all three. Shown only where there is one: Agent block (1 and 3), Lineage tree and Attachment row (2), Run log row and Status badge (3). The Principles page stays, linked from here and the footer, out of the nav. Not merged into Vocabulary: principles are rules, Vocabulary is words.
 - The before/after pair in one frame, with one caption beneath it (D2).
 - Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27.
 - "Set up the package first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
