@@ -375,6 +375,28 @@ test.describe('the jump index', () => {
   });
 });
 
+test.describe('the footer', () => {
+  // Owner, 2026-10-27: a new tagline, and one closing line in place of the row
+  // with the byline, the version and the changelog.
+  test('carries the tagline and one closing line, and no version or changelog', async ({ page }) => {
+    await page.goto('/');
+    const footer = page.getByRole('contentinfo');
+    await expect(footer).toContainText('Components for agent-written, human-verified work.');
+    // The ↗ after each link is aria-hidden but still in the text.
+    await expect(footer).toContainText(/Open source under the MIT license\s*↗?, made by Pascal\s*↗?\./);
+    await expect(footer.getByRole('link', { name: 'MIT license' })).toHaveAttribute(
+      'href',
+      'https://github.com/pascochen/tabular-ui/blob/main/LICENSE',
+    );
+    await expect(footer.getByRole('link', { name: 'Pascal' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/pascal-chenier/',
+    );
+    await expect(footer.getByRole('link', { name: /Changelog/ })).toHaveCount(0);
+    await expect(footer).not.toContainText(/v\d+\.\d+\.\d+/);
+  });
+});
+
 test.describe('standalone links', () => {
   // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
   // index) is ink at rest and turns the sage of a text link on hover, with no
