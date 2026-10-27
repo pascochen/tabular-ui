@@ -7,11 +7,6 @@ import { useTheme, type ThemePreference } from './theme';
 
 const labels: Record<ThemePreference, string> = { system: 'System', dark: 'Dark', light: 'Light' };
 
-/**
- * `useTheme` in an app's settings: the user picks System, Dark or Light, and
- * the hook sets `data-theme` on the root. The story starts in the mode the
- * toolbar set, so it shows that mode until you choose.
- */
 function ThemeSetting({ storageKey }: { storageKey: string | null }) {
   const [initial] = useState<ThemePreference>(() =>
     document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
@@ -34,12 +29,23 @@ function ThemeSetting({ storageKey }: { storageKey: string | null }) {
         )}
       </Field>
       <p className="text-base text-text-secondary" data-testid="mode-in-effect">
-        Mode in effect: {theme}
+        The page is in {theme} mode.
       </p>
     </div>
   );
 }
 
+/**
+ * Without `useTheme()`, an app renders in light mode, in a dark-first system,
+ * and nothing errors. The hook is what sets the colour mode.
+ *
+ * Call it once, in the app's root component. It owns `data-theme` on `<html>`
+ * from then on. Its `preference` and `setPreference` are what `AccountMenu`'s
+ * `theme` and `onThemeChange` take. Put the same mode in `index.html`
+ * (`<html data-theme="dark">`), so the page does not switch modes on load.
+ *
+ * Below, the hook drives a theme setting, which starts in the toolbar's mode.
+ */
 const meta = {
   title: 'Lib/useTheme',
   component: ThemeSetting,
