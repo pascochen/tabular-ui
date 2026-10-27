@@ -12,10 +12,12 @@ export const focusRing = [
 export const textLink = `text-text-interactive underline underline-offset-2 ${focusRing}`;
 
 /**
- * A link that stands alone, not inside a sentence: the nav, the footer, card
- * titles, the jump index, previous and next (owner, 2026-10-27). Ink by
- * default, in the colour its context sets, so a grid of headings doesn't read
- * as a wall of green; on hover, sage with a thin underline. Nothing around it
- * is running text, so colour alone doesn't have to tell it apart (WCAG 1.4.1).
+ * A link that stands alone, not inside a sentence: the footer, card titles,
+ * the jump index, previous and next (owner, 2026-10-27). Ink by default, in
+ * the colour its context sets, so a grid of headings doesn't read as a wall of
+ * green; sage on hover, with no underline (1px, the thinnest that renders on
+ * every screen, was still too heavy). Nothing around it is running text, so
+ * colour alone doesn't have to tell it apart (WCAG 1.4.1). The nav's links are
+ * ghost buttons, not this.
  */
-export const standaloneLink = `decoration-1 underline-offset-4 hover:text-text-interactive hover:underline ${focusRing}`;
+export const standaloneLink = `hover:text-text-interactive ${focusRing}`;
