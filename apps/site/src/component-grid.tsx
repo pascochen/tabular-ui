@@ -1,9 +1,7 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'tabular-ui';
-
 import { ExternalMark, Rail, Section, SectionHeader } from './components/layout';
 import { ComponentCard } from './components/specimen';
-import { components, external, moments, type SiteComponent } from './content';
-import { textLink } from './lib/styles';
+import { components, external, moments } from './content';
+import { standaloneLink, textLink } from './lib/styles';
 import {
   AgentBlockSpecimen,
   AttachmentSpecimen,
@@ -31,17 +29,8 @@ const specimens: Record<string, () => React.ReactNode> = {
   'status-badge': StatusSpecimen,
 };
 
-const built = components.filter((c) => c.built);
-const filters = [
-  { value: 'all', label: `All ${components.length}`, keep: () => true },
-  { value: 'built', label: `Built ${built.length}`, keep: (c: SiteComponent) => c.built },
-  { value: 'to-build', label: `To build ${components.length - built.length}`, keep: (c: SiteComponent) => !c.built },
-];
-
-function MomentSections({ keep }: { keep: (c: SiteComponent) => boolean }) {
+function MomentSections() {
   return moments.map((moment) => {
-    const shown = moment.components.filter(keep);
-    if (shown.length === 0) return null;
     return (
       <section
         key={moment.id}
@@ -56,7 +45,7 @@ function MomentSections({ keep }: { keep: (c: SiteComponent) => boolean }) {
           <p className="text-site-body text-text-secondary">{moment.line}</p>
         </div>
         <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-2 lg:grid-cols-3">
-          {shown.map((c) => {
+          {moment.components.map((c) => {
             const Specimen = specimens[c.name];
             return (
               <li key={c.name} id={c.name} className="scroll-mt-[var(--site-gap)]">
@@ -73,7 +62,7 @@ function MomentSections({ keep }: { keep: (c: SiteComponent) => boolean }) {
 /**
  * The component grid (wireframe `78:191`), on Home since 2026-10-26 (owner): it
  * replaced Home's outline, principles and moments, and /components redirects
- * here. The jump index, the filter, and one section per moment.
+ * here. The jump index, and one section per moment.
  */
 export function ComponentsSection() {
   return (
@@ -100,7 +89,7 @@ export function ComponentsSection() {
               <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">
                 <a
                   href={`#${moment.id}`}
-                  className={`${textLink} text-site-small font-semibold text-text-primary no-underline hover:underline`}
+                  className={`${standaloneLink} text-site-small font-semibold text-text-primary`}
                 >
                   {moment.title}
                 </a>
@@ -109,7 +98,7 @@ export function ComponentsSection() {
                   {moment.components.map((c) => (
                     <li key={c.name} className="text-site-small">
                       {c.built ? (
-                        <a href={`#${c.name}`} className={textLink}>
+                        <a href={`#${c.name}`} className={`${standaloneLink} text-text-body`}>
                           {c.title}
                         </a>
                       ) : (
@@ -123,23 +112,11 @@ export function ComponentsSection() {
           </ul>
         </nav>
 
-        {/* A filter switches the view on one page, so it is the library's Tabs,
-            segmented, as §4 sets them for view modes. Only the chosen view is
-            mounted; the prerendered HTML is "All". */}
-        <Tabs defaultValue="all" className="flex flex-col gap-[var(--site-gap)]">
-          <TabsList variant="segmented" aria-label="Show" className="self-start">
-            {filters.map((f) => (
-              <TabsTrigger key={f.value} value={f.value}>
-                {f.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {filters.map((f) => (
-            <TabsContent key={f.value} value={f.value} className="flex flex-col gap-[var(--site-section-y)]">
-              <MomentSections keep={f.keep} />
-            </TabsContent>
-          ))}
-        </Tabs>
+        {/* No All / Built / To build filter (owner, 2026-10-27): the to-build
+            components are days from shipping, so it would soon have nothing to sort. */}
+        <div className="flex flex-col gap-[var(--site-section-y)]">
+          <MomentSections />
+        </div>
       </Rail>
     </Section>
   );

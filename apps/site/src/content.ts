@@ -81,11 +81,12 @@ export function component(name: string): SiteComponent {
 /** The life of one agent run (wireframe `76:151`). */
 export const moments = (
   [
-    { id: 'asking', title: 'Asking', line: 'A person asks.' },
-    { id: 'thinking', title: 'Thinking', line: 'The agent works it out.' },
-    { id: 'showing', title: 'Showing', line: 'The agent shows its evidence.' },
-    { id: 'waiting', title: 'Waiting', line: 'The agent stops for a person.' },
-    { id: 'recording', title: 'Recording', line: 'The run is written down.' },
+    // Each line says what the moment holds, not what its title already says (owner, 2026-10-27).
+    { id: 'asking', title: 'Asking', line: 'Suggestions to start from, and the box you type in.' },
+    { id: 'thinking', title: 'Thinking', line: 'The agent’s reasoning and plan, shown while it works.' },
+    { id: 'showing', title: 'Showing', line: 'The figures, files and sources behind an answer.' },
+    { id: 'waiting', title: 'Waiting', line: 'Where the run stops until a person answers or approves.' },
+    { id: 'recording', title: 'Recording', line: 'What the run leaves on record, and its state.' },
   ] as const
 ).map((moment) => ({ ...moment, components: components.filter((c) => c.moment === moment.id) }));
 

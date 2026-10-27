@@ -4,12 +4,17 @@ import { Button, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
 import { componentPage, components, pages, storybookDocs } from '../content';
-import { textLink } from '../lib/styles';
+import { focusRing, standaloneLink } from '../lib/styles';
 import { ComponentPair } from '../specimens';
 import NotFound from './not-found';
 import type { Route } from './+types/component';
 
 const built = components.filter((c) => c.built);
+
+// Previous and next follow the standalone-link rule (lib/styles), but the
+// hover colour goes to the title alone: the label stays secondary.
+const neighbour = `group ${focusRing}`;
+const neighbourTitle = 'text-site-title font-semibold text-text-primary group-hover:text-text-interactive';
 const find = (name?: string) => built.find((c) => c.name === name);
 
 export const meta: Route.MetaFunction = ({ params }) => {
@@ -70,10 +75,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           <h2 className="text-site-title font-semibold text-text-primary">Install</h2>
           <CopyCommand command={`pnpm dlx shadcn@latest add https://tabularui.com/r/${c.name}.json`} />
           <p className="flex flex-wrap gap-x-[var(--site-gap)] gap-y-[var(--gap-inline)] text-site-small text-text-secondary">
-            <a href={pages.gettingStarted.href} className={textLink}>
+            <a href={pages.gettingStarted.href} className={`${standaloneLink} text-text-body`}>
               Set up the package first
             </a>
-            <a href={storybookDocs(c.name)} className={textLink}>
+            <a href={storybookDocs(c.name)} className={`${standaloneLink} text-text-body`}>
               {c.title} in Storybook
               <ExternalMark />
             </a>
@@ -85,20 +90,17 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           className="flex justify-between gap-[var(--site-gap)] border-t border-border pt-[var(--site-gap)]"
         >
           {previous ? (
-            <a href={componentPage(previous.name)} className={`${textLink} flex flex-col no-underline`}>
+            <a href={componentPage(previous.name)} className={`${neighbour} flex flex-col`}>
               <span className="text-site-small text-text-secondary">Previous</span>
-              <span className="text-site-title font-semibold text-text-primary underline">{previous.title}</span>
+              <span className={neighbourTitle}>{previous.title}</span>
             </a>
           ) : (
             <span />
           )}
           {next ? (
-            <a
-              href={componentPage(next.name)}
-              className={`${textLink} flex flex-col items-end text-right no-underline`}
-            >
+            <a href={componentPage(next.name)} className={`${neighbour} flex flex-col items-end text-right`}>
               <span className="text-site-small text-text-secondary">Next</span>
-              <span className="text-site-title font-semibold text-text-primary underline">{next.title}</span>
+              <span className={neighbourTitle}>{next.title}</span>
             </a>
           ) : null}
         </nav>

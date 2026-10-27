@@ -219,3 +219,39 @@ test.describe('the Color page’s ramps', () => {
     await expect(ramps.getByText('(the neutral, with one extra step)')).toHaveCSS('text-transform', 'none');
   });
 });
+
+test.describe('standalone links', () => {
+  // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
+  // index) is ink at rest and turns the sage of a text link on hover, with no
+  // underline. A link inside a sentence stays sage and underlined. The nav's
+  // links are ghost buttons, not standalone links.
+  test('are ink at rest, and sage with no underline on hover', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    const sage = await page.locator('#components p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
+    const links = [
+      page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }),
+      page.getByRole('navigation', { name: 'Components by moment' }).getByRole('link', { name: 'Agent plan' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Vocabulary' }),
+    ];
+    for (const link of links) {
+      const style = () =>
+        link.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { color: s.color, line: s.textDecorationLine };
+        });
+      await page.mouse.move(0, 0);
+      const rest = await style();
+      expect(rest.color).not.toBe(sage);
+      expect(rest.line).toBe('none');
+      await link.hover();
+      await expect.poll(style).toEqual({ color: sage, line: 'none' });
+    }
+  });
+
+  test('Home has no All / Built / To build filter', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#components').getByRole('tablist')).toHaveCount(0);
+    await expect(page.locator('#components').getByRole('heading', { level: 4 })).toHaveCount(15);
+  });
+});
