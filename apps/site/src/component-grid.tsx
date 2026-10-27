@@ -87,14 +87,17 @@ export function ComponentsSection() {
           <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
             {moments.map((moment) => (
               <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">
-                <a
-                  href={`#${moment.id}`}
-                  className={`${standaloneLink} text-site-small font-semibold text-text-primary`}
-                >
+                {/* A label, not a link (owner, 2026-10-27), styled as the footer's column
+                    titles: it names the group, and the components under it are the links. */}
+                <p id={`jump-${moment.id}`} className="text-site-small font-semibold text-text-secondary">
                   {moment.title}
-                </a>
+                </p>
                 {/* 6px apart, so each 20px link keeps a 24px target circle (WCAG 2.5.8). */}
-                <ul role="list" className="flex flex-col gap-[var(--gap-control-icon)]">
+                <ul
+                  role="list"
+                  aria-labelledby={`jump-${moment.id}`}
+                  className="flex flex-col gap-[var(--gap-control-icon)]"
+                >
                   {moment.components.map((c) => (
                     <li key={c.name} className="text-site-small">
                       {c.built ? (
