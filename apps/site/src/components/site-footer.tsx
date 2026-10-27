@@ -17,8 +17,9 @@ type FooterLink = { href: string; label: string; external?: boolean; soon?: bool
 const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Guide',
-    // The nav's labels and destinations (owner, 2026-10-27): one name per place.
-    links: [pages.components, pages.gettingStarted, pages.vocabulary]
+    // The nav's labels, destinations and order (owner, 2026-10-27): one name per
+    // place. Foundations has its own column.
+    links: [pages.components, pages.vocabulary, pages.gettingStarted]
       .filter((page) => page.live)
       .map(({ href, label }) => ({ href, label })),
   },
