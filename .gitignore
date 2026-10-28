@@ -42,3 +42,6 @@ apps/storybook/public/r/
 # Visual baselines are Linux-only (apps/storybook/tests/visual.spec.ts); a Mac run writes these
 apps/storybook/tests/visual.spec.ts-snapshots/*-darwin.png
 apps/storybook/tests/visual.spec.ts-snapshots/*-win32.png
+
+# Design prototypes are local scratch work, never committed
+docs/prototypes/
