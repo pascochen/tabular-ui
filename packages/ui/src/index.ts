@@ -270,6 +270,7 @@ export {
   type AgentPlanStep,
 } from './components/product/AgentPlan';
 export { Confirmation, type ConfirmationProps } from './components/product/Confirmation';
+export { Question, type QuestionAnswer, type QuestionOption, type QuestionProps } from './components/product/Question';
 export {
   ChatThread,
   type ChatThreadProps,

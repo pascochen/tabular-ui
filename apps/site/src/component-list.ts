@@ -145,6 +145,14 @@ export const entries: ComponentEntry[] = [
     title: 'Question',
     moment: 'waiting',
     decision: 'One question, with options you can answer in a word.',
+    useWhen: [
+      'The agent can’t settle a fact or a choice from the data, and one answer would.',
+      'The answers fit in a word or a few: up to four as buttons, more in a list.',
+    ],
+    avoidWhen: [
+      'One reading is far more likely. Answer it, and say which reading you took.',
+      'The agent is asking to act. Use `Confirmation`.',
+    ],
   },
   {
     name: 'confirmation',

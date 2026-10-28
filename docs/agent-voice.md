@@ -135,6 +135,7 @@ The strings the product shows around agent output. *Source: `AgentReasoning`,
 `AgentPlan`, `ChatThread`, 2026-10-12.* `Sources` (2026-10-28) labels its lists "Sources" and "Not checked", and
 writes "Nothing. Every part of the question was checked." for an empty one.
 `Confirmation` (2026-10-28) labels its two rows "What changes" and "Who it reaches".
+`Question` (2026-10-28) offers "Skip" and "Choose for me" beside its options, sends a field with "Answer", and labels a long list "Choose an answer".
 
 | Kind | Form | Examples |
 |---|---|---|
