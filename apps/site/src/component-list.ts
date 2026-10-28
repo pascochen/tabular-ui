@@ -151,6 +151,14 @@ export const entries: ComponentEntry[] = [
     title: 'Confirmation',
     moment: 'waiting',
     decision: 'Before an action runs, you see exactly what it changes and who it reaches.',
+    useWhen: [
+      'The agent is about to do one thing outside the conversation: send, notify, rebuild or export.',
+      'People should see what it changes and who it reaches before it runs.',
+    ],
+    avoidWhen: [
+      'It changes the books. Use an `AgentBlock` proposal, so the entry can be edited before anyone posts it.',
+      'You want to offer “Always allow”. Each permission covers one run, so the next one asks again.',
+    ],
   },
   {
     name: 'agent-block',

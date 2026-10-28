@@ -711,6 +711,26 @@
       ]
     },
     {
+      "name": "confirmation",
+      "type": "registry:component",
+      "title": "Confirmation",
+      "description": "Permission for one action before it runs: what it changes and who it reaches. Sits inside an AgentBlock.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/Confirmation/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Confirmation/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "context-switcher",
       "type": "registry:component",
       "title": "ContextSwitcher",
@@ -1186,6 +1206,7 @@
         "https://tabularui.com/r/chip.json",
         "https://tabularui.com/r/code-view.json",
         "https://tabularui.com/r/combobox.json",
+        "https://tabularui.com/r/confirmation.json",
         "https://tabularui.com/r/context-switcher.json",
         "https://tabularui.com/r/control-base.json",
         "https://tabularui.com/r/count-badge.json",

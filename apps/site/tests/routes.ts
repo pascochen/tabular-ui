@@ -11,6 +11,7 @@ export const componentPages = [
   'attachment-row',
   'inline-citation',
   'sources',
+  'confirmation',
   'agent-block',
   'chat-thread',
   'run-log-row',

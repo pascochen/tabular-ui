@@ -58,7 +58,7 @@ The headings also implied that approval hands an entry over to the person. Books
    - `actions` is gone, so the block can't be posted twice.
    - Beneath it sits the run log row for the posting step, `passed`. The green appears only there, where something true happened.
    - It needs no library change.
-3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves every built component (twelve since 2026-10-28). The draft pairs below are owner copy to review:
+3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves every built component (thirteen since 2026-10-28, when Confirmation was built). The draft pairs below are owner copy to review:
 
 | Component | Before | After |
 |---|---|---|
@@ -70,6 +70,7 @@ The headings also implied that approval hands an entry over to the person. Books
 | Attachment row | Uploading | Ready; the name is the link |
 | Inline citation | The answer, no marks | Each figure marked with its source *(added and approved 2026-10-28)* |
 | Sources | The answer, "Found in" one file | Every file it read, and what it didn't check *(added and approved 2026-10-28)* |
+| Confirmation | AI · Awaiting confirmation: the summary, the question, what changes and who it reaches | AI · Sent: "Sent once, by you. The next send asks again." *(added and approved 2026-10-28)* |
 | Agent block | AI · Awaiting review | AI · Posted, posted by you |
 | Chat thread | Question asked, "Working…" | The answer grown in the same place |
 | Run log row | Failed row, closed | Opened to its error |
@@ -140,7 +141,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 **D7. Closing band copy — decided 2026-10-25 (owner).** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components".
 - `demo.tabularui.com` is a five-step onboarding journey (`apps/demo/README.md`). The visitor plays Kasane's Head of FP&A and loads 20 files. A scripted agent reads them, then lists what it understood, the contradictions, the gaps, and questions to ask.
-- It uses 4 of the 10 built agent components, proposes no entries, and runs no September close. Neither wireframe line is true of it.
+- It uses 4 of the 13 built agent components, proposes no entries, and runs no September close. Neither wireframe line is true of it.
 - The duplicate payment the hero shows (D5) is one of the contradictions the demo finds, so the band links the two.
 
 | Slot | Copy | Source of each specific |
@@ -216,7 +217,7 @@ tabularui.com is the public front of Tabular UI for designers and engineers deci
 
 It is not the reference. Storybook (`storybook.tabularui.com`) holds every component, prop and state, and the site links to it rather than repeating it. It is not a sales page: there is no pricing, no sign-up, and no analytics, cookies or tracking.
 
-**The 15 are a subset.** The library has 46 components: 18 foundational and 28 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 10 built and 5 to build. The Components page says so in one line and links to Storybook for the rest.
+**The 15 are a subset.** The library has 47 components: 18 foundational and 29 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 13 built and 2 to build (Question and Tool) since 2026-10-28. The Components page says so in one line and links to Storybook for the rest.
 
 ## 2. Sources of truth
 
@@ -393,6 +394,7 @@ On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draw
 | Attachment row | Three source files, name as link | The pack |
 | Inline citation | The duplicate-payment answer, then a mark on each figure; a mark opens its file and entries | `duplicate-payment`: its sources and entries (added 2026-10-28) |
 | Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, copy approved by the owner the same day) |
+| Confirmation | The variance summary, then Vocabulary's question; Send summary or Don't send puts the outcome where the buttons were | `operatingBridge` through `h1Gap`, compact; the company's name (added 2026-10-28) |
 | Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
 | Run log row | The run's steps, one failed and opened | **Open:** the stories use dbt model names, which aren't Kasane data. The export should produce the run's steps from what the agent read. |
@@ -522,7 +524,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids. The hero moved to a paper plate on a ruled sheet the same day (D3, item 3).
 - A link to a page that isn't built yet is left out (`pages` in `src/content.ts`, each with `live`), so the site never links to a 404 while it grows page by page. The nav shows only its external links, the outline's "15 components" jumps to the moments, and the footer drops empty columns.
 - The hero's question is a plain line above the block, not a `ChatThread` user turn. `ChatThread`'s assistant turn takes no actions, and the proposal can't be a second block inside it (one `AgentBlock` per turn). That's a library gap, raised rather than worked around.
-- The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`.
+- The proposal's three buttons sit in the block's body, where they wrap on a phone as the wireframe draws them, rather than in `AgentBlock`'s header `actions`. *Changed 2026-10-28 (owner: make it consistent):* they follow every decision in the library, Dialog's footer, `AgentPlan` and `Confirmation`: right-aligned, Post entry last, Don't post and Edit entry `ghost`. They were left-aligned, Post entry first, the others `outline`. Edit's Done and Cancel follow the same order.
 - The outline's three links are sans, not the wireframe's serif: they are links, and only a heading element goes serif (§8.3 of the design system).
 - The site's test server is `tests/serve.mjs`, which serves files as Vercel does. `vite preview` answered `/plates` with the Home page's HTML, React hydrated `/plates` over it, and every element rendered twice with no error. A test now checks that each route's HTML is its own.
 
@@ -577,7 +579,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
   - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
-- **Draft copy for the owner:** none since 2026-10-28. Approved as written that day: the three waits' examples, Getting started's prose, the principles' Check lines, the Chat starter specimen's line and suggestions, and the hero's Replay label, "Replay the hero’s run". Status badge's decision line was rewritten the same day, after a microcopy pass: "Each run shows where it stands, so you can spot what failed and what needs you." It replaces "Status copy names the state, never the agent.", a rule for builders that also clashed with the badge's own "AI working". The rule stays on the page as principle 3. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28. The other ten pair captions were approved the same day, after a microcopy pass: nine rewritten, Run log row's kept. Lineage tree's no longer says "figure" or "exact yen": the component isn't only for money, and "figure" for a number is finance English. The 404's copy and its button are the owner's, from the same day (§3).
+- **Draft copy for the owner:** none. Confirmation's was approved as written on 2026-10-28, the day it was built: its use/avoid lines, its pair caption, the card's summary line and the values of its two rows, the outcomes ("Sent once, by you. The next send asks again.", "Not sent. The summary stays here."), the block labels "AI · Awaiting confirmation", "AI · Sent" and "AI · Not sent", and the component's own row labels, "What changes" and "Who it reaches", taken from its decision line. Its question and buttons are Vocabulary's, already approved. Approved as written that day: the three waits' examples, Getting started's prose, the principles' Check lines, the Chat starter specimen's line and suggestions, and the hero's Replay label, "Replay the hero’s run". Status badge's decision line was rewritten the same day, after a microcopy pass: "Each run shows where it stands, so you can spot what failed and what needs you." It replaces "Status copy names the state, never the agent.", a rule for builders that also clashed with the badge's own "AI working". The rule stays on the page as principle 3. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28. The other ten pair captions were approved the same day, after a microcopy pass: nine rewritten, Run log row's kept. Lineage tree's no longer says "figure" or "exact yen": the component isn't only for money, and "figure" for a number is finance English. The 404's copy and its button are the owner's, from the same day (§3).
 
 **Step 5b, as built (2026-10-27):**
 - **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.
