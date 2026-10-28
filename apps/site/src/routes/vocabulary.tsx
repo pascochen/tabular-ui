@@ -16,7 +16,7 @@ export const meta: Route.MetaFunction = () =>
 
 /**
  * The three components that stop the run for a person (wireframe `79:396`).
- * Definitions signed off by the owner, 2026-10-28. The examples are still draft copy.
+ * Definitions and examples signed off by the owner, 2026-10-28.
  */
 const waits = [
   {
