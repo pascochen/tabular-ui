@@ -119,7 +119,47 @@ test.describe('component pages', () => {
       const [before, after] = await plates.allInnerTexts();
       expect(before).not.toBe(after);
     });
+
+    // Owner, 2026-10-28: the plates are static. Run log row's "before" could be
+    // pressed open, and then it read the same as its "after". A plate with a
+    // control is inert; the pairs below hold none, except Inline citation, whose
+    // caption asks the reader to press the mark (src/specimens.tsx, PairParts).
+    // Focus is the check, not an aria snapshot: Playwright's snapshot still lists
+    // an inert plate's buttons, while Chromium drops them from the tree.
+    test(`${route}: a press can't change a plate`, async ({ page }) => {
+      await page.goto(route);
+      await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+      const live = ['/components/attachment-row', '/components/status-badge', '/components/inline-citation'];
+      const focusable = await page.locator('#pair-title ~ figure [data-theme="dark"]').evaluateAll(
+        (plates) =>
+          plates.flatMap((plate) =>
+            [...plate.querySelectorAll<HTMLElement>('button, a[href], input, textarea, select, [tabindex]')].filter(
+              (control) => {
+                control.focus();
+                return document.activeElement === control;
+              },
+            ),
+          ).length,
+      );
+      if (route === '/components/inline-citation') expect(focusable).toBeGreaterThan(0);
+      else expect(focusable).toBe(0);
+      if (!live.includes(route)) {
+        await expect(page.locator('#pair-title ~ figure [data-theme="dark"]:not([inert])')).toHaveCount(0);
+      }
+    });
   }
+
+  // The before plate is the proposal waiting for a person, so it shows the three
+  // buttons that are the component's point (owner, 2026-10-28). The after plate
+  // is posted, with none.
+  test('agent block: the waiting plate shows its three buttons', async ({ page }) => {
+    await page.goto('/components/agent-block');
+    const [before, after] = await page.locator('#pair-title ~ figure [data-theme="dark"]').all();
+    for (const label of ['Post entry', 'Edit entry', 'Don’t post']) {
+      await expect(before.locator('button', { hasText: label })).toBeVisible();
+    }
+    await expect(after.locator('button')).toHaveCount(0);
+  });
 });
 
 test.describe('the component grid', () => {
