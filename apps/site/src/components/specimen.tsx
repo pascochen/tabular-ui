@@ -117,9 +117,21 @@ export function ComponentTag({ component }: { component: SiteComponent }) {
 /**
  * A component's before/after pair (docs/site.md D2): two states in one frame,
  * each on a dark plate (D3), with no headings. Each state's own label carries
- * it, and one caption beneath says what changed. Static: no Replay.
+ * it, and one caption beneath says what changed. Static: no Replay, and each
+ * plate is inert unless the pair says otherwise (`inert` in src/specimens.tsx),
+ * so a press can't turn the before into the after.
  */
-export function Pair({ before, after, caption }: { before: React.ReactNode; after: React.ReactNode; caption: string }) {
+export function Pair({
+  before,
+  after,
+  caption,
+  inert = true,
+}: {
+  before: React.ReactNode;
+  after: React.ReactNode;
+  caption: string;
+  inert?: boolean;
+}) {
   return (
     <figure className="flex flex-col gap-[var(--gap-group)]">
       <div className="grid grid-cols-1 gap-2 border border-border-strong p-2 md:grid-cols-2">
@@ -127,6 +139,7 @@ export function Pair({ before, after, caption }: { before: React.ReactNode; afte
           <div
             key={i}
             data-theme="dark"
+            inert={inert || undefined}
             className="flex flex-col justify-center bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
           >
             {state}
