@@ -7,12 +7,12 @@
   "redirects": [
     {
       "source": "/components",
-      "destination": "/#components",
+      "destination": "/components/chat-starter",
       "permanent": false
     },
     {
       "source": "/components/",
-      "destination": "/#components",
+      "destination": "/components/chat-starter",
       "permanent": false
     },
     {

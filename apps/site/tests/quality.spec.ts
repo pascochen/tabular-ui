@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
 import { canonicalUrl, siteOrigin, socialImage } from '../src/lib/meta';
-import { routes } from './routes';
+import { componentPages, routes } from './routes';
 
 /**
  * Step 5b's checks (docs/site.md §11 and §12): metadata, the sitemap, robots
@@ -239,16 +239,30 @@ test.describe('accessibility beyond axe', () => {
 
   // 2.4.11: nothing fixed or sticky can cover a focused element. The nav
   // scrolls away (D8); the skip link is fixed, but shows only while it has
-  // focus itself, above the page.
+  // focus itself, above the page. From 1024px a component page's list of
+  // components is sticky (owner, 2026-10-28): it sits in its own column, so it
+  // can't cover anything beside it.
   for (const route of routes) {
-    test(`${route}: nothing fixed or sticky but the skip link (2.4.11)`, async ({ page }) => {
+    const isComponent = componentPages.includes(route);
+    test(`${route}: nothing fixed or sticky but the skip link${isComponent ? ' and the component list' : ''} (2.4.11)`, async ({
+      page,
+    }) => {
       await open(page, route);
       const pinned = await page.evaluate(() =>
         [...document.querySelectorAll('body *')]
           .filter((el) => ['fixed', 'sticky'].includes(getComputedStyle(el).position))
-          .map((el) => el.textContent?.trim().slice(0, 40)),
+          .map((el) =>
+            el.getAttribute('aria-labelledby') === 'component-list-title'
+              ? 'Component list'
+              : el.textContent?.trim().slice(0, 40),
+          ),
       );
-      expect(pinned).toEqual(['Skip to content']);
+      expect(pinned).toEqual(isComponent ? ['Skip to content', 'Component list'] : ['Skip to content']);
+      if (isComponent) {
+        const list = (await page.locator('nav[aria-labelledby="component-list-title"]').boundingBox())!;
+        const column = (await page.locator('nav[aria-labelledby="component-list-title"] + div').boundingBox())!;
+        expect(list.x + list.width).toBeLessThan(column.x);
+      }
     });
   }
 
