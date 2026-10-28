@@ -382,6 +382,24 @@ A capped list cannot promise a partial row at its edge. 24px group labels and se
 
 **A mask, never a painted gradient.** A gradient overlay needs a colour, which has to match the ground in both modes and goes wrong when the ground changes. A `mask-image` fades the rows themselves to transparent, so the popup's own surface shows through. There is no colour to pick, and no hue. It adds no elevation layer and no shadow, so the rules above stand. The masked list also takes `scroll-padding` equal to the fade depth: keyboard navigation then stops a highlighted row clear of the faded band, not under it. Asserted in `apps/storybook/tests/combobox.spec.ts`.
 
+### Button groups — the action last, the others ghost
+
+**A decision's buttons are right-aligned, the action last, and the others `ghost`.** A decision is a group of buttons that answers one question: one action, and the buttons that decline it, step back or edit it first. The action is `default`, or `danger` when it destroys. Everything else in the group is `ghost`, and the group sits at the trailing edge of its container (`justify-end`), so the action is the last thing in reading order and in tab order.
+
+Every decision in the library already follows it. Written down 2026-10-28, when the owner asked for button groups to be made consistent while `Confirmation` was built:
+
+- `DialogFooter` is `flex justify-end`. The README's example is `ghost` Cancel, then Re-run; the destructive story is `ghost` Keep model, then `danger` Delete model.
+- `AgentPlan`: `ghost` Edit, then Run plan, right-aligned.
+- `AgentBlock`'s AwaitingReview story: `ghost` "Don't add it", then "Add dedupe step", in the header's trailing `actions`.
+- `Confirmation`: the `ghost` stop button, then the action, right-aligned.
+- `Popover`'s filter story: `ghost` Cancel, then Apply, right-aligned.
+
+**Why `ghost`, not `outline`.** §1 makes the primary action the one solid fill: ink on paper, paper on ink. An `outline` button beside it is a second bordered box, so the group reads as two options of near-equal weight, when one is the thing the user came to do and the other is the way out. `ghost` keeps the other buttons pressable (they take the same hover overlay and focus ring, §4) without drawing a box. Hierarchy comes from fill and border, never from a hue (§0 rule 1).
+
+**`outline` is a secondary action that stands on its own**, with no primary beside it to lean on: the site's Replay, `EmptyState`'s action, `ChatComposer`'s Stop, `MessageScroller`'s scroll button, `ChatStarter`'s suggestions, a menu or popover trigger. There a borderless button would read as text, or vanish into the content it floats over. **`ghost` keeps toolbars and table rows**, where a border on every control adds noise (`Button`'s README).
+
+**Not every row of buttons is a decision.** A toolbar of independent actions, a page's calls to action, and an empty state's ways in answer no single question, so this rule does not order or restyle them.
+
 ---
 
 ## 5. Semantic aliases for pipeline & financial state
