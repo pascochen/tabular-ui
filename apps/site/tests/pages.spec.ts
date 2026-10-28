@@ -157,18 +157,23 @@ test.describe('the component grid', () => {
 });
 
 test.describe('Components in the nav', () => {
-  // Owner, 2026-10-27: Components opens the run at its first component, and
-  // previous and next walk it. Vercel answers /components with a 307 there;
-  // the test server serves files only, so the redirect is checked in vercel.json.
-  test('opens the first component, and /components redirects to it', async ({ page }) => {
+  // Owner, 2026-10-27: Components goes to Home's grid, the one overview, grouped
+  // by moment. Vercel answers /components with a 307 there; the test server
+  // serves files only, so the redirect is checked in vercel.json. On a component
+  // page the nav still marks Components as where you are.
+  test('goes to Home’s grid, and /components redirects there', async ({ page }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Main' });
-    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/components/chat-starter');
+    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/#components');
+    await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Components' })).toHaveAttribute(
+      'href',
+      '/#components',
+    );
     const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
       redirects: { source: string; destination: string; permanent: boolean }[];
     };
     for (const source of ['/components', '/components/']) {
-      expect(vercel.redirects).toContainEqual({ source, destination: '/components/chat-starter', permanent: false });
+      expect(vercel.redirects).toContainEqual({ source, destination: '/#components', permanent: false });
     }
     await page.goto('/components/chat-starter');
     await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
@@ -232,6 +237,31 @@ test.describe('Components in the nav', () => {
 });
 
 test.describe('a component page', () => {
+  // Owner, 2026-10-27: the menu's label counts what it holds, and the open menu
+  // checks the page you're on, on the selection ground, with aria-current.
+  test('the menu counts the components and marks the page you’re on', async ({ page }) => {
+    await page.goto('/components/agent-plan');
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    await page.getByRole('button', { name: `All ${componentPages.length} components` }).click();
+    const items = page.getByRole('menuitem');
+    await expect(items).toHaveCount(componentPages.length);
+    const current = page.locator('[role="menuitem"][aria-current="page"]');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveText('Agent plan');
+    await expect(current).toHaveAttribute('href', '/components/agent-plan');
+    await expect(current.locator('svg')).toHaveCount(1);
+    await expect(items.filter({ hasText: 'Agent block' }).locator('svg')).toHaveCount(0);
+    // Every title starts at the same x, checked or not.
+    const starts = await items.evaluateAll((els) =>
+      els.map((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el.lastChild!);
+        return range.getBoundingClientRect().left;
+      }),
+    );
+    expect(new Set(starts).size).toBe(1);
+  });
+
   // Decision first (owner, 2026-10-27): when to use it and when not, before the
   // pair, and the README's own example under the install command.
   for (const route of componentPages) {

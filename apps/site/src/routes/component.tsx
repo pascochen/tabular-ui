@@ -1,4 +1,4 @@
-import { CaretDownIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
 import { CopyCommand } from '../components/copy-command';
@@ -88,7 +88,7 @@ export const meta: Route.MetaFunction = ({ params }) => {
 
 /**
  * One page per built component (wireframe `78:595`), decision first (owner,
- * 2026-10-27): the jump menu, the name and its decision, when to use it and
+ * 2026-10-27): the menu of all built components, the name and its decision, when to use it and
  * when not, the principles it carries, the before/after pair (D2), its install
  * command (D9) and usage snippet, its Storybook page, and the components either
  * side in run order.
@@ -104,21 +104,35 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
   return (
     <Section rule={false}>
       <Rail size="reading" className="flex flex-col gap-[var(--site-gap)]">
+        {/* The label says what the menu holds, counted from the list, and the page
+            you're on is checked, on the selection ground (owner, 2026-10-27). The
+            check sits in Menu's leading indicator slot, as a checkbox item's does,
+            so every title starts at the same x. */}
         <Menu>
           <MenuTrigger
             render={
               <Button variant="outline" className="self-start">
-                Jump to a component
+                All {built.length} components
                 <CaretDownIcon />
               </Button>
             }
           />
           <MenuContent>
-            {built.map((b) => (
-              <MenuItem key={b.name} render={<a href={componentPage(b.name)} />}>
-                {b.title}
-              </MenuItem>
-            ))}
+            {built.map((b) => {
+              const current = b.name === c.name;
+              return (
+                <MenuItem
+                  key={b.name}
+                  render={<a href={componentPage(b.name)} aria-current={current ? 'page' : undefined} />}
+                  className={current ? 'bg-bg-interactive' : undefined}
+                >
+                  <span className="flex w-[var(--size-icon-sm)] shrink-0 items-center justify-center">
+                    {current ? <CheckIcon weight="bold" aria-hidden="true" /> : null}
+                  </span>
+                  {b.title}
+                </MenuItem>
+              );
+            })}
           </MenuContent>
         </Menu>
 

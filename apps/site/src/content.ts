@@ -19,19 +19,16 @@ export { storybookDocs } from './component-list';
  * page that isn't live is left out, so the site never links to a 404 while it
  * is built page by page (docs/site.md §13).
  */
-/** The first built component in run order: where Components opens the run. */
-const firstBuilt = entries.find((entry) => registry.items.some((item) => item.name === entry.name));
-if (!firstBuilt) throw new Error('No component in the run is in registry.json');
-
-/** Home's component grid, the overview: the hero's "Browse components" and Principles' onward link. */
+/** Home's component grid, the overview: Components in the nav and footer, the hero's "Browse components" and Principles' onward link. */
 export const componentGrid = '/#components';
 
 export const pages = {
-  // Components opens the run at its first component, and previous and next walk
-  // it (owner, 2026-10-27); /components redirects there too (vercel.json). Until
-  // then it went to Home's grid, so it read as a link to the page you were on.
+  // Components goes to Home's grid, the one view of all 15 grouped by moment
+  // (owner, 2026-10-27, from a navigation critique); /components redirects there
+  // too (vercel.json). Earlier that day it opened the first component page, where
+  // the link reloaded the page you were on and no overview was a click away.
   // `current` is the path under which the nav marks it as the page you're on.
-  components: { href: componentPage(firstBuilt.name), label: 'Components', live: true, current: '/components' },
+  components: { href: componentGrid, label: 'Components', live: true, current: '/components' },
   // "Get started" in the nav and the footer (owner, 2026-10-27); the page's own title stays "Getting started".
   gettingStarted: { href: '/getting-started', label: 'Get started', live: true },
   principles: { href: '/principles', label: 'Principles', live: true },
