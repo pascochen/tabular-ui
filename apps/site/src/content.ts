@@ -97,7 +97,7 @@ export const moments = (
   ] as const
 ).map((moment) => ({ ...moment, components: components.filter((c) => c.moment === moment.id) }));
 
-/** The three principles (wireframe `77:230`). The Check lines are drafts. */
+/** The three principles (wireframe `77:230`). The Check lines are owner copy, approved 2026-10-28. */
 export const principles = [
   {
     title: 'An agent stops before anything that posts to the ledger.',
