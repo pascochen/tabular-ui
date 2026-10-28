@@ -157,23 +157,23 @@ test.describe('the component grid', () => {
 });
 
 test.describe('Components in the nav', () => {
-  // Owner, 2026-10-27: Components goes to Home's grid, the one overview, grouped
-  // by moment. Vercel answers /components with a 307 there; the test server
-  // serves files only, so the redirect is checked in vercel.json. On a component
-  // page the nav still marks Components as where you are.
-  test('goes to Home’s grid, and /components redirects there', async ({ page }) => {
+  // Owner, 2026-10-27: Components opens the run at its first component, and
+  // previous and next walk it. Vercel answers /components with a 307 there;
+  // the test server serves files only, so the redirect is checked in vercel.json.
+  // Kept 2026-10-28, with the list beside each component page.
+  test('opens the first component, and /components redirects to it', async ({ page }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Main' });
-    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/#components');
+    await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/components/chat-starter');
     await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Components' })).toHaveAttribute(
       'href',
-      '/#components',
+      '/components/chat-starter',
     );
     const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
       redirects: { source: string; destination: string; permanent: boolean }[];
     };
     for (const source of ['/components', '/components/']) {
-      expect(vercel.redirects).toContainEqual({ source, destination: '/#components', permanent: false });
+      expect(vercel.redirects).toContainEqual({ source, destination: '/components/chat-starter', permanent: false });
     }
     await page.goto('/components/chat-starter');
     await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
@@ -239,8 +239,11 @@ test.describe('Components in the nav', () => {
 test.describe('a component page', () => {
   // Owner, 2026-10-27: the menu's label counts what it holds, and the open menu
   // checks the page you're on, on the selection ground, with aria-current.
-  test('the menu counts the components and marks the page you’re on', async ({ page }) => {
+  // Below 1024px only, where the list beside the page doesn't fit (2026-10-28).
+  test('below 1024px, the menu counts the components and marks the page you’re on', async ({ page }) => {
+    await page.setViewportSize({ width: 1023, height: 800 });
     await page.goto('/components/agent-plan');
+    await expect(page.getByRole('navigation', { name: `All ${componentPages.length} components` })).toBeHidden();
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
     await page.getByRole('button', { name: `All ${componentPages.length} components` }).click();
     const items = page.getByRole('menuitem');
@@ -260,6 +263,41 @@ test.describe('a component page', () => {
       }),
     );
     expect(new Set(starts).size).toBe(1);
+  });
+
+  // Owner, 2026-10-28 (variant A of the component-menu review): from 1024px every
+  // built component is listed beside the page, and the list stays in view as the
+  // page scrolls. The page you're on is marked as the Foundations pages mark
+  // theirs: ink, semibold, a 2px ink rule, aria-current.
+  test('from 1024px, lists every component beside the page, and the list stays in view', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto('/components/agent-plan');
+    const list = page.getByRole('navigation', { name: `All ${componentPages.length} components` });
+    await expect(list).toBeVisible();
+    await expect(page.getByRole('button', { name: `All ${componentPages.length} components` })).toBeHidden();
+    const links = list.getByRole('list').getByRole('link');
+    await expect(links).toHaveCount(componentPages.length);
+    const current = list.locator('[aria-current="page"]');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveText('Agent plan');
+    await expect(current).toHaveCSS('border-left-width', '2px');
+    await expect(current).toHaveCSS('font-weight', '600');
+    await expect(list.getByRole('link', { name: 'All 15, by moment' })).toHaveAttribute('href', '/#components');
+
+    // Beside the reading column, not above it.
+    const box = async (l: typeof list) => (await l.boundingBox())!;
+    const title = page.getByRole('heading', { level: 1 });
+    expect((await box(list)).x + (await box(list)).width).toBeLessThan((await box(title)).x);
+
+    // Scrolled to the install command, the list is still in view, 24px from the top.
+    await page.getByRole('heading', { name: 'Install' }).scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, 400));
+    await expect.poll(async () => Math.round((await box(list)).y)).toBe(24);
+
+    // At 1440px, wide enough for both, the reading column keeps its 1040px.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const column = list.locator('xpath=following-sibling::div[1]');
+    await expect.poll(async () => Math.round((await box(column)).width)).toBe(1040);
   });
 
   // Decision first (owner, 2026-10-27): when to use it and when not, before the
