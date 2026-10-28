@@ -22,7 +22,7 @@ The status hue, icon and label come from `StatusBadge`. The row tint comes from 
 Passing `detail` makes the row expandable. A failed run is useless without its error, and sending the reader to a detail page loses their place in the log.
 
 - Collapsed row stays 24px; the caret is present-but-invisible on non-expandable rows so identifiers stay aligned down the log
-- Detail renders in `--font-mono` with the slashed zero, `whitespace-pre-wrap`, behind a `--border-width-2` rail
+- Detail renders in `--font-mono` with the slashed zero, `whitespace-pre-wrap`, with no rail. Its text starts where the row's first content after the caret starts: the badge, or the timestamp when the row has one. Its left padding is the caret column (`--pad-cell-x`, `--size-icon-xs`, `--pad-cell-x`). An agent-proposed row's rail comes off the row's own padding, so its detail lines up too. Until 2026-10-28 the detail sat behind a 2px `--color-border-strong` rail. §7.8 reserves that width for the agent rail, the focus ring and the active tab. The rail also sat about 5px left of the chevron, in line with nothing. `tests/run-log-row.spec.ts` asserts the x exactly, in both modes
 - Controlled via `open`/`onOpenChange`, or uncontrolled via `defaultOpen`
 - Only an expandable row is a control: `Button variant="inline"` with `aria-expanded`, the same as `LineageTree`'s rows. A plain row is a `<div>`. Both take one set of row classes, so they render identically (checked pixel for pixel, 2026-10-12). Until then the row chose its tag through a variable (`const Row = expandable ? 'button' : 'div'`), a hand-styled `<button>` the lint gate could not see.
 
