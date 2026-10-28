@@ -197,9 +197,11 @@ export const entries: ComponentEntry[] = [
   {
     name: 'status-badge',
     title: 'Status badge',
-    // Draft: reworded for D1. The wireframe's line quoted an authorship label.
+    // Owner, 2026-10-28: what a badge does for the person reading it. The rule it
+    // replaced ("Status copy names the state, never the agent.") was for builders,
+    // and it stays on the page as principle 3.
     moment: 'recording',
-    decision: 'Status copy names the state, never the agent.',
+    decision: 'Each run shows where it stands, so you can spot what failed and what needs you.',
     useWhen: [
       'Something has a state: a run, a check, a file. Queued, running, passed, failed and the rest.',
       'The same state shows on several screens, and must look the same on each.',

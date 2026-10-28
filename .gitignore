@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Environment files and the Vercel CLI's project link (apps/site deploys to Vercel)
+.env
+.env.*
+!.env.example
+.vercel
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
