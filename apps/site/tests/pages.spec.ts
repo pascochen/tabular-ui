@@ -95,6 +95,11 @@ test.describe('a path with no page', () => {
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
     await expect(page.locator('a[href="#main"]')).toHaveCount(1);
+    // Owner copy, 2026-10-28: why, and one way on, to the grid the hero's button opens.
+    const main = page.locator('#main');
+    await expect(main.getByText('The link may be out of date, or the page may have moved.')).toBeVisible();
+    await expect(main.getByRole('link')).toHaveCount(1);
+    await expect(main.getByRole('link', { name: 'Browse components' })).toHaveAttribute('href', '/#components');
   });
 });
 
