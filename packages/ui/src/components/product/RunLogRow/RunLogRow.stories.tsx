@@ -92,6 +92,35 @@ export const WithDetail: Story = {
   ),
 };
 
+/**
+ * Without timestamps, as tabularui.com shows it. The badge is the first
+ * content after the caret, so an open row's detail starts at the badge's x,
+ * the agent-proposed row's included: its rail comes off the row's padding.
+ */
+export const Untimed: Story = {
+  render: () => (
+    <Log>
+      <RunLogRow status="passed" name="stg_sap__bkpf" duration="1.8s" />
+      <RunLogRow
+        status="failed"
+        name="dim_accounts"
+        duration="0.9s"
+        defaultOpen
+        detail={`duplicate key value violates unique constraint "dim_accounts_pkey"
+  DETAIL:  Key (account_id)=(4100-01) already exists.`}
+      />
+      <RunLogRow
+        status="agent-proposed"
+        name="fct_gl_entries_v2"
+        duration="5.0s"
+        defaultOpen
+        detail="Proposed: a dedupe on account_id before the merge. The 412 duplicate rows would collapse to 206."
+      />
+      <RunLogRow status="passed" name="dim_calendar" duration="0.4s" />
+    </Log>
+  ),
+};
+
 /** Grayscale — §10 requires every state to survive it. */
 export const Grayscale: Story = {
   render: () => {
