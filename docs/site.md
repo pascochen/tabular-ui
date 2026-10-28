@@ -58,7 +58,7 @@ The headings also implied that approval hands an entry over to the person. Books
    - `actions` is gone, so the block can't be posted twice.
    - Beneath it sits the run log row for the posting step, `passed`. The green appears only there, where something true happened.
    - It needs no library change.
-3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves every built component (thirteen since 2026-10-28, when Confirmation was built). The draft pairs below are owner copy to review:
+3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves every built component (fourteen since 2026-10-28, when Confirmation and then Question were built). The draft pairs below are owner copy to review:
 
 | Component | Before | After |
 |---|---|---|
@@ -70,6 +70,7 @@ The headings also implied that approval hands an entry over to the person. Books
 | Attachment row | Uploading | Ready; the name is the link |
 | Inline citation | The answer, no marks | Each figure marked with its source *(added and approved 2026-10-28)* |
 | Sources | The answer, "Found in" one file | Every file it read, and what it didn't check *(added and approved 2026-10-28)* |
+| Question | AI · Awaiting your answer: the question, its two options as buttons, Skip and Choose for me | AI · Answered: "Answered by you: KJP only." *(added 2026-10-28, draft)* |
 | Confirmation | AI · Awaiting confirmation: the summary, the question, what changes and who it reaches | AI · Sent: "Sent once, by you. The next send asks again." *(added and approved 2026-10-28)* |
 | Agent block | AI · Awaiting review | AI · Posted, posted by you |
 | Chat thread | Question asked, "Working…" | The answer grown in the same place |
@@ -141,7 +142,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 **D7. Closing band copy — decided 2026-10-25 (owner).** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components".
 - `demo.tabularui.com` is a five-step onboarding journey (`apps/demo/README.md`). The visitor plays Kasane's Head of FP&A and loads 20 files. A scripted agent reads them, then lists what it understood, the contradictions, the gaps, and questions to ask.
-- It uses 4 of the 13 built agent components, proposes no entries, and runs no September close. Neither wireframe line is true of it.
+- It uses 4 of the 14 built agent components, proposes no entries, and runs no September close. Neither wireframe line is true of it.
 - The duplicate payment the hero shows (D5) is one of the contradictions the demo finds, so the band links the two.
 
 | Slot | Copy | Source of each specific |
@@ -217,7 +218,7 @@ tabularui.com is the public front of Tabular UI for designers and engineers deci
 
 It is not the reference. Storybook (`storybook.tabularui.com`) holds every component, prop and state, and the site links to it rather than repeating it. It is not a sales page: there is no pricing, no sign-up, and no analytics, cookies or tracking.
 
-**The 15 are a subset.** The library has 47 components: 18 foundational and 29 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 13 built and 2 to build (Question and Tool) since 2026-10-28. The Components page says so in one line and links to Storybook for the rest.
+**The 15 are a subset.** The library has 48 components: 18 foundational and 30 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 14 built and 1 to build (Tool) since 2026-10-28. The Components page says so in one line and links to Storybook for the rest.
 
 ## 2. Sources of truth
 
@@ -394,6 +395,7 @@ On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draw
 | Attachment row | Three source files, name as link | The pack |
 | Inline citation | The duplicate-payment answer, then a mark on each figure; a mark opens its file and entries | `duplicate-payment`: its sources and entries (added 2026-10-28) |
 | Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, copy approved by the owner the same day) |
+| Question | Vocabulary's question with two options as buttons; an option, Skip or Choose for me puts its outcome where the controls were | The approved example; Choose for me's reason names `duplicate-payment`'s entity (added 2026-10-28) |
 | Confirmation | The variance summary, then Vocabulary's question; Send summary or Don't send puts the outcome where the buttons were | `operatingBridge` through `h1Gap`, compact; the company's name (added 2026-10-28) |
 | Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
@@ -579,7 +581,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
   - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
-- **Draft copy for the owner:** none. Confirmation's was approved as written on 2026-10-28, the day it was built: its use/avoid lines, its pair caption, the card's summary line and the values of its two rows, the outcomes ("Sent once, by you. The next send asks again.", "Not sent. The summary stays here."), the block labels "AI · Awaiting confirmation", "AI · Sent" and "AI · Not sent", and the component's own row labels, "What changes" and "Who it reaches", taken from its decision line. Its question and buttons are Vocabulary's, already approved. Approved as written that day: the three waits' examples, Getting started's prose, the principles' Check lines, the Chat starter specimen's line and suggestions, and the hero's Replay label, "Replay the hero’s run". Status badge's decision line was rewritten the same day, after a microcopy pass: "Each run shows where it stands, so you can spot what failed and what needs you." It replaces "Status copy names the state, never the agent.", a rule for builders that also clashed with the badge's own "AI working". The rule stays on the page as principle 3. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28. The other ten pair captions were approved the same day, after a microcopy pass: nine rewritten, Run log row's kept. Lineage tree's no longer says "figure" or "exact yen": the component isn't only for money, and "figure" for a number is finance English. The 404's copy and its button are the owner's, from the same day (§3).
+- **Draft copy for the owner:** Question's, written when it was built on 2026-10-28: its use/avoid lines and pair caption, the fixed strings "Skip", "Choose for me", "Answer" and "Choose an answer", the outcomes ("Answered by you: KJP only.", "Skipped. I'll cover all entities, and say so in the summary.", "I chose all entities: KJP alone leaves out the KUS invoices."), and the block labels "AI · Awaiting your answer", "AI · Answered", "AI · Skipped" and "AI · Decided". Its question and options are Vocabulary's, already approved. Options are buttons, one press each, up to four, and a `Select` from five (owner, 2026-10-28). Confirmation's was approved as written on 2026-10-28, the day it was built: its use/avoid lines, its pair caption, the card's summary line and the values of its two rows, the outcomes ("Sent once, by you. The next send asks again.", "Not sent. The summary stays here."), the block labels "AI · Awaiting confirmation", "AI · Sent" and "AI · Not sent", and the component's own row labels, "What changes" and "Who it reaches", taken from its decision line. Its question and buttons are Vocabulary's, already approved. Approved as written that day: the three waits' examples, Getting started's prose, the principles' Check lines, the Chat starter specimen's line and suggestions, and the hero's Replay label, "Replay the hero’s run". Status badge's decision line was rewritten the same day, after a microcopy pass: "Each run shows where it stands, so you can spot what failed and what needs you." It replaces "Status copy names the state, never the agent.", a rule for builders that also clashed with the badge's own "AI working". The rule stays on the page as principle 3. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28. The other ten pair captions were approved the same day, after a microcopy pass: nine rewritten, Run log row's kept. Lineage tree's no longer says "figure" or "exact yen": the component isn't only for money, and "figure" for a number is finance English. The 404's copy and its button are the owner's, from the same day (§3).
 
 **Step 5b, as built (2026-10-27):**
 - **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.

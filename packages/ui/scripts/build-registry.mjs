@@ -87,6 +87,7 @@ const descriptions = {
   OrgSwitcher: 'Switches between organizations.',
   ProgressBar: 'The progress of a run, in a tone.',
   ProjectSwitcher: 'Switches between projects.',
+  Question: 'One question the agent can’t settle alone, answered in a press. Sits inside an AgentBlock.',
   RunLogRow: 'One pipeline run in a log.',
   Sources: 'What an answer rests on, numbered, and what was not checked.',
   StatusBadge: 'A run or validation status.',

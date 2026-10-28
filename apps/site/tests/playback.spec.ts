@@ -108,6 +108,45 @@ test.describe('the Agent block card', () => {
   });
 });
 
+test.describe('the Question card', () => {
+  const question = (page: Page) => card(page, 'question');
+  const option = (page: Page, name: string) => question(page).getByRole('button', { name });
+
+  /** The card plays when it scrolls in; the question arrives with the last frame. */
+  async function openCard(page: Page) {
+    await open(page, '/');
+    await question(page).scrollIntoViewIfNeeded();
+    await expect(option(page, 'KJP only')).toBeVisible({ timeout: 6000 });
+    await expect(question(page).locator('[aria-busy="true"]')).toHaveCount(0);
+  }
+
+  test('one press answers, and the outcome takes focus', async ({ page }) => {
+    await openCard(page);
+    await expect(question(page).getByText('AI · Awaiting your answer')).toBeVisible();
+    await expect(question(page).getByRole('radio')).toHaveCount(0);
+    await option(page, 'KJP only').click();
+    await expect(question(page).getByText('AI · Answered')).toBeVisible();
+    await expect(question(page).getByText('Answered by you: KJP only.')).toBeFocused();
+    await expect(option(page, 'All entities')).toHaveCount(0);
+  });
+
+  test('Choose for me lets the agent decide, and it says what it chose', async ({ page }) => {
+    await openCard(page);
+    await option(page, 'Choose for me').click();
+    await expect(question(page).getByText('AI · Decided')).toBeVisible();
+    await expect(question(page).getByText(/^I chose all entities/)).toBeFocused();
+  });
+
+  test('Replay asks again, and hands focus to the first option', async ({ page }) => {
+    await openCard(page);
+    await option(page, 'Skip').click();
+    await expect(question(page).getByText('AI · Skipped')).toBeVisible();
+    await question(page).getByRole('button', { name: 'Replay Question' }).click();
+    await expect(option(page, 'All entities')).toBeFocused({ timeout: 6000 });
+    await expect(question(page).getByRole('status')).toHaveText('Awaiting your answer.');
+  });
+});
+
 test.describe('the Confirmation card', () => {
   const confirmation = (page: Page) => card(page, 'confirmation');
   const send = (page: Page) => confirmation(page).getByRole('button', { name: 'Send summary' });

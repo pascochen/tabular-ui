@@ -13,10 +13,12 @@ import {
   InlineCitation,
   Input,
   LineageTree,
+  Question,
   RunLogRow,
   runStatuses,
   Sources,
   StatusBadge,
+  type QuestionAnswer,
   type RunStatus,
   type Source,
 } from 'tabular-ui';
@@ -266,6 +268,95 @@ export function HeroSpecimen() {
 
 export function AgentBlockSpecimen() {
   return <Proposal />;
+}
+
+// ---------------------------------------------------------------------------
+// Question: which entities the variance covers (Vocabulary's example)
+// ---------------------------------------------------------------------------
+
+/** Vocabulary's example for Question, approved by the owner 2026-10-28. */
+const entityQuestion = 'Which entities should the variance cover: all of them, or KJP only?';
+const entityOptions = [
+  { id: 'all', label: 'All entities' },
+  { id: 'kjp', label: 'KJP only' },
+];
+
+/** What each answer leaves on the page: the block's label, and the line where the controls were. */
+function asked(answer: QuestionAnswer | null): { authorship: string; outcome?: string } {
+  if (!answer) return { authorship: 'AI · Awaiting your answer' };
+  if (answer.kind === 'skip')
+    return { authorship: 'AI · Skipped', outcome: 'Skipped. I’ll cover all entities, and say so in the summary.' };
+  if (answer.kind === 'delegate')
+    return {
+      authorship: 'AI · Decided',
+      outcome: `I chose all entities: KJP alone leaves out the ${duplicatePayment.entity} invoices.`,
+    };
+  const label = answer.kind === 'option' ? entityOptions.find((o) => o.id === answer.id)?.label : answer.text;
+  return { authorship: 'AI · Answered', outcome: `Answered by you: ${label}.` };
+}
+
+function AskEntities({
+  answer,
+  round = 0,
+  reached = true,
+  onAnswer,
+}: {
+  answer: QuestionAnswer | null;
+  round?: number;
+  reached?: boolean;
+  onAnswer?: (answer: QuestionAnswer) => void;
+}) {
+  const { authorship, outcome } = asked(answer);
+  return (
+    <AgentBlock authorship={authorship}>
+      <div {...unreached(!reached)}>
+        <Question key={round} title={entityQuestion} options={entityOptions} onAnswer={onAnswer} outcome={outcome} />
+      </div>
+    </AgentBlock>
+  );
+}
+
+/**
+ * The Question card: live, like the Confirmation card (D6). It plays the
+ * question in and waits. Each option, Skip and Choose for me puts its outcome
+ * where the controls were, and the component moves focus to it. Replay asks
+ * again with a new Question, and hands focus to the first option.
+ */
+export function QuestionSpecimen() {
+  const { ref, frame, playing, play } = usePlayback({ frames: 2 });
+  const { announce, message } = useAnnouncer();
+  const [answer, setAnswer] = useState<QuestionAnswer | null>(null);
+  const [round, setRound] = useState(0);
+  // Bumped when Replay finishes; focus moves after the render that reveals the question.
+  const [focusFirst, setFocusFirst] = useState(0);
+
+  useEffect(() => {
+    if (focusFirst === 0) return;
+    ref.current?.querySelector<HTMLButtonElement>('[data-slot="question"] [role="group"] button')?.focus();
+  }, [focusFirst, ref]);
+
+  const replay = () => {
+    setAnswer(null);
+    setRound((r) => r + 1);
+    play(() => {
+      setFocusFirst((n) => n + 1);
+      announce('Awaiting your answer.');
+    });
+  };
+
+  return (
+    <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
+      <div aria-busy={playing || undefined} className="flex flex-1 flex-col">
+        <AskEntities answer={answer} round={round} reached={frame >= 1} onAnswer={setAnswer} />
+      </div>
+      {answer ? (
+        <div className="flex justify-end">
+          <ReplayButton title="Question" onClick={replay} />
+        </div>
+      ) : null}
+      <LiveRegion message={message} />
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -841,6 +932,14 @@ function citationPair(): PairParts {
   };
 }
 
+function questionPair(): PairParts {
+  return {
+    before: <AskEntities answer={null} />,
+    after: <AskEntities answer={{ kind: 'option', id: 'kjp' }} />,
+    caption: 'Each answer is one press. Skip and Choose for me are always there.',
+  };
+}
+
 function confirmationPair(): PairParts {
   return {
     before: <SendSummary outcome="waiting" />,
@@ -907,6 +1006,7 @@ const pairs: Record<string, () => PairParts> = {
   'attachment-row': attachmentPair,
   'inline-citation': citationPair,
   sources: sourcesPair,
+  question: questionPair,
   confirmation: confirmationPair,
   'agent-block': agentBlockPair,
   'chat-thread': threadPair,
