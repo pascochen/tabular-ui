@@ -177,7 +177,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
    | Typography | §8 | Scale, families, display boundary, numerals |
    | Density | §7 | Spacing tiers and caps, control and row heights, shape, borders, shell widths |
 
-2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. **Getting started** (no wireframe) covers the package setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
+2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. *Since 2026-10-28* the line also adds the item of every other component its usage snippet imports, and the snippet imports from the folders the registry writes (`@/components/tabular-ui/components/product/<Name>`), not from `tabular-ui`, so the two together compile. **Getting started** (no wireframe) covers the setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
 3. **Not in v1:** an Icons page for §11. It would be a fourth Foundations tab later.
 
 ### Approvals — given 2026-10-25 (owner)
@@ -247,7 +247,7 @@ Every route is prerendered to static HTML at build time.
 | `/foundations/color` | Color | `79:537` |
 | `/foundations/typography` | Typography | none; same shell as Color |
 | `/foundations/density` | Density (§7): spacing tiers, control and row heights, shape, borders, shell widths | none; same shell as Color |
-| `/getting-started` | Install, set up the stylesheet, set up the app root | none (D9) |
+| `/getting-started` | Add components with the registry, add the tokens, set up the app root, use | none (D9) |
 | `/r/*` | Rewrite to `storybook.tabularui.com/r/*`, the shadcn registry | — |
 | anything else | 404 | none |
 
@@ -279,7 +279,7 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 - **The rules it follows** (owner, 2026-10-27): each principle the component carries (`carriedBy` in `src/content.ts`), with its check, and a link to all three. Shown only where there is one: Agent block (1 and 3), Lineage tree, Attachment row, Inline citation and Sources (2), Run log row and Status badge (3). The Principles page stays, linked from here, out of the nav and the footer. Not merged into Vocabulary: principles are rules, Vocabulary is words.
 - The before/after pair in one frame, with one caption beneath it (D2).
 - Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27. Inline citation's and Sources' type-check with the site since 2026-10-28.
-- "Set up the package first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
+- "Set up your app first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
 - Previous and next, which walk the run in order. Components in the nav opens the run at its first component.
 
 The pair is static. It shows two states, not a sequence, and has no Replay. *Since 2026-10-28 (owner):* a plate with a control is `inert`, so a press can't turn the before into the after. Run log row's before could be pressed open, and then it read the same as its after. Inert also takes a plate out of the accessibility tree, so a screen reader hears the caption, and the live card on Home is the version it can use. Two exceptions: a pair whose plates hold no control (Attachment row, Status badge) stays readable and selectable, and Inline citation stays live, because its caption asks the reader to press the mark and the popover leaves the plate as it was.
@@ -315,7 +315,7 @@ The wireframe's Surface 2, Rule, Text muted, Person mark, Inverse and State swat
 
 It also states that the site's own layout values are site-only (§7 of this spec).
 
-**Getting started.** The README's three steps, quoted from `packages/ui/README.md`: install, set up the stylesheet, set up the app root. Then the registry commands in the URL form the README uses (`pnpm dlx shadcn@latest add https://tabularui.com/r/agent-block.json`), which works without the user configuring anything.
+**Getting started.** *Registry only since 2026-10-28 (owner):* Tabular UI has no npm releases, so the page has one route, four steps quoted from `packages/ui/README.md`: add components with the registry (`pnpm dlx shadcn@latest add https://tabularui.com/r/all.json`), add the tokens, set up the app root, and use. The npm route ("Install the package") is removed.
 
 **404.** One line saying the page doesn't exist, and links to Home and Components. Draft copy.
 
@@ -466,7 +466,7 @@ A third Vercel project, `apps/site`, at `tabularui.com`, with `www.tabularui.com
 - **The Scope step** sets `site_only` when every changed file is under `apps/site/` or is Markdown.
 - **Site-only PR:** install, lint, type-check, build the site, run the site's Playwright tests. The story tests, visual regression and design system specs are skipped. Target: under 6 minutes, against 25–27 for the full run.
 - **Any other non-docs PR:** the full run as today, plus the site build and the site tests, about 3 minutes more. The site consumes the package, so a library change can break a page.
-- **Off the PR gate:** external link checks and Lighthouse. Both depend on other servers and fail for reasons that aren't the PR. Run them on demand and before a release.
+- **Off the PR gate:** external link checks and Lighthouse. Both depend on other servers and fail for reasons that aren't the PR. Run them on demand.
 
 **Site tests run on their own port**, derived from the checkout's path as `apps/storybook/tests/storybook-port.mjs` does. Otherwise a run in one worktree can test another checkout's server (failure log, 2026-10-08).
 

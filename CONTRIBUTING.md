@@ -58,7 +58,6 @@ pnpm test               # every story rendered in headless Chromium, with axe, i
 pnpm test:playwright    # browser specs: focus rings, contrast, keyboard, layout
 pnpm test:visual        # screenshot comparison (Linux only; runs in CI)
 pnpm build              # the package, the registry, Storybook, then the demo
-pnpm changeset          # describe a change to the package for the next release
 ```
 
 `pnpm test` downloads Chromium on first run.
@@ -103,8 +102,7 @@ And never rename a token: add the new one and deprecate the old.
    Screenshot comparison (`pnpm test:visual`) only runs on Linux, so CI does it for you.
 3. **For a UI change, run the §10 checklist** in `docs/design-system.md`, and look at the stories in both modes. Some checks need a person: say which ones you did and which you didn't.
 4. **Update the docs the change touches**: the component's `README.md`, `docs/components.md`, the spec if a rule changed.
-5. **If a consumer of the package would notice, add a changeset** (`pnpm changeset`): the bump and one sentence on what changed.
-6. **Open a PR.** The template asks for what reviewers need.
+5. **Open a PR.** The template asks for what reviewers need.
 
 ## CI
 
@@ -171,31 +169,9 @@ Baselines are Linux-only, because fonts render differently on a Mac, so `pnpm te
 - **Squash merge** (the only method allowed), so `main` gets one commit per PR, titled "Summary (#123)".
 - **Never write GitHub's skip-CI marker** (square brackets around "skip ci") anywhere in a commit message or PR title. A squash merge copies it into `main` and skips CI there too.
 
-## Releasing
+## Releases
 
-A release is two steps: the version bump goes through a pull request like any change, then the owner publishes from `main`. Publishing needs the owner's npm login.
-
-1. On a new branch, turn pending changesets into a version and a `CHANGELOG.md` entry, then commit and open a PR:
-
-   ```bash
-   git checkout -b release
-   pnpm version-packages
-   git add -A
-   git commit -m "Release tabular-ui <version>"
-   git push -u origin release
-   ```
-
-2. When Verify passes, squash-merge the PR.
-3. Back on `main`, publish and push the release tag:
-
-   ```bash
-   git checkout main
-   git pull
-   pnpm release
-   git push --follow-tags
-   ```
-
-`pnpm release` builds the package and runs `changeset publish`, which publishes every version not yet on npm and tags it (`tabular-ui@<version>`). Check with `npm view tabular-ui version`. While npm is still processing a first publish it can briefly report `0.0.0-stage`, npm's own placeholder.
+There are none (owner, 2026-10-28). Tabular UI is a design system showcase, not a package teams depend on. Components install as source from the shadcn registry at tabularui.com, which is rebuilt from `main` on every deploy, so a merged change is out as soon as the site deploys. `packages/ui` is private, so it can't be published by accident. Version 0.1.0 stays on npm as an early snapshot and isn't updated.
 
 ## Dependency updates
 

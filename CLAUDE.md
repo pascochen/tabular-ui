@@ -50,7 +50,7 @@ Violating any of these fails review.
 
 ## File structure
 
-A pnpm workspace. The library is `packages/ui`, published to npm as `tabular-ui` and copied into apps by the shadcn registry; `apps/storybook`, `apps/demo` and `apps/site` consume it. Paths below are in `packages/ui` unless they say otherwise.
+A pnpm workspace. The library is `packages/ui`, the private workspace package `tabular-ui`, copied into apps outside the repository by the shadcn registry (no npm releases since 2026-10-28; 0.1.0 stays on npm as a snapshot); `apps/storybook`, `apps/demo` and `apps/site` consume it. Paths below are in `packages/ui` unless they say otherwise.
 
 - `src/styles/palette.css` — the Riso Ledger ramps, **generated** by `scripts/generate-palette.mjs` (with `docs/palette.md` and `docs/palette.json` at the repo root). Never edit it by hand: change the script and run it. Imported after `theme.css`, so theme.css's strip of Tailwind's `teal` cannot erase the Riso one.
 - `scripts/check-contrast.mjs` — WCAG check of every colour token in `theme.css`, both modes, every ground. Fails on any colour that is not a palette reference.
