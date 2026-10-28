@@ -11,27 +11,14 @@ Dense React components and design tokens for finance and operations data tools: 
 
 ## Install
 
-From npm:
-
-```bash
-pnpm add tabular-ui @phosphor-icons/react
-```
-
-Then, in the app's main stylesheet, in place of `@import 'tailwindcss'`:
-
-```css
-@import 'tabular-ui/styles.css';
-@source '../node_modules/tabular-ui/dist';
-```
-
-Or copy the source into the app with the shadcn registry, one component or all of them:
+Tabular UI installs as source: the shadcn registry copies components into your app, one or all of them.
 
 ```bash
 pnpm dlx shadcn@latest add https://tabularui.com/r/button.json
 pnpm dlx shadcn@latest add https://tabularui.com/r/all.json
 ```
 
-Setup for both, the colour mode and the tooltip provider included, is in the [package README](packages/ui/README.md).
+Setup, the tokens, the colour mode and the tooltip provider included, is in the [package README](packages/ui/README.md). There are no npm releases: the registry is rebuilt from `main` on every deploy.
 
 ## License
 

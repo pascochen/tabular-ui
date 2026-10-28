@@ -259,16 +259,15 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 - **Pull requests only:** no direct pushes, no force pushes, no deleting the branch, admins included: a rule an admin can skip gets skipped.
 - **Squash merges only.**
 - **No approving review required** while there is one contributor (GitHub doesn't let you approve your own PR). Raise it, and add `CODEOWNERS`, when there's a second.
-- **Releases go through a PR too.** The version bump (`pnpm version-packages`) is committed on a branch and merged like any change; `pnpm release` and pushing the release tag happen afterwards, from `main`, and the ruleset does not cover tags.
 - **Docs-only PRs still pass**: their skipped Verify reports success, which satisfies the rule.
 - **A `Verify` check can come from a job other than `verify`.** The `Visual changes` job creates one on the commit it pushes, which is the verified commit plus that run's screenshots (see "Visual regression"). The up-to-date rule still forces a real run whenever `main` moves.
 
-### Package and releases
+### Package
 
 - **Build:** `pnpm build:ui`. Vite's library mode writes one ES module per source file to `packages/ui/dist` (dependencies and peer dependencies stay imports, unminified so the class strings Tailwind scans stay whole), `tsc -p tsconfig.build.json` writes the declarations beside them, and the CSS is copied as source: it is Tailwind input, compiled by the consuming app. Stories and `src/fixtures/` are never in `dist`.
 - **Peer dependencies:** React 19, `@phosphor-icons/react` (a second copy would break the `IconContext` `Button` sets icon weight through) and Tailwind CSS 4.
-- **What a consuming app adds:** `@import 'tabular-ui/styles.css'` in place of its own `@import 'tailwindcss'`, and an `@source` line pointing at `node_modules/tabular-ui/dist`. `packages/ui/README.md` documents it, and `apps/demo/src/index.css` is the working example.
-- **Versions and changelog: Changesets** (`@changesets/cli`, root dev dependency; config in `.changeset/`). `pnpm changeset` records a change, `pnpm version-packages` turns pending changesets into a version and `packages/ui/CHANGELOG.md`, and `pnpm release` builds and publishes. Only `tabular-ui` is versioned; the apps are private. Publishing needs the owner's npm login: an agent never publishes.
+- **What a workspace app adds:** `@import 'tabular-ui/styles.css'` in place of its own `@import 'tailwindcss'`, and an `@source` line pointing at `node_modules/tabular-ui/dist`. `apps/demo/src/index.css` is the working example. Apps outside this repository install from the shadcn registry instead (`packages/ui/README.md`).
+- **No releases** (owner, 2026-10-28): Tabular UI is a design system showcase. `packages/ui` is `"private": true`, so nothing publishes it, and the shadcn registry is the only install route outside this repository. Changesets, the `changeset`, `version-packages` and `release` scripts, and `CHANGELOG.md` were removed. Version 0.1.0 stays on npm as an early snapshot; an agent never publishes or deprecates it.
 
 ### shadcn registry
 
@@ -304,10 +303,9 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | `pnpm test:playwright` | Playwright browser checks, on this checkout's own Storybook port (see above) |
 | `pnpm test:visual` | Screenshot comparison (Linux only; CI) |
 | `pnpm test:site` | The site's page checks and axe, against its built pages, on this checkout's own port |
-| `node apps/site/scripts/check-links.mjs` | Request every external link in the built site, Storybook story ids included. Off the PR gate (`docs/site.md` §10): run before a release |
+| `node apps/site/scripts/check-links.mjs` | Request every external link in the built site, Storybook story ids included. Off the PR gate (`docs/site.md` §10): run on demand |
 | `pnpm dlx lighthouse@12 <url>` | Lighthouse on the served site build, at mobile settings. Not a dependency; how to run it is in `apps/site/README.md` |
 | `node apps/site/scripts/og-image.mjs` | Rewrite the site's social image from the wordmark and the palette |
-| `pnpm changeset` | Record a change to the package for the next release |
 | `pnpm --filter tabular-ui palette` | Regenerate the palette |
 | `pnpm --filter tabular-ui contrast` | Check every colour token's contrast |
 | `KASANE_DATA_DIR=… pnpm --filter tabular-ui-demo export-fixtures` | Rebuild the demo's, the stories' and the site's Kasane data from the full dataset (`onboarding/` included) |

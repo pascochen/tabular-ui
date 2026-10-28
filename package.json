@@ -24,13 +24,9 @@
     "test:playwright": "pnpm --filter tabular-ui-storybook test:playwright",
     "test:visual": "pnpm --filter tabular-ui-storybook test:visual",
     "test:site": "pnpm --filter tabular-ui-site test",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm build:ui && changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.12.0",
     "eslint-plugin-react-hooks": "^7.1.1",
