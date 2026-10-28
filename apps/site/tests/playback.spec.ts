@@ -108,6 +108,49 @@ test.describe('the Agent block card', () => {
   });
 });
 
+test.describe('the Confirmation card', () => {
+  const confirmation = (page: Page) => card(page, 'confirmation');
+  const send = (page: Page) => confirmation(page).getByRole('button', { name: 'Send summary' });
+  const sent = 'Sent once, by you. The next send asks again.';
+
+  /** The card plays when it scrolls in; the question arrives with the last frame. */
+  async function openCard(page: Page) {
+    await open(page, '/');
+    await confirmation(page).scrollIntoViewIfNeeded();
+    await expect(send(page)).toBeVisible({ timeout: 6000 });
+    await expect(confirmation(page).locator('[aria-busy="true"]')).toHaveCount(0);
+  }
+
+  test('asks before it sends, and Send summary sends it once', async ({ page }) => {
+    await openCard(page);
+    await expect(confirmation(page).getByText('AI · Awaiting confirmation')).toBeVisible();
+    await expect(confirmation(page).getByRole('term')).toHaveText(['What changes', 'Who it reaches']);
+    await send(page).click();
+
+    await expect(confirmation(page).getByText('AI · Sent')).toBeVisible();
+    await expect(confirmation(page).getByRole('button', { name: 'Send summary' })).toHaveCount(0);
+    // Focus moves to the outcome that replaced the pressed button, never to the page.
+    await expect(confirmation(page).getByText(sent)).toBeFocused();
+  });
+
+  test('Replay asks again, and hands focus to Send summary', async ({ page }) => {
+    await openCard(page);
+    await send(page).click();
+    await confirmation(page).getByRole('button', { name: 'Replay Confirmation' }).click();
+    await expect(send(page)).toBeFocused({ timeout: 6000 });
+    await expect(send(page)).toBeEnabled();
+    await expect(confirmation(page).getByText('AI · Awaiting confirmation')).toBeVisible();
+    await expect(confirmation(page).getByRole('status')).toHaveText('Awaiting confirmation.');
+  });
+
+  test('Don’t send stops it', async ({ page }) => {
+    await openCard(page);
+    await confirmation(page).getByRole('button', { name: 'Don’t send' }).click();
+    await expect(confirmation(page).getByText('AI · Not sent')).toBeVisible();
+    await expect(confirmation(page).getByText('Not sent. The summary stays here.')).toBeFocused();
+  });
+});
+
 test.describe('the cards', () => {
   test('a card below the first screen rewinds unseen and plays to rest when it scrolls in', async ({ page }) => {
     await open(page, '/');

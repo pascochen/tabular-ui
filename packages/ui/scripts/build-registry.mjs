@@ -73,6 +73,8 @@ const descriptions = {
   ChatStarter: 'Suggested prompts for an empty conversation.',
   ChatThread: 'A conversation of user and assistant turns.',
   CodeView: 'Read-only SQL and dbt code.',
+  Confirmation:
+    'Permission for one action before it runs: what it changes and who it reaches. Sits inside an AgentBlock.',
   ContextSwitcher: 'A menu for switching the current context, with actions.',
   CountBadge: 'A count beside a label or icon.',
   DataTable: 'A sortable, filterable, virtualized table with 28px rows.',
