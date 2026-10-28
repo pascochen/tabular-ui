@@ -16,7 +16,7 @@ export const meta: Route.MetaFunction = () =>
 
 /**
  * The three components that stop the run for a person (wireframe `79:396`).
- * Draft definitions, to settle before Question and Confirmation are built.
+ * Definitions signed off by the owner, 2026-10-28. The examples are still draft copy.
  */
 const waits = [
   {
@@ -28,7 +28,7 @@ const waits = [
   {
     name: 'confirmation',
     needs: 'Permission for one action before it runs.',
-    can: 'Allow once, or stop.',
+    can: 'Let it run once, or stop it.',
     example: 'Send the variance summary to the controller?',
   },
   {
@@ -106,12 +106,7 @@ export default function Vocabulary() {
                 key={w.name}
                 className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap)]"
               >
-                <div className="flex items-start justify-between gap-[var(--gap-inline)]">
-                  <h3 className="text-site-title font-semibold text-text-primary">{component(w.name).title}</h3>
-                  <span className="border border-dashed border-border-strong px-2 py-0.5 text-xs text-text-secondary">
-                    Draft definition
-                  </span>
-                </div>
+                <h3 className="text-site-title font-semibold text-text-primary">{component(w.name).title}</h3>
                 {[
                   ['The agent needs', w.needs],
                   ['The person can', w.can],

@@ -5,7 +5,7 @@
 
 Dense React components and design tokens for finance and operations data tools: tables, run logs, metric tiles, lineage, and the agent-authored blocks, plans and chat around them.
 
-18 foundational components on Base UI, 26 product components, and one OKLCH token layer for Tailwind CSS v4. Dark-first, five hues, colour only for state.
+18 foundational components on Base UI, 28 product components, and one OKLCH token layer for Tailwind CSS v4. Dark-first, five hues, colour only for state.
 
 **[Storybook](https://storybook.tabularui.com)** · **[Demo](https://demo.tabularui.com)**
 

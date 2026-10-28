@@ -144,6 +144,8 @@ test.describe('the cards', () => {
         'agent-plan',
         'lineage-tree',
         'attachment-row',
+        'inline-citation',
+        'sources',
         'chat-thread',
         'run-log-row',
         'status-badge',

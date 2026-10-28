@@ -9,6 +9,8 @@ export const componentPages = [
   'agent-plan',
   'lineage-tree',
   'attachment-row',
+  'inline-citation',
+  'sources',
   'agent-block',
   'chat-thread',
   'run-log-row',
