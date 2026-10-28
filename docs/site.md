@@ -286,7 +286,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 
 **Vocabulary** (`79:345`):
 - The 5 moments, compact.
-- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. The wireframe marks these definitions as drafts. Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
+- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. *Signed off 2026-10-28 (owner):* the wireframe marked these definitions as drafts, and they're now settled. Confirmation's "can" line changed from "Allow once, or stop." to "Let it run once, or stop it.", because a button names its action (`docs/agent-voice.md`, *Fixed strings*): "Send summary" and "Don't send", never a bare "Allow". The owner also wants Confirmation to sit close to Agent block. Whether Question's options are radio buttons is open: CLAUDE.md has no `Radio`, and adding one is a foundational decision. Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
 - Status words, as the three vocabularies of D1, each in its own table:
   - Statuses are read from `runStatuses` and rendered as real `StatusBadge`s.
   - Activity lines are rendered by the components in their working state, so the words on the page are the component's own. *Changed in step 5a:* this named `ChatThread` and finished states. It is `AgentReasoning` and `AgentPlan`, streaming, in three columns rather than tables (§13).
@@ -575,9 +575,9 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **Vocabulary**, changed from §4:
   - Status words sit in three columns, not three tables: a list of badges with their tones, the activity lines, and the four authorship labels in real `AgentBlock`s.
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
-  - Question and Confirmation carry a "Draft definition" tag, as the wireframe marks them.
+  - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
-- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' definitions and examples, and Getting started's prose.
+- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' examples (their definitions were signed off 2026-10-28), and Getting started's prose.
 
 **Step 5b, as built (2026-10-27):**
 - **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.
