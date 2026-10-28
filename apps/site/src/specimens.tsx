@@ -445,7 +445,7 @@ function Ident({ children }: { children: React.ReactNode }) {
 
 /**
  * What the answer didn't check, from the pack itself: the only bank file isn't
- * the entity's, and the invoice file covers H1. Draft copy.
+ * the entity's, and the invoice file covers H1. Approved by the owner, 2026-10-28.
  */
 const notChecked = [
   <>
@@ -578,7 +578,7 @@ export function StatusSpecimen() {
 // The before/after pairs (docs/site.md D2): two states that prove each decision
 // ---------------------------------------------------------------------------
 
-/** One composition per built component: its two states and the caption beneath. Captions are draft copy. */
+/** One composition per built component: its two states and the caption beneath. Captions are draft copy, except Inline citation's and Sources', approved 2026-10-28. */
 type PairParts = { before: React.ReactNode; after: React.ReactNode; caption: string };
 
 function chatStarterPair(): PairParts {

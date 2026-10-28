@@ -68,8 +68,8 @@ The headings also implied that approval hands an entry over to the person. Books
 | Agent plan | Drafting a step, actions disabled | Ready, Run plan enabled |
 | Lineage tree | The figure | Opened down to its entries |
 | Attachment row | Uploading | Ready; the name is the link |
-| Inline citation | The answer, no marks | Each figure marked with its source *(added 2026-10-28, draft)* |
-| Sources | The answer, "Found in" one file | Every file it read, and what it didn't check *(added 2026-10-28, draft)* |
+| Inline citation | The answer, no marks | Each figure marked with its source *(added and approved 2026-10-28)* |
+| Sources | The answer, "Found in" one file | Every file it read, and what it didn't check *(added and approved 2026-10-28)* |
 | Agent block | AI · Awaiting review | AI · Posted, posted by you |
 | Chat thread | Question asked, "Working…" | The answer grown in the same place |
 | Run log row | Failed row, closed | Opened to its error |
@@ -286,7 +286,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay.
 
 **Vocabulary** (`79:345`):
 - The 5 moments, compact.
-- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. *Signed off 2026-10-28 (owner):* the wireframe marked these definitions as drafts, and they're now settled. Confirmation's "can" line changed from "Allow once, or stop." to "Let it run once, or stop it.", because a button names its action (`docs/agent-voice.md`, *Fixed strings*): "Send summary" and "Don't send", never a bare "Allow". The owner also wants Confirmation to sit close to Agent block. Whether Question's options are radio buttons is open: CLAUDE.md has no `Radio`, and adding one is a foundational decision. Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
+- "Three ways the agent waits for you": Question, Confirmation and Agent block, each with what the agent needs, what the person can do, and a Kasane example. *Signed off 2026-10-28 (owner):* the wireframe marked these definitions as drafts, and they're now settled. Confirmation's "can" line changed from "Allow once, or stop." to "Let it run once, or stop it.", because a button names its action (`docs/agent-voice.md`, *Fixed strings*): "Send summary" and "Don't send", never a bare "Allow". The owner also wants Confirmation to sit close to Agent block. Question's options won't be radio buttons: the owner confirmed CLAUDE.md's rule, "There is no `Radio`: in dense UI a `Select` beats a radio group" (2026-10-28). Agent block's example is the hero's entry (D5), not the wireframe's rebate accrual.
 - Status words, as the three vocabularies of D1, each in its own table:
   - Statuses are read from `runStatuses` and rendered as real `StatusBadge`s.
   - Activity lines are rendered by the components in their working state, so the words on the page are the component's own. *Changed in step 5a:* this named `ChatThread` and finished states. It is `AgentReasoning` and `AgentPlan`, streaming, in three columns rather than tables (§13).
@@ -392,7 +392,7 @@ On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draw
 | Lineage tree | H1 operating profit down to the bridge's six steps | `operatingBridge`, exact yen |
 | Attachment row | Three source files, name as link | The pack |
 | Inline citation | The duplicate-payment answer, then a mark on each figure; a mark opens its file and entries | `duplicate-payment`: its sources and entries (added 2026-10-28) |
-| Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, draft copy) |
+| Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, copy approved by the owner the same day) |
 | Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
 | Run log row | The run's steps, one failed and opened | **Open:** the stories use dbt model names, which aren't Kasane data. The export should produce the run's steps from what the agent read. |
@@ -577,7 +577,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
   - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
-- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' examples (their definitions were signed off 2026-10-28), and Getting started's prose.
+- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' examples (their definitions were signed off 2026-10-28), and Getting started's prose. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28.
 
 **Step 5b, as built (2026-10-27):**
 - **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.
