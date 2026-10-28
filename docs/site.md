@@ -58,7 +58,7 @@ The headings also implied that approval hands an entry over to the person. Books
    - `actions` is gone, so the block can't be posted twice.
    - Beneath it sits the run log row for the posting step, `passed`. The green appears only there, where something true happened.
    - It needs no library change.
-3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves all ten. The draft pairs below are owner copy to review:
+3. **Every component page has a pair, and the pair proves the component's decision line.** The wireframe draws one page; the same layout serves every built component (twelve since 2026-10-28). The draft pairs below are owner copy to review:
 
 | Component | Before | After |
 |---|---|---|
@@ -68,6 +68,8 @@ The headings also implied that approval hands an entry over to the person. Books
 | Agent plan | Drafting a step, actions disabled | Ready, Run plan enabled |
 | Lineage tree | The figure | Opened down to its entries |
 | Attachment row | Uploading | Ready; the name is the link |
+| Inline citation | The answer, no marks | Each figure marked with its source *(added 2026-10-28, draft)* |
+| Sources | The answer, "Found in" one file | Every file it read, and what it didn't check *(added 2026-10-28, draft)* |
 | Agent block | AI · Awaiting review | AI · Posted, posted by you |
 | Chat thread | Question asked, "Working…" | The answer grown in the same place |
 | Run log row | Failed row, closed | Opened to its error |
@@ -214,7 +216,7 @@ tabularui.com is the public front of Tabular UI for designers and engineers deci
 
 It is not the reference. Storybook (`storybook.tabularui.com`) holds every component, prop and state, and the site links to it rather than repeating it. It is not a sales page: there is no pricing, no sign-up, and no analytics, cookies or tracking.
 
-**The 15 are a subset.** The library has 44 components: 18 foundational and 26 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 10 built and 5 to build. The Components page says so in one line and links to Storybook for the rest.
+**The 15 are a subset.** The library has 46 components: 18 foundational and 28 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, 10 built and 5 to build. The Components page says so in one line and links to Storybook for the rest.
 
 ## 2. Sources of truth
 
@@ -274,9 +276,9 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 - Every built component, in run order, beside the page from 1024px (owner, 2026-10-28, variant A of a review of the component menu). The list is a column to the left of the reading column, as wide as its longest title, with the page's side margin (`--site-pad-x`) between them; the two are centred in the wide rail, so the reading column keeps its 1040px from about 1300px. The list sticks 24px (`--site-gap`) from the top as the page scrolls, so another component is always one click away; the nav bar still scrolls away. Its label is "All 10 components", counted from the list. The page you're on is marked as the Foundations pages mark theirs: ink and semibold, a 2px ink rule over the list's 1px rule, and `aria-current="page"`. Its last line, "All 15, by moment", links to Home's grid. Below 1024px there's no room for a column, and the page keeps a menu of the same components, built with the library's `Menu`. *Changed 2026-10-27 (owner, from a heuristic critique):* its trigger reads "All 10 components", where it read "Jump to a component", and the page you're on is checked, on the selection ground (`--color-bg-interactive`), with `aria-current="page"`, the check in the menu's leading indicator slot so every title starts at the same x. Repeating the list at the end of the page was rejected: beside Previous and Next it read as a second footer, and it would draw readers away from the page's own sections. Previous and Next stay at every width: on a phone they're the only way on from the end of the page.
 - The name as `<h1>`, and the decision line.
 - **Use it when** and **Don't use it when**, side by side, two lines each (`useWhen` and `avoidWhen` in `src/component-list.ts`, owner copy). Each "don't" names the component to use instead, so a no still moves the visitor on. On a phone they stack.
-- **The rules it follows** (owner, 2026-10-27): each principle the component carries (`carriedBy` in `src/content.ts`), with its check, and a link to all three. Shown only where there is one: Agent block (1 and 3), Lineage tree and Attachment row (2), Run log row and Status badge (3). The Principles page stays, linked from here, out of the nav and the footer. Not merged into Vocabulary: principles are rules, Vocabulary is words.
+- **The rules it follows** (owner, 2026-10-27): each principle the component carries (`carriedBy` in `src/content.ts`), with its check, and a link to all three. Shown only where there is one: Agent block (1 and 3), Lineage tree, Attachment row, Inline citation and Sources (2), Run log row and Status badge (3). The Principles page stays, linked from here, out of the nav and the footer. Not merged into Vocabulary: principles are rules, Vocabulary is words.
 - The before/after pair in one frame, with one caption beneath it (D2).
-- Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27.
+- Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27. Inline citation's and Sources' type-check with the site since 2026-10-28.
 - "Set up the package first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
 - Previous and next, which walk the run in order. Components in the nav opens the run at its first component.
 
@@ -389,6 +391,8 @@ On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draw
 | Agent plan | A plan's steps, ticking through | Pack file names |
 | Lineage tree | H1 operating profit down to the bridge's six steps | `operatingBridge`, exact yen |
 | Attachment row | Three source files, name as link | The pack |
+| Inline citation | The duplicate-payment answer, then a mark on each figure; a mark opens its file and entries | `duplicate-payment`: its sources and entries (added 2026-10-28) |
+| Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, draft copy) |
 | Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
 | Run log row | The run's steps, one failed and opened | **Open:** the stories use dbt model names, which aren't Kasane data. The export should produce the run's steps from what the agent read. |

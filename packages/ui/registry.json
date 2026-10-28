@@ -833,6 +833,28 @@
       ]
     },
     {
+      "name": "inline-citation",
+      "type": "registry:component",
+      "title": "InlineCitation",
+      "description": "A numbered mark after a figure that opens the source it rests on.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/chip.json",
+        "https://tabularui.com/r/popover.json",
+        "https://tabularui.com/r/sources.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/InlineCitation/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/InlineCitation/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "lineage-tree",
       "type": "registry:component",
       "title": "LineageTree",
@@ -940,6 +962,26 @@
           "path": "src/components/product/RunLogRow/index.tsx",
           "type": "registry:file",
           "target": "@components/tabular-ui/components/product/RunLogRow/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sources",
+      "type": "registry:component",
+      "title": "Sources",
+      "description": "What an answer rests on, numbered, and what was not checked.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/attachment-row.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/Sources/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Sources/index.tsx"
         }
       ]
     },
@@ -1155,6 +1197,7 @@
         "https://tabularui.com/r/field.json",
         "https://tabularui.com/r/filter-chip.json",
         "https://tabularui.com/r/icon-button.json",
+        "https://tabularui.com/r/inline-citation.json",
         "https://tabularui.com/r/input.json",
         "https://tabularui.com/r/lineage-tree.json",
         "https://tabularui.com/r/menu.json",
@@ -1168,6 +1211,7 @@
         "https://tabularui.com/r/project-switcher.json",
         "https://tabularui.com/r/run-log-row.json",
         "https://tabularui.com/r/select.json",
+        "https://tabularui.com/r/sources.json",
         "https://tabularui.com/r/spinner.json",
         "https://tabularui.com/r/status-badge.json",
         "https://tabularui.com/r/switch.json",

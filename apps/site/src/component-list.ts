@@ -117,12 +117,28 @@ export const entries: ComponentEntry[] = [
     title: 'Inline citation',
     moment: 'showing',
     decision: 'Each figure names what it rests on, in the line where it appears.',
+    useWhen: [
+      'A figure or claim in an answer comes from a specific file or entry.',
+      'People need to check a number without losing the line they’re reading.',
+    ],
+    avoidWhen: [
+      'The figure is built from other figures. Use `LineageTree`, so it opens down to its parts.',
+      'You need everything the answer read in one place. Use `Sources` below the answer.',
+    ],
   },
   {
     name: 'sources',
     title: 'Sources',
     moment: 'showing',
     decision: 'Lists what the answer rests on, and what wasn’t checked.',
+    useWhen: [
+      'An answer rests on files or records that people may want to check.',
+      'Part of the question wasn’t covered, and the reader needs to know which part.',
+    ],
+    avoidWhen: [
+      'You’re showing files someone attached or uploaded. Use `AttachmentRow`.',
+      'One figure needs its source beside it. Use `InlineCitation`, and list them all in `Sources`.',
+    ],
   },
   {
     name: 'question',

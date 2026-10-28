@@ -278,6 +278,8 @@ export {
 } from './components/product/ChatThread';
 export { ChatComposer, type ChatComposerHandle, type ChatComposerProps } from './components/product/ChatComposer';
 export { ChatStarter, type ChatStarterProps } from './components/product/ChatStarter';
+export { InlineCitation, type InlineCitationProps } from './components/product/InlineCitation';
+export { Sources, type Source, type SourcesProps } from './components/product/Sources';
 export { CodeView, type CodeViewProps } from './components/product/CodeView';
 export {
   ContextSwitcher,

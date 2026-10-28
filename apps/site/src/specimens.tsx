@@ -9,12 +9,15 @@ import {
   ChatStarter,
   ChatThread,
   Field,
+  InlineCitation,
   Input,
   LineageTree,
   RunLogRow,
   runStatuses,
+  Sources,
   StatusBadge,
   type RunStatus,
+  type Source,
 } from 'tabular-ui';
 
 import { duplicatePayment, h1Gap, kasane, packFile } from './data';
@@ -414,6 +417,91 @@ export function AttachmentSpecimen() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Sources and Inline citation: what the duplicate-payment answer rests on (D5)
+// ---------------------------------------------------------------------------
+
+/** A pack file as a Source, with its size. No link: the site serves no pack files. */
+function packSource(name: string): Source {
+  const file = kasane.pack.find((f) => f.name === packFile(name))!;
+  return { id: file.name, name: file.name, size: formatBytes(file.bytes) };
+}
+
+const answerSources = (() => {
+  const invoices = duplicatePayment.sources.find((s) => s.endsWith('.csv'));
+  const interview = duplicatePayment.sources.find((s) => s.endsWith('.txt'));
+  if (!invoices || !interview)
+    throw new Error('kasane.json’s duplicate payment no longer cites an invoice file and an interview');
+  // Citation order: the figure's file first, then the interview.
+  return [packSource(invoices), packSource(interview)];
+})();
+
+const bankFiles = kasane.pack.filter((f) => f.name.startsWith('bank_export_')).map((f) => f.name);
+
+/** An identifier in a --text-sm line: mono, one step below (§8.3). */
+function Ident({ children }: { children: React.ReactNode }) {
+  return <code className="font-mono text-xs">{children}</code>;
+}
+
+/**
+ * What the answer didn't check, from the pack itself: the only bank file isn't
+ * the entity's, and the invoice file covers H1. Draft copy.
+ */
+const notChecked = [
+  <>
+    {duplicatePayment.entity}’s bank statements: the only bank file is <Ident>{bankFiles.join(', ')}</Ident>, so both
+    payments are as the invoice file records them.
+  </>,
+  <>
+    Invoices outside H1: <Ident>{answerSources[0].name}</Ident> holds H1 only.
+  </>,
+];
+
+/** The answer's two sentences, each figure marked with its source when `cited`. */
+function CitedAnswer({ cited }: { cited: boolean }) {
+  const d = duplicatePayment;
+  return (
+    <div className="flex flex-col gap-[var(--gap-group)]">
+      <p>
+        Yes. Invoice <code>{d.supplierInvoice}</code> was entered twice and{' '}
+        {d.paid.every(Boolean) ? 'paid twice' : 'paid once'}, <span className="tabular-nums">{d.amountLabel}</span> each
+        time.
+        {cited ? <InlineCitation number={1} source={answerSources[0]} locator={d.entries.join(' and ')} /> : null}
+      </p>
+      <p className="text-text-secondary">
+        AP says the system blocks a repeated supplier invoice number.
+        {cited ? <InlineCitation number={2} source={answerSources[1]} /> : null}
+      </p>
+    </div>
+  );
+}
+
+/** Sources: the files the answer read, one after another, then what it didn't check. */
+export function SourcesSpecimen() {
+  return (
+    <Specimen title="Sources" frames={answerSources.length}>
+      {(f) => (
+        <AgentBlock authorship="AI">
+          <Sources sources={answerSources.slice(0, f + 1)} notChecked={notChecked} />
+        </AgentBlock>
+      )}
+    </Specimen>
+  );
+}
+
+/** Inline citation: the answer, then each figure marked with its source. Press a mark to open it. */
+export function CitationSpecimen() {
+  return (
+    <Specimen title="Inline citation" frames={2}>
+      {(f) => (
+        <AgentBlock authorship="AI">
+          <CitedAnswer cited={f === 1} />
+        </AgentBlock>
+      )}
+    </Specimen>
+  );
+}
+
 /**
  * Chat thread: the question asked, "Working…", and the answer grown in the same
  * place. Its scroller needs a bounded parent; the aspect ratio bounds it without
@@ -593,6 +681,46 @@ function attachmentPair(): PairParts {
   };
 }
 
+function sourcesPair(): PairParts {
+  return {
+    before: (
+      <AgentBlock authorship="AI">
+        <div className="flex flex-col gap-[var(--gap-group)]">
+          <CitedAnswer cited={false} />
+          <p className="text-text-secondary">
+            Found in <code>{answerSources[0].name}</code>.
+          </p>
+        </div>
+      </AgentBlock>
+    ),
+    after: (
+      <AgentBlock authorship="AI">
+        <div className="flex flex-col gap-[var(--gap-group)]">
+          <CitedAnswer cited />
+          <Sources sources={answerSources} notChecked={notChecked} />
+        </div>
+      </AgentBlock>
+    ),
+    caption: 'The answer lists every file it read, and says what it didn’t check.',
+  };
+}
+
+function citationPair(): PairParts {
+  return {
+    before: (
+      <AgentBlock authorship="AI">
+        <CitedAnswer cited={false} />
+      </AgentBlock>
+    ),
+    after: (
+      <AgentBlock authorship="AI">
+        <CitedAnswer cited />
+      </AgentBlock>
+    ),
+    caption: 'Each figure names its source in its own line. Press the mark for the file and the entries.',
+  };
+}
+
 function agentBlockPair(): PairParts {
   return {
     before: <Proposal fixed="waiting" />,
@@ -648,6 +776,8 @@ const pairs: Record<string, () => PairParts> = {
   'agent-plan': planPair,
   'lineage-tree': lineagePair,
   'attachment-row': attachmentPair,
+  'inline-citation': citationPair,
+  sources: sourcesPair,
   'agent-block': agentBlockPair,
   'chat-thread': threadPair,
   'run-log-row': runLogPair,
