@@ -2,16 +2,16 @@ import { Rail, Section } from '../components/layout';
 import { ComponentTag } from '../components/specimen';
 import { componentGrid, components, moments, principles } from '../content';
 import { standaloneLink } from '../lib/styles';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/principles';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Principles · Tabular UI' },
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Principles · Tabular UI',
+    description:
       'Three rules every Tabular UI component follows, each with a check a reviewer can run against any component.',
-  },
-];
+    path: '/principles',
+  });
 
 /** Principles (wireframe `77:230`): each rule, its why, its check, and the components that carry it. */
 export default function Principles() {

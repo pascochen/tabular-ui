@@ -481,9 +481,9 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4).
 
 **Keyboard and focus (scripted):**
-- After a client-side route change, focus moves to the new page's `<h1>` and the new title is announced. React Router does not do this.
-- Outline links move focus to their section.
-- The jump menu and Foundations tabs are the library's `Menu` and `Tabs`, with their keyboard behaviour.
+- Every link is a plain `<a>`, so every page loads as a new document, and the browser moves focus to the top and announces the new title. A test fails on any React Router `<Link>` (`data-discover`). *Changed in 5b:* this asked for focus to move to the `<h1>` after a client-side route change; the site has none to manage.
+- The jump index's links move focus to their card.
+- The component page's menu is the library's `Menu`, with its keyboard behaviour. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`).
 
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places.
@@ -491,11 +491,11 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - Contrast is measured on the ground the text sits on, including the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 
-**Manual, by the owner:** a VoiceOver pass in Safari on Home, Components and one component page, following a written 10-step script delivered with the final PR.
+**Manual, by the owner:** a VoiceOver pass in Safari on Home, one component page and Color, following the 10-step script in `docs/site-voiceover.md` (delivered in 5b; Components became a section of Home on 2026-10-26).
 
 ## 12. Performance and metadata
 
-- **Lighthouse** on Home and Components at mobile settings: Performance and Accessibility both 95 or above.
+- **Lighthouse** on Home and a component page at mobile settings: Performance and Accessibility both 95 or above, the median of several runs. *Changed in 5b:* Components is a section of Home since 2026-10-26.
 - **Fonts** come from the package's stylesheet. Preload only the faces the first screen uses: the serif heading and the sans body.
 - **Metadata:** a title and description per page, canonical URLs, `sitemap.xml` and `robots.txt`.
 - **Social preview:** one shared Open Graph image built from `brand/tabular-wordmark.svg`. Per-page images need a renderer, which is a new dependency, so not in v1.
@@ -574,5 +574,18 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - Question and Confirmation carry a "Draft definition" tag, as the wireframe marks them.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
 - **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' definitions and examples, and Getting started's prose.
+
+**Step 5b, as built (2026-10-27):**
+- **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.
+- **`/sitemap.xml`** is a resource route the build prerenders. It reads the page list and the registry, so a component that ships appears there with its page. Principles is listed: it stays indexed while it's out of the nav and footer. **`/robots.txt`** allows everything and names the sitemap.
+- **The social image** is `public/og.png`, 1200×630: the wordmark file, unchanged, centred on `ledger-50` paper read from `docs/palette.json`. `scripts/og-image.mjs` renders it with Playwright, which the site already has, so no renderer was added.
+- **Fonts.** A page fetches three faces of the 35 files in the build: sans, serif and mono, Latin, upright. The sans and the serif are preloaded (`links` in `src/root.tsx`). Before that, the sans arrived after the first paint, the hero's lead rewrapped on a phone and pushed the specimen down: a layout shift of 0.165 on production. The files are imported by path from `packages/ui`'s fonts, since the fonts are its dependency, and a test checks the preloaded URLs are the ones the stylesheet fetches, each once.
+- **Forced colours.** The Foundations mode panels and the Color ramps set `forced-color-adjust: none`: their colours are the content, and forced colours painted the interactive fill swatch the same as its panel. Every plate's frame and every filled site control keeps a border there, checked on four pages.
+- **Lighthouse,** mobile settings, the build served compressed as Vercel serves it, four runs each: Home 94, 96, 96, 94 (median 95), Agent block 96, 96, 95, 96 (median 96). Accessibility 100 and layout shift 0 on every run. Production before 5b scored 88 on Home. Home clears the bar by a point: the 122 KB serif is the largest thing left before its first paint.
+- **Tests** (`tests/quality.spec.ts`, with the route list now in `tests/routes.ts`): metadata on every route, unique titles and descriptions, the sitemap against the routes, robots, the image's size, no client-side links, every internal link and `#fragment` resolving, one destination per link name, ↗ on exactly the external links, nothing animating under reduced motion on every route, nothing fixed or sticky but the skip link (2.4.11), forced colours, and the font preloads.
+- **One link-name exception, waiting for the owner:** on Home, a built component's name in the jump index goes to its card, and the same name as the card's title goes to its page. The test allows exactly that pair, with its reason.
+- **External links** are checked by `scripts/check-links.mjs`, on demand: 14 links, none failed, LinkedIn checked by hand (it refuses scripts). Storybook answers any `?path=` with a 200, so the script checks each story id against Storybook's `index.json`.
+- **VoiceOver:** the owner's 10-step script is `docs/site-voiceover.md`. **`apps/site/README.md`** covers running the site, where its content comes from, and adding a page when a to-build component ships.
+- **For the library, not fixed here:** an expanded failed `RunLogRow` loses its tinted ground in forced colours. It keeps its words, so nothing is lost, but the row has no edge there.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

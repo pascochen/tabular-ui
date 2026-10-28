@@ -4,15 +4,15 @@ import { CodeView } from 'tabular-ui';
 import { ExternalMark, Rail, Section, SectionHeader } from '../components/layout';
 import { external } from '../content';
 import { textLink } from '../lib/styles';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/getting-started';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Getting started · Tabular UI' },
-  {
-    name: 'description',
-    content: 'Install Tabular UI from npm, or copy the components’ source into your app with the shadcn registry.',
-  },
-];
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Getting started · Tabular UI',
+    description: 'Install Tabular UI from npm, or copy the components’ source into your app with the shadcn registry.',
+    path: '/getting-started',
+  });
 
 /**
  * The code on this page is read from packages/ui/README.md at build time, by

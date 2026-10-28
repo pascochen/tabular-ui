@@ -3,34 +3,9 @@ import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-/**
- * Page-level checks every route must pass (docs/site.md §11). Routes are added
- * here as they are built.
- */
-const componentPages = [
-  'chat-starter',
-  'chat-composer',
-  'agent-reasoning',
-  'agent-plan',
-  'lineage-tree',
-  'attachment-row',
-  'agent-block',
-  'chat-thread',
-  'run-log-row',
-  'status-badge',
-].map((name) => `/components/${name}`);
+import { componentPages, routes } from './routes';
 
-const routes = [
-  '/',
-  '/principles',
-  ...componentPages,
-  '/vocabulary',
-  '/foundations/color',
-  '/foundations/typography',
-  '/foundations/density',
-  '/getting-started',
-  '/404',
-];
+/** Page-level checks every route must pass (docs/site.md §11). The 5b checks are in quality.spec.ts. */
 
 // WCAG 2.2 AA, every level up to it. No rule is disabled: an exception needs
 // the owner's approval and a written reason.

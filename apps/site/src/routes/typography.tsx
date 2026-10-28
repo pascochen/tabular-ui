@@ -7,15 +7,15 @@ import { kasane, packFile } from '../data';
 import { cn } from '../lib/cn';
 import { exactMoney, money } from '../lib/format';
 import { onCanvas, px, stepLabel, themeToken, tokenStep } from '../tokens';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/typography';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Typography · Tabular UI' },
-  {
-    name: 'description',
-    content: 'A 13px scale for dense tools, one superfamily, and tabular figures everywhere, prose included.',
-  },
-];
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Typography · Tabular UI',
+    description: 'A 13px scale for dense tools, one superfamily, and tabular figures everywhere, prose included.',
+    path: '/foundations/typography',
+  });
 
 /** The library's scale (§8.1), written out so Tailwind generates each class. */
 const scale = [

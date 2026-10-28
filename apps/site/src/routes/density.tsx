@@ -2,15 +2,15 @@ import { FoundationsHeader, TokenLabel } from '../components/foundations';
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { pages } from '../content';
 import { themeToken, themeTokensWith } from '../tokens';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/density';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Density · Tabular UI' },
-  {
-    name: 'description',
-    content: 'Spacing capped at 32px, controls at 36px, rows at 28px, and square corners. The cap is the design.',
-  },
-];
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Density · Tabular UI',
+    description: 'Spacing capped at 32px, controls at 36px, rows at 28px, and square corners. The cap is the design.',
+    path: '/foundations/density',
+  });
 
 /** A token's own comment from theme.css, first line only. */
 const note = (text?: string) => text?.split(/\s{2,}/)[0];
