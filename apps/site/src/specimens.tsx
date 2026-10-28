@@ -334,7 +334,7 @@ export function PlanSpecimen() {
 
 const suggestions = ['Explain the H1 operating profit gap', question, 'Which customers pay later each month?'];
 
-/** Chat starter: suggestions written as a person would ask them. A pick fills the box and never sends. Draft copy. */
+/** Chat starter: suggestions written as a person would ask them. A pick fills the box and never sends. Approved 2026-10-28. */
 export function ChatStarterSpecimen() {
   return (
     <Specimen title="Chat starter" frames={suggestions.length + 1}>
