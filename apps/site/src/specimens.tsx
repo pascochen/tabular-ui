@@ -49,7 +49,8 @@ type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
  * The agent's proposal. In the hero it's a teaser (owner, 2026-10-26): it rests
  * on the waiting proposal with no buttons, and Replay plays the run back to it.
  * On the Agent block card it's live: it stops and waits, and the visitor is the
- * person it waits for (D6).
+ * person it waits for (D6). On Agent block's pair it's fixed: the waiting plate
+ * shows the three buttons, and the plate is inert, so they can't be pressed.
  * - **Post entry** sets the label to "AI · Posted" and meta to "posted by you",
  *   and writes a passed run log row with the entry's journal number (D1, D2).
  * - **Don't post** sets "AI · Not posted", "declined by you", and a skipped row:
@@ -72,6 +73,8 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
   if (!invoices) throw new Error('kasane.json’s duplicate payment cites no invoice file');
   const defaults = { period: kasane.company.openPeriod, memo: 'Reverse the duplicate payment' };
   // The hero is a teaser, and a fixed proposal is a pair's plate: neither takes a decision.
+  // A fixed proposal still shows its buttons while it waits (owner, 2026-10-28): they are
+  // the component's point, and the pair's plate is inert.
   const live = !hero && !fixed;
 
   // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
@@ -204,7 +207,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                       </p>
                     </>
                   )}
-                  {outcome === 'waiting' && live ? (
+                  {outcome === 'waiting' && !hero ? (
                     <div className="mt-2 flex flex-wrap gap-[var(--gap-inline)]">
                       <Button size="sm" ref={postRef} onClick={() => decide('posted')}>
                         Post entry
@@ -578,8 +581,19 @@ export function StatusSpecimen() {
 // The before/after pairs (docs/site.md D2): two states that prove each decision
 // ---------------------------------------------------------------------------
 
-/** One composition per built component: its two states and the caption beneath. Captions are draft copy, except Inline citation's and Sources', approved 2026-10-28. */
-type PairParts = { before: React.ReactNode; after: React.ReactNode; caption: string };
+/**
+ * One composition per built component: its two states and the caption beneath.
+ * Every caption is approved (owner, 2026-10-28).
+ *
+ * A plate with a control is inert, so a press can't turn the before into the
+ * after (owner, 2026-10-28). Inert also takes the plate out of the accessibility
+ * tree, so a screen reader hears the caption; each component's live card on Home
+ * is the version it can use. A pair whose plates hold no control sets
+ * `inert: false`, so they stay readable and selectable. So does Inline citation:
+ * its caption asks the reader to press the mark, and the popover opens over the
+ * plate and leaves it as it was. `tests/pages.spec.ts` holds the rule.
+ */
+type PairParts = { before: React.ReactNode; after: React.ReactNode; caption: string; inert?: false };
 
 function chatStarterPair(): PairParts {
   return {
@@ -591,7 +605,7 @@ function chatStarterPair(): PairParts {
       />
     ),
     after: <ChatComposer value={question} onValueChange={noop} onSend={noop} />,
-    caption: 'A pick fills the box and nothing is sent, so the question can still change.',
+    caption: 'Picking a question fills the box without sending it, so you can still edit it.',
   };
 }
 
@@ -601,7 +615,7 @@ function composerPair(): PairParts {
   return {
     before: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('running')} />,
     after: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('passed')} />,
-    caption: 'Send waits while the file uploads, and is ready once it has.',
+    caption: 'Nothing sends while a file is still uploading.',
   };
 }
 
@@ -623,7 +637,7 @@ function reasoningPair(): PairParts {
         </div>
       </AgentBlock>
     ),
-    caption: 'The thinking stays folded until you open it.',
+    caption: 'The reasoning stays folded while the AI thinks. Open it to read the steps.',
   };
 }
 
@@ -641,7 +655,7 @@ function planPair(): PairParts {
   return {
     before: plan('streaming', 2),
     after: plan('ready', planSteps.length),
-    caption: 'The plan is written where you can see it, and can only run once it is ready.',
+    caption: 'Steps appear as the plan is written. Run plan waits for the last one.',
   };
 }
 
@@ -661,7 +675,7 @@ function lineagePair(): PairParts {
   return {
     before: <LineageTree defaultExpanded={[]} nodes={nodes} />,
     after: <LineageTree defaultExpanded={['actual']} nodes={nodes} />,
-    caption: 'The figure opens down to what it is built from, in exact yen that add up.',
+    caption: 'Open a line to see what it’s built from, without leaving the page.',
   };
 }
 
@@ -677,7 +691,8 @@ function attachmentPair(): PairParts {
   return {
     before: rows((i) => (i === 0 ? 'running' : 'queued')),
     after: rows(() => 'passed'),
-    caption: 'Each file shows its own state, and its name stays text you can select and copy.',
+    caption: 'Each file shows its own state. Its name stays text you can select and copy.',
+    inert: false,
   };
 }
 
@@ -718,6 +733,7 @@ function citationPair(): PairParts {
       </AgentBlock>
     ),
     caption: 'Each figure names its source in its own line. Press the mark for the file and the entries.',
+    inert: false,
   };
 }
 
@@ -725,7 +741,7 @@ function agentBlockPair(): PairParts {
   return {
     before: <Proposal fixed="waiting" />,
     after: <Proposal fixed="posted" />,
-    caption: 'The same entry, before and after a person posts it.',
+    caption: 'The AI proposes the entry. Only a person can post it, with Post entry.',
   };
 }
 
@@ -744,7 +760,7 @@ function threadPair(): PairParts {
   return {
     before: thread(),
     after: thread(answer),
-    caption: 'The answer’s space appears when you ask, and the answer grows in it.',
+    caption: 'The reply shows Working… as soon as you ask, then the answer takes its place.',
   };
 }
 
@@ -764,7 +780,8 @@ function statusPair(): PairParts {
   return {
     before: <StatusBadge status="agent-working" />,
     after: <StatusBadge status="agent-proposed" />,
-    caption: 'The label names the state. Where the actor matters, the role tag says who.',
+    caption: 'Each badge says what’s happening now: AI working, then proposed.',
+    inert: false,
   };
 }
 

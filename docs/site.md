@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 4 of §13 are built and step 5a is in review: `apps/site` is live at tabularui.com.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -282,7 +282,7 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 - "Set up the package first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
 - Previous and next, which walk the run in order. Components in the nav opens the run at its first component.
 
-The pair is static. It shows two states, not a sequence, and has no Replay.
+The pair is static. It shows two states, not a sequence, and has no Replay. *Since 2026-10-28 (owner):* a plate with a control is `inert`, so a press can't turn the before into the after. Run log row's before could be pressed open, and then it read the same as its after. Inert also takes a plate out of the accessibility tree, so a screen reader hears the caption, and the live card on Home is the version it can use. Two exceptions: a pair whose plates hold no control (Attachment row, Status badge) stays readable and selectable, and Inline citation stays live, because its caption asks the reader to press the mark and the popover leaves the plate as it was.
 
 **Vocabulary** (`79:345`):
 - The 5 moments, compact.
@@ -567,7 +567,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 **Step 5a, as built (2026-10-26):**
 - **The 404.** React Router prerenders `/404`, and the build copies it to `build/client/404.html`, which Vercel serves with a 404 status for any path it has no file for. The catch-all route renders the same page, so a client-side navigation to a missing path shows it too. `tests/serve.mjs` serves `404.html` the same way, and a test checks the status, the page, and one skip link after hydration.
 - **The component pages** are prerendered from `packages/ui/registry.json` (`react-router.config.ts`), so only a built component has one. An unbuilt name renders the 404 page. The component list moved from `src/content.ts` to `src/component-list.ts`, which the config can import without Vite.
-- **The pairs** (`ComponentPair` in `src/specimens.tsx`) reuse each card's data, in two dark plates under one caption. Agent block's pair is the hero's proposal fixed at waiting and at posted, with no buttons and no Replay. A test checks that each pair's two plates read differently: Lineage tree's "before" first shipped already open, because `LineageTree` expands everything when `defaultExpanded` is omitted.
+- **The pairs** (`ComponentPair` in `src/specimens.tsx`) reuse each card's data, in two dark plates under one caption. Agent block's pair is the hero's proposal fixed at waiting and at posted, with no buttons and no Replay. *Changed 2026-10-28 (owner):* the waiting plate shows Post entry, Edit entry and Don't post, the component's point, on an inert plate. A test checks that each pair's two plates read differently: Lineage tree's "before" first shipped already open, because `LineageTree` expands everything when `defaultExpanded` is omitted.
 - **Each pair sits under a visually hidden `<h2>`, "Before and after".** Agent plan's title is an `<h3>`, which followed the page's `<h1>` with a level skipped (axe).
 - **The Storybook link** goes to `/docs/product-<name without hyphens>--docs`, Storybook's id for a story file titled `Product/<Name>`.
 - **The install command** has a copy button that says "Copied", and announces it once, after the clipboard write succeeds.
@@ -577,7 +577,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
   - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
-- **Draft copy for the owner:** the ten pair captions, the 404's line, the three waits' examples (their definitions were signed off 2026-10-28), and Getting started's prose. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28.
+- **Draft copy for the owner:** the 404's line, the three waits' examples (their definitions were signed off 2026-10-28), and Getting started's prose. Inline citation's and Sources' copy (use/avoid lines, pair captions and not-checked lines) was approved on 2026-10-28. The other ten pair captions were approved the same day, after a microcopy pass: nine rewritten, Run log row's kept. Lineage tree's no longer says "figure" or "exact yen": the component isn't only for money, and "figure" for a number is finance English.
 
 **Step 5b, as built (2026-10-27):**
 - **Metadata.** Every route's `meta` goes through `pageMeta()` (`src/lib/meta.ts`): title, description, a canonical URL without a trailing slash (Vercel serves `/principles` and `/principles/` alike), and Open Graph and Twitter tags. Home's description is the hero's lead. The 404 has no canonical or social tags, and `noindex`.
@@ -589,7 +589,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **Tests** (`tests/quality.spec.ts`, with the route list now in `tests/routes.ts`): metadata on every route, unique titles and descriptions, the sitemap against the routes, robots, the image's size, no client-side links, every internal link and `#fragment` resolving, one destination per link name, ↗ on exactly the external links, nothing animating under reduced motion on every route, nothing fixed or sticky but the skip link (2.4.11) and, since 2026-10-28, the component list beside each component page, which sits in its own column and so can't cover a focused element, forced colours, and the font preloads.
 - **One link-name exception, approved by the owner (2026-10-27):** on Home, a built component's name in the jump index goes to its card, and the same name as the card's title goes to its page. Both lead to the same component, and the jump index's label gives the first its context (2.4.4). The test allows exactly that pair, with its reason; any other shared name with two destinations still fails.
 - **External links** are checked by `scripts/check-links.mjs`, on demand: 14 links, none failed, LinkedIn checked by hand (it refuses scripts). Storybook answers any `?path=` with a 200, so the script checks each story id against Storybook's `index.json`.
-- **VoiceOver:** the owner's 10-step script is `docs/site-voiceover.md`. **`apps/site/README.md`** covers running the site, where its content comes from, and adding a page when a to-build component ships.
+- **VoiceOver:** the owner's 10-step script is `docs/site-voiceover.md`. The owner ran it on 2026-10-28, with nothing to report. **`apps/site/README.md`** covers running the site, where its content comes from, and adding a page when a to-build component ships.
 - **For the library, not fixed here:** an expanded failed `RunLogRow` loses its tinted ground in forced colours. It keeps its words, so nothing is lost, but the row has no edge there.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.
