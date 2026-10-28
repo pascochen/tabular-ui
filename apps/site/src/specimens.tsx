@@ -8,6 +8,7 @@ import {
   ChatComposer,
   ChatStarter,
   ChatThread,
+  Confirmation,
   Field,
   InlineCitation,
   Input,
@@ -170,7 +171,18 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                       <p className="text-text-secondary">
                         {d.amountLabel}. The amount is the duplicate’s, and can’t be changed here.
                       </p>
-                      <div className="flex flex-wrap gap-[var(--gap-inline)]">
+                      <div className="flex flex-wrap justify-end gap-[var(--gap-inline)]">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setDraft(entry);
+                            setOutcome('waiting');
+                            setFocusTarget('edit');
+                          }}
+                        >
+                          Cancel
+                        </Button>
                         <Button
                           size="sm"
                           onClick={() => {
@@ -180,17 +192,6 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                           }}
                         >
                           Done
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setDraft(entry);
-                            setOutcome('waiting');
-                            setFocusTarget('edit');
-                          }}
-                        >
-                          Cancel
                         </Button>
                       </div>
                     </div>
@@ -207,14 +208,16 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                       </p>
                     </>
                   )}
+                  {/* As every decision in the library (Dialog's footer, AgentPlan, Confirmation):
+                      right-aligned, the action last, the others ghost. */}
                   {outcome === 'waiting' && !hero ? (
-                    <div className="mt-2 flex flex-wrap gap-[var(--gap-inline)]">
-                      <Button size="sm" ref={postRef} onClick={() => decide('posted')}>
-                        Post entry
+                    <div className="mt-2 flex flex-wrap justify-end gap-[var(--gap-inline)]">
+                      <Button size="sm" variant="ghost" onClick={() => decide('declined')}>
+                        Don’t post
                       </Button>
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         ref={editRef}
                         onClick={() => {
                           setDraft(entry);
@@ -224,8 +227,8 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                       >
                         Edit entry
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => decide('declined')}>
-                        Don’t post
+                      <Button size="sm" ref={postRef} onClick={() => decide('posted')}>
+                        Post entry
                       </Button>
                     </div>
                   ) : null}
@@ -266,7 +269,108 @@ export function AgentBlockSpecimen() {
 }
 
 // ---------------------------------------------------------------------------
-// The other nine cards
+// Confirmation: the variance summary, sent once (Vocabulary's example)
+// ---------------------------------------------------------------------------
+
+/** Vocabulary's example for Confirmation, approved by the owner 2026-10-28. */
+const sendQuestion = 'Send the variance summary to the controller?';
+const sentOutcome = 'Sent once, by you. The next send asks again.';
+const notSentOutcome = 'Not sent. The summary stays here.';
+
+type SendOutcome = 'waiting' | 'sent' | 'not-sent';
+
+/**
+ * The agent's turn: the summary in one line, then the Confirmation. Each
+ * `round` is a new Confirmation, because one is spent once it's answered.
+ */
+function SendSummary({
+  outcome,
+  round = 0,
+  reached = true,
+  onDecide,
+}: {
+  outcome: SendOutcome;
+  round?: number;
+  reached?: boolean;
+  onDecide?: (outcome: Exclude<SendOutcome, 'waiting'>) => void;
+}) {
+  const authorship =
+    outcome === 'sent' ? 'AI · Sent' : outcome === 'not-sent' ? 'AI · Not sent' : 'AI · Awaiting confirmation';
+  return (
+    <AgentBlock authorship={authorship}>
+      <div className="flex flex-col gap-[var(--gap-group)]">
+        <p>
+          The variance summary is ready. H1 operating profit is {money(h1Gap.shortfall)} under budget, and exchange
+          rates explain {money(h1Gap.exchangeRates)} of it.
+        </p>
+        <div {...unreached(!reached)}>
+          <Confirmation
+            key={round}
+            title={sendQuestion}
+            changes="Nothing in the books. One message goes out, with the H1 variance summary."
+            reaches={`${kasane.company.name}’s controller. No one else.`}
+            confirmLabel="Send summary"
+            stopLabel="Don’t send"
+            onConfirm={() => onDecide?.('sent')}
+            onStop={() => onDecide?.('not-sent')}
+            outcome={outcome === 'sent' ? sentOutcome : outcome === 'not-sent' ? notSentOutcome : undefined}
+          />
+        </div>
+      </div>
+    </AgentBlock>
+  );
+}
+
+/**
+ * The Confirmation card: live, like the Agent block card (D6). It plays the
+ * summary, then the question, and waits for the visitor.
+ * - **Send summary** or **Don't send** puts the outcome where the buttons were,
+ *   and the component moves focus to it, so the outcome is what a screen
+ *   reader hears. The block's label says the state.
+ * - **Replay** then asks again with a new Confirmation, and hands focus to
+ *   Send summary.
+ */
+export function ConfirmationSpecimen() {
+  const { ref, frame, playing, play } = usePlayback({ frames: 2 });
+  const { announce, message } = useAnnouncer();
+  const [outcome, setOutcome] = useState<SendOutcome>('waiting');
+  const [round, setRound] = useState(0);
+  // Bumped when Replay finishes. Focus moves in an effect, after the render that
+  // reveals the question: in `play`'s callback the button is still invisible.
+  const [focusSend, setFocusSend] = useState(0);
+
+  useEffect(() => {
+    if (focusSend === 0) return;
+    // Replay unmounts with the outcome, so focus goes to the action that waits.
+    ref.current?.querySelector<HTMLButtonElement>('[data-slot="confirmation"] button:last-of-type')?.focus();
+  }, [focusSend, ref]);
+
+  const replay = () => {
+    setOutcome('waiting');
+    setRound((r) => r + 1);
+    play(() => {
+      setFocusSend((n) => n + 1);
+      announce('Awaiting confirmation.');
+    });
+  };
+
+  return (
+    <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
+      <div aria-busy={playing || undefined} className="flex flex-1 flex-col">
+        <SendSummary outcome={outcome} round={round} reached={frame >= 1} onDecide={setOutcome} />
+      </div>
+      {outcome !== 'waiting' ? (
+        <div className="flex justify-end">
+          <ReplayButton title="Confirmation" onClick={replay} />
+        </div>
+      ) : null}
+      <LiveRegion message={message} />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The other cards
 // ---------------------------------------------------------------------------
 
 const reasoningText = `Read ${packFile('trial_balance_monthly.csv')} and ${packFile('budget_forecast_monthly.csv')}. Translated each entity at budget rates, then compared H1 with budget.`;
@@ -737,6 +841,14 @@ function citationPair(): PairParts {
   };
 }
 
+function confirmationPair(): PairParts {
+  return {
+    before: <SendSummary outcome="waiting" />,
+    after: <SendSummary outcome="sent" />,
+    caption: 'Before it sends, you see what changes and who it reaches. Send summary sends it once.',
+  };
+}
+
 function agentBlockPair(): PairParts {
   return {
     before: <Proposal fixed="waiting" />,
@@ -795,6 +907,7 @@ const pairs: Record<string, () => PairParts> = {
   'attachment-row': attachmentPair,
   'inline-citation': citationPair,
   sources: sourcesPair,
+  confirmation: confirmationPair,
   'agent-block': agentBlockPair,
   'chat-thread': threadPair,
   'run-log-row': runLogPair,
