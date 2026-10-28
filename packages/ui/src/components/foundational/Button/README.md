@@ -17,12 +17,21 @@ import { Button } from 'tabular-ui';
 | Variant | Ground | Use |
 |---|---|---|
 | `default` | `--color-fill-interactive` + `--color-on-interactive` | Primary action. The interactive role (§1). |
-| `outline` | 1px `--color-border`, transparent | Secondary action beside a primary one |
-| `ghost` | transparent | Toolbars, table rows — anywhere a border would add noise |
+| `outline` | 1px `--color-border`, transparent | A secondary action that stands on its own: Replay, `EmptyState`'s action, `ChatComposer`'s Stop, `ChatStarter`'s suggestions. Not the other buttons of a decision. |
+| `ghost` | transparent | The other buttons of a decision (Cancel, Edit, "Don't add it"). Toolbars, table rows — anywhere a border would add noise |
 | `danger` | `--color-bg-danger` + `--color-text-danger` | Delete, drop, force-fail |
 | `inline` | none, no border, no padding, no hover fill | A control embedded in another component's structure: a sortable column header, a tree row |
 
 Only `danger` carries a hue. Everything else is neutral, per §0 rule 1 — colour means state, not hierarchy.
+
+**A decision's buttons are right-aligned, the action last, and the others `ghost`.** A decision is a group that answers one question: the action, as `default` (or `danger`), and the buttons that decline it, step back or edit first. `DialogFooter` (`flex justify-end`), `AgentPlan`'s Edit and Run plan, `AgentBlock`'s "Don't add it" and "Add dedupe step", and `Confirmation` all follow it. `outline` beside the action would make two bordered boxes of one question. The rule and its reasoning are §4 *Button groups* in `docs/design-system.md`.
+
+```tsx
+<div className="flex justify-end gap-[var(--gap-inline)]">
+  <Button variant="ghost">Cancel</Button>
+  <Button>Re-run</Button>
+</div>
+```
 
 **`danger`, not `destructive`.** Until 2026-10-10 this variant was `destructive`, while Badge, ProgressBar and every token called the same role `danger`. The old spelling still renders the same and logs a one-time warning in development (`foundational/dangerVariant.ts`); `buttonVariants({ variant: 'destructive' })` is honoured too. Lint rejects `variant="destructive"` and `variant: 'destructive'`, so new code uses `danger`. The deprecated spelling will be removed in a later, separate change.
 
