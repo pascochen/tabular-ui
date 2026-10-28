@@ -486,7 +486,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - The component page's menu is the library's `Menu`, with its keyboard behaviour. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`).
 
 **Content:**
-- Links make sense out of context, and no two links share a name but go to different places.
+- Links make sense out of context, and no two links share a name but go to different places. One exception, approved by the owner on 2026-10-27: on Home, a built component's jump-index link goes to its card and its card title to its page (step 5b, as built).
 - ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it.
 - Contrast is measured on the ground the text sits on, including the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
@@ -583,7 +583,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **Forced colours.** The Foundations mode panels and the Color ramps set `forced-color-adjust: none`: their colours are the content, and forced colours painted the interactive fill swatch the same as its panel. Every plate's frame and every filled site control keeps a border there, checked on four pages.
 - **Lighthouse,** mobile settings, the build served compressed as Vercel serves it, four runs each: Home 94, 96, 96, 94 (median 95), Agent block 96, 96, 95, 96 (median 96). Accessibility 100 and layout shift 0 on every run. Production before 5b scored 88 on Home. Home clears the bar by a point: the 122 KB serif is the largest thing left before its first paint.
 - **Tests** (`tests/quality.spec.ts`, with the route list now in `tests/routes.ts`): metadata on every route, unique titles and descriptions, the sitemap against the routes, robots, the image's size, no client-side links, every internal link and `#fragment` resolving, one destination per link name, ↗ on exactly the external links, nothing animating under reduced motion on every route, nothing fixed or sticky but the skip link (2.4.11), forced colours, and the font preloads.
-- **One link-name exception, waiting for the owner:** on Home, a built component's name in the jump index goes to its card, and the same name as the card's title goes to its page. The test allows exactly that pair, with its reason.
+- **One link-name exception, approved by the owner (2026-10-27):** on Home, a built component's name in the jump index goes to its card, and the same name as the card's title goes to its page. Both lead to the same component, and the jump index's label gives the first its context (2.4.4). The test allows exactly that pair, with its reason; any other shared name with two destinations still fails.
 - **External links** are checked by `scripts/check-links.mjs`, on demand: 14 links, none failed, LinkedIn checked by hand (it refuses scripts). Storybook answers any `?path=` with a 200, so the script checks each story id against Storybook's `index.json`.
 - **VoiceOver:** the owner's 10-step script is `docs/site-voiceover.md`. **`apps/site/README.md`** covers running the site, where its content comes from, and adding a page when a to-build component ships.
 - **For the library, not fixed here:** an expanded failed `RunLogRow` loses its tinted ground in forced colours. It keeps its words, so nothing is lost, but the row has no edge there.
