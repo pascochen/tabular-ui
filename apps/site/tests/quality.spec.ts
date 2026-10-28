@@ -175,9 +175,9 @@ test.describe('links', () => {
   // §11: no two links share a name but go to different places, and ↗ marks
   // exactly the links to another site, hidden from assistive technology.
   //
-  // One exception, waiting for the owner's approval (5b PR): on Home, a built
-  // component's name in the jump index goes to its card (`/#agent-plan`), and
-  // the same name as the card's title goes to its page. Both lead to the same
+  // One exception, approved by the owner on 2026-10-27 (after PR #31): on
+  // Home, a built component's name in the jump index goes to its card
+  // (`/#agent-plan`), and the same name as the card's title goes to its page. Both lead to the same
   // component, the jump index's label ("Components by moment") gives the first
   // its context (2.4.4), and the card it lands on holds the second.
   const jumpToCard = (route: string, name: string, hrefs: string[]) =>
