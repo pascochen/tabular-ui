@@ -123,10 +123,16 @@ function RunLogRow({
       )}
 
       {expandable && isOpen ? (
+        // No rail: §7.8 keeps a 2px edge for the agent rail, the focus ring
+        // and the active tab. The detail hangs past the caret column instead
+        // (padding, caret, gap), so its text starts where the row's first
+        // content after the caret does: the badge, or the timestamp when
+        // there is one. An agent-proposed row's rail takes its 2px off the
+        // row's own padding (runStatusRowTreatment), so that x holds there too.
         <div
+          data-slot="run-log-detail"
           className={cn(
-            'border-l-[length:var(--border-width-2)] border-l-border-strong',
-            'ml-[var(--pad-cell-x)] px-[var(--pad-cell-x)] py-[var(--pad-cell-y)]',
+            'pr-[var(--pad-cell-x)] pl-[calc(var(--pad-cell-x)*2+var(--size-icon-xs))] py-[var(--pad-cell-y)]',
             'font-mono text-xs whitespace-pre-wrap text-text-secondary',
           )}
         >
