@@ -10,7 +10,7 @@ import type { Route } from './+types/getting-started';
 export const meta: Route.MetaFunction = () =>
   pageMeta({
     title: 'Getting started · Tabular UI',
-    description: 'Install Tabular UI from npm, or copy the components’ source into your app with the shadcn registry.',
+    description: 'Copy Tabular UI’s components into your app with the shadcn registry, then add the tokens.',
     path: '/getting-started',
   });
 
@@ -57,29 +57,35 @@ export default function GettingStarted() {
         <Rail size="reading" className="flex flex-col gap-[var(--gap-group)]">
           <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Getting started</h1>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-            Two ways in: install the package from npm, or copy the components’ source into your app with the shadcn
-            registry. Both need React 19 and Tailwind CSS 4.
+            Tabular UI installs as source: the shadcn registry copies each component into your app, where you own it.
+            The app needs React 19, Tailwind CSS 4 and a components.json from shadcn init.
           </p>
         </Rail>
       </Section>
-
-      <Section labelledBy="npm-title">
+      <Section labelledBy="setup-title">
         <Rail size="reading" className="flex flex-col gap-[var(--site-gap)]">
-          <SectionHeader id="npm-title" title="Install the package" />
+          <SectionHeader
+            id="setup-title"
+            title="Set up with shadcn"
+            lead="Four steps, once per app. After that, each component page gives the one command that adds it."
+          />
           <ol role="list" className="flex flex-col gap-[var(--site-gap)]">
-            <Step title="Install">
-              <Code heading="Install" label="Install command" />
+            <Step title="Add components">
+              <Code heading="Install" label="Registry commands" />
               <p className={prose}>
-                Tailwind CSS 4.1 or later must already be set up in the app; for Vite, with @tailwindcss/vite.
+                Files land under components/tabular-ui/, and your own lib/utils is never replaced. Each component brings
+                what it imports.
               </p>
             </Step>
-            <Step title="Set up the stylesheet">
-              <p className={prose}>
-                The package ships its CSS as Tailwind source, compiled by your app’s Tailwind. Replace your stylesheet’s
-                own Tailwind import with these two lines. The second lets Tailwind see the classes the components use;
-                its path is relative to the stylesheet.
-              </p>
+            <Step title="Add the tokens">
               <Code heading="Set up the stylesheet" label="Stylesheet" />
+              <p className={prose}>
+                The tokens bring the fonts, the animations, Base UI’s state variants and a base layer, so delete the
+                copies shadcn init wrote: its :root, .dark, @theme inline and @custom-variant dark blocks, its @layer
+                base block (it halves the focus ring), and its shadcn/tailwind.css, font and tw-animate-css imports.
+                Then remove the packages it installed for them.
+              </p>
+              <Code heading="Set up the stylesheet" index={1} label="Packages to remove" />
             </Step>
             <Step title="Set up the app root">
               <p className={prose}>
@@ -87,9 +93,14 @@ export default function GettingStarted() {
                 control.
               </p>
               <Code heading="Set up the app root" label="App root" />
+              <p className={prose}>Without everything added, useTheme and TooltipProvider come from their own items.</p>
+              <Code heading="Set up the app root" index={1} label="Theme and tooltip items" />
             </Step>
             <Step title="Use">
+              <p className={prose}>With everything added, imports read from one index.</p>
               <Code heading="Use" label="Usage" />
+              <p className={prose}>A single component is imported from its own folder.</p>
+              <Code heading="Use" index={1} label="Importing one component" />
               <p className={prose}>
                 Every component, its props and its states are in{' '}
                 <a href={external.storybook.href} className={textLink}>
@@ -98,38 +109,6 @@ export default function GettingStarted() {
                 </a>
                 . In a Next.js App Router project, render them from a file marked ‘use client’.
               </p>
-            </Step>
-          </ol>
-        </Rail>
-      </Section>
-
-      <Section labelledBy="registry-title">
-        <Rail size="reading" className="flex flex-col gap-[var(--site-gap)]">
-          <SectionHeader
-            id="registry-title"
-            title="Or copy the source with shadcn"
-            lead="For apps that want the components in their own repository. The app must already be a shadcn project: Tailwind 4, the @/ alias, and a components.json from shadcn init."
-          />
-          <ol role="list" className="flex flex-col gap-[var(--site-gap)]">
-            <Step title="Add components">
-              <Code heading="Or copy the source with shadcn" index={0} label="Registry commands" />
-              <p className={prose}>
-                Files land under components/tabular-ui/, and your own lib/utils is never replaced. With everything
-                added, imports read from one index; a single component is imported from its own folder.
-              </p>
-              <Code heading="Or copy the source with shadcn" index={1} label="Importing one component" />
-            </Step>
-            <Step title="Add the tokens">
-              <Code heading="Or copy the source with shadcn" index={2} label="Stylesheet" />
-              <p className={prose}>
-                The tokens bring the fonts, the animations, Base UI’s state variants and a base layer, so delete the
-                copies shadcn init wrote: its :root, .dark, @theme inline and @custom-variant dark blocks, its @layer
-                base block (it halves the focus ring), and its shadcn/tailwind.css, font and tw-animate-css imports.
-              </p>
-            </Step>
-            <Step title="Theme and tooltips">
-              <p className={prose}>Without everything added, useTheme and TooltipProvider come from their own items.</p>
-              <Code heading="Or copy the source with shadcn" index={3} label="Theme and tooltip items" />
             </Step>
           </ol>
         </Rail>

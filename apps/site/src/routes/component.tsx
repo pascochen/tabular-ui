@@ -6,7 +6,7 @@ import { ExternalMark, Rail, Section } from '../components/layout';
 import { componentGrid, componentPage, components, pages, principles, storybookDocs } from '../content';
 import { cn } from '../lib/cn';
 import { focusRing, standaloneLink } from '../lib/styles';
-import { usage } from '../component-usage';
+import { install, usage } from '../component-usage';
 import { notFoundMeta, pageMeta } from '../lib/meta';
 import { ComponentPair } from '../specimens';
 import NotFound from './not-found';
@@ -219,14 +219,14 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
 
           <div className="flex flex-col gap-[var(--gap-group)]">
             <h2 className="text-site-title font-semibold text-text-primary">Install</h2>
-            <CopyCommand command={`pnpm dlx shadcn@latest add https://tabularui.com/r/${c.name}.json`} />
+            <CopyCommand command={install(c.name)} />
             <h3 className="pt-[var(--gap-inline)] text-site-small font-semibold text-text-primary">Usage</h3>
             <CodeView language="tsx" label={`${c.title} usage`}>
               {usage(c.name)}
             </CodeView>
             <p className="flex flex-wrap gap-x-[var(--site-gap)] gap-y-[var(--gap-inline)] text-site-small text-text-secondary">
               <a href={pages.gettingStarted.href} className={`${standaloneLink} text-text-body`}>
-                Set up the package first
+                Set up your app first
               </a>
               <a href={storybookDocs(c.name)} className={`${standaloneLink} text-text-body`}>
                 {c.title} in Storybook

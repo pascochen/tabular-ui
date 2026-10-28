@@ -42,6 +42,6 @@ That builds the package, then runs the demo with the package rebuilding on chang
 
 ## How it uses Tabular UI
 
-Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's published declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
+Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's built declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
 
 `src/components/` holds two components only this app needs: `StageTracker`, placed here deliberately (promote it into Tabular UI when a second screen needs it), and `DemoBanner`.

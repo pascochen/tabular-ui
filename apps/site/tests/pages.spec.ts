@@ -101,7 +101,9 @@ test.describe('a path with no page', () => {
 test.describe('getting started', () => {
   test('shows the README’s own commands', async ({ page }) => {
     await page.goto('/getting-started');
-    await expect(page.getByText('pnpm add tabular-ui @phosphor-icons/react')).toBeVisible();
+    await expect(page.getByText('pnpm dlx shadcn@latest add https://tabularui.com/r/all.json')).toBeVisible();
+    // Registry only (owner, 2026-10-28): no npm route.
+    await expect(page.getByText('pnpm add tabular-ui')).toHaveCount(0);
     await expect(page.getByText("@import './components/tabular-ui/tokens.css';")).toBeVisible();
   });
 });
@@ -329,7 +331,9 @@ test.describe('a component page', () => {
       const pairTop = await page.locator('#pair-title ~ figure').evaluate((el) => el.getBoundingClientRect().top);
       expect(await top(use)).toBeLessThan(pairTop);
       const usage = page.locator('pre').last();
-      await expect(usage).toContainText("from 'tabular-ui';");
+      // Imports come from the folders the registry writes, never from the npm package.
+      await expect(usage).toContainText("from '@/components/tabular-ui/");
+      await expect(usage).not.toContainText("from 'tabular-ui'");
       // Each name is imported once. Chat starter's first import line listed
       // ChatComposerHandle twice: its generic matched the JSX-tag pattern.
       const imported = (await usage.innerText())
@@ -369,7 +373,9 @@ test.describe('a component page', () => {
       .trim()
       .split('\n')[0];
     await expect(page.locator('pre').last()).toContainText(example);
-    await expect(page.locator('pre').last()).toContainText("import { RunLogRow } from 'tabular-ui';");
+    await expect(page.locator('pre').last()).toContainText(
+      "import { RunLogRow } from '@/components/tabular-ui/components/product/RunLogRow';",
+    );
   });
 });
 
