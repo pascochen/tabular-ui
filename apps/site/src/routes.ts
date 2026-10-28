@@ -9,6 +9,8 @@ export default [
   route('foundations/typography', 'routes/typography.tsx'),
   route('foundations/density', 'routes/density.tsx'),
   route('getting-started', 'routes/getting-started.tsx'),
+  // A resource route, prerendered to build/client/sitemap.xml (docs/site.md §12).
+  route('sitemap.xml', 'routes/sitemap.ts'),
   // Any other path. Prerendered at /404 (react-router.config.ts) and copied to 404.html.
   route('*', 'routes/not-found.tsx'),
 ] satisfies RouteConfig;

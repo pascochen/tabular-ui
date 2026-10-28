@@ -3,16 +3,16 @@ import { AgentBlock, AgentPlan, AgentReasoning, runStatuses, StatusBadge, type R
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { component, moments } from '../content';
 import { duplicatePayment } from '../data';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/vocabulary';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Vocabulary · Tabular UI' },
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Vocabulary · Tabular UI',
+    description:
       'The words Tabular UI uses for an agent run: its moments, the three ways it waits for a person, and its status words.',
-  },
-];
+    path: '/vocabulary',
+  });
 
 /**
  * The three components that stop the run for a person (wireframe `79:396`).

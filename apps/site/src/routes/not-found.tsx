@@ -1,9 +1,10 @@
 import { Rail, Section } from '../components/layout';
 import { pages } from '../content';
+import { notFoundMeta } from '../lib/meta';
 import { standaloneLink } from '../lib/styles';
 import type { Route } from './+types/not-found';
 
-export const meta: Route.MetaFunction = () => [{ title: 'Page not found · Tabular UI' }];
+export const meta: Route.MetaFunction = () => notFoundMeta;
 
 /**
  * The 404 (docs/site.md §3). Prerendered at /404 and copied to 404.html, which

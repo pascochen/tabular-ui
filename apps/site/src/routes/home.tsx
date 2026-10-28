@@ -1,14 +1,14 @@
 import { ComponentsSection } from '../component-grid';
 import { ClosingBand, HeroSection } from '../sections';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/home';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Tabular UI' },
-  {
-    name: 'description',
-    content: 'Dense React components and design tokens for finance and operations data tools, agentic UI included.',
-  },
-];
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Tabular UI',
+    description: 'Components that show how the agent reasoned, what it proposes and what a person approved.',
+    path: '/',
+  });
 
 /**
  * Home (wireframe `76:23`, mobile `77:96`): the hero, the component grid, and the
