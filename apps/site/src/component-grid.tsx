@@ -17,6 +17,7 @@ import {
   SourcesSpecimen,
   StatusSpecimen,
   ThreadSpecimen,
+  ToolSpecimen,
 } from './specimens';
 
 /** Each built component's specimen, at rest (docs/site.md §6). */
@@ -25,6 +26,7 @@ const specimens: Record<string, () => React.ReactNode> = {
   'chat-composer': ComposerSpecimen,
   'agent-reasoning': ReasoningSpecimen,
   'agent-plan': PlanSpecimen,
+  tool: ToolSpecimen,
   'lineage-tree': LineageSpecimen,
   'attachment-row': AttachmentSpecimen,
   'inline-citation': CitationSpecimen,

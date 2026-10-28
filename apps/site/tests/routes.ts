@@ -7,6 +7,7 @@ export const componentPages = [
   'chat-composer',
   'agent-reasoning',
   'agent-plan',
+  'tool',
   'lineage-tree',
   'attachment-row',
   'inline-citation',

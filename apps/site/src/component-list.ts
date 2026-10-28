@@ -83,6 +83,14 @@ export const entries: ComponentEntry[] = [
     title: 'Tool',
     moment: 'thinking',
     decision: 'An action says it’s done only after it ran. A failure says what to do next.',
+    useWhen: [
+      'The agent reads, searches or queries while it works, and people should see what it touched.',
+      'It makes several calls in a row. `ToolGroup` folds them into one line, and any failure stays in view.',
+    ],
+    avoidWhen: [
+      'The steps are a pipeline run, each with a status to scan. Use Run log row.',
+      'The agent is about to change something. Ask first with `Confirmation`, and show the call here once it has run.',
+    ],
   },
   {
     name: 'lineage-tree',

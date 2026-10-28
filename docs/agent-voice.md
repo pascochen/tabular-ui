@@ -136,11 +136,12 @@ The strings the product shows around agent output. *Source: `AgentReasoning`,
 writes "Nothing. Every part of the question was checked." for an empty one.
 `Confirmation` (2026-10-28) labels its two rows "What changes" and "Who it reaches".
 `Question` (2026-10-28) offers "Skip" and "Choose for me" beside its options, sends a field with "Answer", and labels a long list "Choose an answer".
+`Tool` (2026-10-28) writes each call twice, "Reading …" while it runs and "Read …" once it has, and a failure as what failed, then what happens next: "Couldn't match … to fields: it has no header row." / "I'll take both payments as the invoice file records them."
 
 | Kind | Form | Examples |
 |---|---|---|
-| In-progress status | Present participle, no subject, ends with the `…` character | Working… · Thinking… · Drafting step 3… |
-| Finished status | Past tense with the measure | Thought for 4s |
+| In-progress status | Present participle, no subject, ends with the `…` character | Working… · Thinking… · Drafting step 3… · Reading `bank_export_kjp_2026-09.csv`… |
+| Finished status | Past tense with the measure, only once it ran | Thought for 4s · Read 3 files |
 | Plan title | Verb phrase, sentence case, no period | Rebuild revenue model |
 | Plan description | One sentence, with a period | Switch revenue to net_amount and check the monthly totals still reconcile. |
 | Plan step | Imperative, one action, names its object, no period | Replace order_total with net_amount in fct_revenue |

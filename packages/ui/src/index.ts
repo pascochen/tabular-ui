@@ -272,6 +272,14 @@ export {
 export { Confirmation, type ConfirmationProps } from './components/product/Confirmation';
 export { Question, type QuestionAnswer, type QuestionOption, type QuestionProps } from './components/product/Question';
 export {
+  Tool,
+  ToolGroup,
+  type ToolCall,
+  type ToolGroupProps,
+  type ToolProps,
+  type ToolStatus,
+} from './components/product/Tool';
+export {
   ChatThread,
   type ChatThreadProps,
   type ChatTurn,

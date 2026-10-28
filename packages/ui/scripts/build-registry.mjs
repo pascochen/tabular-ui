@@ -91,6 +91,7 @@ const descriptions = {
   RunLogRow: 'One pipeline run in a log.',
   Sources: 'What an answer rests on, numbered, and what was not checked.',
   StatusBadge: 'A run or validation status.',
+  Tool: 'Each call the agent makes, as one line: what it’s doing, what it did, or what failed and what’s next. Sits inside an AgentBlock.',
   Toolbar: 'A row of controls above a table or view.',
   TruncatedText: 'Text cut to fit, with the full text in a tooltip.',
 };
@@ -113,6 +114,10 @@ const modules = {
     'Reads the danger variant and its retired spelling, destructive.',
   ],
   'components/product/workingLabel.tsx': ['working-label', 'The label a working state shows, with its elapsed time.'],
+  'components/product/announcement.ts': [
+    'announcement',
+    'useAnnouncement(): says a change once in a live region, then clears it.',
+  ],
 };
 
 const kebab = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
