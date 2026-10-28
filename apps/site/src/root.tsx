@@ -5,8 +5,28 @@ import { buttonVariants, TooltipProvider } from 'tabular-ui';
 import { SiteFooter } from './components/site-footer';
 import { SiteNav } from './components/site-nav';
 import { cn } from './lib/cn';
+import type { Route } from './+types/root';
 
 import './index.css';
+
+// The two faces the first screen uses (docs/site.md §12): the sans body and
+// the serif heading, Latin, upright. Preloaded so they arrive before the first
+// paint: when the sans came later, the hero's lead rewrapped on a phone and
+// pushed the specimen down (Lighthouse, 2026-10-27: CLS 0.165 of 0.166). They
+// are the files the package's stylesheet loads, imported by path because the
+// fonts are `packages/ui`'s dependency, not the site's; Vite gives both the
+// same hashed URL, and tests/quality.spec.ts checks they match.
+import sansUrl from '../../../packages/ui/node_modules/@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+import serifUrl from '../../../packages/ui/node_modules/@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-normal.woff2?url';
+
+export const links: Route.LinksFunction = () =>
+  [sansUrl, serifUrl].map((href) => ({
+    rel: 'preload',
+    href,
+    as: 'font',
+    type: 'font/woff2',
+    crossOrigin: 'anonymous' as const,
+  }));
 
 /**
  * The document every route renders into. The page is light only (docs/site.md

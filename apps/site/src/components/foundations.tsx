@@ -88,7 +88,10 @@ export function ModePair({
         <div
           key={mode}
           data-theme={mode === 'dark' ? 'dark' : undefined}
-          className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
+          // Out of forced colours: the panel's ground and every sample in it are
+          // what the page is showing, measured for contrast in their own mode, and
+          // forced colours would replace them with the system's (docs/site.md D4).
+          className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)] text-base text-text-body forced-color-adjust-none"
         >
           <p className="text-xs font-medium text-text-secondary">{mode === 'light' ? 'Light' : 'Dark'}</p>
           {children(mode)}

@@ -13,16 +13,16 @@ import {
   stepLabel,
   tokenStep,
 } from '../tokens';
+import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/color';
 
-export const meta: Route.MetaFunction = () => [
-  { title: 'Color · Tabular UI' },
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Color · Tabular UI',
+    description:
       'Five hues and a neutral, each named by the state it marks, in both modes, with every ratio measured on its ground.',
-  },
-];
+    path: '/foundations/color',
+  });
 
 /**
  * Every swatch paints the real token's utility, so the page shows what the
@@ -148,7 +148,12 @@ function Swatch({ step, hex }: { step: string; hex: string }) {
     <li className="flex flex-col gap-[var(--gap-bonded)]">
       {/* The measured hex from palette.json, read at build time: painting
           the palette is this page's one job that no token can do. */}
-      <span aria-hidden="true" className="h-8 border border-border" style={{ background: hex }} />
+      {/* Out of forced colours, like ModePair's panels: the colour is the content. */}
+      <span
+        aria-hidden="true"
+        className="h-8 border border-border forced-color-adjust-none"
+        style={{ background: hex }}
+      />
       <code className="text-2xs text-text-secondary">{step}</code>
     </li>
   );

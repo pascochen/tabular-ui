@@ -7,6 +7,7 @@ import { componentGrid, componentPage, components, pages, principles, storybookD
 import { cn } from '../lib/cn';
 import { focusRing, standaloneLink } from '../lib/styles';
 import { usage } from '../component-usage';
+import { notFoundMeta, pageMeta } from '../lib/meta';
 import { ComponentPair } from '../specimens';
 import NotFound from './not-found';
 import type { Route } from './+types/component';
@@ -75,7 +76,7 @@ function ComponentList({ current }: { current: string }) {
   return (
     <nav
       aria-labelledby="component-list-title"
-      className="sticky top-[var(--site-gap)] hidden flex-col gap-[var(--gap-inline)] lg:flex"
+      className="hidden flex-col gap-[var(--gap-inline)] lg:sticky lg:top-[var(--site-gap)] lg:flex"
     >
       <p id="component-list-title" className="text-site-small font-semibold text-text-secondary">
         All {built.length} components
@@ -130,8 +131,12 @@ function WhenList({ id, title, lines }: { id: string; title: string; lines: read
 export const meta: Route.MetaFunction = ({ params }) => {
   const c = find(params.name);
   return c
-    ? [{ title: `${c.title} · Tabular UI` }, { name: 'description', content: `${c.title}: ${c.decision}` }]
-    : [{ title: 'Page not found · Tabular UI' }];
+    ? pageMeta({
+        title: `${c.title} · Tabular UI`,
+        description: `${c.title}: ${c.decision}`,
+        path: componentPage(c.name),
+      })
+    : notFoundMeta;
 };
 
 /**
