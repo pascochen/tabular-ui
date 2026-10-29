@@ -447,6 +447,8 @@ The block is otherwise neutral: a 1px `--color-border` box with no ground of its
 
 **Agent-proposed rows take the same rail — decided 2026-10-21 (owner), after a side-by-side in Storybook.** Until then the run-state table above gave them a `--color-border-agent` rail, the tint this section had already rejected for the block: 1.39:1 against the tinted row in dark mode and 1.24:1 in light. Solid `--color-text-agent` measures 6.21:1 dark and 6.52:1 light on the tinted row, and 5.23:1 at worst when the row is hovered, so "agent" reads the same on a row as on a block. The rail is 2px of the row's own width, so the row gives up 2px of left padding and its content stays in line with its neighbours. In a table the first cell draws it: a separated-borders table paints no border on a `<tr>`, which is why `DataTable` had shown no rail at all. Both live in `runStatusRowTreatment`.
 
+**Rows in forced colours — decided 2026-10-29 (owner).** Forced colours (Windows high contrast) replace backgrounds with the system's, so a row whose state is shown by its tint alone loses that state there. Such a row draws a 1px outline instead, inside itself (negative offset), so its content keeps its x. It is an outline, not a border, because a border is geometry. Today the only such state is `failed`. An open `RunLogRow` draws the outline round the row and its detail together, so the error sits inside its row's edge. An agent-proposed row draws nothing extra: its rail is a border, and forced colours keep borders. Lives in `runStatusRowTreatment`.
+
 ---
 
 ## 6. Chart ramp

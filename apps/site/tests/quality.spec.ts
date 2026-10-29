@@ -270,8 +270,8 @@ test.describe('accessibility beyond axe', () => {
   // a ground drew is gone. Every plate's frame, and every site control or link
   // with a ground of its own (a filled or tinted button), must keep a border.
   // Ghost and inline controls have no ground at rest: they read as text there.
-  // Inside a plate are the library's components, whose own tests cover them
-  // (an expanded failed RunLogRow loses its tint here, and keeps its words).
+  // Inside a plate are the library's components, whose own tests cover them,
+  // and the failed run below.
   for (const route of ['/', '/components/agent-block', '/foundations/color', '/vocabulary']) {
     test(`${route}: in forced colours, every plate and filled control keeps a visible edge`, async ({ page }) => {
       await open(page, route);
@@ -307,6 +307,31 @@ test.describe('accessibility beyond axe', () => {
       expect(edgeless).toEqual([]);
     });
   }
+
+  // A failed run shows its state by its tint alone, which forced colours
+  // remove, so the library draws a 1px outline round the row and its open
+  // error together (design-system §5, 2026-10-29). Until then an expanded
+  // failed RunLogRow here had no edge at all. Painted, not just computed: the
+  // row's screenshot changes when the outline is taken away.
+  test('/components/run-log-row: in forced colours, the open failed run keeps an edge', async ({ page }) => {
+    await open(page, '/components/run-log-row');
+    await page.emulateMedia({ forcedColors: 'active' });
+    const run = page
+      .locator('[data-slot="run-log-row"]')
+      .filter({ has: page.locator('[data-status="failed"]') })
+      .filter({ has: page.locator('[data-slot="run-log-detail"]') })
+      .first();
+    await run.scrollIntoViewIfNeeded();
+    expect(
+      await run.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return [s.outlineStyle, s.outlineWidth, s.outlineOffset];
+      }),
+    ).toEqual(['solid', '1px', '-1px']);
+    const withEdge = await run.screenshot();
+    await run.evaluate((el) => el.style.setProperty('outline-style', 'none', 'important'));
+    expect(withEdge.equals(await run.screenshot()), 'the edge paints').toBe(false);
+  });
 
   // On the Foundations pages the colours are the content: the mode panels and
   // the ramps opt out of forced colours, so a sample still shows its colour.

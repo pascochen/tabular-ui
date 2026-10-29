@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { gotoStory, tabTo } from './helpers';
 
 /**
  * RunLogRow's open detail draws no rail and starts its text where the row's
@@ -64,4 +64,74 @@ for (const theme of ['dark', 'light'] as const) {
       if (c.story.endsWith('untimed')) expect(open.map((r) => r.status)).toContain('agent-proposed');
     });
   }
+}
+
+/**
+ * §5 — forced colours (Windows high contrast) removes backgrounds, so a row
+ * whose state is shown by its tint alone has no edge there. A failed row
+ * draws a 1px outline instead, inside itself so the content keeps its x.
+ * When it is open, the outline moves to the wrapper, so the error sits inside
+ * the same edge as its row, and the row draws none of its own: one edge, not
+ * two. Every other row draws nothing. An agent-proposed row keeps its rail,
+ * because forced colours keep borders.
+ *
+ * Until 2026-10-29 an open failed row had no edge at all in forced colours
+ * (docs/site.md, "For the library, not fixed here").
+ */
+const edgeCases = [
+  { story: 'product-runlogrow--with-detail', failedOpen: true },
+  { story: 'product-runlogrow--run-log', failedOpen: false },
+] as const;
+
+for (const c of edgeCases) {
+  test(`in forced colours, a failed row draws one 1px edge, others none — ${c.story}`, async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' });
+    await gotoStory(page, c.story);
+    const g = await page.evaluate(() => {
+      // No outline is `null`: Chrome reports the `medium` width (3px) when
+      // the style is `none`, so the width alone says nothing.
+      const outline = (el: Element) => {
+        const s = getComputedStyle(el);
+        return s.outlineStyle === 'none'
+          ? null
+          : { style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset };
+      };
+      return Array.from(document.querySelectorAll('[data-slot="run-log-row"]')).map((wrap) => {
+        const row = wrap.querySelector<HTMLElement>('[data-status]')!;
+        return {
+          status: row.dataset.status!,
+          open: wrap.querySelector('[data-slot="run-log-detail"]') !== null,
+          wrap: outline(wrap),
+          row: outline(row),
+          rail: getComputedStyle(row).borderLeftWidth,
+        };
+      });
+    });
+
+    const none = null;
+    const edge = { style: 'solid', width: '1px', offset: '-1px' };
+    const failed = g.filter((r) => r.status === 'failed');
+    expect(failed).toHaveLength(1);
+    expect(failed[0].open).toBe(c.failedOpen);
+    for (const r of g) {
+      const isFailed = r.status === 'failed';
+      expect(r.wrap, `${r.status}: wrapper`).toEqual(isFailed && r.open ? edge : none);
+      expect(r.row, `${r.status}: row`).toEqual(isFailed && !r.open ? edge : none);
+      if (r.status === 'agent-proposed') expect(r.rail, 'agent rail survives').toBe('2px');
+    }
+
+    // The open row gives its edge to the wrapper with forced-colors:outline-none,
+    // which must not take its focus ring too: the ring still draws, inset.
+    if (c.failedOpen) {
+      // The row's button; the StatusBadge inside it carries data-status too.
+      const row = page.locator('button[data-status="failed"]');
+      expect(await tabTo(page, row)).toBe(true);
+      expect(
+        await row.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return [s.outlineStyle, s.outlineWidth, s.outlineOffset];
+        }),
+      ).toEqual(['solid', '2px', '-2px']);
+    }
+  });
 }
