@@ -122,7 +122,7 @@ export function PreflightDialog({ open, onOpenChange, files, onConfirm }: Prefli
         ) : null}
 
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">Go back</Button>} />
+          <DialogClose render={<Button variant="ghost">Go back</Button>} />
           <Button disabled={unchecked > 0} onClick={onConfirm}>
             Start modeling
           </Button>
