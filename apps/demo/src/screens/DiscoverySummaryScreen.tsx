@@ -180,7 +180,7 @@ export function DiscoverySummaryScreen({ files, outcome, counts, onRestartAnalys
           View documents
         </Button>
         <span className="flex-1" />
-        <Button variant="outline" onClick={onRestartAnalysis}>
+        <Button variant="ghost" onClick={onRestartAnalysis}>
           <ArrowClockwiseIcon weight="bold" aria-hidden="true" />
           Restart analysis
         </Button>
