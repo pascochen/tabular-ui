@@ -26,8 +26,9 @@ const scale = [
   { token: '--text-md', className: 'text-md' },
   { token: '--text-lg', className: 'text-lg' },
   { token: '--text-xl', className: 'text-xl' },
-  { token: '--text-metric-sm', className: 'text-metric-sm font-display tabular-nums' },
-  { token: '--text-metric', className: 'text-metric font-display tabular-nums' },
+  // The metric tier at its weight, 600, as MetricTile sets it (§8.5).
+  { token: '--text-metric-sm', className: 'text-metric-sm font-display font-semibold tabular-nums' },
+  { token: '--text-metric', className: 'text-metric font-display font-semibold tabular-nums' },
 ];
 
 const firstFamily = (token: string) => themeToken(token).value.split(',')[0].replace(/['"]/g, '');

@@ -15,6 +15,7 @@ From the repository root:
 | `pnpm test:site` | The Playwright suite against that build: page checks and axe on every route, metadata, links, forced colours, reduced motion, the specimens. Build first. |
 | `node apps/site/scripts/check-links.mjs` | Request every link to another site, Storybook story ids included. Off the PR gate: run it before a release. |
 | `node apps/site/scripts/og-image.mjs` | Rewrite `public/og.png`, the social image, when the wordmark or the palette changes |
+| `python3 -I apps/site/scripts/serif-trim.py` | Rewrite the site's trimmed serif in `src/fonts/` when `@fontsource-variable/source-serif-4` changes. Needs fontTools and brotli; the script's header says how to install them out of the repository. A test fails until it's run. |
 
 **Lighthouse,** before a release, at mobile settings, against the build served as Vercel serves it (compressed):
 

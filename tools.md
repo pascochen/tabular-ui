@@ -127,6 +127,7 @@ Styling rules are **not** in this file. See `CLAUDE.md` for the non-negotiables 
 - **Family names carry a `Variable` suffix.** `@fontsource-variable/*` registers e.g. `"Source Code Pro Variable"`. A font stack naming only the plain form falls through to the system fallback and renders the wrong face silently. `apps/storybook/tests/density.spec.ts` asserts each family loads under that name.
 - `font-optical-sizing: auto` stays enabled, and drives Source Serif 4's `opsz` axis: the text cut for headings, the display cut for the metric tier. See `docs/design-system.md` §8.4.
 - If subsetting, verify the `tnum` and `zero` OpenType features survive. Subsetters strip unused features by default and both are mandatory.
+- **The site's serif is trimmed** (2026-10-29): `apps/site` draws headings from two committed cuts of Source Serif 4's Latin upright file, 600 and 400, each with every optical size, renamed Tabular Serif for the OFL. They're written by `apps/site/scripts/serif-trim.py` with fontTools, a Python tool installed outside the repository, not a dependency. Instancing keeps every glyph and feature (`tnum` included; the serif has no `zero`), checked on 2026-10-29. The library still ships the full file.
 
 ### Linting — the primary design system gate
 
@@ -306,6 +307,7 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | `node apps/site/scripts/check-links.mjs` | Request every external link in the built site, Storybook story ids included. Off the PR gate (`docs/site.md` §10): run on demand |
 | `pnpm dlx lighthouse@12 <url>` | Lighthouse on the served site build, at mobile settings. Not a dependency; how to run it is in `apps/site/README.md` |
 | `node apps/site/scripts/og-image.mjs` | Rewrite the site's social image from the wordmark and the palette |
+| `python3 -I apps/site/scripts/serif-trim.py` | Rewrite the site's trimmed serif (`apps/site/src/fonts/`) from the installed Source Serif 4. On demand, when that package changes; `apps/site/tests/quality.spec.ts` fails until it's run |
 | `pnpm --filter tabular-ui palette` | Regenerate the palette |
 | `pnpm --filter tabular-ui contrast` | Check every colour token's contrast |
 | `KASANE_DATA_DIR=… pnpm --filter tabular-ui-demo export-fixtures` | Rebuild the demo's, the stories' and the site's Kasane data from the full dataset (`onboarding/` included) |

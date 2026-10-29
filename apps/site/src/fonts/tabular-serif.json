@@ -1,0 +1,19 @@
+{
+  "note": "Written by apps/site/scripts/serif-trim.py. Do not edit.",
+  "source": "@fontsource-variable/source-serif-4@5.3.1",
+  "sourceFile": "source-serif-4-latin-opsz-normal.woff2",
+  "sourceSha256": "f2ea9c12d2fe9bd3a9589b02ad2c0909da88f30938c91adc838c4f4098f9f9e0",
+  "fontTools": "4.60.2",
+  "files": {
+    "tabular-serif-400.woff2": {
+      "weight": 400,
+      "bytes": 47160,
+      "sha256": "23dbda82e824f8c22f3f5881f90b412980eeebaa70fab6891fa0d215af0dfb7e"
+    },
+    "tabular-serif-600.woff2": {
+      "weight": 600,
+      "bytes": 50428,
+      "sha256": "52404c435a69ea72224aea1ef67675e75691c27c4053a7f7ffdae0c66e41093d"
+    }
+  }
+}
