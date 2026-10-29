@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
-import { ChatsIcon, HashIcon, HouseIcon, ListChecksIcon, TreeStructureIcon, UserIcon } from '@phosphor-icons/react';
+import { ChatsIcon, HouseIcon, ListChecksIcon, TreeStructureIcon, UserIcon } from '@phosphor-icons/react';
 import { AppShellPanelHeader } from 'tabular-ui';
 
 import { channels, lastClosedMonth, memberName } from '../lib/kasane';
 import type { View } from '../lib/view';
+import { ClosePanel } from '../components/ClosePanel';
 import { PanelPlaceholder, Placeholder, Profile } from './parts';
+import { SepCloseChannel } from './SepClose';
 
 /**
  * What one view puts in the shell's slots: the page header, the main body and,
@@ -53,13 +55,13 @@ export function slotsFor(view: View): ViewSlots {
   if (view.channel === 'sep-close') {
     return {
       title,
-      body: <Placeholder icon={HashIcon} title={channel.topic} description="The channel. Built in phase 4." />,
+      body: <SepCloseChannel />,
       panel: {
         label: `${lastClosedMonth} close`,
         content: (
           <>
             <AppShellPanelHeader title={`${lastClosedMonth} close`} />
-            <PanelPlaceholder title="The close panel" description="Progress, tiles and the decision log. Phase 4." />
+            <ClosePanel />
           </>
         ),
       },

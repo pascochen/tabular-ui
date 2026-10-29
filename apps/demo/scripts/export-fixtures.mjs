@@ -1026,6 +1026,8 @@ const closeExceptions = closeSource.exceptions.map((e) => {
       `follow-up ${e.waiting.followUp} exists`,
     );
   for (const s of finding.sources) must(packNames.has(s), `${s} (${e.id}) is a pack file`);
+  // Sources needs it (docs/agent-voice.md principle 4): [] says every part was checked.
+  must(Array.isArray(e.notChecked), `${e.id} says what wasn't checked (notChecked, [] for nothing)`);
   return fillAll({ ...e, claim: finding.claim, evidence: finding.evidence, sources: finding.sources });
 });
 

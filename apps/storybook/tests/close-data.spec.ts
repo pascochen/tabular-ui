@@ -25,6 +25,7 @@ type Exception = {
   replies: Reply[];
   resolution?: { by: string; log: string };
   waiting?: { followUp: string };
+  notChecked: string[];
 };
 type Close = {
   agent: { reads: string[]; setUpBy: string };
@@ -57,6 +58,10 @@ test('everyone who speaks, resolves or belongs is a person in people.json', () =
     close.agent.setUpBy,
   ];
   for (const key of named) expect(members, key).toContain(key);
+});
+
+test("every exception says what wasn't checked, [] for nothing", () => {
+  for (const e of close.exceptions) expect(Array.isArray(e.notChecked), e.id).toBe(true);
 });
 
 test('an unresolved exception waits on a follow-up that exists', () => {

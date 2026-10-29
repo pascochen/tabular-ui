@@ -4,6 +4,8 @@ import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, TruncatedText } 
 
 import { channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
 import { hrefFor, onViewLinkClick, sameView, useView, type View } from '../lib/view';
+import { useClose } from '../lib/close-context';
+import { progress } from '../lib/close-state';
 import { MemberAvatar } from './members';
 
 function NavLink({
@@ -34,15 +36,14 @@ function NavLink({
   );
 }
 
-/** Open exceptions at landing. Phase 6's store will drive it as they resolve. */
-const openAtLanding = close.exceptions.filter((e) => e.atLanding === 'open').length;
-
 /**
  * The sidebar: Home, the three channels and the direct messages. Every item
  * opens a view (`lib/view.ts`), because a dead link is where a three-minute
  * visitor leaves.
  */
 export function Sidebar() {
+  const { resolved, total } = progress(useClose().state);
+  const open = total - resolved;
   return (
     <AppShellNav aria-label="Workspace">
       <AppShellNavGroup>
@@ -59,13 +60,13 @@ export function Sidebar() {
             trailing={
               c.id === 'sep-close' ? (
                 <Badge shape="count" aria-hidden="true">
-                  {openAtLanding}
+                  {open}
                 </Badge>
               ) : undefined
             }
           >
             {c.name}
-            {c.id === 'sep-close' ? <span className="sr-only">, {openAtLanding} open</span> : null}
+            {c.id === 'sep-close' ? <span className="sr-only">, {open} open</span> : null}
           </NavLink>
         ))}
       </AppShellNavGroup>

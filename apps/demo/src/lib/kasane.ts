@@ -6,6 +6,7 @@ import checksData from '../../data/checks.json';
 import closeData from '../../data/close.json';
 import company from '../../data/company.json';
 import findingsData from '../../data/findings.json';
+import pack from '../../data/pack.json';
 import peopleData from '../../data/people.json';
 
 export const kasaneCompany = company;
@@ -57,6 +58,11 @@ export function memberName(key: string): string {
 export const directMessages = close.directMessages;
 
 export const checks = checksData;
+
+/** A file in Kasane's pack: its name and size, for a `Sources` row. No contents. */
+export function packFile(name: string): { name: string; bytes: number } | undefined {
+  return pack.find((f) => f.name === name);
+}
 
 export const findings: {
   contradictions: { id: string; claim: string; evidence: string; sources: string[] }[];

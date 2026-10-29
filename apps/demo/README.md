@@ -2,7 +2,9 @@
 
 The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exceptions workbench for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
 
-**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. The channel, the decision and the timeline follow, so most views show a placeholder that names the phase that builds it.
+**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. Phase 4 is `#sep-close` in its landing state: the agent's catch-up, six exception cards and the close panel. The decision and the timeline follow, and the other views show a placeholder that names the phase that builds them.
+
+**One store.** `src/lib/close-state.ts` holds each exception's status and replies, the decision log and each check's figure. The panel, the tiles and the sidebar's open count are derived from it.
 
 ## Playing it
 
@@ -40,4 +42,4 @@ That builds the package, then runs the demo with the package rebuilding on chang
 
 Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's built declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
 
-`src/components/` holds `DemoBanner`, which only this app needs. `src/shell/` is the sidebar and member avatars, and `src/views/` what each view puts in the shell's slots.
+`src/components/` holds what only this app needs: `DemoBanner`, `ExceptionCard` and `ClosePanel`. `src/shell/` is the sidebar and member avatars, and `src/views/` what each view puts in the shell's slots.
