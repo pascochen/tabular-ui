@@ -65,15 +65,12 @@
     U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* The one library token the site redefines: the serif family, so headings and
-   the metric tier take the trimmed faces. --font-heading reads it. */
+/* The site's layout values (docs/site.md §7): its own custom properties, under
+   --site- so none can shadow a library token. Space and width only. One
+   library token is redefined here on purpose, the serif family, so headings
+   and the metric tier take the trimmed faces above; --font-heading reads it. */
 :root {
   --font-display: 'Tabular Serif', 'Source Serif 4 Variable', 'Source Serif 4', 'Georgia', serif;
-}
-
-/* The site's layout values (docs/site.md §7): its own custom properties, under
-   --site- so none can shadow a library token. Space and width only. */
-:root {
   --site-pad-x: 16px;
   --site-section-y: 48px;
   --site-gap: 24px;
