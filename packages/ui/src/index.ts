@@ -286,6 +286,15 @@ export {
   type ChatUserTurn,
   type ChatAssistantTurn,
 } from './components/product/ChatThread';
+export {
+  ChannelMessage,
+  ChannelMessageList,
+  ChannelMessageReply,
+  type ChannelMessageAuthor,
+  type ChannelMessageListProps,
+  type ChannelMessageProps,
+  type ChannelMessageReplyProps,
+} from './components/product/ChannelMessage';
 export { ChatComposer, type ChatComposerHandle, type ChatComposerProps } from './components/product/ChatComposer';
 export { ChatStarter, type ChatStarterProps } from './components/product/ChatStarter';
 export { InlineCitation, type InlineCitationProps } from './components/product/InlineCitation';

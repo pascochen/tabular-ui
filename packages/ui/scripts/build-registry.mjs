@@ -69,6 +69,7 @@ const descriptions = {
   AppBar: 'The top bar: brand, navigation and actions.',
   AppShell: 'The page frame: sidebar, page header, panels and content width.',
   AttachmentRow: 'A file in a list: type icon, name, size and status.',
+  ChannelMessage: 'A member’s message in a multi-person channel, with inline replies.',
   ChatComposer: 'The message box, with send, attach and stop inside it.',
   ChatStarter: 'Suggested prompts for an empty conversation.',
   ChatThread: 'A conversation of user and assistant turns.',
