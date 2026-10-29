@@ -294,6 +294,7 @@ function asked(answer: QuestionAnswer | null): { authorship: string; outcome?: s
       outcome: `I chose all entities: KJP alone leaves out the ${duplicatePayment.entity} invoices.`,
     };
   const label = answer.kind === 'option' ? entityOptions.find((o) => o.id === answer.id)?.label : answer.text;
+  // Approved by the owner 2026-10-29; the other outcomes are still draft (docs/site.md).
   return { authorship: 'AI · Answered', outcome: `Answered by you: ${label}.` };
 }
 

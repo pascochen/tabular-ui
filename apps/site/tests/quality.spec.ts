@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 import { expect, test, type Page } from '@playwright/test';
@@ -116,12 +117,95 @@ test.describe('fonts', () => {
       .evaluateAll((links) => links.map((l) => new URL((l as HTMLLinkElement).href).pathname));
     expect(preloads).toHaveLength(2);
     expect(preloads[0]).toMatch(/\/source-sans-3-latin-wght-normal-[\w-]+\.woff2$/);
-    expect(preloads[1]).toMatch(/\/source-serif-4-latin-opsz-normal-[\w-]+\.woff2$/);
+    expect(preloads[1]).toMatch(/\/tabular-serif-600-[\w-]+\.woff2$/);
     for (const href of preloads)
       expect(
         fetched.filter((f) => f === href),
         href,
       ).toHaveLength(1);
+  });
+
+  // §12: the site's serif is the package's file cut to 600 and 400 by
+  // scripts/serif-trim.py. A page that asked for another weight, or text that
+  // fell through to the package's own serif, would fetch a second serif file
+  // on load. Specimens play as they scroll in, so each page is scrolled first.
+  test('every page draws its serif from the preloaded 600 file alone', async ({ page }) => {
+    const fetched: string[] = [];
+    page.on('request', (r) => {
+      if (r.url().endsWith('.woff2')) fetched.push(new URL(r.url()).pathname.split('/').pop()!);
+    });
+    for (const route of routes) {
+      fetched.length = 0;
+      await open(page, route);
+      await page.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += 600) {
+          window.scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 50));
+        }
+      });
+      await page.waitForLoadState('networkidle');
+      const serifs = fetched.filter((f) => /serif/.test(f));
+      expect(serifs, route).toHaveLength(1);
+      expect(serifs[0], route).toMatch(/^tabular-serif-600-/);
+    }
+  });
+
+  // The 400 file exists for one place, Inline citation's popover number.
+  test('the 400 serif loads when a citation opens, and the number is drawn in it', async ({ page }) => {
+    await open(page, '/components/inline-citation');
+    const fetched = page.waitForRequest((r) => /\/tabular-serif-400-[\w-]+\.woff2$/.test(r.url()));
+    await page.locator('main button:not([inert] button)').filter({ hasText: /^1$/ }).first().click();
+    await fetched;
+    const number = page.getByRole('dialog').locator('h2 span').filter({ hasText: /^1$/ });
+    await expect(number).toHaveCSS('font-weight', '400');
+    await expect.poll(() => page.evaluate(() => document.fonts.check('400 16px "Tabular Serif"'))).toBe(true);
+  });
+
+  // The heading renders in the trimmed face, not a fallback, and the face kept
+  // its optical sizes: the display cut at 60 is narrower than the text cut at 8
+  // (docs/design-system.md §8.4).
+  test('the hero heading renders in Tabular Serif, with its optical sizes', async ({ page }) => {
+    await open(page, '/');
+    await page.evaluate(() => document.fonts.ready);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('DOM.enable');
+    await cdp.send('CSS.enable');
+    const { root } = await cdp.send('DOM.getDocument');
+    const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#hero-title' });
+    const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+    expect(fonts.map((f) => f.familyName)).toEqual(['Tabular Serif']);
+    const widths = await page.evaluate(() =>
+      [8, 60].map((opsz) => {
+        const span = document.createElement('span');
+        span.textContent = 'Hamburgefonstiv';
+        span.style.cssText = `font: 600 32px "Tabular Serif"; font-variation-settings: 'opsz' ${opsz}; position: absolute`;
+        document.body.append(span);
+        const width = span.getBoundingClientRect().width;
+        span.remove();
+        return width;
+      }),
+    );
+    expect(widths[1]).toBeLessThan(widths[0] * 0.9);
+  });
+
+  // The trimmed files are generated and committed. They must come from the
+  // serif the package installs now, and nobody edits them by hand: run
+  // scripts/serif-trim.py when either check fails.
+  test('the trimmed serif matches the installed package', () => {
+    const fonts = new URL('../src/fonts/', import.meta.url);
+    const manifest = JSON.parse(readFileSync(new URL('tabular-serif.json', fonts), 'utf8')) as {
+      sourceSha256: string;
+      sourceFile: string;
+      files: Record<string, { sha256: string }>;
+    };
+    const hash = (url: URL) => createHash('sha256').update(readFileSync(url)).digest('hex');
+    const source = new URL(
+      `../../../packages/ui/node_modules/@fontsource-variable/source-serif-4/files/${manifest.sourceFile}`,
+      import.meta.url,
+    );
+    expect(hash(source), 'the package serif changed: run scripts/serif-trim.py').toBe(manifest.sourceSha256);
+    for (const [name, file] of Object.entries(manifest.files))
+      expect(hash(new URL(name, fonts)), name).toBe(file.sha256);
   });
 });
 
@@ -270,8 +354,8 @@ test.describe('accessibility beyond axe', () => {
   // a ground drew is gone. Every plate's frame, and every site control or link
   // with a ground of its own (a filled or tinted button), must keep a border.
   // Ghost and inline controls have no ground at rest: they read as text there.
-  // Inside a plate are the library's components, whose own tests cover them
-  // (an expanded failed RunLogRow loses its tint here, and keeps its words).
+  // Inside a plate are the library's components, whose own tests cover them,
+  // and the failed run below.
   for (const route of ['/', '/components/agent-block', '/foundations/color', '/vocabulary']) {
     test(`${route}: in forced colours, every plate and filled control keeps a visible edge`, async ({ page }) => {
       await open(page, route);
@@ -307,6 +391,31 @@ test.describe('accessibility beyond axe', () => {
       expect(edgeless).toEqual([]);
     });
   }
+
+  // A failed run shows its state by its tint alone, which forced colours
+  // remove, so the library draws a 1px outline round the row and its open
+  // error together (design-system §5, 2026-10-29). Until then an expanded
+  // failed RunLogRow here had no edge at all. Painted, not just computed: the
+  // row's screenshot changes when the outline is taken away.
+  test('/components/run-log-row: in forced colours, the open failed run keeps an edge', async ({ page }) => {
+    await open(page, '/components/run-log-row');
+    await page.emulateMedia({ forcedColors: 'active' });
+    const run = page
+      .locator('[data-slot="run-log-row"]')
+      .filter({ has: page.locator('[data-status="failed"]') })
+      .filter({ has: page.locator('[data-slot="run-log-detail"]') })
+      .first();
+    await run.scrollIntoViewIfNeeded();
+    expect(
+      await run.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return [s.outlineStyle, s.outlineWidth, s.outlineOffset];
+      }),
+    ).toEqual(['solid', '1px', '-1px']);
+    const withEdge = await run.screenshot();
+    await run.evaluate((el) => el.style.setProperty('outline-style', 'none', 'important'));
+    expect(withEdge.equals(await run.screenshot()), 'the edge paints').toBe(false);
+  });
 
   // On the Foundations pages the colours are the content: the mode panels and
   // the ramps opt out of forced colours, so a sample still shows its colour.
