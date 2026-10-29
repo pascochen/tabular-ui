@@ -1,6 +1,6 @@
 # Contributing to Tabular UI
 
-Tabular UI is a design system: one token layer, 18 foundational components, 31 product components, and the apps built on them. This guide is for people, designers and developers alike. `CLAUDE.md` holds the same rules written for AI agents, plus the failure log; when the two seem to disagree, `CLAUDE.md` and the spec win, and this file should be fixed.
+Tabular UI is a design system: one token layer, 18 foundational components, 32 product components, and the apps built on them. This guide is for people, designers and developers alike. `CLAUDE.md` holds the same rules written for AI agents, plus the failure log; when the two seem to disagree, `CLAUDE.md` and the spec win, and this file should be fixed.
 
 ## Read first
 

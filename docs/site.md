@@ -219,7 +219,7 @@ tabularui.com is the public front of Tabular UI for designers and engineers deci
 
 It is not the reference. Storybook (`storybook.tabularui.com`) holds every component, prop and state, and the site links to it rather than repeating it. It is not a sales page: there is no pricing, no sign-up, and no analytics, cookies or tracking.
 
-**The 15 are a subset.** The library has 49 components: 18 foundational and 31 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, all 15 built since 2026-10-28, when Tool was the last. The Components page says so in one line and links to Storybook for the rest.
+**The 15 are a subset.** The library has 50 components: 18 foundational and 32 product (`docs/components.md`). The site presents the 15 that make up an agent run, grouped into five moments, all 15 built since 2026-10-28, when Tool was the last. The Components page says so in one line and links to Storybook for the rest.
 
 ## 2. Sources of truth
 

@@ -625,6 +625,28 @@
       ]
     },
     {
+      "name": "channel-message",
+      "type": "registry:component",
+      "title": "ChannelMessage",
+      "description": "A member’s message in a multi-person channel, with inline replies.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/agent-block.json",
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/ChannelMessage/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/ChannelMessage/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "chat-composer",
       "type": "registry:component",
       "title": "ChatComposer",
@@ -1264,6 +1286,7 @@
         "https://tabularui.com/r/avatar.json",
         "https://tabularui.com/r/badge.json",
         "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/channel-message.json",
         "https://tabularui.com/r/chat-composer.json",
         "https://tabularui.com/r/chat-starter.json",
         "https://tabularui.com/r/chat-thread.json",
