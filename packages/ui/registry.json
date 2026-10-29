@@ -534,6 +534,7 @@
       "author": "Pascal Chenier",
       "dependencies": ["@phosphor-icons/react@^2.1.10"],
       "registryDependencies": [
+        "https://tabularui.com/r/announcement.json",
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/spinner.json",
         "https://tabularui.com/r/tokens.json",
@@ -1056,6 +1057,30 @@
       ]
     },
     {
+      "name": "tool",
+      "type": "registry:component",
+      "title": "Tool",
+      "description": "Each call the agent makes, as one line: what it’s doing, what it did, or what failed and what’s next. Sits inside an AgentBlock.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/announcement.json",
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/spinner.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json",
+        "https://tabularui.com/r/working-label.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/Tool/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Tool/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "toolbar",
       "type": "registry:component",
       "title": "Toolbar",
@@ -1205,6 +1230,22 @@
       ]
     },
     {
+      "name": "announcement",
+      "type": "registry:lib",
+      "title": "announcement",
+      "description": "useAnnouncement(): says a change once in a live region, then clears it.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        {
+          "path": "src/components/product/announcement.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/announcement.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:item",
       "title": "All of Tabular UI",
@@ -1216,6 +1257,7 @@
         "https://tabularui.com/r/agent-block.json",
         "https://tabularui.com/r/agent-plan.json",
         "https://tabularui.com/r/agent-reasoning.json",
+        "https://tabularui.com/r/announcement.json",
         "https://tabularui.com/r/app-bar.json",
         "https://tabularui.com/r/app-shell.json",
         "https://tabularui.com/r/attachment-row.json",
@@ -1264,6 +1306,7 @@
         "https://tabularui.com/r/textarea.json",
         "https://tabularui.com/r/theme-mode.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/tool.json",
         "https://tabularui.com/r/toolbar.json",
         "https://tabularui.com/r/tooltip.json",
         "https://tabularui.com/r/truncated-text.json",

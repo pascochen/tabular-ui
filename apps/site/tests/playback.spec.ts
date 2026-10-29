@@ -108,6 +108,52 @@ test.describe('the Agent block card', () => {
   });
 });
 
+test.describe('the Tool card', () => {
+  const tool = (page: Page) => card(page, 'tool');
+  const summary = (page: Page) => tool(page).getByRole('button', { name: 'Read 3 files' });
+
+  /** The card plays when it scrolls in, and rests on the three reads folded into one line. */
+  async function openCard(page: Page) {
+    await open(page, '/');
+    await tool(page).scrollIntoViewIfNeeded();
+    await expect(tool(page).locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 6000 });
+    await expect(summary(page)).toBeVisible();
+  }
+
+  test('rests on one line, folded, with the failure and its next step in view', async ({ page }) => {
+    await openCard(page);
+    await expect(summary(page)).toHaveAttribute('aria-expanded', 'false');
+    // Exact: the live region holds the same words, joined, for a few seconds after it announces them.
+    await expect(
+      tool(page).getByText('Couldn’t match bank_export_kjp_2026-09.csv to fields: it has no header row.', {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      tool(page).getByText('I’ll take both payments as the invoice file records them.', { exact: true }),
+    ).toBeVisible();
+  });
+
+  test('says a file was read only once it has been', async ({ page }) => {
+    await openCard(page);
+    await tool(page).getByRole('button', { name: 'Replay Tool' }).click();
+    // Mid-run the line says what's running, and the summary's past tense waits for the last read.
+    await expect(tool(page).getByRole('button', { name: /^Reading / })).toBeVisible();
+    await expect(summary(page)).toHaveCount(0);
+    await expect(summary(page)).toBeVisible({ timeout: 6000 });
+  });
+
+  test('opens to each read, and each read to what it found', async ({ page }) => {
+    await openCard(page);
+    await summary(page).click();
+    await expect(tool(page).getByRole('listitem')).toHaveCount(3);
+    await tool(page)
+      .getByRole('button', { name: /^Read supplier_invoices/ })
+      .click();
+    await expect(tool(page).getByText(/appears twice/)).toBeVisible();
+  });
+});
+
 test.describe('the Question card', () => {
   const question = (page: Page) => card(page, 'question');
   const option = (page: Page, name: string) => question(page).getByRole('button', { name });

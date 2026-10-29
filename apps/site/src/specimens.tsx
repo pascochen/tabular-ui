@@ -18,9 +18,11 @@ import {
   runStatuses,
   Sources,
   StatusBadge,
+  ToolGroup,
   type QuestionAnswer,
   type RunStatus,
   type Source,
+  type ToolCall,
 } from 'tabular-ui';
 
 import { duplicatePayment, h1Gap, kasane, packFile } from './data';
@@ -527,6 +529,91 @@ export function PlanSpecimen() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Tool: the reads behind the duplicate-payment answer (D5)
+// ---------------------------------------------------------------------------
+
+type Read = ToolCall & { id: string };
+
+/**
+ * The three files the answer read, in order. The first two are the answer's
+ * sources; the third is the pack's only bank export, and its failure is real:
+ * it has no header row (findings.json, bank-header), the same failure Run log
+ * row shows. The next step agrees with Sources' not-checked line.
+ */
+function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' | 'detail'> }[] {
+  const d = duplicatePayment;
+  return [
+    {
+      file: answerSources[0].name,
+      done: {
+        done: (
+          <>
+            Read <Ident>{answerSources[0].name}</Ident>
+          </>
+        ),
+        detail: (
+          <>
+            Supplier invoice <Ident>{d.supplierInvoice}</Ident> appears twice, as <Ident>{d.entries[0]}</Ident> and{' '}
+            <Ident>{d.reverse}</Ident>, <span className="tabular-nums">{d.amountLabel}</span> each.
+          </>
+        ),
+      },
+    },
+    {
+      file: answerSources[1].name,
+      done: {
+        done: (
+          <>
+            Read <Ident>{answerSources[1].name}</Ident>
+          </>
+        ),
+        detail: 'AP says the system blocks a repeated supplier invoice number.',
+      },
+    },
+    { file: packFile(bankFiles[0]) },
+  ];
+}
+
+/** The calls with the first `ran` finished and the next one running. All three have run when `ran` is 3. */
+function readCalls(ran: number): Read[] {
+  return reads()
+    .slice(0, ran + 1)
+    .map(({ file, done }, i): Read => {
+      const running = (
+        <>
+          Reading <Ident>{file}</Ident>
+        </>
+      );
+      if (i === ran) return { id: file, status: 'running', running, done: null };
+      if (done) return { id: file, status: 'done', running, ...done };
+      return {
+        id: file,
+        status: 'failed',
+        running,
+        error: (
+          <>
+            Couldn’t match <Ident>{file}</Ident> to fields: it has no header row.
+          </>
+        ),
+        next: 'I’ll take both payments as the invoice file records them.',
+      };
+    });
+}
+
+/** Tool: each file read in turn, then one line for all three, with the failure and its next step under it. */
+export function ToolSpecimen() {
+  return (
+    <Specimen title="Tool" frames={4}>
+      {(f) => (
+        <AgentBlock authorship="AI">
+          <ToolGroup summary="Read 3 files" calls={readCalls(f)} />
+        </AgentBlock>
+      )}
+    </Specimen>
+  );
+}
+
 const suggestions = ['Explain the H1 operating profit gap', question, 'Which customers pay later each month?'];
 
 /** Chat starter: suggestions written as a person would ask them. A pick fills the box and never sends. Approved 2026-10-28. */
@@ -854,6 +941,19 @@ function planPair(): PairParts {
   };
 }
 
+function toolPair(): PairParts {
+  const group = (ran: number) => (
+    <AgentBlock authorship="AI">
+      <ToolGroup summary="Read 3 files" calls={readCalls(ran)} />
+    </AgentBlock>
+  );
+  return {
+    before: group(2),
+    after: group(3),
+    caption: 'Each file says it was read only once it has been. A failure says what happens next.',
+  };
+}
+
 function lineagePair(): PairParts {
   const bridge = kasane.operatingBridge;
   const nodes = [
@@ -1002,6 +1102,7 @@ const pairs: Record<string, () => PairParts> = {
   'chat-composer': composerPair,
   'agent-reasoning': reasoningPair,
   'agent-plan': planPair,
+  tool: toolPair,
   'lineage-tree': lineagePair,
   'attachment-row': attachmentPair,
   'inline-citation': citationPair,
