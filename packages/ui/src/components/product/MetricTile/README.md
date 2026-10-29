@@ -32,7 +32,7 @@ Zero is neutral, never a hue (§5). §5 also restricts polarity colour to varian
 
 `value` and `delta` are rendered as given. Currency, locale and precision belong to the screen, which knows the user's locale and the account's currency; a tile that formatted `847200000` would have to guess both.
 
-`deltaValue` is the raw signed number and exists only to decide polarity.
+`deltaValue` is the raw signed number behind `delta`, and it decides both the arrow and the colour. The type makes the two go together: `delta` without `deltaValue` does not compile. A caller that gets past the type (plain JavaScript, a cast) gets the delta with no arrow, in `--color-text-secondary`. The tile cannot read a direction out of a formatted string, and a guessed arrow would state a direction nobody measured. Until 2026-10-28 it drew a down arrow there, whatever the delta said.
 
 ## Note
 

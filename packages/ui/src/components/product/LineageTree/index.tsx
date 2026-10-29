@@ -32,8 +32,12 @@ export type LineageTreeProps = {
  * (`--gap-tree-indent`). 12px is enough to read the nesting and tight enough
  * that a six-deep lineage still fits a panel — at 16px it would not.
  *
- * Renders `role="tree"` with `aria-level`, so depth is announced rather than
- * being purely visual. Indentation alone tells a screen reader nothing.
+ * Renders nested lists, so depth is announced rather than being purely
+ * visual: a screen reader names each list's nesting level. Indentation alone
+ * tells it nothing. Not `role="tree"`: that role promises one tab stop and
+ * arrow-key movement, which this does not implement. Each caret is a
+ * disclosure button carrying `aria-expanded`, and the selected node's name
+ * carries `aria-current`. See the README.
  *
  * Status is optional per node and comes from `StatusBadge`; the tree does not
  * decide what a failed model looks like.
@@ -51,7 +55,9 @@ function LineageTree({ nodes, defaultExpanded, selectedId, onSelect, className }
     });
 
   return (
-    <div role="tree" data-slot="lineage-tree" className={cn('w-full', className)}>
+    // role="list": Preflight's `list-style: none` drops list semantics in
+    // Safari, and the nesting level is the point.
+    <ul role="list" data-slot="lineage-tree" className={cn('w-full', className)}>
       {nodes.map((node) => (
         <LineageBranch
           key={node.id}
@@ -63,7 +69,7 @@ function LineageTree({ nodes, defaultExpanded, selectedId, onSelect, className }
           onSelect={onSelect}
         />
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -87,7 +93,7 @@ function LineageBranch({
   const isSelected = selectedId === node.id;
 
   return (
-    <div role="treeitem" aria-expanded={hasChildren ? isOpen : undefined} aria-level={depth + 1}>
+    <li>
       <div
         className={cn(
           'flex h-[var(--h-row-xs)] items-center gap-[var(--gap-control-icon)]',
@@ -107,6 +113,7 @@ function LineageBranch({
           <IconButton
             variant="inline"
             tooltip={false}
+            aria-expanded={isOpen}
             onClick={() => toggle(node.id)}
             aria-label={isOpen ? `Collapse ${node.name}` : `Expand ${node.name}`}
             className={cn(
@@ -128,6 +135,7 @@ function LineageBranch({
 
         <Button
           variant="inline"
+          aria-current={isSelected ? 'true' : undefined}
           onClick={() => onSelect?.(node)}
           className={cn(
             // `shrink` beats Button's shrink-0, or the name never truncates.
@@ -146,7 +154,7 @@ function LineageBranch({
       </div>
 
       {hasChildren && isOpen ? (
-        <div role="group">
+        <ul role="list">
           {node.children!.map((child) => (
             <LineageBranch
               key={child.id}
@@ -158,9 +166,9 @@ function LineageBranch({
               onSelect={onSelect}
             />
           ))}
-        </div>
+        </ul>
       ) : null}
-    </div>
+    </li>
   );
 }
 

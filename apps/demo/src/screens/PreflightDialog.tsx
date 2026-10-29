@@ -38,9 +38,15 @@ export type PreflightDialogProps = {
  * The rows and the flagged file are computed from the actual selection, not
  * canned: the CSV called out below really lacks a header row, because the
  * sniffer read it.
+ *
+ * A file whose check has not finished is shown as queued, never as passed,
+ * and the run cannot start until every check has a result. Until 2026-10-28
+ * an unchecked file read "passed" here, and confirming cancelled its check,
+ * so a CSV without a header could reach the run unflagged.
  */
 export function PreflightDialog({ open, onOpenChange, files, onConfirm }: PreflightDialogProps) {
   const flagged = files.filter((f) => f.status === 'needs-review');
+  const unchecked = files.filter((f) => f.status === 'queued').length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +65,11 @@ export function PreflightDialog({ open, onOpenChange, files, onConfirm }: Prefli
           {kindOrder.map((kind) => {
             const ofKind = files.filter((f) => f.kind === kind);
             if (ofKind.length === 0) return null;
-            const kindFlagged = ofKind.some((f) => f.status === 'needs-review');
+            const kindStatus = ofKind.some((f) => f.status === 'needs-review')
+              ? 'needs-review'
+              : ofKind.some((f) => f.status === 'queued')
+                ? 'queued'
+                : 'passed';
             const KindIcon = kindIcons[kind];
             return (
               <li key={kind} className="flex h-[var(--h-row-sm)] items-center gap-[var(--gap-inline)]">
@@ -73,7 +83,7 @@ export function PreflightDialog({ open, onOpenChange, files, onConfirm }: Prefli
                     the StatusBadge beside it carries the state. */}
                 <CountBadge label={fileKinds[kind].plural} count={ofKind.length} />
                 <span className="flex-1" />
-                <StatusBadge status={kindFlagged ? 'needs-review' : 'passed'} />
+                <StatusBadge status={kindStatus} />
               </li>
             );
           })}
@@ -104,9 +114,18 @@ export function PreflightDialog({ open, onOpenChange, files, onConfirm }: Prefli
           cancel early — everything already read is kept.
         </p>
 
+        {/* Says why Start modeling is disabled; it goes when the last check lands. */}
+        {unchecked > 0 ? (
+          <p className="text-sm text-text-secondary tabular-nums">
+            Checking {unchecked} {unchecked === 1 ? 'file' : 'files'}. The run can start when every file is checked.
+          </p>
+        ) : null}
+
         <DialogFooter>
           <DialogClose render={<Button variant="outline">Go back</Button>} />
-          <Button onClick={onConfirm}>Start modeling</Button>
+          <Button disabled={unchecked > 0} onClick={onConfirm}>
+            Start modeling
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

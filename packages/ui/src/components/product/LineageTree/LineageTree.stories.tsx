@@ -62,5 +62,5 @@ export const WithSelection: Story = {
   },
 };
 
-/** Collapsed to the root — `aria-expanded` and `aria-level` carry the structure. */
+/** Collapsed to the root — the carets' `aria-expanded` and the nested lists carry the structure. */
 export const Collapsed: Story = { args: { nodes: NODES, defaultExpanded: ['fct_gl_entries'] } };

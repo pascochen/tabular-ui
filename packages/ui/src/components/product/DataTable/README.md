@@ -51,6 +51,27 @@ Sort affordances are real `<button>`s with `aria-sort` on the header cell. Their
 
 Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per-state background swap.
 
+## Clickable rows
+
+`onRowClick` makes the whole row a pointer target. It is a shortcut for the mouse, not the way in: a `<tr>` is not a control, and it gets no `tabIndex`, because in a table of 50,000 rows that is 50,000 tab stops. **Whenever you pass `onRowClick`, render the row's identifier as a link or a `Button variant="inline"` that does the same thing.** That control is the keyboard path, the screen reader's path, and the thing a user can middle-click or copy.
+
+```tsx
+{
+  accessorKey: 'model',
+  header: 'Model',
+  meta: { content: 'mono' },
+  cell: ({ row }) => (
+    <Button variant="inline" onClick={() => open(row.original)}>
+      {row.original.model}
+    </Button>
+  ),
+}
+```
+
+A click on any control inside a row stays with that control: the identifier's own button, a selection checkbox or a row action never also fires `onRowClick`, and neither does a click inside a popup opened from the row. So the identifier's handler and `onRowClick` can be the same function without opening the row twice. The `ClickableRows` story shows the pattern and tests all three paths.
+
+`AttachmentRow` follows the same split outside a table: the filename is the link, and whole-row activation is left to `DataTable`.
+
 ## Columns with no visible header
 
 A selection or row-action column still needs a header name. Pass one that is visually hidden, never `''`:

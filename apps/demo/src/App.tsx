@@ -317,7 +317,8 @@ export function App() {
         files={files}
         onConfirm={() => {
           // Committing freezes validation: from here the recap must agree
-          // with the counts this dialog just showed.
+          // with the counts this dialog just showed. The dialog enables this
+          // only once every file is checked, so nothing pending is lost.
           cancelPendingValidation();
           setPreflightOpen(false);
           setPhase('reading');

@@ -81,17 +81,43 @@ test.describe('LineageTree — rows and carets', () => {
     await gotoStory(page, 'product-lineagetree--collapsed');
     const caret = page.getByRole('button', { name: 'Expand dim_accounts' });
     // Hold the element, not a locator: the caret's name flips to "Collapse"
-    // on success, and items nest, so a `has:` filter would match ancestors.
-    const item = await caret.evaluateHandle((el) => el.closest('[role="treeitem"]')!);
-    const expanded = () => item.evaluate((el) => el.getAttribute('aria-expanded'));
+    // on success.
+    const handle = await caret.elementHandle();
+    const expanded = () => handle!.evaluate((el) => el.getAttribute('aria-expanded'));
 
     expect(await expanded()).toBe('false');
+    await expect(page.getByText('stg_sap__skat')).toHaveCount(0);
     await caret.focus();
     await page.keyboard.press('Enter');
     await expect.poll(expanded).toBe('true');
     await expect(page.getByRole('button', { name: 'Collapse dim_accounts' })).toBeFocused();
+    // The child is a list item one list deeper than its parent: nesting is
+    // what a screen reader announces as depth.
+    const depth = (name: RegExp) =>
+      page.getByRole('button', { name }).evaluate((el) => {
+        let n = 0;
+        for (let p = el.parentElement; p; p = p.parentElement) if (p.tagName === 'UL') n++;
+        return n;
+      });
+    expect(await depth(/^stg_sap__skat/)).toBe((await depth(/^dim_accounts/)) + 1);
 
     // dim_calendar is a leaf: no Expand/Collapse control exists for it.
     await expect(page.getByRole('button', { name: /^(Expand|Collapse) dim_calendar$/ })).toHaveCount(0);
+  });
+
+  test('the selection is announced, and nothing claims to be a tree', async ({ page }) => {
+    await gotoStory(page, 'product-lineagetree--with-selection');
+    // role="tree" promises one tab stop and arrow keys, which this component
+    // does not implement. Nested lists promise nothing they don't deliver.
+    await expect(page.getByRole('tree')).toHaveCount(0);
+    await expect(page.getByRole('treeitem')).toHaveCount(0);
+
+    const accounts = page.getByRole('button', { name: /^dim_accounts/ });
+    const calendar = page.getByRole('button', { name: /^dim_calendar/ });
+    await expect(accounts).toHaveAttribute('aria-current', 'true');
+    await expect(calendar).not.toHaveAttribute('aria-current');
+    await calendar.click();
+    await expect(calendar).toHaveAttribute('aria-current', 'true');
+    await expect(accounts).not.toHaveAttribute('aria-current');
   });
 });
