@@ -53,6 +53,12 @@ export type DataTableProps<TData> = {
   virtualizeAfter?: number;
   /** Extra classes per row — how `runStatusRowTreatment` gets applied (§5). */
   rowClassName?: (row: Row<TData>) => string | undefined;
+  /**
+   * Whole-row activation, for the pointer. A `<tr>` is not a control, so the
+   * keyboard path is a link or button in the row's identifier cell that does
+   * the same thing. A click on any control inside the row belongs to that
+   * control and does not reach this. See the README.
+   */
   onRowClick?: (row: Row<TData>) => void;
   /** Rendered in place of the body when there are no rows. */
   empty?: React.ReactNode;
@@ -63,6 +69,23 @@ export type DataTableProps<TData> = {
 };
 
 const ROW_HEIGHT = 28; // --h-row-sm. Virtualization needs a number, not a var.
+
+const ROW_CONTROLS =
+  'a[href], button, input, select, textarea, label, [role="button"], [role="checkbox"], [role="switch"], [role="link"], [role="menuitem"]';
+
+/**
+ * Whether a click inside a row was meant for something other than the row: a
+ * control in one of its cells (the identifier's own link, a checkbox, a row
+ * action), or a popup portalled out of the row, whose clicks React still
+ * bubbles through the `<tr>`. Without this, clicking a cell's link would
+ * activate the row as well, and selecting a row would open it.
+ */
+function isClickForControl(event: React.MouseEvent<HTMLTableRowElement>) {
+  const target = event.target as Element;
+  if (!event.currentTarget.contains(target)) return true;
+  const control = target.closest(ROW_CONTROLS);
+  return control !== null && event.currentTarget.contains(control);
+}
 
 /**
  * DataTable — product.
@@ -232,7 +255,13 @@ function DataTable<TData>({
               <tr
                 key={row.id}
                 data-row-id={row.id}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onClick={
+                  onRowClick
+                    ? (event) => {
+                        if (!isClickForControl(event)) onRowClick(row);
+                      }
+                    : undefined
+                }
                 className={cn(
                   // §4 — one neutral overlay, composited. Not a per-state
                   // background swap.

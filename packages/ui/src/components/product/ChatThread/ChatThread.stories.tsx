@@ -228,6 +228,30 @@ export const AwaitingResponse: Story = {
 };
 
 /**
+ * A turn whose text is the number 0 still has text. In a finance tool, "how
+ * many entries failed?" can be answered with a bare figure, and a truthiness
+ * check dropped it: the answer vanished and "Working…" stayed for good.
+ */
+export const ZeroAnswer: Story = {
+  args: {
+    turns: [
+      { id: 'q-failed', role: 'user', text: 'How many journal entries failed to post?' },
+      { id: 'a-failed', role: 'assistant', text: 0 },
+    ],
+  },
+  render: (args) => (
+    <Panel>
+      <ChatThread {...args} />
+    </Panel>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('0')).toBeVisible();
+    await expect(canvas.queryByText('Working…')).toBeNull();
+  },
+};
+
+/**
  * Files sent with a question list above it, in the user's turn, so the thread
  * records what the agent was given. A message can be the files alone.
  */

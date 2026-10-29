@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { Button } from '../../foundational/Button';
 import { Checkbox } from '../../foundational/Checkbox';
 import { IconButton } from '../../foundational/IconButton';
 import { Input } from '../../foundational/Input';
@@ -195,6 +197,70 @@ export const WithSelectionAndFilter: Story = {
         </div>
       </div>
     );
+  },
+};
+
+/**
+ * Whole-row activation, with the keyboard path it needs. The row is the
+ * pointer's shortcut; the model name is a real button that does the same
+ * thing, and a click on it opens the row once, not twice.
+ */
+export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
+  args: { onOpen: fn() },
+  render: function ClickableStory(args) {
+    const [opened, setOpened] = useState<string | null>(null);
+    const data = useMemo(() => makeRows(8), []);
+    const open = (model: string) => {
+      setOpened(model);
+      args.onOpen(model);
+    };
+
+    const cols: ColumnDef<Model, unknown>[] = [
+      {
+        accessorKey: 'model',
+        header: 'Model',
+        meta: { content: 'mono' },
+        size: 260,
+        cell: ({ row }) => (
+          <Button variant="inline" className="max-w-full shrink" onClick={() => open(row.original.model)}>
+            <span className="truncate">{row.original.model}</span>
+          </Button>
+        ),
+      },
+      ...columns.slice(1),
+    ];
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-field)', height: 320 }}>
+        <p role="status" className="text-xs text-text-secondary">
+          {opened ? `Opened ${opened}` : 'No model open'}
+        </p>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <DataTable columns={cols} data={data} onRowClick={(row) => open(row.original.model)} />
+        </div>
+      </div>
+    );
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const status = canvas.getByRole('status');
+
+    // The pointer: anywhere on the row.
+    await userEvent.click(canvas.getAllByRole('cell', { name: 'a.kanzaki' })[0]);
+    await expect(status).toHaveTextContent('Opened fct_gl_entries_0');
+
+    // The keyboard: the identifier is a tab stop that opens the same row.
+    const second = canvas.getByRole('button', { name: 'dim_accounts_1' });
+    second.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(status).toHaveTextContent('Opened dim_accounts_1');
+
+    // A click on the identifier is the button's, not the row's as well.
+    await userEvent.click(canvas.getByRole('button', { name: 'stg_sap_bkpf_2' }));
+    await expect(status).toHaveTextContent('Opened stg_sap_bkpf_2');
+    // One call per open. Enter on the button and a click on it each bubble to
+    // the row; without the row's control guard this would be 5.
+    await expect(args.onOpen).toHaveBeenCalledTimes(3);
   },
 };
 

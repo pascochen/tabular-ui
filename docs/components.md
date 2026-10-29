@@ -65,7 +65,7 @@ variant.
 | DataTable | **built** | TanStack Table + Virtual (headless). 28px rows, sticky neutral header, virtualizes past 100 rows. `meta.align: 'numeric'` drives tabular-nums; `meta.content: 'mono'` for identifiers. |
 | MetricTile | **built** | The only user of `--font-display`. 32px hero / 24px grid tier, tracking 0. `higherIsBetter` decides delta polarity — direction is not goodness. |
 | RunLogRow | **built** | 24px via `--h-row-xs`. Composes `StatusBadge` + `runStatusRowTreatment`. Expands to show error detail when given `detail`. |
-| LineageTree | **built** | 24px rows, 12px indent per level via `--gap-tree-indent`. `role="tree"` with `aria-level`, so depth is announced, not only drawn. |
+| LineageTree | **built** | 24px rows, 12px indent per level via `--gap-tree-indent`. Nested lists with disclosure carets, so depth is announced, not only drawn. Not `role="tree"`, whose keyboard pattern it does not implement (2026-10-28). |
 | CodeView | **built** | Deliberately unhighlighted — syntax colour is decoration and would spend all five hues (§0 rule 1). Optional gutter; `highlightLines` marks an error line, which *is* state. Becomes a named, focusable region only when a line overflows, so the keyboard can scroll it. |
 | StatusBadge | **built** | §5's state mapping in one place. Nine statuses, each with an icon for the grayscale gate. Row treatments exported separately — a badge cannot tint its row. |
 | ProgressBar | **built** | 2/4px track, determinate or indeterminate, five roles via `tone` (was `role`, still honoured). `label` required — a bare bar announces nothing. |

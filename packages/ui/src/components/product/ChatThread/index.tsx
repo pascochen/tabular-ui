@@ -155,13 +155,13 @@ function UserTurn({ turn }: { turn: ChatUserTurn }) {
           ))}
         </ul>
       ) : null}
-      {turn.text ? <div className="whitespace-pre-wrap">{turn.text}</div> : null}
+      {hasText(turn.text) ? <div className="whitespace-pre-wrap">{turn.text}</div> : null}
     </div>
   );
 }
 
 function AssistantTurn({ turn }: { turn: ChatAssistantTurn }) {
-  const pending = !turn.reasoning && !turn.text && !turn.plan;
+  const pending = !turn.reasoning && !hasText(turn.text) && !turn.plan;
   return (
     <AgentBlock authorship={turn.authorship ?? 'AI'} meta={turn.meta}>
       <div className="flex flex-col gap-[var(--gap-group)]">
@@ -180,11 +180,20 @@ function AssistantTurn({ turn }: { turn: ChatAssistantTurn }) {
         ) : null}
         {turn.reasoning ? <AgentReasoning {...turn.reasoning} /> : null}
         {/* A div, not a <p>: the node may hold block content. */}
-        {turn.text ? <div className="whitespace-pre-wrap">{turn.text}</div> : null}
+        {hasText(turn.text) ? <div className="whitespace-pre-wrap">{turn.text}</div> : null}
         {turn.plan ? <AgentPlan {...turn.plan} /> : null}
       </div>
     </AgentBlock>
   );
+}
+
+/**
+ * Whether a turn's `text` draws anything. Not truthiness: a turn whose answer
+ * is the number 0 has text. An empty string does not, so a stream that has
+ * opened with `''` still shows the working indicator.
+ */
+function hasText(text: React.ReactNode) {
+  return text !== undefined && text !== null && typeof text !== 'boolean' && text !== '';
 }
 
 export { ChatThread };

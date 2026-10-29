@@ -2,17 +2,10 @@ import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from '@phosphor-icons/react';
 
 import { cn } from '../../../lib/utils';
 
-export type MetricTileProps = {
+type MetricTileBase = {
   label: string;
   /** Pre-formatted. The tile does not format — currency and locale are the caller's. */
   value: React.ReactNode;
-  /**
-   * Signed change against the comparison period. Pre-formatted for display;
-   * `deltaValue` carries the number that decides the colour.
-   */
-  delta?: React.ReactNode;
-  /** The signed number behind `delta`. Required for polarity to resolve. */
-  deltaValue?: number;
   /**
    * Whether an increase is good. **Set `false` for cost, error rate, latency,
    * days-to-close** — anything where up is bad. Direction and goodness are not
@@ -25,6 +18,22 @@ export type MetricTileProps = {
   size?: 'sm' | 'default';
   className?: string;
 };
+
+/**
+ * A delta comes with its number or not at all. The tile cannot read a
+ * direction out of a formatted string, so a `delta` without `deltaValue`
+ * would draw an arrow it had guessed.
+ */
+type MetricTileDelta =
+  | { delta?: undefined; deltaValue?: undefined }
+  | {
+      /** Signed change against the comparison period, pre-formatted for display. */
+      delta: React.ReactNode;
+      /** The signed number behind `delta`. It decides the arrow and the colour. */
+      deltaValue: number;
+    };
+
+export type MetricTileProps = MetricTileBase & MetricTileDelta;
 
 /**
  * MetricTile — product.
@@ -52,7 +61,9 @@ function MetricTile({
   // hue. `higherIsBetter` is what keeps a rising cost from rendering green.
   const good = deltaValue === undefined ? null : higherIsBetter ? deltaValue > 0 : deltaValue < 0;
   const flat = deltaValue !== undefined && Math.abs(deltaValue) < Number.EPSILON;
-  const DeltaIcon = flat ? MinusIcon : deltaValue !== undefined && deltaValue > 0 ? ArrowUpIcon : ArrowDownIcon;
+  // No number, no arrow: a JavaScript caller can still pass `delta` alone, and
+  // a guessed direction is worse than none.
+  const DeltaIcon = deltaValue === undefined ? null : flat ? MinusIcon : deltaValue > 0 ? ArrowUpIcon : ArrowDownIcon;
 
   return (
     <div
@@ -91,7 +102,7 @@ function MetricTile({
                 flat || good === null ? 'text-text-secondary' : good ? 'text-text-success' : 'text-text-danger',
               )}
             >
-              <DeltaIcon weight="bold" aria-hidden="true" className="size-[var(--size-icon-xs)]" />
+              {DeltaIcon ? <DeltaIcon weight="bold" aria-hidden="true" className="size-[var(--size-icon-xs)]" /> : null}
               {delta}
             </span>
           ) : null}
