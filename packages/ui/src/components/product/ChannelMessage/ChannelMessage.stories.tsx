@@ -238,3 +238,49 @@ export const Channel: Story = {
     await expect(within(list).getAllByRole('listitem')).toHaveLength(3);
   },
 };
+
+/**
+ * A run: the agent posts three exceptions in the same minute. The first
+ * message carries the avatar and the header; the next two are `continued`,
+ * so the run reads as one voice, each still in its own `AgentBlock`. Their
+ * name and time stay for a screen reader. Then a person's message starts a
+ * new run.
+ */
+export const Grouped: Story = {
+  args: Default.args,
+  render: () => (
+    <>
+      <ChannelMessage author={agent} time="09:04" dateTime="2026-10-16T09:04" authorship="AI">
+        Invoice <Ident>INV-KJP-2609-00363</Ident> is dated 30 Sep but was delivered 2 Oct.
+      </ChannelMessage>
+      <ChannelMessage author={agent} time="09:04" dateTime="2026-10-16T09:04" authorship="AI" continued>
+        KUS entered supplier invoice <Ident>MFL-58821</Ident> twice and paid $48,216.40 both times.
+      </ChannelMessage>
+      <ChannelMessage author={agent} time="09:04" dateTime="2026-10-16T09:04" authorship="AI" continued>
+        <Ident>JE-KUK-2608-00055</Ident> moved £18,400 from advertising to prepaid expenses.
+      </ChannelMessage>
+      <ChannelMessage author={controller} time="09:31" dateTime="2026-10-16T09:31">
+        Five is Japan. The group needs a sixth day for consolidation.
+      </ChannelMessage>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const items = [...canvasElement.querySelectorAll<HTMLElement>('[data-slot="channel-message"]')];
+    await expect(items).toHaveLength(4);
+    const [first, second, , person] = items;
+    // A continued message shows no avatar and no visible header...
+    await expect(second.querySelector('[data-slot="avatar"]')).toBeNull();
+    await expect(second.querySelector('[data-slot="channel-message-header"]')).toBeNull();
+    // ...but still names its author and time first, for a screen reader.
+    await expect(second.textContent?.startsWith('Close agent 09:04')).toBe(true);
+    await expect(second.querySelector('time')).toHaveAttribute('dateTime', '2026-10-16T09:04');
+    // Its body starts where the first message's body starts.
+    const bodyX = (li: HTMLElement) =>
+      li.querySelector('[data-slot="channel-message-body"]')!.getBoundingClientRect().left;
+    await expect(bodyX(second)).toBe(bodyX(first));
+    // A run sits --gap-field (8px) apart; a new author --gap-group (12px).
+    const gap = (a: HTMLElement, b: HTMLElement) => b.getBoundingClientRect().top - a.getBoundingClientRect().bottom;
+    await expect(gap(first, second)).toBe(8);
+    await expect(gap(items[2], person)).toBe(12);
+  },
+};
