@@ -596,6 +596,5 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **One link-name exception, approved by the owner (2026-10-27):** on Home, a built component's name in the jump index goes to its card, and the same name as the card's title goes to its page. Both lead to the same component, and the jump index's label gives the first its context (2.4.4). The test allows exactly that pair, with its reason; any other shared name with two destinations still fails.
 - **External links** are checked by `scripts/check-links.mjs`, on demand: 14 links, none failed, LinkedIn checked by hand (it refuses scripts). Storybook answers any `?path=` with a 200, so the script checks each story id against Storybook's `index.json`.
 - **VoiceOver:** the owner's 10-step script is `docs/site-voiceover.md`. The owner ran it on 2026-10-28, with nothing to report. **`apps/site/README.md`** covers running the site, where its content comes from, and adding a page when a to-build component ships.
-- **For the library, not fixed here:** an expanded failed `RunLogRow` loses its tinted ground in forced colours. It keeps its words, so nothing is lost, but the row has no edge there.
 
 The library PR for D1 ("AI working") can run in parallel with steps 1–3. It must merge before Vocabulary and the Status badge specimen are built.

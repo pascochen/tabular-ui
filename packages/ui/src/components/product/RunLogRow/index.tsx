@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
 import { StatusBadge } from '../StatusBadge';
-import { runStatusRowTreatment, type RunStatus } from '../StatusBadge/statuses';
+import { forcedColorsRowEdge, runStatusRowTreatment, type RunStatus } from '../StatusBadge/statuses';
 
 export type RunLogRowProps = {
   status: RunStatus;
@@ -51,6 +51,10 @@ function RunLogRow({
   const [uncontrolled, setUncontrolled] = useState(defaultOpen);
   const isOpen = open ?? uncontrolled;
   const expandable = detail !== undefined;
+  // A tint-only row's forced-colours edge (§5) goes round the row and its
+  // open detail together, so the error sits inside its row's edge: the
+  // wrapper draws it and the row draws none, one edge rather than two.
+  const edgeOnWrapper = expandable && isOpen && !!runStatusRowTreatment[status]?.includes(forcedColorsRowEdge);
 
   const setOpen = (next: boolean) => {
     if (open === undefined) setUncontrolled(next);
@@ -68,6 +72,7 @@ function RunLogRow({
     // Inset, so the ring survives a scrolling log with overflow:hidden (§4).
     'focus-visible:outline-offset-[-2px]',
     runStatusRowTreatment[status],
+    edgeOnWrapper && 'forced-colors:outline-none',
   );
 
   const cells = (
@@ -96,7 +101,7 @@ function RunLogRow({
   );
 
   return (
-    <div data-slot="run-log-row" className={cn('group/run', className)}>
+    <div data-slot="run-log-row" className={cn('group/run', edgeOnWrapper && forcedColorsRowEdge, className)}>
       {expandable ? (
         // The row is the disclosure, so it is the real control: `Button
         // variant="inline"`, as LineageTree's rows are, never a hand-styled

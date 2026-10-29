@@ -68,14 +68,32 @@ export const runStatuses = Object.fromEntries(
 ) as Record<RunStatus, RunStatusEntry>;
 
 /**
+ * §5 — forced colours (Windows high contrast) removes backgrounds, so a row
+ * whose state is shown by its tint alone has no edge there. It draws a 1px
+ * outline instead, inside itself (negative offset). An outline, not a border:
+ * a border is geometry and would push the content right (failure log,
+ * Switch). An agent-proposed row needs none, because its rail is a border and
+ * forced colours keep borders.
+ *
+ * Exported so `RunLogRow` can move the same edge to its wrapper when the row
+ * is open, and the error sits inside its row's edge.
+ */
+export const forcedColorsRowEdge = [
+  'forced-colors:outline-solid',
+  'forced-colors:outline-[length:var(--border-width)]',
+  'forced-colors:outline-offset-[calc(var(--border-width)*-1)]',
+].join(' ');
+
+/**
  * Row-level treatments §5 assigns to a status but which are **not** the
  * badge's job — a badge cannot tint the row it sits in.
  *
  * `DataTable`, `RunLogRow` and `AttachmentRow` read this; nothing else should.
  */
 export const runStatusRowTreatment: Partial<Record<RunStatus, string>> = {
-  // §5: "Failed → --color-text-danger + --color-bg-danger row tint"
-  failed: 'bg-bg-danger',
+  // §5: "Failed → --color-text-danger + --color-bg-danger row tint", and in
+  // forced colours, where the tint is gone, a 1px edge (2026-10-29).
+  failed: ['bg-bg-danger', forcedColorsRowEdge].join(' '),
   // §5: "Agent proposed → --color-bg-agent ground + solid --color-text-agent
   // left rail", the rail AgentBlock draws (2026-10-21). The tinted
   // --color-border-agent rail it replaces measured 1.38:1, under the 3:1 a
