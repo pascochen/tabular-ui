@@ -75,10 +75,25 @@ for (const route of routes) {
       expect(overflow).toBe(0);
     });
 
+    // Twice: the page as it arrives, and hydrated. Hydration starts after the
+    // first paint (src/lib/defer-hydration.ts), so the prerendered page is what
+    // a reader has until then, and all a visitor without JavaScript ever gets.
+    // Blocking the scripts holds it there; a long CodeView with no tab stop
+    // showed up only in this state (2026-10-29).
     for (const { name, width, height } of widths) {
-      test(`has no axe violations at WCAG 2.2 AA, ${name}`, async ({ page }) => {
+      test(`has no axe violations at WCAG 2.2 AA, ${name}, before hydration`, async ({ page }) => {
+        await page.route(/\.js$/, (r) => r.abort());
         await page.setViewportSize({ width, height });
         await page.goto(route);
+        await expect(page.locator('html')).not.toHaveAttribute('data-hydrated');
+        const { violations } = await new AxeBuilder({ page }).withTags(wcagTags).analyze();
+        expect(violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
+      });
+
+      test(`has no axe violations at WCAG 2.2 AA, ${name}, hydrated`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto(route);
+        await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
         const { violations } = await new AxeBuilder({ page }).withTags(wcagTags).analyze();
         expect(violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
       });

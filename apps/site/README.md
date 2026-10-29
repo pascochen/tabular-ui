@@ -27,7 +27,7 @@ node apps/site/tests/serve.mjs apps/site/build/client 8199
 pnpm dlx lighthouse@12 http://localhost:8199/ --only-categories=performance,accessibility --chrome-flags="--headless=new" --view
 ```
 
-Run each page several times and take the median: a single run varies by a point or two. The bar is 95 for Performance and Accessibility on Home and a component page (§12).
+Run each page several times and take the median: a single run varies by a point or two. The bar is 95 for Performance and Accessibility on Home and a component page (§12). Request every file once before the first run (the server compresses each file on its first request, and that run once scored a false 100), and write the Chrome and Lighthouse versions next to the scores: they're in the report's `environment.hostUserAgent` and `lighthouseVersion`. The same build scored 95 on 2026-10-27 and 86 on 2026-10-29, and without the versions nobody could say why.
 
 The **VoiceOver** pass is manual, by the owner: [`docs/site-voiceover.md`](../../docs/site-voiceover.md).
 
@@ -49,6 +49,7 @@ Nothing the site shows is typed twice. Each kind of content is read from the fil
 
 - Routes are in `src/routes.ts`, and each module in `src/routes/`. A new page also goes in `tests/routes.ts`, so every check covers it, and in the sitemap (`src/routes/sitemap.ts`).
 - **Every route's `meta` goes through `pageMeta()`** in `src/lib/meta.ts`: title, description, canonical URL (no trailing slash) and the Open Graph and Twitter tags. The 404 uses `notFoundMeta`, with no canonical and `noindex`.
+- **Hydration starts after the first paint.** `buildEnd` in `react-router.config.ts` strips React Router's module preloads from every prerendered page and starts its module script once the page has loaded and painted (`src/lib/defer-hydration.ts`). A page must read and navigate without JavaScript; only its buttons wait. The axe tests check each page with the scripts blocked as well as hydrated.
 - **Links are plain `<a>`**, never React Router's `<Link>`: every page is prerendered, and a full load moves focus and announces the title without any code. A test fails on any client-side link.
 - A link inside a sentence is `textLink`; a link that stands alone is `standaloneLink`; the nav's are ghost buttons (`src/lib/styles.ts`). ↗ (`ExternalMark`) marks a link to another site, and only those.
 
