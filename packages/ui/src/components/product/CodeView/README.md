@@ -26,4 +26,4 @@ The gutter is `sticky left-0` so line numbers stay pinned while long lines scrol
 
 ## Keyboard
 
-When a long line overflows, the view becomes a focusable region (`tabIndex={0}`, `role="region"`), so a keyboard user can Tab to it and scroll with the arrow keys (WCAG 2.1.1). Its name defaults to the language ("SQL code"); pass `label` to say what the code is. A snippet that fits gets no tab stop. Overflow is measured with a `ResizeObserver`, so resizing the container adds or removes the stop.
+When a long line overflows, the view becomes a focusable region (`tabIndex={0}`, `role="region"`), so a keyboard user can Tab to it and scroll with the arrow keys (WCAG 2.1.1). Its name defaults to the language ("SQL code"); pass `label` to say what the code is. A snippet that fits gets no tab stop. Overflow is measured with a `ResizeObserver`, so resizing the container adds or removes the stop. Until the first measure, the view is a focusable region: on a server-rendered or prerendered page the HTML arrives before React can measure, and a long line must be reachable by keyboard from the start. A snippet that fits loses its stop as soon as the component has hydrated.

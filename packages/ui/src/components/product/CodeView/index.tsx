@@ -42,8 +42,14 @@ function CodeView({ children, showLineNumbers, highlightLines, language, label, 
   // when it actually overflows: a tab stop on a snippet that fits is noise.
   // Measured, as in TruncatedText, so a resize that adds or removes overflow
   // adds or removes the stop.
+  //
+  // Scrollable until measured. A server-rendered or prerendered page shows
+  // the HTML before React hydrates and can measure, and a long line was
+  // unreachable by keyboard for that whole time (tabularui.com's Getting
+  // started, 2026-10-29). A stop on a snippet that fits, until the first
+  // measure removes it, is the cheaper mistake.
   const ref = useRef<HTMLDivElement>(null);
-  const [scrollable, setScrollable] = useState(false);
+  const [scrollable, setScrollable] = useState(true);
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
