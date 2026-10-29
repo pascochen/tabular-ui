@@ -1,6 +1,26 @@
+import { createRequire } from 'node:module';
+
 import { expect, test, type Page } from '@playwright/test';
 
 import { focusRingStyle, gotoStory, ringOverhang, tabTo } from './helpers';
+
+/**
+ * The axe the story tests run, resolved through `@storybook/addon-a11y`,
+ * which depends on it. axe-core is not a dependency of this package, and
+ * `@axe-core/playwright` only wraps this same script.
+ */
+const axePath = createRequire(import.meta.resolve('@storybook/addon-a11y')).resolve('axe-core/axe.min.js');
+
+declare global {
+  interface Window {
+    axe: {
+      run: (
+        context: Document,
+        options: { runOnly: { type: 'rule'; values: string[] } },
+      ) => Promise<{ violations: { nodes: { target: string[] }[] }[] }>;
+    };
+  }
+}
 
 /**
  * AppShell's behaviour is a function of viewport width, so it is tested here
@@ -298,6 +318,33 @@ test.describe('docked — at and above the 1280px floor', () => {
     await expect(skip).toBeInViewport();
     await page.keyboard.press('Enter');
     await expect(page.locator('main')).toBeFocused();
+  });
+
+  test('every region of the shell sits inside a landmark (axe `region`, whole page)', async ({ page }) => {
+    // The story tests scope axe to the story root, where `region` cannot
+    // fail: it judges content against the whole page's landmarks. The
+    // sidebar header, footer and the project block shipped outside every
+    // landmark, and only an axe run on a full app page (the Kasane demo)
+    // found it.
+    await gotoStory(page, 'product-appshell--expanded');
+    await page.addScriptTag({ path: axePath });
+    const targets = await page.evaluate(async () => {
+      // Storybook's own hidden screens (preparing, no preview, error) carry
+      // links to storybook.js.org ahead of the story. axe counts a link as a
+      // skip link only when no other link precedes it, so they made the
+      // shell's skip link a violation that no app page has.
+      document.querySelectorAll('body > .sb-wrapper').forEach((el) => el.remove());
+      const { violations } = await window.axe.run(document, { runOnly: { type: 'rule', values: ['region'] } });
+      return violations.flatMap((v) => v.nodes.map((n) => n.target.join(' ')));
+    });
+    expect(targets).toEqual([]);
+
+    // axe exempts buttons, so the switchers in the story's header and footer
+    // pass `region` on their own. A workspace name or the user's identity as
+    // plain text, as in the demo, does not. Both bands are in the landmark.
+    const sidebar = page.getByRole('region', { name: 'Sidebar' });
+    await expect(sidebar.locator('[data-slot="app-shell-sidebar-header"]')).toBeVisible();
+    await expect(sidebar.locator('[data-slot="app-shell-sidebar-footer"]')).toBeVisible();
   });
   test('clicking the top-nav toggle pins the sidebar — never an overlay', async ({ page }) => {
     await gotoStory(page, 'product-appshell--collapsed');
