@@ -5,7 +5,7 @@ Product. Each call the agent makes, as one line: what it's doing while it runs, 
 ```tsx
 <AgentBlock authorship="AI">
   <ToolGroup
-    summary="Read 2 files"
+    summary="Read 1 of 2 files"
     calls={[
       {
         id: 'invoices',
@@ -17,7 +17,7 @@ Product. Each call the agent makes, as one line: what it's doing while it runs, 
         id: 'bank',
         status: 'failed',
         running: 'Reading bank_export_kjp_2026-09.csv',
-        error: 'Couldn’t match bank_export_kjp_2026-09.csv to fields: it has no header row.',
+        error: 'Couldn’t read the columns in bank_export_kjp_2026-09.csv: it has no header row.',
         next: 'I’ll take both payments as the invoice file records them.',
       },
     ]}
@@ -70,8 +70,8 @@ The failure is the one hue: it's a state (§0 rule 1). Running and done are neut
 ## Copy
 
 - **`running`:** a verb in the present and the thing it acts on, in the data's own name: "Reading `supplier_invoices_fy2026_h1.csv`", "Searching `fct_revenue` for MFL-58821". No ellipsis: the line adds it. Sentence case, no period.
-- **`done`:** the same, in the past: "Read …", "Searched …". `summary` counts: "Read 3 files".
-- **`error`:** what failed, and why if known, in one sentence: "Couldn't match `bank_export_kjp_2026-09.csv` to fields: it has no header row." Never "Oops" and never "Sorry".
+- **`done`:** the same, in the past: "Read …", "Searched …". `summary` counts what ran: "Read 3 files", or "Read 2 of 3 files" when one failed, since a failed call wasn't read.
+- **`error`:** what failed, and why if known, in one sentence: "Couldn't read the columns in `bank_export_kjp_2026-09.csv`: it has no header row." Never "Oops" and never "Sorry".
 - **`next`:** what happens next, in the agent's "I": "I'll take both payments as the invoice file records them." Or what the person can do: "Re-export it with headers to include it."
 - **File and model names** in `--font-mono`, one step smaller (`--text-xs` in this `--text-sm` line, §8.3). The props take nodes for this.
 - A line holds a verb and one identifier. It wraps on a narrow panel, with the caret and spinner held to its first line, but anything more belongs in `detail`.

@@ -136,7 +136,7 @@ The strings the product shows around agent output. *Source: `AgentReasoning`,
 writes "Nothing. Every part of the question was checked." for an empty one.
 `Confirmation` (2026-10-28) labels its two rows "What changes" and "Who it reaches".
 `Question` (2026-10-28) offers "Skip" and "Choose for me" beside its options, sends a field with "Answer", and labels a long list "Choose an answer".
-`Tool` (2026-10-28) writes each call twice, "Reading …" while it runs and "Read …" once it has, and a failure as what failed, then what happens next: "Couldn't match … to fields: it has no header row." / "I'll take both payments as the invoice file records them."
+`Tool` (2026-10-28) writes each call twice, "Reading …" while it runs and "Read …" once it has, and a failure as what failed, then what happens next: "Couldn't read the columns in …: it has no header row." / "I'll take both payments as the invoice file records them."
 
 | Kind | Form | Examples |
 |---|---|---|

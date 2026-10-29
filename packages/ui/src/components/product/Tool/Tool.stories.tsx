@@ -45,14 +45,14 @@ const readInterview = {
       Read <Ident>{interview}</Ident>
     </>
   ),
-  detail: 'AP says the system blocks a repeated supplier invoice number in every entity.',
+  detail: 'In the interview, accounts payable says the system blocks repeated invoice numbers in every entity.',
 };
 
 /** The failure is real: the bank export has no header row (findings.json, bank-header). */
 const bankFailure = {
   error: (
     <>
-      Couldn’t match <Ident>{bank}</Ident> to fields: it has no header row.
+      Couldn’t read the columns in <Ident>{bank}</Ident>: it has no header row.
     </>
   ),
   next: 'I’ll take both payments as the invoice file records them.',
@@ -186,7 +186,7 @@ export const Group: Story = {
 export const GroupRunning: Story = {
   render: () => (
     <ToolGroup
-      summary="Read 3 files"
+      summary="Read 2 files"
       calls={[
         { ...readInvoices, id: 'invoices', status: 'done' },
         { ...readInterview, id: 'interview', status: 'running' },
@@ -196,16 +196,16 @@ export const GroupRunning: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('button', { name: `Reading ${interview}` })).toBeVisible();
-    await expect(canvas.queryByText('Read 3 files')).toBeNull();
+    await expect(canvas.queryByText('Read 2 files')).toBeNull();
   },
 };
 
 /** A failed call shows under the group's line, open or folded, with its next step. */
 export const GroupWithFailure: Story = {
-  render: () => <ToolGroup summary="Read 3 files" calls={withFailure} />,
+  render: () => <ToolGroup summary="Read 2 of 3 files" calls={withFailure} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const toggle = canvas.getByRole('button', { name: 'Read 3 files' });
+    const toggle = canvas.getByRole('button', { name: 'Read 2 of 3 files' });
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(canvas.getByText(/has no header row/)).toBeVisible();
     await expect(canvas.getByText(bankFailure.next)).toBeVisible();
@@ -215,7 +215,7 @@ export const GroupWithFailure: Story = {
 
 /** Opened: every call in order, the failure in its place. */
 export const GroupOpen: Story = {
-  render: () => <ToolGroup summary="Read 3 files" calls={withFailure} defaultOpen />,
+  render: () => <ToolGroup summary="Read 2 of 3 files" calls={withFailure} defaultOpen />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const items = canvas.getAllByRole('listitem');
@@ -232,7 +232,7 @@ export const InATurn: Story = {
   name: 'In a turn',
   render: () => (
     <div className="flex flex-col gap-[var(--gap-group)]">
-      <ToolGroup summary="Read 3 files" calls={withFailure} />
+      <ToolGroup summary="Read 2 of 3 files" calls={withFailure} />
       <p>
         Yes. Invoice <code className="font-mono text-sm">MFL-58821</code> was entered twice and paid twice,{' '}
         <span className="tabular-nums">$48,216.40</span> each time.

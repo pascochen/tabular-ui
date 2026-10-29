@@ -89,8 +89,9 @@ export function component(name: string): SiteComponent {
 export const moments = (
   [
     // Each line says what the moment holds, not what its title already says (owner, 2026-10-27).
+    // Thinking's names Tool's reads since 2026-10-29 (owner); not "actions": the agent changes nothing.
     { id: 'asking', title: 'Asking', line: 'Suggestions to start from, and the box you type in.' },
-    { id: 'thinking', title: 'Thinking', line: 'The agent’s reasoning and plan, shown while it works.' },
+    { id: 'thinking', title: 'Thinking', line: 'The agent’s reasoning, plan and reads, shown while it works.' },
     { id: 'showing', title: 'Showing', line: 'The figures, files and sources behind an answer.' },
     { id: 'waiting', title: 'Waiting', line: 'Where the run stops until a person answers or approves.' },
     { id: 'recording', title: 'Recording', line: 'What the run leaves on record, and its state.' },
