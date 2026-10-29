@@ -275,3 +275,66 @@ for (const theme of ['dark', 'light'] as const) {
     });
   }
 }
+
+/**
+ * §5 — in forced colours a failed row, whose state is shown by its tint
+ * alone, draws a 1px outline inside itself, because forced colours remove the
+ * tint. Checked in all three components that apply runStatusRowTreatment, as
+ * the rail is above: the outline is asserted computed, and painted (the row's
+ * screenshot changes when it is taken away), because a <tr>'s computed
+ * border once read 2px and painted nothing. An outline takes no width, so the
+ * content keeps a plain row's x, and a plain row draws none.
+ */
+const edgeCases = [
+  { story: 'product-runlogrow--run-log', rows: '#storybook-root div[data-status]:not([data-slot])' },
+  { story: 'product-datatable--default', rows: 'tbody tr[data-row-id]' },
+  { story: 'product-attachmentrow--states', rows: '[data-slot="attachment-row"]' },
+];
+
+for (const c of edgeCases) {
+  test(`in forced colours, a failed row draws a painted 1px edge, content in line — ${c.story}`, async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' });
+    await gotoStory(page, c.story);
+    await page.mouse.move(0, 0);
+    const result = await page.evaluate((c) => {
+      const rows = Array.from(document.querySelectorAll<HTMLElement>(c.rows)).filter((r) => r.offsetHeight > 0);
+      const textX = (row: HTMLElement) => {
+        const td = row.querySelector('td');
+        if (td) {
+          const range = document.createRange();
+          range.selectNodeContents(td);
+          return range.getBoundingClientRect().left - row.getBoundingClientRect().left;
+        }
+        return row.firstElementChild!.getBoundingClientRect().left - row.getBoundingClientRect().left;
+      };
+      const outline = (el: HTMLElement) => {
+        const s = getComputedStyle(el);
+        // Chrome reports the `medium` width when the style is `none`.
+        return s.outlineStyle === 'none'
+          ? null
+          : { style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset };
+      };
+      // A tint is an unprefixed bg-bg-* class: every row also has hover:bg-bg-hover.
+      const tint = (r: HTMLElement) => Array.from(r.classList).find((k) => k.startsWith('bg-bg-'));
+      const failed = rows.find((r) => tint(r) === 'bg-bg-danger')!;
+      const plain = rows.find((r) => !tint(r))!;
+      failed.dataset.probe = 'failed';
+      return {
+        failed: outline(failed),
+        plain: outline(plain),
+        failedX: textX(failed),
+        plainX: textX(plain),
+      };
+    }, c);
+
+    expect(result.failed).toEqual({ style: 'solid', width: '1px', offset: '-1px' });
+    expect(result.plain).toBeNull();
+    expect(result.failedX).toBeCloseTo(result.plainX, 1);
+
+    const row = page.locator('[data-probe="failed"]');
+    const withEdge = await row.screenshot();
+    await row.evaluate((el) => el.style.setProperty('outline-style', 'none', 'important'));
+    const withoutEdge = await row.screenshot();
+    expect(withEdge.equals(withoutEdge), 'the edge paints').toBe(false);
+  });
+}
