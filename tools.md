@@ -256,12 +256,14 @@ Verify takes about 25–27 minutes and is capped at 45 (raised from 30 on 2026-1
 A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-10-24) targets the default branch, with an empty bypass list:
 
 - **Required check: `Verify`, pinned to GitHub Actions** (app 15368), so no other app can satisfy it by posting a check with that name. **If the CI job is ever renamed, update the rule in the same PR**, or nothing can merge.
-- **Up to date with `main` before merging.** When `main` moves, "Update branch" and Verify runs again on the combination.
+- **Not required to be up to date with `main`** (owner, 2026-10-29). A PR merges on its own Verify, run against the `main` it last saw. Until then the ruleset required an up-to-date branch, and on 2026-10-29 that turned five green PRs into about an hour of back-to-back runs, with an "Update branch" between each. A merge queue would keep the guarantee without the wait, but GitHub offers one only on organization-owned repositories, and this one belongs to a personal account.
+- **Auto-merge is allowed** (Settings → General). "Enable auto-merge" (squash) on a PR merges it once Verify passes, so a batch of green PRs lands without anyone waiting on each.
+- **`main`'s own run checks the combination.** Every push to `main` runs Verify in full (12–21 min). Two PRs can pass alone and fail together: a screenshot rendered before the other PR changed a component, an export the other PR renamed. That now shows up on `main`, after the merge. Fix it forward in a PR straight away. A PR's Verify tests its merge with `main`, so while `main` is red every PR fails with it.
 - **Pull requests only:** no direct pushes, no force pushes, no deleting the branch, admins included: a rule an admin can skip gets skipped.
 - **Squash merges only.**
 - **No approving review required** while there is one contributor (GitHub doesn't let you approve your own PR). Raise it, and add `CODEOWNERS`, when there's a second.
 - **Docs-only PRs still pass**: their skipped Verify reports success, which satisfies the rule.
-- **A `Verify` check can come from a job other than `verify`.** The `Visual changes` job creates one on the commit it pushes, which is the verified commit plus that run's screenshots (see "Visual regression"). The up-to-date rule still forces a real run whenever `main` moves.
+- **A `Verify` check can come from a job other than `verify`.** The `Visual changes` job creates one on the commit it pushes, which is the verified commit plus that run's screenshots (see "Visual regression"). Without the up-to-date rule, that commit can merge onto a `main` that moved after its run; `main`'s push run is what then tests the two together.
 
 ### Package
 
@@ -338,7 +340,7 @@ Note: there is no `test:ui`. It was ambiguous between Vitest UI mode and "test t
 
 Reviewing one:
 
-- **It merges on the Verify its PR page shows**, like any other PR. Branch protection blocks the merge until Verify passes and the branch is up to date (see "Branch protection").
+- **It merges on the Verify its PR page shows**, like any other PR. Branch protection blocks the merge until Verify passes (see "Branch protection").
 - **If Visual regression fails, a dependency changed how something renders.** Fonts, Tailwind and Base UI are the likely ones. Open the diff report: an unintended change is a regression to fix or the update to decline, not a baseline to approve. If it is intended, the `update-visual-baselines` label works as on any PR.
 - **A Base UI update** is the one to read closely. The foundational behaviour tests (`apps/storybook/tests/tabs.spec.ts`, `dialog.spec.ts`, the menu and switcher specs) are what pin its behaviour. If it adds an entry point a component uses, add it to `optimizeDeps.include` in `apps/storybook/vite.config.ts`, as `tabular-ui > <entry>` (see the failure log).
 - **Never fix one by hand-editing the lockfile.** Comment `@dependabot rebase` or `@dependabot recreate` on the PR instead. To skip a version, comment `@dependabot ignore this minor version` (or `major`, or `dependency`).
