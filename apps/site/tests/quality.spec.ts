@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 import { expect, test, type Page } from '@playwright/test';
 
+import { deferHydration } from '../src/lib/defer-hydration';
 import { canonicalUrl, siteOrigin, socialImage } from '../src/lib/meta';
 import { componentPages, routes } from './routes';
 
@@ -206,6 +207,52 @@ test.describe('fonts', () => {
     expect(hash(source), 'the package serif changed: run scripts/serif-trim.py').toBe(manifest.sourceSha256);
     for (const [name, file] of Object.entries(manifest.files))
       expect(hash(new URL(name, fonts)), name).toBe(file.sha256);
+  });
+});
+
+test.describe('hydration', () => {
+  // §12: hydration starts after the page has painted. React Router's preloads
+  // and its eager module script are replaced at build time by a loader
+  // (src/lib/defer-hydration.ts), so no JavaScript competes with the CSS and
+  // fonts the first paint needs.
+  test('no page preloads modules or runs a module script on load', async ({ request }) => {
+    for (const route of routes) {
+      const html = await (await request.get(route)).text();
+      expect(html, route).not.toContain('rel="modulepreload"');
+      expect(html, route).not.toContain('<script type="module"');
+      expect(html.match(/function hydrate\(\)/g), route).toHaveLength(1);
+    }
+  });
+
+  test('every page fetches its scripts only after it has loaded, then hydrates', async ({ page }) => {
+    for (const route of routes) {
+      await open(page, route);
+      const { loaded, firstScript } = await page.evaluate(() => {
+        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const scripts = performance
+          .getEntriesByType('resource')
+          .filter((r) => new URL(r.name).pathname.endsWith('.js'))
+          .map((r) => r.startTime);
+        return { loaded: navigation.loadEventStart, firstScript: Math.min(...scripts) };
+      });
+      expect(loaded, route).toBeGreaterThan(0);
+      expect(firstScript, route).toBeGreaterThanOrEqual(loaded);
+    }
+  });
+
+  // The transform throws on markup it doesn't know, so a React Router upgrade
+  // that changes it fails the build instead of shipping a page that never
+  // hydrates.
+  test('the transform refuses markup it does not recognise', () => {
+    const page = (body: string) => `<html><head></head><body>${body}</body></html>`;
+    const boot = '<script type="module" async="">window.__reactRouterRouteModules = {};</script>';
+    expect(() => deferHydration(page(''))).toThrow(/found 0/);
+    expect(() => deferHydration(page(boot + boot))).toThrow(/found 2/);
+    expect(() => deferHydration(page('<script type="module">import "/a.js";</script>'))).toThrow(/RouteModules/);
+    const deferred = deferHydration(page('<link rel="modulepreload" href="/a.js"/>' + boot));
+    expect(deferred).not.toContain('modulepreload');
+    expect(deferred).toContain(String.raw`s.textContent="window.__reactRouterRouteModules = {};"`);
+    expect(deferHydration(page(boot.replace('{}', '"</script>"')))).not.toMatch(/"<\/script>"/);
   });
 });
 

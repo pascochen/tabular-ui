@@ -296,7 +296,7 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | `pnpm dev:site` | The site, with the package rebuilding on change |
 | `pnpm storybook` | Storybook dev server |
 | `pnpm build` | The package, the registry, Storybook, the demo, then the site |
-| `pnpm build:site` | The site only: React Router prerenders every route into `apps/site/build/client`. Needs the package built. |
+| `pnpm build:site` | The site only: React Router prerenders every route into `apps/site/build/client`, then its `buildEnd` hook defers hydration on every page until after the first paint (`apps/site/src/lib/defer-hydration.ts`, `docs/site.md` §12). Needs the package built. |
 | `pnpm build:ui` | The package only |
 | `pnpm build:registry` | `registry.json` and the registry JSON in `apps/storybook/public/r` |
 | `pnpm lint` | ESLint + Stylelint + Prettier, failing on any warning. **Run this first.** |
