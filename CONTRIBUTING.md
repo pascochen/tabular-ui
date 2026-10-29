@@ -165,7 +165,7 @@ Baselines are Linux-only, because fonts render differently on a Mac, so `pnpm te
 
 ## Merging
 
-- **GitHub enforces the gate.** A ruleset on `main` accepts changes only through a pull request, once Verify has passed on its latest commit and the branch is up to date with `main`. If `main` moved while you waited, use "Update branch" and let Verify run again. Nobody can push to `main` directly, the owner included. No approving review is required yet.
+- **GitHub enforces the gate.** A ruleset on `main` accepts changes only through a pull request, once Verify has passed on its latest commit. The branch doesn't have to be up to date with `main` (since 2026-10-29): enable auto-merge and the PR merges when Verify passes. Each merge runs Verify again on `main`. If that run fails, fix it in a PR straight away, because every PR's Verify tests its merge with `main` and fails along with it. Nobody can push to `main` directly, the owner included. No approving review is required yet.
 - **Squash merge** (the only method allowed), so `main` gets one commit per PR, titled "Summary (#123)".
 - **Never write GitHub's skip-CI marker** (square brackets around "skip ci") anywhere in a commit message or PR title. A squash merge copies it into `main` and skips CI there too.
 
