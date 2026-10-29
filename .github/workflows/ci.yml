@@ -223,8 +223,9 @@ jobs:
   # rather than waiting for a second 20-minute run that GitHub would hold for
   # approval anyway (a commit pushed by Actions can't start a workflow on its
   # own). That run still appears as "awaiting approval"; approving it is
-  # harmless. If main moves, branch protection's up-to-date rule forces a real
-  # run, so the shortcut never covers code Verify didn't test.
+  # harmless. The branch need not be up to date with main (2026-10-29), so this
+  # commit can merge onto a main that moved after Verify ran; main's own push
+  # run then tests the two together (tools.md, "Branch protection").
   #
   # Write access, so it installs no dependencies and runs no repo code: git,
   # gh and the files Verify uploaded.
