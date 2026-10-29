@@ -210,8 +210,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
 
           <section aria-labelledby="pair-title">
             {/* Hidden, not absent: a component's own heading inside the pair (AgentPlan's
-              <h3>) must not follow the page's <h1> with a level skipped. */}
-            <h2 id="pair-title" className="sr-only">
+              <h3>) must not follow the page's <h1> with a level skipped. Semibold
+              like every heading, so it draws from the preloaded serif and doesn't fetch
+              the 400 file (index.css). */}
+            <h2 id="pair-title" className="sr-only font-semibold">
               Before and after
             </h2>
             <ComponentPair name={c.name} />

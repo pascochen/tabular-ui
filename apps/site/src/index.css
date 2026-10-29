@@ -34,7 +34,44 @@
   --text-site-small--line-height: 1.25rem;
 }
 
-/* The site's layout values (docs/site.md §7): its only custom properties, under
+/* The serif, trimmed for the site (docs/site.md §12). The package's face holds
+   every weight from 200 to 900 in one 122 KB file, and the hero's heading waited
+   on it before its first paint. These are the same Latin upright file cut to one
+   weight each by scripts/serif-trim.py, with every optical size kept: 600, which
+   root.tsx preloads, and 400, which only Inline citation's popover number uses,
+   so the browser fetches it only when one opens. Renamed for the font's licence
+   (fonts/OFL.txt), which reserves "Source" for the unmodified font. The range is
+   the package's Latin range; anything outside it falls through to the package's
+   own faces, named next in the stack. */
+@font-face {
+  font-family: 'Tabular Serif';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/tabular-serif-600.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Tabular Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/tabular-serif-400.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* The one library token the site redefines: the serif family, so headings and
+   the metric tier take the trimmed faces. --font-heading reads it. */
+:root {
+  --font-display: 'Tabular Serif', 'Source Serif 4 Variable', 'Source Serif 4', 'Georgia', serif;
+}
+
+/* The site's layout values (docs/site.md §7): its own custom properties, under
    --site- so none can shadow a library token. Space and width only. */
 :root {
   --site-pad-x: 16px;
