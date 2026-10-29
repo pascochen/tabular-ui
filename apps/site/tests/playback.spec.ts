@@ -110,7 +110,7 @@ test.describe('the Agent block card', () => {
 
 test.describe('the Tool card', () => {
   const tool = (page: Page) => card(page, 'tool');
-  const summary = (page: Page) => tool(page).getByRole('button', { name: 'Read 3 files' });
+  const summary = (page: Page) => tool(page).getByRole('button', { name: 'Read 2 of 3 files' });
 
   /** The card plays when it scrolls in, and rests on the three reads folded into one line. */
   async function openCard(page: Page) {
@@ -125,7 +125,7 @@ test.describe('the Tool card', () => {
     await expect(summary(page)).toHaveAttribute('aria-expanded', 'false');
     // Exact: the live region holds the same words, joined, for a few seconds after it announces them.
     await expect(
-      tool(page).getByText('Couldn’t match bank_export_kjp_2026-09.csv to fields: it has no header row.', {
+      tool(page).getByText('Couldn’t read the columns in bank_export_kjp_2026-09.csv: it has no header row.', {
         exact: true,
       }),
     ).toBeVisible();
@@ -134,7 +134,7 @@ test.describe('the Tool card', () => {
     ).toBeVisible();
   });
 
-  test('says a file was read only once it has been', async ({ page }) => {
+  test('says Read only once a file is done', async ({ page }) => {
     await openCard(page);
     await tool(page).getByRole('button', { name: 'Replay Tool' }).click();
     // Mid-run the line says what's running, and the summary's past tense waits for the last read.

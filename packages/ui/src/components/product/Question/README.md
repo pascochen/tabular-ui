@@ -81,7 +81,7 @@ Groups are `--gap-group` (12px) apart.
 - **Title:** one question, sentence case, with its question mark. It names the options: "all of them, or KJP only?" (`docs/agent-voice.md`).
 - **Options:** a word or a few, each the whole answer: "All entities", "KJP only". Never "Yes" and "No" to a question that names two things.
 - **Fixed strings:** "Skip", "Choose for me", "Answer", and the `Select`'s placeholder, "Choose an answer".
-- **Outcome:** what was answered, by whom. "Answered by you: KJP only." For Skip, what the agent does instead: "Skipped. I'll cover all entities, and say so in the summary." For Choose for me, what it chose and why: "I chose all entities: KJP alone leaves out the KUS invoices."
+- **Outcome:** what was answered, by whom. "Answered by you: KJP only." For Skip, what the agent does instead: "Skipped by you. I'll cover all entities, and say so in the summary." For Choose for me, what it chose and why: "I chose all entities: KJP alone leaves out the KUS invoices."
 - **The block's label** says the state: "AI · Awaiting your answer", then "AI · Answered" or "AI · Skipped".
 
 ## Not here

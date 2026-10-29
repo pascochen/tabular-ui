@@ -287,14 +287,16 @@ const entityOptions = [
 function asked(answer: QuestionAnswer | null): { authorship: string; outcome?: string } {
   if (!answer) return { authorship: 'AI · Awaiting your answer' };
   if (answer.kind === 'skip')
-    return { authorship: 'AI · Skipped', outcome: 'Skipped. I’ll cover all entities, and say so in the summary.' };
+    return {
+      authorship: 'AI · Skipped',
+      outcome: 'Skipped by you. I’ll cover all entities, and say so in the summary.',
+    };
   if (answer.kind === 'delegate')
     return {
       authorship: 'AI · Decided',
       outcome: `I chose all entities: KJP alone leaves out the ${duplicatePayment.entity} invoices.`,
     };
   const label = answer.kind === 'option' ? entityOptions.find((o) => o.id === answer.id)?.label : answer.text;
-  // Approved by the owner 2026-10-29; the other outcomes are still draft (docs/site.md).
   return { authorship: 'AI · Answered', outcome: `Answered by you: ${label}.` };
 }
 
@@ -569,7 +571,7 @@ function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' 
             Read <Ident>{answerSources[1].name}</Ident>
           </>
         ),
-        detail: 'AP says the system blocks a repeated supplier invoice number.',
+        detail: 'In the interview, accounts payable says the system blocks repeated invoice numbers.',
       },
     },
     { file: packFile(bankFiles[0]) },
@@ -594,7 +596,7 @@ function readCalls(ran: number): Read[] {
         running,
         error: (
           <>
-            Couldn’t match <Ident>{file}</Ident> to fields: it has no header row.
+            Couldn’t read the columns in <Ident>{file}</Ident>: it has no header row.
           </>
         ),
         next: 'I’ll take both payments as the invoice file records them.',
@@ -608,7 +610,7 @@ export function ToolSpecimen() {
     <Specimen title="Tool" frames={4}>
       {(f) => (
         <AgentBlock authorship="AI">
-          <ToolGroup summary="Read 3 files" calls={readCalls(f)} />
+          <ToolGroup summary="Read 2 of 3 files" calls={readCalls(f)} />
         </AgentBlock>
       )}
     </Specimen>
@@ -945,13 +947,13 @@ function planPair(): PairParts {
 function toolPair(): PairParts {
   const group = (ran: number) => (
     <AgentBlock authorship="AI">
-      <ToolGroup summary="Read 3 files" calls={readCalls(ran)} />
+      <ToolGroup summary="Read 2 of 3 files" calls={readCalls(ran)} />
     </AgentBlock>
   );
   return {
     before: group(2),
     after: group(3),
-    caption: 'Each file says it was read only once it has been. A failure says what happens next.',
+    caption: 'Each line changes from Reading to Read only when the file is done. A failure says what happens next.',
   };
 }
 

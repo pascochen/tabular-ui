@@ -84,7 +84,7 @@ export const entries: ComponentEntry[] = [
     moment: 'thinking',
     decision: 'An action says it’s done only after it ran. A failure says what to do next.',
     useWhen: [
-      'The agent reads, searches or queries while it works, and people should see what it touched.',
+      'The agent reads, searches or queries while it works, and people should see what it used.',
       'It makes several calls in a row. `ToolGroup` folds them into one line, and any failure stays in view.',
     ],
     avoidWhen: [
@@ -158,8 +158,8 @@ export const entries: ComponentEntry[] = [
       'The answers fit in a word or a few: up to four as buttons, more in a list.',
     ],
     avoidWhen: [
-      'One reading is far more likely. Answer it, and say which reading you took.',
-      'The agent is asking to act. Use `Confirmation`.',
+      'One meaning is far more likely. The agent should go with it and say so.',
+      'The agent needs permission to act. Use `Confirmation`.',
     ],
   },
   {

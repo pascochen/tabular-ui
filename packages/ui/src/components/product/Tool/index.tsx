@@ -37,7 +37,7 @@ export type ToolCall = {
     }
   | {
       status: 'failed';
-      /** What failed, and why if known: "Couldn't match … to fields: it has no header row." */
+      /** What failed, and why if known: "Couldn't read the columns in …: it has no header row." */
       error: React.ReactNode;
       /**
        * What happens next, in the agent's words: "I'll take both payments as

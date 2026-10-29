@@ -144,7 +144,7 @@ export const Decide: Story = {
       a.kind === 'option'
         ? `Answered by you: ${entities.find((e) => e.id === a.id)?.label}.`
         : a.kind === 'skip'
-          ? 'Skipped. I’ll cover all entities, and say so in the summary.'
+          ? 'Skipped by you. I’ll cover all entities, and say so in the summary.'
           : 'I chose all entities: KJP alone leaves out the KUS invoices.';
     return (
       <Question
@@ -162,7 +162,7 @@ export const Decide: Story = {
     canvas.getByRole('button', { name: 'Skip' }).focus();
     await userEvent.keyboard('{Enter}');
     await expect(args.onAnswer).toHaveBeenCalledWith({ kind: 'skip' });
-    await waitFor(() => expect(canvas.getByText(/^Skipped\./)).toHaveFocus());
+    await waitFor(() => expect(canvas.getByText(/^Skipped by you\./)).toHaveFocus());
     await expect(canvas.queryByRole('button')).toBeNull();
   },
 };
