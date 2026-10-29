@@ -5,13 +5,18 @@ import {
   CaretUpDownIcon,
   ChatsIcon,
   DotsThreeVerticalIcon,
+  HashIcon,
+  HouseIcon,
   LightningIcon,
   PulseIcon,
   QuestionIcon,
+  RobotIcon,
   TreeStructureIcon,
 } from '@phosphor-icons/react';
 import type { ColumnDef } from '@tanstack/react-table';
 
+import { Avatar, AvatarFallback } from '../../foundational/Avatar';
+import { Badge } from '../../foundational/Badge';
 import { Button } from '../../foundational/Button';
 import { IconButton } from '../../foundational/IconButton';
 import { Menu, MenuContent, MenuItem, MenuTrigger } from '../../foundational/Menu';
@@ -488,6 +493,72 @@ export const LongPageTitle: Story = {
     ),
   },
   globals: { viewport: { value: 'laptop', isRotated: false } },
+};
+
+/**
+ * A sidebar of channels and people, as in a team chat. `avatar` takes the
+ * icon's place for a person, and `trailing` holds what follows the label: a
+ * count, or the `agent` badge that marks the AI as a member. A long name
+ * truncates before its trailing content does.
+ */
+export const PeopleAndCounts: Story = {
+  args: {
+    ...Expanded.args,
+    sidebar: (
+      <AppShellNav>
+        <AppShellNavGroup>
+          <AppShellNavItem href="#" icon={<HouseIcon />}>
+            Home
+          </AppShellNavItem>
+        </AppShellNavGroup>
+        <AppShellNavGroup label="Channels">
+          <AppShellNavItem
+            href="#"
+            icon={<HashIcon />}
+            active
+            trailing={
+              <Badge shape="count" aria-hidden="true">
+                4
+              </Badge>
+            }
+          >
+            sep-close<span className="sr-only">, 4 open</span>
+          </AppShellNavItem>
+          <AppShellNavItem href="#" icon={<HashIcon />}>
+            open-items
+          </AppShellNavItem>
+        </AppShellNavGroup>
+        <AppShellNavGroup label="Direct messages">
+          <AppShellNavItem
+            href="#"
+            avatar={
+              <Avatar size="sm" aria-hidden="true">
+                <AvatarFallback>
+                  <RobotIcon weight="bold" />
+                </AvatarFallback>
+              </Avatar>
+            }
+            trailing={<Badge tone="agent">AI</Badge>}
+          >
+            Close agent
+          </AppShellNavItem>
+          {[people.controller, people.payables, people.longName].map((p) => (
+            <AppShellNavItem
+              key={p.id}
+              href="#"
+              avatar={
+                <Avatar size="sm" aria-hidden="true">
+                  <AvatarFallback>{p.initials}</AvatarFallback>
+                </Avatar>
+              }
+            >
+              {p.name}
+            </AppShellNavItem>
+          ))}
+        </AppShellNavGroup>
+      </AppShellNav>
+    ),
+  },
 };
 
 /**

@@ -1,22 +1,16 @@
-# Demo: Kasane onboarding
+# Demo: Kasane September close
 
-The public demo at [demo.tabularui.com](https://demo.tabularui.com): a five-step onboarding journey for an AI finance tool, on one route with a step state machine (no router), built from Tabular UI.
+The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exceptions workbench for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
 
-1. **Upload**: dashed dropzone (§7.8: dashed = awaiting content). Accepts `.txt` `.md` `.jpg` `.jpeg` `.png` `.csv`, 5 MB per file.
-2. **Files selected**: same frame, border goes solid; per-file validation status via `runStatuses` (`passed` / `needs-review` / `queued`).
-3. **Pre-flight dialog**: what was detected, computed from the actual files (the flagged CSV really lacks a header row; the app read it).
-4. **Reading**: simulated long run: stage tracker, overall progress, time remaining, per-file `RunLogRow`s. Cancellable, and says you can leave.
-5. **Recap**: counts found and run summary, "Open modeling".
+**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. The channel, the decision and the timeline follow, so most views show a placeholder that names the phase that builds it.
 
 ## Playing it
 
-A visitor plays Mei Tachibana, Head of FP&A at **Kasane Corporation**, a fictional Tokyo printer maker, and needs no files of their own:
+A visitor plays Mei Tachibana, Head of FP&A at **Kasane Corporation**, a fictional Tokyo printer maker. The people in the channel and the agent are scripted, and every figure they quote comes from the generated data (below).
 
-- **"Use Kasane's files"** loads the company's 20-file pack. The pack's contents are not in this repository: each file is a stand-in built from `data/pack.json`, carrying the real file's name and size, and a spreadsheet's first line. Stand-ins go through the same validation as a dropped file: the bank export really has no header row, and the check really reads its first line.
-- **The agent is scripted, not simulated at random.** `data/findings.json` lists the contradictions, gaps and follow-ups in the material, with evidence computed from the data, and the files each one rests on. The recap counts a finding only when all its files were read, so cancelling halfway shrinks the counts, and a visitor's own files give none.
-- **Deep links:** `?step=files|preflight|reading|recap|discovery` opens the journey at that point with Kasane's files already validated. The URL follows the journey, so any screen can be shared.
-- The run is shortened to under a minute and says so, and "Skip to results" ends it.
-- `DemoBanner` says all of this in one line; see its README.
+- **Views by URL, with no router.** `?view=sep-close` (the default, `/`), `?view=open-items`, `?view=rev-check`, `?view=home`, and `?dm=agent|controller|apLead` for a direct message. Every sidebar item is a real link, so it opens in a new tab and Back works. `src/lib/view.ts`.
+- **The right panel follows the view**: the close panel in `#sep-close`, the member's profile in a direct message, the selected item in `#open-items`. Home and `#rev-check` have none.
+- `DemoBanner`, in the top nav, says all of this in one line; see its README.
 
 ## Data
 
@@ -46,4 +40,4 @@ That builds the package, then runs the demo with the package rebuilding on chang
 
 Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's built declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
 
-`src/components/` holds two components only this app needs: `StageTracker`, placed here deliberately (promote it into Tabular UI when a second screen needs it), and `DemoBanner`.
+`src/components/` holds `DemoBanner`, which only this app needs. `src/shell/` is the sidebar and member avatars, and `src/views/` what each view puts in the shell's slots.
