@@ -1,0 +1,24 @@
+[
+  {
+    "id": "revenue-cut-off",
+    "label": "Revenue cut-off",
+    "meaning": "Sep 2026 revenue on invoices delivered after the month",
+    "currency": "JPY",
+    "before": 42720000,
+    "after": 0,
+    "sources": ["sales_invoices_2026-09.csv"],
+    "beforeLabel": "¥42.7m",
+    "afterLabel": "¥0"
+  },
+  {
+    "id": "duplicate-payment",
+    "label": "Supplier payments",
+    "meaning": "Paid twice on one supplier invoice number",
+    "currency": "USD",
+    "before": 48216.4,
+    "after": 0,
+    "sources": ["supplier_invoices_fy2026_h1.csv"],
+    "beforeLabel": "$48,216.40",
+    "afterLabel": "$0"
+  }
+]

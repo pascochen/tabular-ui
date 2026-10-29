@@ -20,7 +20,9 @@ A visitor plays Mei Tachibana, Head of FP&A at **Kasane Corporation**, a fiction
 
 ## Data
 
-`data/` holds four small JSON files, only what the screens read: `pack.json`, `company.json`, `discovery.json` and `findings.json`. They are generated; never edit them by hand.
+`data/` holds small JSON files, only what the screens read: `pack.json`, `company.json`, `discovery.json` and `findings.json` for the onboarding journey, and `people.json`, `close.json` and `checks.json` for the close demo that replaces it (`kasane-close-demo-plan.md`). They are generated; never edit them by hand.
+
+The close demo's copy is authored in the dataset, in `onboarding/close-demo.json`: the channel's exceptions, replies, the hero question and the proposed entry's wording. Every figure in it is a `{token}` the export script fills from the data, and its people are employee ids, each of whom must attend an interview. The script stops on an unknown token, a person who isn't in the material, an unbalanced entry or an account missing from the chart of accounts. `apps/storybook/tests/close-data.spec.ts` checks the generated files against each other, since CI has no dataset.
 
 The full Kasane dataset is kept outside this repository. To rebuild the fixtures from it:
 
@@ -28,7 +30,7 @@ The full Kasane dataset is kept outside this repository. To rebuild the fixtures
 KASANE_DATA_DIR=/path/to/kasane pnpm --filter tabular-ui-demo export-fixtures
 ```
 
-`KASANE_DATA_DIR` is the dataset's root, the folder holding `01_master_data/` through `05_reporting/`, `docs/` and `onboarding/`. The script also rewrites the story fixtures in `packages/ui/src/fixtures/kasane.ts`, and stops if the data no longer supports a finding. On an unchanged dataset it produces no diff.
+`KASANE_DATA_DIR` is the dataset's root, the folder holding `01_master_data/` through `05_reporting/`, `docs/` and `onboarding/` (`transcripts/`, the org chart and `close-demo.json`). The script also rewrites the story fixtures in `packages/ui/src/fixtures/kasane.ts`, and stops if the data no longer supports a finding. On an unchanged dataset it produces no diff.
 
 ## Running it
 

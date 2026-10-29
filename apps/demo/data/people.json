@@ -1,0 +1,79 @@
+{
+  "visitor": {
+    "key": "visitor",
+    "id": "E0011",
+    "name": "Mei Tachibana",
+    "shortName": "Mei",
+    "title": "Head of FP&A",
+    "entity": "KJP",
+    "email": "mei.tachibana@kasane.example",
+    "initials": "MT",
+    "handle": "m.tachibana"
+  },
+  "controller": {
+    "key": "controller",
+    "id": "E0010",
+    "name": "Daisuke Onodera",
+    "shortName": "Daisuke",
+    "title": "Group Controller",
+    "entity": "KJP",
+    "email": "daisuke.onodera@kasane.example",
+    "initials": "DO",
+    "handle": "d.onodera"
+  },
+  "apLead": {
+    "key": "apLead",
+    "id": "E0016",
+    "name": "Kenta Ishiguro",
+    "shortName": "Kenta",
+    "title": "Accounts Payable Lead",
+    "entity": "KJP",
+    "email": "kenta.ishiguro@kasane.example",
+    "initials": "KI",
+    "handle": "k.ishiguro"
+  },
+  "glAccountant": {
+    "key": "glAccountant",
+    "id": "E0019",
+    "name": "Shun Morimoto",
+    "shortName": "Shun",
+    "title": "General Ledger Accountant",
+    "entity": "KJP",
+    "email": "shun.morimoto@kasane.example",
+    "initials": "SM",
+    "handle": "s.morimoto"
+  },
+  "fpaAnalyst": {
+    "key": "fpaAnalyst",
+    "id": "E0020",
+    "name": "Nanami Okabe",
+    "shortName": "Nanami",
+    "title": "FP&A Analyst",
+    "entity": "KJP",
+    "email": "nanami.okabe@kasane.example",
+    "initials": "NO",
+    "handle": "n.okabe"
+  },
+  "arLead": {
+    "key": "arLead",
+    "id": "E0015",
+    "name": "Yui Matsuda",
+    "shortName": "Yui",
+    "title": "Accounts Receivable and Credit Lead",
+    "entity": "KJP",
+    "email": "yui.matsuda@kasane.example",
+    "initials": "YM",
+    "handle": "y.matsuda"
+  },
+  "usCredit": {
+    "key": "usCredit",
+    "id": "E1003",
+    "name": "Marcus Bell",
+    "shortName": "Marcus",
+    "title": "AR and Credit Manager",
+    "entity": "KUS",
+    "email": "marcus.bell@kasane.example",
+    "initials": "MB",
+    "handle": "m.bell"
+  }
+}
