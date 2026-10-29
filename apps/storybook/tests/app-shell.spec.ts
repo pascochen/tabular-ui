@@ -490,3 +490,53 @@ test.describe('frame tier', () => {
     });
   });
 });
+
+test.describe('nav items with people and counts', () => {
+  test.use({ viewport: SKETCH });
+
+  test('a trailing badge keeps its width and the edge while a long name truncates', async ({ page }) => {
+    await gotoStory(page, 'product-appshell--people-and-counts');
+    const rows = await dockedSidebar(page).evaluate((sb) =>
+      [...sb.querySelectorAll<HTMLElement>('[data-slot="app-shell-nav-item"]')].map((a) => {
+        const label = a.querySelector<HTMLElement>('span.truncate')!;
+        const badge = a.querySelector<HTMLElement>('[data-slot="badge"]');
+        const avatar = a.querySelector<HTMLElement>('[data-slot="avatar"]');
+        const r = a.getBoundingClientRect();
+        return {
+          name: label.textContent,
+          truncated: label.scrollWidth > label.clientWidth,
+          labelRight: label.getBoundingClientRect().right,
+          badgeLeft: badge?.getBoundingClientRect().left,
+          badgeRight: badge?.getBoundingClientRect().right,
+          avatar: avatar ? avatar.getBoundingClientRect().width : null,
+          weight: avatar?.getAttribute('weight') ?? null,
+          right: r.right,
+          paddingRight: parseFloat(getComputedStyle(a).paddingRight),
+          borderRight: parseFloat(getComputedStyle(a).borderRightWidth),
+        };
+      }),
+    );
+    const longName = rows.find((r) => r.name?.startsWith('Anna-Lena'))!;
+    expect(longName.truncated).toBe(true);
+    for (const r of rows.filter((x) => x.badgeRight !== undefined)) {
+      // The badge ends at the item's content edge and the label stops before it.
+      expect(r.badgeRight).toBeCloseTo(r.right - r.paddingRight - r.borderRight, 0);
+      expect(r.labelRight).toBeLessThanOrEqual(r.badgeLeft!);
+    }
+    // A person's avatar is the 24px size, and receives no Phosphor weight.
+    for (const r of rows.filter((x) => x.avatar !== null)) {
+      expect(r.avatar).toBe(24);
+      expect(r.weight).toBeNull();
+    }
+  });
+});
+
+test('a nav item is named by its label: no avatar initials, no count run into it', async ({ page }) => {
+  await page.setViewportSize(SKETCH);
+  await gotoStory(page, 'product-appshell--people-and-counts');
+  const sidebar = dockedSidebar(page);
+  // Chrome puts a space at the hidden span's edge; a screen reader doesn't voice it.
+  await expect(sidebar.getByRole('link', { name: /^sep-close ?, 4 open$/ })).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'Daisuke Onodera', exact: true })).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'Close agent AI', exact: true })).toBeVisible();
+});
