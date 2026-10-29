@@ -35,6 +35,13 @@ type MessageBase = {
   authorship?: string;
   /** Controls in the `AgentBlock`'s header. Only with `authorship`. */
   agentActions?: ReactNode;
+  /**
+   * The same author's next message in the same minute: no avatar and no
+   * visible header, so a run of messages reads as one voice. The name and time
+   * stay for assistive technology. The caller decides what counts as a run;
+   * a later minute starts a new header, or its time would be shown nowhere.
+   */
+  continued?: boolean;
   children: ReactNode;
   className?: string;
 };
@@ -77,12 +84,49 @@ function MessageRow({
   authorship,
   agentActions,
   children,
+  continued = false,
   reply,
   after,
 }: MessageBase & { reply: boolean; after?: ReactNode }) {
   const avatar = isValidElement(author.avatar)
     ? cloneElement(author.avatar, { size: reply ? 'sm' : 'default', 'aria-hidden': true })
     : author.avatar;
+  const timeClass = 'text-xs text-text-secondary tabular-nums';
+  const body = (
+    <div data-slot="channel-message-body" className="min-w-0 break-words text-base text-text-body">
+      {authorship ? (
+        <AgentBlock authorship={authorship} actions={agentActions}>
+          {children}
+        </AgentBlock>
+      ) : (
+        children
+      )}
+    </div>
+  );
+
+  if (continued) {
+    return (
+      <div data-continued="" className="relative flex items-start gap-[var(--gap-inline)]">
+        {/*
+          Who and when, for assistive technology, first: read alone, the
+          message still says who wrote it and at what time. Visually both are
+          the run's first message's, by definition of a run (same author, same
+          minute), so showing them again would say nothing new. sr-only is
+          absolute: it takes no flex gap.
+        */}
+        <span className="sr-only">
+          {author.name} <time dateTime={dateTime}>{time}</time>
+        </span>
+        {/* The avatar's width, so the body starts where the run's first body does. */}
+        <span aria-hidden="true" className={cn('shrink-0', reply ? 'w-6' : 'w-8')} />
+        <div className="flex min-w-0 flex-1 flex-col gap-[var(--gap-bonded)]">
+          {body}
+          {after}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-start gap-[var(--gap-inline)]">
       {avatar}
@@ -100,19 +144,11 @@ function MessageRow({
           <span className={cn('font-semibold text-text-primary', reply ? 'text-sm' : 'text-base')}>{author.name}</span>
           {author.badge}
           {/* §0 rule 7: a time is a figure. Secondary, never tertiary: it is read (§3). */}
-          <time dateTime={dateTime} className="text-xs text-text-secondary tabular-nums">
+          <time dateTime={dateTime} className={timeClass}>
             {time}
           </time>
         </div>
-        <div data-slot="channel-message-body" className="min-w-0 break-words text-base text-text-body">
-          {authorship ? (
-            <AgentBlock authorship={authorship} actions={agentActions}>
-              {children}
-            </AgentBlock>
-          ) : (
-            children
-          )}
-        </div>
+        {body}
         {after}
       </div>
     </div>
@@ -154,7 +190,16 @@ function ChannelMessage({
   };
 
   return (
-    <li data-slot="channel-message" className={cn('min-w-0', className)}>
+    <li
+      data-slot="channel-message"
+      className={cn(
+        'min-w-0',
+        // A run sits --gap-field apart, closer than the list's --gap-group
+        // between authors, so the run reads as one block.
+        message.continued && 'mt-[calc(var(--gap-field)-var(--gap-group))]',
+        className,
+      )}
+    >
       <MessageRow
         {...message}
         reply={false}

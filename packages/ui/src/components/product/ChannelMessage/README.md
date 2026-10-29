@@ -43,6 +43,7 @@ One member's message in a channel of several people, with its replies inline ben
 | `dateTime` | `string` | The `<time>`'s machine-readable value |
 | `authorship` | `string` | The agent wrote this message. The body renders inside an `AgentBlock` with this label |
 | `agentActions` | node | Controls in that `AgentBlock`'s header |
+| `continued` | `boolean` | The same author's next message in the same minute: no avatar or visible header (below) |
 | `replies` | `ChannelMessageReply[]` | Inline beneath the message, behind a disclosure |
 | `repliesOpen` / `defaultRepliesOpen` / `onRepliesOpenChange` | | Controlled or uncontrolled. Closed by default |
 
@@ -59,6 +60,10 @@ One member's message in a channel of several people, with its replies inline ben
 | Replies fold behind `Button variant="inline"` | `AgentReasoning`'s disclosure, with its recipe unchanged, so the two read as one control. `aria-expanded`, and `aria-controls` once the replies exist. The count stays the label, open or closed |
 | Replies render only when open | As `AgentReasoning` and `RunLogRow`. Nothing hidden sits in the tab order |
 | A 1px `--color-border` rule left of the replies | It marks the thread as structure, so it is neutral |
+| `continued` drops the avatar and header, not the name | A run from one author reads as one voice, as every team chat groups it. The name and time stay as visually hidden text, first, so each message still says who wrote it and when, read alone |
+| A run is the same author in the same minute, and the caller decides | Then a continued message's time is its first message's, and showing it again says nothing. A later minute must start a new header, or its time is shown nowhere |
+| A run sits `--gap-field` apart; a new author `--gap-group` | The tighter spacing is what makes the run read as a block. A negative top margin on the `<li>` takes the difference off the list's gap |
+| An agent's continued message keeps its `AgentBlock` | Every agent message carries its own rail and label (§5). Grouping removes repeated chrome, never the authorship signal |
 | One level of replies | A thread of a thread is where a channel stops being readable. `ChannelMessageReply` has no `replies` prop, so it can't be nested |
 | Body `break-words` | A file name or address with no break opportunity would otherwise widen the column past the panel |
 | Messages are list items | A screen reader announces "list, 6 items". Not `role="feed"`: that is a composite role with a keyboard pattern this doesn't implement (failure log, `LineageTree`) |
@@ -69,4 +74,4 @@ The component announces nothing itself. A channel that grows while someone reads
 
 ## Testing
 
-Stories: `Default`, `AgentMessage` (the `AgentBlock` is there), `WithReplies` (the disclosure's states and its `aria-controls`), `ThreadWithAgentReply`, `SystemMember`, `Narrow` (440px; nothing widens the column) and `Channel` (folded replies aren't messages of the channel's list). Every story runs in both modes with axe.
+Stories: `Default`, `Grouped` (a continued message's hidden name and time, body x and run spacing), `AgentMessage` (the `AgentBlock` is there), `WithReplies` (the disclosure's states and its `aria-controls`), `ThreadWithAgentReply`, `SystemMember`, `Narrow` (440px; nothing widens the column) and `Channel` (folded replies aren't messages of the channel's list). Every story runs in both modes with axe.
