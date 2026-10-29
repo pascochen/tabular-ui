@@ -1,6 +1,7 @@
 import { ChannelMessage, ChannelMessageList } from 'tabular-ui';
 
 import { ExceptionCard } from '../components/ExceptionCard';
+import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
 import { useClose } from '../lib/close-context';
 import { agent, close } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
@@ -14,6 +15,7 @@ const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero =
  */
 export function SepCloseChannel() {
   const { state } = useClose();
+  const heroReplies = useHeroReplies();
   return (
     <ChannelMessageList aria-label="Messages in sep-close">
       <ChannelMessage
@@ -40,6 +42,7 @@ export function SepCloseChannel() {
           continued={i > 0 && close.exceptions[i - 1].postedAt === e.postedAt && !isHero(close.exceptions[i - 1])}
           // The decision the visitor makes: open on arrival, so the reply is there.
           defaultRepliesOpen={isHero(e)}
+          extraReplies={isHero(e) ? heroReplies : undefined}
         />
       ))}
     </ChannelMessageList>

@@ -2,8 +2,10 @@ import { useReducer } from 'react';
 import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tabular-ui';
 
 import { DemoBanner } from './components/DemoBanner';
+import { HeroAnnouncer } from './components/HeroThread/Announcer';
 import { CloseContext } from './lib/close-context';
 import { closeReducer, landingState } from './lib/close-state';
+import { useHeroScript } from './lib/hero-script';
 import { useView } from './lib/view';
 import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
 import { slotsFor } from './views/slots';
@@ -19,6 +21,8 @@ export function App() {
   const slots = slotsFor(view);
   // One store for the close: every view and the panel read it (lib/close-state.ts).
   const [state, dispatch] = useReducer(closeReducer, undefined, landingState);
+  // The agent's scripted steps run here, not in the channel, so they land from any view.
+  useHeroScript(state, dispatch);
 
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
@@ -27,6 +31,8 @@ export function App() {
         topNav={
           <AppBar brand={<AppShellSidebarToggle />}>
             <DemoBanner />
+            {/* In the top nav, which every view keeps, so a change is heard anywhere. */}
+            <HeroAnnouncer />
           </AppBar>
         }
         sidebarHeader={<SidebarHeader />}

@@ -2,12 +2,12 @@
 // The data is in apps/demo/data/, written by scripts/export-fixtures.mjs from the full Kasane
 // dataset, which is not in this repository. Kasane Corporation is fictional.
 
-import checksData from '../../data/checks.json';
-import closeData from '../../data/close.json';
-import company from '../../data/company.json';
-import findingsData from '../../data/findings.json';
-import pack from '../../data/pack.json';
-import peopleData from '../../data/people.json';
+import checksData from '../../data/checks.json' with { type: 'json' };
+import closeData from '../../data/close.json' with { type: 'json' };
+import company from '../../data/company.json' with { type: 'json' };
+import findingsData from '../../data/findings.json' with { type: 'json' };
+import pack from '../../data/pack.json' with { type: 'json' };
+import peopleData from '../../data/people.json' with { type: 'json' };
 
 export const kasaneCompany = company;
 

@@ -962,6 +962,8 @@ must(
 const calendarText = packText(P.closeCalendar);
 const earningsRelease = calendarText.match(/earnings release[^|]*\| \w{3} (\d+ \w{3}) \d{4}/)?.[1];
 must(earningsRelease, 'close_calendar.md gives the H1 earnings release date');
+const auditFieldwork = calendarText.match(/Auditor interim review fieldwork \| ([^(|]+?) \(/)?.[1];
+must(auditFieldwork, "close_calendar.md gives the auditors' interim fieldwork dates");
 const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
 must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
 const glOverBeforeAugust = glOverLimit.filter((r) => r.period < '2026-08');
@@ -990,6 +992,7 @@ const closeTokens = {
   glLimit: money(glLimit, 'USD'),
   glOverCount: String(glOverBeforeAugust.length),
   legalDecision,
+  auditFieldwork,
   europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
 };
 const fill = (text) =>
@@ -1056,6 +1059,10 @@ must(
   `the ${cutoff.invoice_id} reversal balances`,
 );
 must(closeSource.hero.exception === 'revenue-cut-off', 'the hero decision is the revenue cut-off');
+must(
+  closeSource.hero.options.some((o) => o.id === closeSource.hero.delegate.option),
+  'the option "Choose for me" picks is one of the hero options',
+);
 
 // Checks: the before and after figure of each tie-out the close panel shows.
 const closeChecks = [

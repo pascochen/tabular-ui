@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { AppShellPanelBody, MetricTile, ProgressBar, StatusBadge, buttonVariants, cn } from 'tabular-ui';
 
-import { checkLabel, progress } from '../../lib/close-state';
+import { checkLabel, isTiedOut, progress, type CloseState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
 import { checks, close, lastClosedMonth } from '../../lib/kasane';
 
@@ -13,6 +13,21 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
       {children}
     </section>
   );
+}
+
+/**
+ * What the figure means now. A check that reran to its after-figure is tied
+ * out. The cut-off settled by keeping September locked changes no figure,
+ * so it says where the amount went instead. Words, so the state survives
+ * without colour: the figure itself takes no hue (§5).
+ */
+function caption(state: CloseState, c: (typeof checks)[number]) {
+  if (isTiedOut(state, c.id)) return `Tied out. ${c.meaning}.`;
+  const round = state.hero.rounds[state.hero.rounds.length - 1];
+  if (c.id === close.hero.exception && round.answer === 'keep-locked' && round.stage === 'done') {
+    return `Listed for the auditors' review. ${c.meaning}.`;
+  }
+  return `${c.meaning}.`;
 }
 
 /**
@@ -40,7 +55,13 @@ export function ClosePanel() {
       <Section title="Checks">
         <div className="grid grid-cols-2 gap-[var(--gap-group)]">
           {checks.map((c) => (
-            <MetricTile key={c.id} size="sm" label={c.label} value={checkLabel(state, c.id)} caption={c.meaning} />
+            <MetricTile
+              key={c.id}
+              size="sm"
+              label={c.label}
+              value={checkLabel(state, c.id)}
+              caption={caption(state, c)}
+            />
           ))}
         </div>
       </Section>

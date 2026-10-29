@@ -210,6 +210,11 @@
       "reason": "Delivered 2 Oct. The invoice is rebooked on that date, in October.",
       "postLabel": "Post the reversal",
       "cancelLabel": "Don’t post it",
+      "changes": "Five lines in KJP, dated 30 Sep: revenue, tax and the receivable come off, and the stock goes back. September reopens for this entry only.",
+      "reaches": "The KJP ledger and the H1 consolidation, which takes the new September figures.",
+      "outcome": "Posted by you. INV-KJP-2609-00363 is reversed in September.",
+      "stopped": "Not posted. Choose again, or leave it open.",
+      "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
       "entity": "KJP",
       "postingDate": "2026-09-30",
       "currency": "JPY",
@@ -225,8 +230,20 @@
       "title": "List INV-KJP-2609-00363 for the auditors?",
       "reason": "September stays as booked. The review list gains one line: ¥42.7m of revenue a month early.",
       "postLabel": "Add it to the list",
-      "cancelLabel": "Don’t add it"
+      "cancelLabel": "Don’t add it",
+      "changes": "Nothing in the books. The review list gains one line.",
+      "reaches": "The auditors' interim review, 19–30 Oct.",
+      "outcome": "Added by you. September stays as booked.",
+      "stopped": "Not added. Choose again, or leave it open.",
+      "log": "Revenue cut-off: ¥42.7m listed for the auditors' review. September stays as booked."
     },
-    "rerun": "Revenue cut-off check reran in 2s"
+    "rerun": "Revenue cut-off check reran in 2s",
+    "askedAt": "13:49",
+    "authorship": { "asked": "AI · Awaiting your answer", "proposed": "AI · Awaiting confirmation", "done": "AI" },
+    "delegate": {
+      "option": "reopen",
+      "reason": "The policy puts revenue in the month of delivery, and H1 is published on 6 Nov."
+    },
+    "skipped": "Skipped. INV-KJP-2609-00363 stays open until someone decides."
   }
 }

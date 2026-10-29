@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactElement } from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
 import {
   Button,
@@ -36,6 +36,8 @@ export type ExceptionCardProps = {
   defaultRepliesOpen?: boolean;
   /** The agent posted the message before this one in the same minute: group it under that header. */
   continued?: boolean;
+  /** Replies the close state doesn't hold as text: the hero's question, proposal and rerun. After the others. */
+  extraReplies?: ReactElement[];
 };
 
 /**
@@ -53,6 +55,7 @@ export function ExceptionCard({
   state,
   defaultRepliesOpen = false,
   continued = false,
+  extraReplies = [],
 }: ExceptionCardProps) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const sourcesId = useId();
@@ -70,11 +73,14 @@ export function ExceptionCard({
       authorship={close.agent.authorship}
       defaultRepliesOpen={defaultRepliesOpen}
       continued={continued}
-      replies={state.replies.map((r, i) => (
-        <ChannelMessageReply key={i} author={authorOf(r.author)} time={r.at} dateTime={`${close.scene.date}T${r.at}`}>
-          {r.text}
-        </ChannelMessageReply>
-      ))}
+      replies={[
+        ...state.replies.map((r, i) => (
+          <ChannelMessageReply key={i} author={authorOf(r.author)} time={r.at} dateTime={`${close.scene.date}T${r.at}`}>
+            {r.text}
+          </ChannelMessageReply>
+        )),
+        ...extraReplies,
+      ]}
     >
       <div className="flex flex-col gap-[var(--gap-field)]">
         <div className="flex items-center gap-[var(--gap-inline)]">
