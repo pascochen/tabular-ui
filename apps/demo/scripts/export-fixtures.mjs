@@ -5,7 +5,8 @@
 //   KASANE_DATA_DIR=/path/to/kasane pnpm --filter tabular-ui-demo export-fixtures
 //
 // The dataset is not in this repository. KASANE_DATA_DIR points at its root: the folder holding
-// 01_master_data/ … 05_reporting/, docs/ and onboarding/.
+// 01_master_data/ … 05_reporting/, docs/ and onboarding/ (the transcripts, the org chart and
+// close-demo.json).
 //
 // Writes:
 //   packages/ui/src/fixtures/kasane.ts   story fixtures (never exported from src/index.ts)
@@ -14,6 +15,11 @@
 //   apps/demo/data/company.json          the company and the visitor's persona
 //   apps/demo/data/discovery.json        what the agent says it learned, and from which files
 //   apps/demo/data/findings.json         contradictions, gaps and follow-ups, and their files
+//   apps/demo/data/people.json           the close demo's people, by role, from employees.csv
+//   apps/demo/data/close.json            the scripted #sep-close channel: exceptions, replies, the hero
+//                                        decision and its proposed entry (copy from
+//                                        onboarding/close-demo.json, figures from the data)
+//   apps/demo/data/checks.json           each close check's figure before and after its fix
 //   apps/site/data/kasane.json           the public site's specimen records (docs/site.md §5)
 //
 // Only what the demo's screens read is written: no file contents, no rows.
@@ -898,6 +904,200 @@ await writeJson('apps/site/data/kasane.json', {
   },
   operatingBridge: fixtures.operatingBridge,
 });
+
+// ---------------------------------------------------------------------------
+// Close demo: the scripted #sep-close channel. The copy is authored in onboarding/close-demo.json;
+// every figure in it is a {token} filled here from the data, and the people are employee ids.
+// ---------------------------------------------------------------------------
+
+const closeSource = JSON.parse(readFileSync(join(data, 'onboarding/close-demo.json'), 'utf8'));
+const packNames = new Set(pack.map((f) => f.name));
+const packText = (name) => readFileSync(join(data, ...packPath(name)), 'utf8');
+function packPath(name) {
+  if (name.endsWith('.txt')) return ['onboarding/transcripts', name];
+  const docs = {
+    [P.policies]: 'docs/06_accounting_policies.md',
+    [P.closeCalendar]: 'docs/07_close_calendar.md',
+    [P.closeMemo]: 'docs/commentary/2026-09_month_end_close_memo.md',
+  };
+  must(docs[name], `a path for ${name}`);
+  return [docs[name]];
+}
+
+// People: each must be an employee, and must attend one of the interviews.
+const attendees = readdirSync(join(data, 'onboarding/transcripts'))
+  .map((f) => readFileSync(join(data, 'onboarding/transcripts', f), 'utf8').match(/^Attendees: (.*)$/m)?.[1] ?? '')
+  .join(' ');
+const closePeople = Object.fromEntries(
+  Object.entries(closeSource.people).map(([key, id]) => {
+    must(
+      employees.some((e) => e.employee_id === id),
+      `employee ${id} (${key}) in employees.csv`,
+    );
+    const p = person(id);
+    must(attendees.includes(p.name), `${p.name} (${key}) attends an interview in onboarding/transcripts/`);
+    return [key, { key, ...p }];
+  }),
+);
+
+// The figures the copy may use.
+const cutoffLine = readCsv('02_subledgers/sales_invoice_lines.csv').filter((l) => l.invoice_id === cutoff.invoice_id);
+must(cutoffLine.length === 1, `${cutoff.invoice_id} has one invoice line`);
+const [cutoffItem] = cutoffLine;
+must(
+  num(cutoffItem.net_amount) === num(cutoff.net_amount),
+  `${cutoff.invoice_id}'s line and header agree on the net amount`,
+);
+const cutoffShipped = cutoff.note.match(/shipped from Tsukuba (\d+ \w{3})/)?.[1];
+must(cutoffShipped, `${cutoff.invoice_id}'s note says when it shipped from Tsukuba`);
+const cutoffBefore = sum(
+  salesInvoices
+    .filter((r) => r.period === LAST_CLOSED && r.delivery_date.slice(0, 7) > LAST_CLOSED)
+    .map((r) => num(r.net_amount)),
+);
+must(
+  cutoffBefore === num(cutoff.net_amount),
+  `${cutoff.invoice_id} is the only ${LAST_CLOSED} invoice delivered later`,
+);
+const calendarText = packText(P.closeCalendar);
+const earningsRelease = calendarText.match(/earnings release[^|]*\| \w{3} (\d+ \w{3}) \d{4}/)?.[1];
+must(earningsRelease, 'close_calendar.md gives the H1 earnings release date');
+const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
+must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
+const glOverBeforeAugust = glOverLimit.filter((r) => r.period < '2026-08');
+const longMonth = (p) =>
+  new Date(`${p}-01T00:00:00Z`).toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const shortDate = (iso) => fmtDate(iso).replace(/ \d{4}$/, '');
+
+const closeTokens = {
+  lastClosedLabel: longMonth(LAST_CLOSED).split(' ')[0],
+  openLabel: longMonth(OPEN.period).split(' ')[0],
+  closeDate: shortDate(lastClose.close_completed_date),
+  closeDay: String(closeDay),
+  exceptionCount: String(closeSource.exceptions.length),
+  resolvedAtLanding: String(closeSource.exceptions.filter((e) => e.atLanding === 'resolved').length),
+  cutoffInvoice: cutoff.invoice_id,
+  cutoffNet: money(num(cutoff.net_amount), 'JPY'),
+  cutoffInvoiceDate: shortDate(cutoff.invoice_date),
+  cutoffDeliveryDate: shortDate(cutoff.delivery_date),
+  cutoffShipped,
+  earningsRelease,
+  dupEntity: dup[0].entity_id,
+  dupNumber: dup[0].supplier_invoice_number,
+  dupAmount: money(num(dup[0].gross_amount), dup[0].currency),
+  saEntry: sa.je_id,
+  saAmount: money(num(sa.debit), sa.currency),
+  glLimit: money(glLimit, 'USD'),
+  glOverCount: String(glOverBeforeAugust.length),
+  legalDecision,
+  europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
+};
+const fill = (text) =>
+  curly(
+    text.replace(/\{(\w+)\}/g, (_, k) => {
+      must(k in closeTokens, `a value for {${k}} in close-demo.json`);
+      return closeTokens[k];
+    }),
+  );
+const fillAll = (v) =>
+  typeof v === 'string'
+    ? fill(v)
+    : Array.isArray(v)
+      ? v.map(fillAll)
+      : v && typeof v === 'object'
+        ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fillAll(x)]))
+        : v;
+
+// Exceptions: one per contradiction, in the order the channel shows them, each with its evidence.
+const memberKeys = new Set([...Object.keys(closePeople), 'agent']);
+const mustBeMember = (key, where) => must(memberKeys.has(key), `${key} (${where}) is a person in close-demo.json`);
+must(
+  closeSource.exceptions.length === contradictions.length &&
+    contradictions.every((c) => closeSource.exceptions.some((e) => e.id === c.id)),
+  'close-demo.json has one exception per contradiction',
+);
+const closeExceptions = closeSource.exceptions.map((e) => {
+  const finding = contradictions.find((c) => c.id === e.id);
+  for (const r of e.replies) mustBeMember(r.author, `${e.id} reply`);
+  if (e.resolution) mustBeMember(e.resolution.by, `${e.id} resolution`);
+  if (e.waiting)
+    must(
+      followUps.some((f) => f.id === e.waiting.followUp),
+      `follow-up ${e.waiting.followUp} exists`,
+    );
+  for (const s of finding.sources) must(packNames.has(s), `${s} (${e.id}) is a pack file`);
+  return fillAll({ ...e, claim: finding.claim, evidence: finding.evidence, sources: finding.sources });
+});
+
+for (const c of closeSource.channels) for (const m of c.members) mustBeMember(m, `#${c.name}`);
+for (const m of closeSource.directMessages) mustBeMember(m, 'direct messages');
+mustBeMember(closeSource.agent.setUpBy, 'agent profile');
+for (const f of closeSource.agent.reads) must(packNames.has(f), `${f} (agent profile) is a pack file`);
+
+// The proposed reversal: the invoice's own lines, from the chart of accounts. Debits equal credits.
+const coa = readCsv('01_master_data/chart_of_accounts.csv');
+const account = (id) => {
+  const a = coa.find((r) => r.account_id === id);
+  must(a, `account ${id} in chart_of_accounts.csv`);
+  return { account: id, name: a.account_name };
+};
+must(cutoffItem.revenue_account_id === '4000', `${cutoff.invoice_id} is equipment revenue (4000)`);
+const reversal = [
+  { ...account('4000'), debit: num(cutoff.net_amount), credit: 0 },
+  { ...account('2300'), debit: num(cutoff.tax_amount), credit: 0 },
+  { ...account('1100'), debit: 0, credit: num(cutoff.gross_amount) },
+  { ...account('1200'), debit: num(cutoffItem.cost_amount_local), credit: 0 },
+  { ...account('5000'), debit: 0, credit: num(cutoffItem.cost_amount_local) },
+];
+must(
+  sum(reversal.map((l) => l.debit)) === sum(reversal.map((l) => l.credit)),
+  `the ${cutoff.invoice_id} reversal balances`,
+);
+must(closeSource.hero.exception === 'revenue-cut-off', 'the hero decision is the revenue cut-off');
+
+// Checks: the before and after figure of each tie-out the close panel shows.
+const closeChecks = [
+  {
+    id: 'revenue-cut-off',
+    label: 'Revenue cut-off',
+    meaning: `${fmtPeriod(LAST_CLOSED)} revenue on invoices delivered after the month`,
+    currency: 'JPY',
+    before: cutoffBefore,
+    after: 0,
+    sources: [P.salesInvoices],
+  },
+  {
+    id: 'duplicate-payment',
+    label: 'Supplier payments',
+    meaning: 'Paid twice on one supplier invoice number',
+    currency: dup[0].currency,
+    before: num(dup[0].gross_amount) * (dupPaid.filter(Boolean).length - 1),
+    after: 0,
+    sources: [P.supplierInvoices],
+  },
+].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
+for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
+
+await writeJson('apps/demo/data/people.json', closePeople);
+await writeJson('apps/demo/data/close.json', {
+  scene: closeSource.scene,
+  agent: fillAll(closeSource.agent),
+  channels: fillAll(closeSource.channels),
+  directMessages: closeSource.directMessages,
+  catchUp: fillAll(closeSource.catchUp),
+  exceptions: closeExceptions,
+  hero: fillAll({
+    ...closeSource.hero,
+    entry: {
+      ...closeSource.hero.entry,
+      entity: cutoff.entity_id,
+      postingDate: `${LAST_CLOSED}-${cutoff.invoice_date.slice(8)}`,
+      currency: 'JPY',
+      lines: reversal,
+    },
+  }),
+});
+await writeJson('apps/demo/data/checks.json', closeChecks);
 
 console.log(
   `kasane fixtures: ${pack.length} pack files (${(sum(pack.map((f) => f.bytes)) / 1024 / 1024).toFixed(1)} MB), ` +

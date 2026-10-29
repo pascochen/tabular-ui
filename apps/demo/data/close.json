@@ -1,0 +1,224 @@
+{
+  "scene": { "date": "2026-10-16", "landingTime": "14:00", "channel": "sep-close" },
+  "agent": {
+    "name": "Close agent",
+    "authorship": "AI",
+    "reads": [
+      "sales_invoices_2026-09.csv",
+      "supplier_invoices_fy2026_h1.csv",
+      "manual_journal_entries_fy2026_h1.csv",
+      "ar_aging_monthly.csv",
+      "trial_balance_monthly.csv",
+      "close_calendar.md",
+      "accounting_policies.md"
+    ],
+    "does": [
+      "Compares what people say about the close with the ledger and subledgers",
+      "Reruns a check when a decision changes its input",
+      "Drafts journal entries for a person to post"
+    ],
+    "never": ["Posts an entry", "Changes a locked period", "Messages anyone outside the channel"],
+    "setUpBy": "controller"
+  },
+  "channels": [
+    {
+      "id": "sep-close",
+      "name": "sep-close",
+      "topic": "September close exceptions",
+      "members": ["visitor", "controller", "apLead", "glAccountant", "fpaAnalyst", "usCredit", "agent"]
+    },
+    {
+      "id": "open-items",
+      "name": "open-items",
+      "topic": "Gaps and follow-ups from onboarding",
+      "members": ["visitor", "controller", "agent"]
+    },
+    {
+      "id": "rev-check",
+      "name": "rev-check",
+      "topic": "How the revenue check is built",
+      "members": ["visitor", "glAccountant", "agent"]
+    }
+  ],
+  "directMessages": ["agent", "controller", "apLead"],
+  "catchUp": [
+    "September was locked on 8 Oct, business day 6.",
+    "6 exceptions found since. 2 are resolved.",
+    "September revenue includes ¥42.7m delivered in October."
+  ],
+  "exceptions": [
+    {
+      "id": "close-length",
+      "title": "Close length",
+      "summary": "The CFO says the group closes in five working days. September locked on business day 6.",
+      "postedAt": "09:04",
+      "atLanding": "resolved",
+      "replies": [
+        {
+          "author": "controller",
+          "at": "09:31",
+          "text": "Five is Japan. The group needs a sixth day for consolidation."
+        }
+      ],
+      "resolution": { "by": "controller", "at": "09:33", "log": "Group close is business day 6; Japan’s is 5." },
+      "claim": "The CFO says the group closes in five working days.",
+      "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
+    },
+    {
+      "id": "europe-on-plan",
+      "title": "Europe on plan",
+      "summary": "FP&A says Europe is on plan in euros. H1 sales were 5.7% under budget; profit was above it.",
+      "postedAt": "09:04",
+      "atLanding": "resolved",
+      "replies": [
+        {
+          "author": "fpaAnalyst",
+          "at": "11:12",
+          "text": "Agreed. The board pack now says sales are under plan and profit is above it."
+        }
+      ],
+      "resolution": {
+        "by": "fpaAnalyst",
+        "at": "11:14",
+        "log": "Europe: sales 5.7% under plan, profit above. Board pack wording corrected."
+      },
+      "claim": "FP&A says Europe is on plan in euros.",
+      "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
+    },
+    {
+      "id": "revenue-cut-off",
+      "title": "Revenue cut-off",
+      "summary": "Invoice INV-KJP-2609-00363 is dated 30 Sep but was delivered 2 Oct, so ¥42.7m of revenue is in the wrong month.",
+      "postedAt": "09:04",
+      "atLanding": "open",
+      "hero": true,
+      "replies": [
+        {
+          "author": "controller",
+          "at": "13:48",
+          "text": "Logistics confirms it left Tsukuba on 1 Oct. The cut-off review missed it."
+        }
+      ],
+      "resolution": {
+        "by": "visitor",
+        "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
+      },
+      "claim": "The controller says the Sep 2026 cut-off was clean.",
+      "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
+      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"]
+    },
+    {
+      "id": "duplicate-payment",
+      "title": "Duplicate payment",
+      "summary": "KUS entered supplier invoice MFL-58821 twice and paid $48,216.40 both times.",
+      "postedAt": "09:04",
+      "atLanding": "open",
+      "replies": [
+        {
+          "author": "apLead",
+          "delayMs": 4000,
+          "text": "The duplicate check compares the description too. \"June\" and \"Jun\" got past it."
+        },
+        {
+          "author": "apLead",
+          "delayMs": 9000,
+          "text": "Midwest Freight has agreed to credit $48,216.40 against the next invoice."
+        }
+      ],
+      "resolution": {
+        "by": "apLead",
+        "delayMs": 11000,
+        "log": "Duplicate payment: $48,216.40 to be credited by the supplier."
+      },
+      "claim": "AP says the system blocks a duplicate supplier invoice number, in every entity.",
+      "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"]
+    },
+    {
+      "id": "self-approved-entry",
+      "title": "Self-approved entry",
+      "summary": "JE-KUK-2608-00055 moved £18,400 from advertising to prepaid expenses. The same person created and approved it.",
+      "postedAt": "09:04",
+      "atLanding": "open",
+      "replies": [
+        {
+          "author": "controller",
+          "delayMs": 6000,
+          "text": "Fiona has reversed it in October, and the UK approval rule now blocks self-approval."
+        }
+      ],
+      "resolution": {
+        "by": "controller",
+        "delayMs": 8000,
+        "log": "Self-approved entry: JE-KUK-2608-00055 reversed; self-approval now blocked in KUK."
+      },
+      "claim": "The controller says every manual journal has a different approver, enforced group-wide.",
+      "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in this material.",
+      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"]
+    },
+    {
+      "id": "credit-limit",
+      "title": "Credit limit",
+      "summary": "US credit says Great Lakes Duplicating Supply was within its limit until August. It was over $600,000 in 7 earlier months.",
+      "postedAt": "09:04",
+      "atLanding": "open",
+      "replies": [
+        {
+          "author": "usCredit",
+          "delayMs": 14000,
+          "text": "Agreed on the history. Legal decides on recovery by 30 Oct, and nothing changes until then."
+        }
+      ],
+      "waiting": { "on": "Legal decision by 30 Oct", "followUp": "great-lakes-decision" },
+      "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
+      "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"]
+    }
+  ],
+  "hero": {
+    "exception": "revenue-cut-off",
+    "question": "September is locked. Where should the ¥42.7m correction go?",
+    "basis": "The policy puts revenue in the month of delivery. It doesn’t say whether a locked month is reopened.",
+    "options": [
+      {
+        "id": "reopen",
+        "label": "Reopen September",
+        "description": "Reverse the invoice in September and rebook it on 2 Oct. H1 is right for the 6 Nov earnings release."
+      },
+      {
+        "id": "keep-locked",
+        "label": "Keep September locked",
+        "description": "Post nothing. List the ¥42.7m for the auditors' interim review, and the year to date is right from October."
+      }
+    ],
+    "tool": {
+      "running": "Reading the delivery note for INV-KJP-2609-00363…",
+      "done": "Read the delivery note for INV-KJP-2609-00363"
+    },
+    "entry": {
+      "title": "Reverse INV-KJP-2609-00363 in September?",
+      "reason": "Delivered 2 Oct. The invoice is rebooked on that date, in October.",
+      "postLabel": "Post the reversal",
+      "cancelLabel": "Don’t post it",
+      "entity": "KJP",
+      "postingDate": "2026-09-30",
+      "currency": "JPY",
+      "lines": [
+        { "account": "4000", "name": "Net sales - equipment", "debit": 42720000, "credit": 0 },
+        { "account": "2300", "name": "Output consumption tax / VAT payable", "debit": 4272000, "credit": 0 },
+        { "account": "1100", "name": "Trade receivables", "debit": 0, "credit": 46992000 },
+        { "account": "1200", "name": "Merchandise and finished goods", "debit": 29968000, "credit": 0 },
+        { "account": "5000", "name": "Cost of sales - equipment", "debit": 0, "credit": 29968000 }
+      ]
+    },
+    "record": {
+      "title": "List INV-KJP-2609-00363 for the auditors?",
+      "reason": "September stays as booked. The review list gains one line: ¥42.7m of revenue a month early.",
+      "postLabel": "Add it to the list",
+      "cancelLabel": "Don’t add it"
+    },
+    "rerun": "Revenue cut-off check reran in 2s"
+  }
+}
