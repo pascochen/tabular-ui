@@ -5,6 +5,8 @@ import { useClose } from '../lib/close-context';
 import { agent, close } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
 
+const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero === true;
+
 /**
  * #sep-close: the agent's catch-up, then one message per exception, each with
  * its replies inline. Phase 4 is the landing state; the decision (phase 5)
@@ -26,13 +28,18 @@ export function SepCloseChannel() {
           ))}
         </ul>
       </ChannelMessage>
-      {close.exceptions.map((e) => (
+      {close.exceptions.map((e, i) => (
         <ExceptionCard
           key={e.id}
           exception={e}
           state={state.exceptions[e.id]}
+          // A run: the agent posted every exception at once. Same author, same
+          // minute, so one header (ChannelMessage's `continued`). Except after
+          // the hero, whose thread opens with a person's reply: a headerless
+          // message under it would read as that person's.
+          continued={i > 0 && close.exceptions[i - 1].postedAt === e.postedAt && !isHero(close.exceptions[i - 1])}
           // The decision the visitor makes: open on arrival, so the reply is there.
-          defaultRepliesOpen={'hero' in e && e.hero === true}
+          defaultRepliesOpen={isHero(e)}
         />
       ))}
     </ChannelMessageList>

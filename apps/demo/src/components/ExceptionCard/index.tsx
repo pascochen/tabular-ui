@@ -34,6 +34,8 @@ export type ExceptionCardProps = {
   exception: Exception;
   state: ExceptionState;
   defaultRepliesOpen?: boolean;
+  /** The agent posted the message before this one in the same minute: group it under that header. */
+  continued?: boolean;
 };
 
 /**
@@ -46,7 +48,12 @@ export type ExceptionCardProps = {
  * App-local, as the plan says (§3): it composes `ChannelMessage`,
  * `StatusBadge` and `Sources`, and promotes if a second screen needs it.
  */
-export function ExceptionCard({ exception: e, state, defaultRepliesOpen = false }: ExceptionCardProps) {
+export function ExceptionCard({
+  exception: e,
+  state,
+  defaultRepliesOpen = false,
+  continued = false,
+}: ExceptionCardProps) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const sourcesId = useId();
   const sources = sourcesOf(e);
@@ -62,6 +69,7 @@ export function ExceptionCard({ exception: e, state, defaultRepliesOpen = false 
       dateTime={`${close.scene.date}T${e.postedAt}`}
       authorship={close.agent.authorship}
       defaultRepliesOpen={defaultRepliesOpen}
+      continued={continued}
       replies={state.replies.map((r, i) => (
         <ChannelMessageReply key={i} author={authorOf(r.author)} time={r.at} dateTime={`${close.scene.date}T${r.at}`}>
           {r.text}
