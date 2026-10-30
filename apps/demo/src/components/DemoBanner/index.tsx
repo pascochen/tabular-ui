@@ -16,10 +16,8 @@ import {
 import { sceneNow } from '../../lib/clock';
 import { useClose } from '../../lib/close-context';
 import { kasaneCompany, visitor } from '../../lib/kasane';
+import { AI_COMPONENTS_URL, STORYBOOK_URL } from '../../lib/links';
 import { useReplay } from '../../lib/replay';
-
-const STORYBOOK_URL = 'https://storybook.tabularui.com';
-const PORTFOLIO_URL = 'https://pascalchenier.com';
 
 /**
  * The line that tells a visitor where they are: a demo, played as Kasane's
@@ -88,12 +86,12 @@ export function DemoBanner() {
             </p>
           </div>
           <DialogFooter>
-            <a className={buttonVariants({ variant: 'outline' })} href={PORTFOLIO_URL} target="_blank" rel="noreferrer">
-              Designer&rsquo;s portfolio
+            <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
+              Storybook
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
-            <a className={buttonVariants()} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
-              Browse the components
+            <a className={buttonVariants()} href={AI_COMPONENTS_URL} target="_blank" rel="noreferrer">
+              Browse the AI components
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           </DialogFooter>
