@@ -50,6 +50,12 @@ export function ExceptionCard({
   extraReplies = [],
 }: ExceptionCardProps) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  // The thread opens by itself when a teammate replies in it after landing,
+  // so the reply is read, not just counted. Once the visitor opens or closes
+  // it by hand, their choice holds.
+  const [chosen, setChosen] = useState<boolean>();
+  const atLanding = e.replies.filter((r) => 'at' in r && r.at).length;
+  const repliesOpen = chosen ?? (defaultRepliesOpen || state.replies.length > atLanding);
   const sourcesId = useId();
   const sources = sourcesOf(e);
   const split = e.summary.lastIndexOf(' ') + 1;
@@ -62,7 +68,8 @@ export function ExceptionCard({
       time={e.postedAt}
       dateTime={`${close.scene.date}T${e.postedAt}`}
       authorship={close.agent.authorship}
-      defaultRepliesOpen={defaultRepliesOpen}
+      repliesOpen={repliesOpen}
+      onRepliesOpenChange={setChosen}
       continued={continued}
       replies={[
         ...state.replies.map((r, i) => (

@@ -14,3 +14,4 @@ App-local, as the plan puts it (`kasane-close-demo-plan.md` §3). It composes `C
 | Citations stay on the line of the sentence's last word | Wrapped onto a line of their own, the marks read as citing nothing |
 | Sources fold behind the replies' disclosure recipe | Two disclosures in one message read alike. Folded, six cards stay scannable |
 | `Sources` with the exception's `notChecked` | `docs/agent-voice.md` principle 4. The lines are authored in `close-demo.json`, and `[]` says every part was checked |
+| The thread opens by itself when a teammate replies in it after landing | So the reply is read, not just counted (`docs/reviews/demo-first-pass-2026-10-30.md`, issue 3). It's derived, not synced: the visitor's own open or close wins from then on |

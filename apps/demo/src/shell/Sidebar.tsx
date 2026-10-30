@@ -1,9 +1,9 @@
 import type { ReactElement, ReactNode } from 'react';
-import { HashIcon, HouseIcon } from '@phosphor-icons/react';
+import { HashIcon } from '@phosphor-icons/react';
 import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, TruncatedText } from 'tabular-ui';
 
-import { channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
-import { hrefFor, onViewLinkClick, sameView, useView, type View } from '../lib/view';
+import { channels, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
+import { BUILT_CHANNELS, hrefFor, onViewLinkClick, sameView, useView, type View } from '../lib/view';
 import { useClose } from '../lib/close-context';
 import { progress } from '../lib/close-state';
 import { MemberAvatar } from './members';
@@ -37,7 +37,7 @@ function NavLink({
 }
 
 /**
- * The sidebar: Home, the three channels and the direct messages. Every item
+ * The sidebar: the channels and the direct messages. Every item
  * opens a view (`lib/view.ts`), because a dead link is where a three-minute
  * visitor leaves.
  */
@@ -46,13 +46,8 @@ export function Sidebar() {
   const open = total - resolved;
   return (
     <AppShellNav aria-label="Workspace">
-      <AppShellNavGroup>
-        <NavLink view={{ kind: 'home' }} icon={<HouseIcon />}>
-          Home
-        </NavLink>
-      </AppShellNavGroup>
       <AppShellNavGroup label="Channels">
-        {channels.map((c) => (
+        {BUILT_CHANNELS.map((id) => channels.find((c) => c.id === id)!).map((c) => (
           <NavLink
             key={c.id}
             view={{ kind: 'channel', channel: c.id }}
@@ -72,14 +67,7 @@ export function Sidebar() {
       </AppShellNavGroup>
       <AppShellNavGroup label="Direct messages">
         {directMessages.map((key) => (
-          <NavLink
-            key={key}
-            view={{ kind: 'dm', member: key }}
-            avatar={<MemberAvatar memberKey={key} />}
-            // The agent is a member, marked as one: the authorship label, in
-            // the agent's tone, as AgentBlock's (docs/agent-voice.md, rule 1).
-            trailing={key === 'agent' ? <Badge tone="agent">{close.agent.authorship}</Badge> : undefined}
-          >
+          <NavLink key={key} view={{ kind: 'dm', member: key }} avatar={<MemberAvatar memberKey={key} />}>
             {memberName(key)}
           </NavLink>
         ))}

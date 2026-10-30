@@ -51,6 +51,7 @@ export function App() {
         pageHeader={<AppShellPageHeader title={slots.title} actions={slots.actions} />}
         panel={slots.panel?.content}
         panelLabel={slots.panel?.label}
+        contentWidth={slots.contentWidth}
       >
         {slots.body}
       </AppShell>
