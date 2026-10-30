@@ -177,3 +177,14 @@ test('the catch-up changes only on refresh', () => {
     tiedOut: [],
   });
 });
+
+test('each typing indicator names the card its reply lands on', () => {
+  timeline.forEach((e, i) => {
+    if (e.effect.kind !== 'typing') return;
+    const { who, exception } = e.effect;
+    const reply = timeline.slice(i + 1).find((x) => x.effect.kind === 'reply' && x.effect.author === who);
+    expect(reply?.effect, `${who} typing at event ${i}`).toMatchObject({ exception });
+  });
+  const s = closeReducer(landingState(), { type: 'event', index: 0, at: '14:00' });
+  expect(s.typing).toEqual({ who: 'apLead', exception: 'duplicate-payment' });
+});

@@ -5,6 +5,8 @@ Two methods from Ileana Marcut's UX + AI method library, run on the Kasane close
 1. **Variants of one element**, on the agent's display name ("Close agent").
 2. **Heuristic critique**, on the demo as a whole.
 
+**Status, 2026-10-30:** the name (variant 1, "AI") and the three severity-3 issues are fixed in the PR after #66. The rest are open.
+
 Everything below was seen in the live site at 1440×900, light mode, walking the plan's 3-minute script: land, open the hero, answer Reopen September, post, watch the teammates, reach the end, then every sidebar item. The findings are hypotheses for the user tests to confirm, not results.
 
 ---

@@ -1,19 +1,17 @@
 import type { ReactNode } from 'react';
-import { ChatsIcon, HouseIcon, ListChecksIcon, TreeStructureIcon, UserIcon } from '@phosphor-icons/react';
 import { AppShellPanelHeader } from 'tabular-ui';
 
+import { ClosePanel } from '../components/ClosePanel';
 import { channels, lastClosedMonth, memberName } from '../lib/kasane';
 import type { View } from '../lib/view';
-import { ClosePanel } from '../components/ClosePanel';
 import { ChannelPresence } from '../shell/ChannelPresence';
-import { PanelPlaceholder, Placeholder, Profile } from './parts';
+import { OpenItemsChannel } from './OpenItems';
+import { NoMessages, Profile } from './parts';
 import { SepCloseChannel } from './SepClose';
 
 /**
  * What one view puts in the shell's slots: the page header, the main body and,
- * for some views, the right panel. The bodies are placeholders until the
- * phase that builds each view (kasane-close-demo-plan.md §6); the header, the
- * panel's place and the profile are real.
+ * for some views, the right panel. Only built views reach here (`lib/view.ts`).
  */
 export type ViewSlots = {
   title: string;
@@ -21,27 +19,15 @@ export type ViewSlots = {
   actions?: ReactNode;
   body: ReactNode;
   panel?: { label: string; content: ReactNode };
+  /** `full` for a table page, where extra width is extra columns (AppShell, §7.9). */
+  contentWidth?: 'full';
 };
 
-const channelName = (id: string) => channels.find((c) => c.id === id)!;
-
 export function slotsFor(view: View): ViewSlots {
-  if (view.kind === 'home') {
-    return {
-      title: 'Home',
-      body: <Placeholder icon={HouseIcon} title="Home" description="The close at a glance. Built in phase 9." />,
-    };
-  }
   if (view.kind === 'dm') {
     return {
       title: memberName(view.member),
-      body: (
-        <Placeholder
-          icon={view.member === 'agent' ? ChatsIcon : UserIcon}
-          title={`Messages with ${memberName(view.member)}`}
-          description="A short scripted history. Built in phase 7."
-        />
-      ),
+      body: <NoMessages memberKey={view.member} />,
       panel: {
         label: 'Profile',
         content: (
@@ -53,41 +39,23 @@ export function slotsFor(view: View): ViewSlots {
       },
     };
   }
-  const channel = channelName(view.channel);
+  const channel = channels.find((c) => c.id === view.channel)!;
   const title = `# ${channel.name}`;
-  if (view.channel === 'sep-close') {
-    return {
-      title,
-      actions: <ChannelPresence channel="sep-close" />,
-      body: <SepCloseChannel />,
-      panel: {
-        label: `${lastClosedMonth} close`,
-        content: (
-          <>
-            <AppShellPanelHeader title={`${lastClosedMonth} close`} />
-            <ClosePanel />
-          </>
-        ),
-      },
-    };
-  }
   if (view.channel === 'open-items') {
-    return {
-      title,
-      body: <Placeholder icon={ListChecksIcon} title={channel.topic} description="The open items. Built in phase 8." />,
-      panel: {
-        label: 'Item',
-        content: (
-          <>
-            <AppShellPanelHeader title="Item" />
-            <PanelPlaceholder title="No item selected" description="Select an item to see where it came from." />
-          </>
-        ),
-      },
-    };
+    return { title, body: <OpenItemsChannel />, contentWidth: 'full' };
   }
   return {
     title,
-    body: <Placeholder icon={TreeStructureIcon} title={channel.topic} description="Built in phase 10." />,
+    actions: <ChannelPresence channel="sep-close" />,
+    body: <SepCloseChannel />,
+    panel: {
+      label: `${lastClosedMonth} close`,
+      content: (
+        <>
+          <AppShellPanelHeader title={`${lastClosedMonth} close`} />
+          <ClosePanel />
+        </>
+      ),
+    },
   };
 }
