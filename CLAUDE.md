@@ -17,7 +17,7 @@ Before changing tooling, dependencies, tests, package scripts, or deployment con
 - **Hues**: exactly five — sage, vermilion, ochre, federal, orchid. The accent is ink: the primary action, focus ring and checked controls are `ledger` (ink on paper, paper on ink in dark); the ring is a step softer, `ledger-800` / `ledger-200` (2026-10-22). Links and selection stay `sage`, the same green as success; federal is `info`. A seventh ramp, `teal`, is for chart series only.
 - **Modes**: dark-first, light fully specified
 - **Radius**: square. `--radius-xs` through `--radius-lg` are 0px since 2026-10-16; `--radius-full` keeps round shapes round (status dot, avatar, count badge, progress track). Every control is square, the switch included since 2026-10-23. Still name a rectangle's tier token, never `rounded-none` — see `docs/design-system.md` §7.7.
-- **Components**: 18 foundational, 32 product — inventory in `docs/components.md`
+- **Components**: 18 foundational, 33 product — inventory in `docs/components.md`
 - **Primitive layer**: shadcn/ui on **Base UI** — not Radix. Use `/docs/components/base/*`, never `/docs/components/radix/*`.
 - **Icons**: `@phosphor-icons/react`, and nothing else. `lucide` and `hugeicons` are out of the stack. Stroke weight matches adjacent type weight, except at ≤16px where `bold` is the floor — see `docs/design-system.md` §11.
 - **Package manager**: pnpm. All commands use `pnpm`, never `npm`.
@@ -122,7 +122,7 @@ Add via `pnpm dlx shadcn@latest add <component>`, then apply our tokens. Always 
 
 Notes: `IconButton` is separate from `Button` — different padding, mandatory `aria-label`. `Tooltip` is not optional; truncated table cells are unreadable without it. There is no `Radio` — in dense UI a `Select` beats a radio group. `Avatar` (added 2026-10-07) is still by default; an `animatedSrc` plays only when asked and never under reduced motion. `MessageScroller` (added 2026-10-12) is shadcn's chat scroller: its behaviour is the headless `@shadcn/react` package, not Base UI, and it was written from source rather than `shadcn add` (see its README). `Textarea` (added 2026-10-13) is a native `<textarea>` styled as `Input`; it grows with its text, and one line is `--h-control`. `variant="borderless"` is for a field inside a container that draws its border and focus ring, as `ChatComposer` does. `Spinner` (added 2026-10-20) is the working indicator: a square tracer, the one mark drawn outside Phosphor (§11.5). It is shadcn's `Spinner` API with our glyph, written from source.
 
-### Product (32) — domain composites
+### Product (33) — domain composites
 
 Built **from** foundational components. These should proliferate freely; that is what a product layer is for. Build them without asking, but check `docs/components.md` first.
 
@@ -132,7 +132,7 @@ Evidence       Sources · InlineCitation
 Status         StatusBadge · ProgressBar · CountBadge
 Controls       FilterChip · Toolbar · Field · ContextSwitcher · OrgSwitcher · ProjectSwitcher
 Agent          AgentBlock · AgentReasoning · AgentPlan · Confirmation · Question · Tool
-Chat           ChatThread · ChatComposer · ChatStarter · ChannelMessage
+Chat           ChatThread · ChatComposer · ChatStarter · ChannelMessage · PresenceStack
 Shell          AppShell · AppBar · AccountMenu · EmptyState
 ```
 
