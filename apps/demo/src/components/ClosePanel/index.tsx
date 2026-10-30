@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { AppShellPanelBody, MetricTile, ProgressBar, StatusBadge, buttonVariants, cn } from 'tabular-ui';
+import { AppShellPanelBody, MetricTile, ProgressBar, buttonVariants, cn } from 'tabular-ui';
 
 import { checkLabel, isTiedOut, progress, type CloseState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
+import { ExceptionStatus } from '../ExceptionStatus';
 import { checks, close, lastClosedMonth } from '../../lib/kasane';
 
 /** §8.1's micro-label tier, as AppShell's sidebar section labels. A heading, so the panel has an outline. */
@@ -17,16 +18,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 /**
  * What the figure means now. A check that reran to its after-figure is tied
- * out. The cut-off settled by keeping September locked changes no figure,
- * so it says where the amount went instead. Words, so the state survives
- * without colour: the figure itself takes no hue (§5).
+ * out. One whose exception was settled without changing its figure (keeping
+ * September locked; a supplier agreeing to credit) says how, from the
+ * decision log's line. Words, so the state survives without colour: the
+ * figure itself takes no hue (§5).
  */
 function caption(state: CloseState, c: (typeof checks)[number]) {
   if (isTiedOut(state, c.id)) return `Tied out. ${c.meaning}.`;
-  const round = state.hero.rounds[state.hero.rounds.length - 1];
-  if (c.id === close.hero.exception && round.answer === 'keep-locked' && round.stage === 'done') {
-    return `Listed for the auditors' review. ${c.meaning}.`;
-  }
+  const settled = state.log.findLast((l) => l.exception === c.id);
+  if (settled) return settled.text.slice(settled.text.indexOf(': ') + 2);
   return `${c.meaning}.`;
 }
 
@@ -69,7 +69,6 @@ export function ClosePanel() {
       <Section title="Exceptions">
         <ul role="list" className="-mx-[var(--pad-control-x)] flex flex-col">
           {close.exceptions.map((e) => {
-            const done = state.exceptions[e.id].status === 'resolved';
             return (
               <li key={e.id}>
                 {/* A link to the exception's message in the channel. */}
@@ -81,11 +80,7 @@ export function ClosePanel() {
                   )}
                 >
                   <span className="min-w-0 truncate">{e.title}</span>
-                  {done ? (
-                    <StatusBadge status="passed">Resolved</StatusBadge>
-                  ) : (
-                    <StatusBadge status="needs-review">Open</StatusBadge>
-                  )}
+                  <ExceptionStatus status={state.exceptions[e.id].status} />
                 </a>
               </li>
             );

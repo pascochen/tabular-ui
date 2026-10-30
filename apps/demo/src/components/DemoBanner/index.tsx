@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { InfoIcon } from '@phosphor-icons/react';
+import { ArrowCounterClockwiseIcon, FastForwardIcon, InfoIcon } from '@phosphor-icons/react';
 import {
   Badge,
   Button,
@@ -13,7 +13,10 @@ import {
   buttonVariants,
 } from 'tabular-ui';
 
+import { sceneNow } from '../../lib/clock';
+import { useClose } from '../../lib/close-context';
 import { kasaneCompany, visitor } from '../../lib/kasane';
+import { useReplay } from '../../lib/replay';
 
 const STORYBOOK_URL = 'https://storybook.tabularui.com';
 const PORTFOLIO_URL = 'https://pascalchenier.com';
@@ -27,6 +30,8 @@ const PORTFOLIO_URL = 'https://pascalchenier.com';
  */
 export function DemoBanner() {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const { state, dispatch } = useClose();
+  const replay = useReplay();
 
   return (
     <div
@@ -36,6 +41,24 @@ export function DemoBanner() {
       <Badge>Demo</Badge>
       <TruncatedText side="bottom">{`You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`}</TruncatedText>
       <span className="flex-1" />
+      {/*
+        Skip and Replay work at any point (the plan, §5). Skip is disabled at
+        the end rather than hidden, so the bar doesn't shift under the
+        pointer; Replay is always there.
+      */}
+      <Button
+        size="sm"
+        variant="ghost"
+        disabled={state.ended}
+        onClick={() => dispatch({ type: 'skip', at: sceneNow() })}
+      >
+        <FastForwardIcon aria-hidden="true" />
+        Skip to the end
+      </Button>
+      <Button size="sm" variant="ghost" onClick={replay}>
+        <ArrowCounterClockwiseIcon aria-hidden="true" />
+        Replay
+      </Button>
       <Button size="sm" variant="ghost" onClick={() => setAboutOpen(true)}>
         <InfoIcon aria-hidden="true" />
         About this demo

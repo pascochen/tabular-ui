@@ -3,9 +3,13 @@ import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tab
 
 import { DemoBanner } from './components/DemoBanner';
 import { HeroAnnouncer } from './components/HeroThread/Announcer';
+import { TimelineAnnouncer } from './components/TimelineAnnouncer';
 import { CloseContext } from './lib/close-context';
-import { closeReducer, landingState } from './lib/close-state';
+import { sceneNow } from './lib/clock';
+import { closeReducer, endState, landingState } from './lib/close-state';
 import { useHeroScript } from './lib/hero-script';
+import { useTimeline } from './lib/timeline-script';
+import { parseAtEnd } from './lib/view';
 import { useView } from './lib/view';
 import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
 import { slotsFor } from './views/slots';
@@ -20,9 +24,14 @@ export function App() {
   const view = useView();
   const slots = slotsFor(view);
   // One store for the close: every view and the panel read it (lib/close-state.ts).
-  const [state, dispatch] = useReducer(closeReducer, undefined, landingState);
-  // The agent's scripted steps run here, not in the channel, so they land from any view.
+  // `?at=end` opens on the end state, for screenshots and sharing. Read once,
+  // as the initial state: the URL is not consulted again.
+  const [state, dispatch] = useReducer(closeReducer, undefined, () =>
+    parseAtEnd(window.location.search) ? endState(sceneNow()) : landingState(),
+  );
+  // The scripted steps run here, not in the channel, so they land from any view.
   useHeroScript(state, dispatch);
+  useTimeline(state, dispatch);
 
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
@@ -33,6 +42,7 @@ export function App() {
             <DemoBanner />
             {/* In the top nav, which every view keeps, so a change is heard anywhere. */}
             <HeroAnnouncer />
+            <TimelineAnnouncer />
           </AppBar>
         }
         sidebarHeader={<SidebarHeader />}

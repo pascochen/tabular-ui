@@ -2,7 +2,14 @@
 
 The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exceptions workbench for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
 
-**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. Phase 4 is `#sep-close` in its landing state: the agent's catch-up, six exception cards and the close panel. Phase 5 is the decision in the Revenue cut-off thread (`src/components/HeroThread/README.md`). The timeline follows, and the other views show a placeholder that names the phase that builds them.
+**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. Phase 4 is `#sep-close` in its landing state: the agent's catch-up, six exception cards and the close panel. Phase 5 is the decision in the Revenue cut-off thread (`src/components/HeroThread/README.md`). Phase 6 is the timeline: once the visitor decides, the teammates reply and resolve in the background, and the run ends at 5 of 6 with an end strip. Phases 0–6 are the demo; the other views still show a placeholder that names the phase that builds them.
+
+**The timeline** (`src/lib/timeline.ts`) is one list in one fixed order, built from `close.json`'s delays, so every run plays the same. `src/lib/timeline-script.ts` plays it one event at a time.
+- It pauses while the tab is hidden, and the waiting event starts its gap again on return.
+- Under reduced motion it applies everything at once, with no typing indicators.
+- Only one timer exists at a time, so none outlives a view.
+
+**Skip to the end** and **Replay** sit in the top nav and work at any point. Skip finishes the decision as "Choose for me" would, unless the visitor already answered, then applies every event left. `?at=end` opens on the end state.
 
 **One store.** `src/lib/close-state.ts` holds each exception's status and replies, the decision log and each check's figure. The panel, the tiles and the sidebar's open count are derived from it.
 

@@ -43,9 +43,11 @@
   "directMessages": ["agent", "controller", "apLead"],
   "catchUp": [
     "September was locked on 8 Oct, business day 6.",
-    "6 exceptions found since. 2 are resolved.",
-    "September revenue includes ¥42.7m delivered in October."
+    "6 exceptions found since. {resolved} resolved.",
+    { "text": "September revenue includes ¥42.7m delivered in October.", "whileUntied": "revenue-cut-off" }
   ],
+  "typingMs": 1500,
+  "endStrip": { "title": "That’s the close so far." },
   "exceptions": [
     {
       "id": "close-length",

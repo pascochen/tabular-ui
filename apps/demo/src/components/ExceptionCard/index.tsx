@@ -1,18 +1,10 @@
 import { useId, useState, type ReactElement } from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
-import {
-  Button,
-  ChannelMessage,
-  ChannelMessageReply,
-  InlineCitation,
-  Sources,
-  StatusBadge,
-  cn,
-  type Source,
-} from 'tabular-ui';
+import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn, type Source } from 'tabular-ui';
 
 import type { ExceptionState } from '../../lib/close-state';
 import { agent, close, memberName, packFile } from '../../lib/kasane';
+import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
 
 type Exception = (typeof close.exceptions)[number];
@@ -60,7 +52,6 @@ export function ExceptionCard({
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const sourcesId = useId();
   const sources = sourcesOf(e);
-  const resolved = state.status === 'resolved';
   const split = e.summary.lastIndexOf(' ') + 1;
   const lead = e.summary.slice(0, split);
   const lastWord = e.summary.slice(split);
@@ -88,11 +79,7 @@ export function ExceptionCard({
           <h2 id={e.id} className="scroll-mt-[var(--pad-page-y)] text-md font-semibold text-text-primary">
             {e.title}
           </h2>
-          {resolved ? (
-            <StatusBadge status="passed">Resolved</StatusBadge>
-          ) : (
-            <StatusBadge status="needs-review">Open</StatusBadge>
-          )}
+          <ExceptionStatus status={state.status} />
         </div>
         <p>
           {lead}
@@ -104,6 +91,11 @@ export function ExceptionCard({
             ))}
           </span>
         </p>
+        {state.status === 'waiting' && 'waiting' in e && e.waiting ? (
+          <p className="text-sm text-text-secondary">
+            Waiting on the {e.waiting.on.charAt(0).toLowerCase() + e.waiting.on.slice(1)}.
+          </p>
+        ) : null}
         <div className="flex flex-col items-start gap-[var(--gap-field)]">
           <Button
             variant="inline"

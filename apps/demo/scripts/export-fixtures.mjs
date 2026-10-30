@@ -978,6 +978,8 @@ const closeTokens = {
   closeDay: String(closeDay),
   exceptionCount: String(closeSource.exceptions.length),
   resolvedAtLanding: String(closeSource.exceptions.filter((e) => e.atLanding === 'resolved').length),
+  // Filled by the demo at run time: the catch-up's count changes as exceptions resolve.
+  resolved: '{resolved}',
   cutoffInvoice: cutoff.invoice_id,
   cutoffNet: money(num(cutoff.net_amount), 'JPY'),
   cutoffInvoiceDate: shortDate(cutoff.invoice_date),
@@ -1086,6 +1088,14 @@ const closeChecks = [
   },
 ].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
+for (const line of closeSource.catchUp) {
+  if (typeof line === 'object')
+    must(
+      closeChecks.some((c) => c.id === line.whileUntied),
+      `catch-up line's check ${line.whileUntied}`,
+    );
+}
+must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
 await writeJson('apps/demo/data/people.json', closePeople);
 await writeJson('apps/demo/data/close.json', {
@@ -1094,6 +1104,8 @@ await writeJson('apps/demo/data/close.json', {
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   catchUp: fillAll(closeSource.catchUp),
+  typingMs: closeSource.typingMs,
+  endStrip: fillAll(closeSource.endStrip),
   exceptions: closeExceptions,
   hero: fillAll({
     ...closeSource.hero,

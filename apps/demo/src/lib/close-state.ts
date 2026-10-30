@@ -1,12 +1,14 @@
 // The close as it stands: each exception's status and replies, the visitor's decision, the
-// decision log and each check's figure. One state object; the close panel, the tiles and the
-// counts are derived from it, never stored (kasane-close-demo-plan.md §5). Phase 6 adds the
-// scripted background resolutions.
+// teammates' scripted replies, the decision log and each check's figure. One state object; the
+// close panel, the tiles and the counts are derived from it, never stored
+// (kasane-close-demo-plan.md §5).
 
 import { checks, close } from './kasane';
+import { timeline } from './timeline';
 
 export type ExceptionId = (typeof close.exceptions)[number]['id'];
-export type ExceptionStatus = 'open' | 'resolved';
+/** `waiting`: nobody here can settle it; it waits on a decision outside the channel. */
+export type ExceptionStatus = 'open' | 'resolved' | 'waiting';
 
 export type Reply = { author: string; text: string; at: string };
 
@@ -46,6 +48,16 @@ export type CloseState = {
   log: LogEntry[];
   /** Each check's current figure, by check id. */
   checks: Record<string, number>;
+  /** How many of `timeline`'s events have applied. The next one to play is this index. */
+  applied: number;
+  /** A person typing now, by member key, or null. People only: the agent never types. */
+  typing: string | null;
+  /** The scripted run is over: the end strip shows. */
+  ended: boolean;
+  /** What the visitor wrote in the composer. Nobody replies to it. */
+  posts: { text: string; at: string }[];
+  /** The catch-up as of its last refresh: when, and how many were resolved then. */
+  catchUp: { at: string; resolved: number; tiedOut: string[] };
 };
 
 const HERO = close.hero.exception as ExceptionId;
@@ -66,11 +78,29 @@ export function landingState(): CloseState {
     }
   }
   log.sort((a, b) => a.at.localeCompare(b.at));
-  return {
+  const base = {
     exceptions,
     hero: { rounds: [{ askedAt: close.hero.askedAt }] },
     log,
     checks: Object.fromEntries(checks.map((c) => [c.id, c.before])),
+    applied: 0,
+    typing: null,
+    ended: false,
+    posts: [],
+  };
+  return { ...base, catchUp: snapshot(base, close.scene.landingTime) };
+}
+
+/** The end state: the decision made (Reopen, as Choose for me picks) and every event applied. `?at=end` opens here. */
+export function endState(at: string): CloseState {
+  return closeReducer(landingState(), { type: 'skip', at });
+}
+
+function snapshot(state: Pick<CloseState, 'exceptions' | 'checks'>, at: string): CloseState['catchUp'] {
+  return {
+    at,
+    resolved: Object.values(state.exceptions).filter((e) => e.status === 'resolved').length,
+    tiedOut: checks.filter((c) => state.checks[c.id] === c.after).map((c) => c.id),
   };
 }
 
@@ -85,7 +115,15 @@ export type CloseAction =
   /** The visitor declined it: the agent asks again. */
   | { type: 'stop'; at: string }
   /** The revenue cut-off check finished rerunning. */
-  | { type: 'rerun'; at: string };
+  | { type: 'rerun'; at: string }
+  /** The next background event, by its index in `timeline`. `quiet` drops a typing indicator (reduced motion). */
+  | { type: 'event'; index: number; at: string; quiet?: boolean }
+  /** Skip to the end: finish the decision if it's open, then apply every event left. */
+  | { type: 'skip'; at: string }
+  /** Refresh the catch-up to now. */
+  | { type: 'refresh'; at: string }
+  /** The visitor posted in the composer. */
+  | { type: 'say'; text: string; at: string };
 
 const current = (state: CloseState) => state.hero.rounds[state.hero.rounds.length - 1];
 
@@ -104,11 +142,72 @@ function resolveHero(state: CloseState, at: string, log: string): CloseState {
   };
 }
 
+function applyEvent(state: CloseState, index: number, at: string, quiet: boolean): CloseState {
+  if (index !== state.applied || index >= timeline.length) return state;
+  const next = { ...state, applied: index + 1 };
+  const effect = timeline[index].effect;
+  switch (effect.kind) {
+    case 'typing':
+      return quiet ? next : { ...next, typing: effect.who };
+    case 'reply': {
+      const id = effect.exception as ExceptionId;
+      const e = next.exceptions[id];
+      return {
+        ...next,
+        typing: next.typing === effect.author ? null : next.typing,
+        exceptions: {
+          ...next.exceptions,
+          [id]: { ...e, replies: [...e.replies, { author: effect.author, text: effect.text, at }] },
+        },
+      };
+    }
+    case 'resolve': {
+      const id = effect.exception as ExceptionId;
+      return {
+        ...next,
+        exceptions: { ...next.exceptions, [id]: { ...next.exceptions[id], status: 'resolved' } },
+        log: [...next.log, { at, exception: id, text: effect.log, by: effect.by }],
+      };
+    }
+    case 'wait': {
+      const id = effect.exception as ExceptionId;
+      return { ...next, exceptions: { ...next.exceptions, [id]: { ...next.exceptions[id], status: 'waiting' } } };
+    }
+    case 'end':
+      return { ...next, typing: null, ended: true };
+  }
+}
+
+/** Whether the visitor's decision has settled, which starts the background. */
+export function decided(state: CloseState): boolean {
+  const stage = current(state).stage;
+  return stage === 'done' || stage === 'skipped';
+}
+
 export function closeReducer(state: CloseState, action: CloseAction): CloseState {
   const round = current(state);
   switch (action.type) {
     case 'reset':
       return landingState();
+    case 'event':
+      return applyEvent(state, action.index, action.at, action.quiet ?? false);
+    case 'skip': {
+      // Finish the decision from wherever it stands, as the visitor would have.
+      let s = state;
+      const step = (a: CloseAction) => (s = closeReducer(s, a));
+      if (!current(s).answer) step({ type: 'answer', answer: 'delegate', at: action.at });
+      if (current(s).stage === 'reading') step({ type: 'read' });
+      if (current(s).stage === 'proposed') step({ type: 'post', at: action.at });
+      if (current(s).stage === 'rerunning') step({ type: 'rerun', at: action.at });
+      while (s.applied < timeline.length) s = applyEvent(s, s.applied, action.at, true);
+      return { ...s, catchUp: snapshot(s, action.at) };
+    }
+    case 'refresh':
+      return { ...state, catchUp: snapshot(state, action.at) };
+    case 'say':
+      return action.text.trim()
+        ? { ...state, posts: [...state.posts, { text: action.text.trim(), at: action.at }] }
+        : state;
     case 'answer': {
       if (round.answer) return state;
       if (action.answer === 'skip')

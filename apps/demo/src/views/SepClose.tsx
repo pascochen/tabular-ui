@@ -1,50 +1,112 @@
-import { ChannelMessage, ChannelMessageList } from 'tabular-ui';
+import { ArrowClockwiseIcon } from '@phosphor-icons/react';
+import { Button, ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
 
+import { EndStrip } from '../components/EndStrip';
 import { ExceptionCard } from '../components/ExceptionCard';
 import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
+import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
-import { agent, close } from '../lib/kasane';
+import { agent, close, memberName } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
 
 const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero === true;
+const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /**
- * #sep-close: the agent's catch-up, then one message per exception, each with
- * its replies inline. Phase 4 is the landing state; the decision (phase 5)
- * and the timeline (phase 6) change it through the close state.
+ * The catch-up, as of its last refresh. The count is the state's, filled into
+ * the authored line; the cut-off line shows only while that check is untied,
+ * because once it ties out the line is no longer true.
+ */
+function CatchUp() {
+  const { state, dispatch } = useClose();
+  const { catchUp } = state;
+  const lines = close.catchUp.flatMap((line) =>
+    typeof line === 'string'
+      ? [line.replace('{resolved}', String(catchUp.resolved))]
+      : catchUp.tiedOut.includes(line.whileUntied)
+        ? []
+        : [line.text],
+  );
+  return (
+    <ChannelMessage
+      author={{ name: agent.name, avatar: <MemberAvatar memberKey="agent" /> }}
+      time={catchUp.at}
+      dateTime={dateTime(catchUp.at)}
+      authorship={`${agent.authorship} · Catch-up`}
+      agentActions={
+        <Button size="sm" variant="ghost" onClick={() => dispatch({ type: 'refresh', at: sceneNow() })}>
+          <ArrowClockwiseIcon aria-hidden="true" />
+          Refresh
+        </Button>
+      }
+    >
+      <ul role="list" className="flex list-disc flex-col gap-[var(--gap-bonded)] pl-4">
+        {lines.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+    </ChannelMessage>
+  );
+}
+
+/**
+ * #sep-close: the agent's catch-up, one message per exception with its replies
+ * inline, whatever the visitor writes, and the composer. The decision and the
+ * timeline change it all through the close state.
  */
 export function SepCloseChannel() {
-  const { state } = useClose();
+  const { state, dispatch } = useClose();
   const heroReplies = useHeroReplies();
   return (
-    <ChannelMessageList aria-label="Messages in sep-close">
-      <ChannelMessage
-        author={{ name: agent.name, avatar: <MemberAvatar memberKey="agent" /> }}
-        time={close.scene.landingTime}
-        dateTime={`${close.scene.date}T${close.scene.landingTime}`}
-        authorship={`${agent.authorship} · Catch-up`}
-      >
-        <ul role="list" className="flex list-disc flex-col gap-[var(--gap-bonded)] pl-4">
-          {close.catchUp.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </ChannelMessage>
-      {close.exceptions.map((e, i) => (
-        <ExceptionCard
-          key={e.id}
-          exception={e}
-          state={state.exceptions[e.id]}
-          // A run: the agent posted every exception at once. Same author, same
-          // minute, so one header (ChannelMessage's `continued`). Except after
-          // the hero, whose thread opens with a person's reply: a headerless
-          // message under it would read as that person's.
-          continued={i > 0 && close.exceptions[i - 1].postedAt === e.postedAt && !isHero(close.exceptions[i - 1])}
-          // The decision the visitor makes: open on arrival, so the reply is there.
-          defaultRepliesOpen={isHero(e)}
-          extraReplies={isHero(e) ? heroReplies : undefined}
+    <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
+      <ChannelMessageList aria-label="Messages in sep-close">
+        <CatchUp />
+        {close.exceptions.map((e, i) => (
+          <ExceptionCard
+            key={e.id}
+            exception={e}
+            state={state.exceptions[e.id]}
+            // A run: the agent posted every exception at once. Same author, same
+            // minute, so one header (ChannelMessage's `continued`). Except after
+            // the hero, whose thread opens with a person's reply: a headerless
+            // message under it would read as that person's.
+            continued={i > 0 && close.exceptions[i - 1].postedAt === e.postedAt && !isHero(close.exceptions[i - 1])}
+            // The decision the visitor makes: open on arrival, so the reply is there.
+            defaultRepliesOpen={isHero(e)}
+            extraReplies={isHero(e) ? heroReplies : undefined}
+          />
+        ))}
+        {state.posts.map((p, i) => (
+          <ChannelMessage
+            key={i}
+            author={{ name: memberName('visitor'), avatar: <MemberAvatar memberKey="visitor" /> }}
+            time={p.at}
+            dateTime={dateTime(p.at)}
+            continued={i > 0 && state.posts[i - 1].at === p.at}
+          >
+            {p.text}
+          </ChannelMessage>
+        ))}
+      </ChannelMessageList>
+      {state.ended ? <EndStrip /> : null}
+      {/*
+        The composer stays at the foot of the channel while it scrolls. The
+        typing line sits on it; aria-hidden, because a screen reader hears the
+        reply itself when it lands, and "typing" once per reply is noise.
+        Sticky to the scroller's edge, not its padding: the main body has
+        --pad-page-y at the bottom, and at bottom-0 the messages showed
+        through that strip. The canvas ground covers it.
+      */}
+      <div className="sticky bottom-[calc(var(--pad-page-y)*-1)] -mb-[var(--pad-page-y)] mt-auto flex flex-col gap-[var(--gap-bonded)] bg-canvas pb-[var(--pad-page-y)]">
+        <p aria-hidden="true" className="min-h-[var(--text-xs--line-height)] text-xs text-text-secondary">
+          {state.typing ? `${memberName(state.typing)} is typing…` : null}
+        </p>
+        <ChatComposer
+          label="Message sep-close"
+          placeholder="Message #sep-close"
+          onSend={(text) => dispatch({ type: 'say', text, at: sceneNow() })}
         />
-      ))}
-    </ChannelMessageList>
+      </div>
+    </div>
   );
 }

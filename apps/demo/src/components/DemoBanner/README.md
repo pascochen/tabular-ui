@@ -8,6 +8,8 @@ links to the Storybook and the designer's portfolio. It sits inside `AppBar`,
 not above the shell, so `AppShell` keeps the full viewport height. The line
 truncates, with its full text in a tooltip.
 
+Beside the line: **Skip to the end** (disabled at the end, not hidden, so the bar doesn't shift under the pointer) and **Replay**, which start over from landing from any point.
+
 App-local: only the public demo needs it.
 
 ## Decisions

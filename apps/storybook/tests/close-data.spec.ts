@@ -89,8 +89,14 @@ test('every check belongs to an exception and has something to fix', () => {
   }
 });
 
-test('no authored token is left unfilled', () => {
+test('no authored token is left unfilled, except those the demo fills at run time', () => {
+  // {resolved}: the catch-up's count, which changes as exceptions resolve.
+  const runtime = new Set(['{resolved}']);
   for (const name of ['close.json', 'people.json', 'checks.json']) {
-    expect(readFileSync(path.join(dataDir, name), 'utf8')).not.toMatch(/\{[a-zA-Z]+\}/);
+    const left = readFileSync(path.join(dataDir, name), 'utf8').match(/\{[a-zA-Z]+\}/g) ?? [];
+    expect(
+      left.filter((t) => !runtime.has(t)),
+      name,
+    ).toEqual([]);
   }
 });
