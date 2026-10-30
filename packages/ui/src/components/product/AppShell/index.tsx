@@ -101,6 +101,11 @@ export type AppShellProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   sidebar?: React.ReactNode;
   /** Sidebar footer — account, settings. Pinned to the bottom. */
   sidebarFooter?: React.ReactNode;
+  /**
+   * Accessible name for the sidebar's `region` landmark, which holds the
+   * header, body and footer. Defaults to "Sidebar".
+   */
+  sidebarLabel?: string;
   /** Whether the sidebar starts pinned at ≥1280px. Below it, it always starts collapsed. */
   defaultSidebarOpen?: boolean;
   /**
@@ -179,6 +184,7 @@ function AppShell({
   sidebarHeader,
   sidebar,
   sidebarFooter,
+  sidebarLabel = 'Sidebar',
   defaultSidebarOpen = true,
   panel,
   panelLabel,
@@ -216,7 +222,7 @@ function AppShell({
   const mainId = useId();
   const mainRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
   const headerToggleRef = useRef<HTMLButtonElement>(null);
   // Element refs fed by callback refs, read only in effects and handlers.
   const navToggleRef = useRef<HTMLButtonElement | null>(null);
@@ -420,12 +426,21 @@ function AppShell({
 
         {/*
           After the body in source order, so a peek paints over main without
-          a z-index war. Sidebar landmarks come from its content (AppShellNav).
+          a z-index war.
+
+          One named region around the whole sidebar. The header and footer
+          (OrgSwitcher, AccountMenu) and anything in the body beside
+          AppShellNav would otherwise sit outside every landmark (axe
+          `region`), and a screen reader's landmark list would never reach
+          them. `region`, not `complementary` or `nav`: it claims a place to
+          jump to and nothing about the content, so AppShellNav's own <nav>
+          nests inside it unchanged.
         */}
         {hasSidebar ? (
-          <div
+          <section
             ref={sidebarRef}
             id={sidebarId}
+            aria-label={sidebarLabel}
             data-slot="app-shell-sidebar"
             data-state={pinned ? 'pinned' : peek ? 'peek' : 'collapsed'}
             hidden={!pinned && !peek}
@@ -497,7 +512,7 @@ function AppShell({
                 {sidebarFooter}
               </div>
             ) : null}
-          </div>
+          </section>
         ) : null}
       </div>
     </AppShellContext.Provider>
