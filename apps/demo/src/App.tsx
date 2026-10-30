@@ -48,7 +48,7 @@ export function App() {
         sidebarHeader={<SidebarHeader />}
         sidebar={<Sidebar />}
         sidebarFooter={<SidebarFooter />}
-        pageHeader={<AppShellPageHeader title={slots.title} />}
+        pageHeader={<AppShellPageHeader title={slots.title} actions={slots.actions} />}
         panel={slots.panel?.content}
         panelLabel={slots.panel?.label}
       >

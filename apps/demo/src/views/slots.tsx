@@ -5,6 +5,7 @@ import { AppShellPanelHeader } from 'tabular-ui';
 import { channels, lastClosedMonth, memberName } from '../lib/kasane';
 import type { View } from '../lib/view';
 import { ClosePanel } from '../components/ClosePanel';
+import { ChannelPresence } from '../shell/ChannelPresence';
 import { PanelPlaceholder, Placeholder, Profile } from './parts';
 import { SepCloseChannel } from './SepClose';
 
@@ -16,6 +17,8 @@ import { SepCloseChannel } from './SepClose';
  */
 export type ViewSlots = {
   title: string;
+  /** Trailing the title, in the page header band. */
+  actions?: ReactNode;
   body: ReactNode;
   panel?: { label: string; content: ReactNode };
 };
@@ -55,6 +58,7 @@ export function slotsFor(view: View): ViewSlots {
   if (view.channel === 'sep-close') {
     return {
       title,
+      actions: <ChannelPresence channel="sep-close" />,
       body: <SepCloseChannel />,
       panel: {
         label: `${lastClosedMonth} close`,
