@@ -4,7 +4,7 @@ The line in the top nav that tells a visitor where they are: a demo, played
 as Kasane's Head of FP&A, in a channel whose people and agent are scripted.
 "About this demo" opens a dialog saying what is fictional (the company), what
 is scripted (the people and the agent) and what is real (the interface), with
-links to the Storybook and the designer's portfolio. It sits inside `AppBar`,
+links to Storybook and to the AI components on tabularui.com. It sits inside `AppBar`,
 not above the shell, so `AppShell` keeps the full viewport height. The line
 truncates, with its full text in a tooltip.
 

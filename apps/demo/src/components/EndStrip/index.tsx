@@ -5,15 +5,15 @@ import { useReplay } from '../../lib/replay';
 import { progress } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
 import { close } from '../../lib/kasane';
+import { AI_COMPONENTS_URL } from '../../lib/links';
 import { hrefFor, onViewLinkClick } from '../../lib/view';
 
-const STORYBOOK_URL = 'https://storybook.tabularui.com';
 const openItems = { kind: 'channel', channel: 'open-items' } as const;
 const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 /**
  * Where the scripted run ends: what the close came to, then where to go.
- * Replay, the open items, or the components. Neutral, and not an
+ * Replay, the open items, or the AI components on tabularui.com. Neutral, and not an
  * `AgentBlock`: the demo says this, not the agent. A `region` with its own
  * name, so it can be found from the landmarks list.
  */
@@ -56,11 +56,11 @@ export function EndStrip() {
         </a>
         <a
           className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          href={STORYBOOK_URL}
+          href={AI_COMPONENTS_URL}
           target="_blank"
           rel="noreferrer"
         >
-          Browse the components
+          Browse the AI components
           <ArrowSquareOutIcon aria-hidden="true" />
           <span className="sr-only"> (opens in a new tab)</span>
         </a>
