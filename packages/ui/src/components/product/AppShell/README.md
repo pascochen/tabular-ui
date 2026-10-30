@@ -119,7 +119,7 @@ The model is complete without hover: Enter or a tap pins the sidebar, which reac
 | `AppShellPanelHeader` | 49px band with an `<h2>` + `actions` | Same band height as the top nav |
 | `AppShellPanelBody` | Scrolling region | A panel that isn't a chat. `ChatThread` goes in its place: it carries the body's insets and is its own scroller |
 | `AppShellPanelFooter` | Pinned region | The composer, `ChatComposer` |
-| `AppShellNav` / `AppShellNavGroup` / `AppShellNavItem` | `<nav>` / labelled `<ul>` / `<li><a>` | Unchanged. See below |
+| `AppShellNav` / `AppShellNavGroup` / `AppShellNavItem` | `<nav>` / labelled `<ul>` / `<li><a>` | An item takes `icon`, or `avatar` for a person, and `trailing` for a count or badge after the label. See below |
 | `useAppShell()` | Hook | `sidebarOpen` (pinned; a peek doesn't count), `toggleSidebar`, `panelOpen`, `setPanelOpen`, `togglePanel`, `panelId` |
 
 The sidebar-header toggle is rendered by the shell itself, after `sidebarHeader`. You don't place it.
@@ -194,6 +194,14 @@ Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's
 **Closing the panel from inside it returns focus to the panel's opener**, meaning whatever carries `aria-controls={panelId}`. Otherwise the focused element would unmount and focus would drop to `<body>`.
 
 **Active nav is neutral**, the same as `AppBarNavItem`. If the current page needs a background, §4's answer is `--color-bg-interactive`, never `--color-bg-hover`.
+
+## People and counts in the sidebar
+
+`AppShellNavItem` takes two optional slots beside `icon` (`PeopleAndCounts` story):
+
+- **`avatar`**: an `Avatar size="sm"` for a link to a person, in `icon`'s place. It is a separate prop because `icon` is cloned with a Phosphor `weight` (§11.2), which an avatar would pass to the DOM. At 24px it sits in the 32px row as it does in the sidebar footer, so a person's label starts 8px right of an icon's.
+- **`trailing`**: what follows the label, such as a `Badge shape="count"` or the `agent` badge that marks the AI as a member. The label truncates and the trailing content keeps its width.
+- **The link's name is its label**, so what sits beside the label must not repeat it or run into it. An avatar beside a name takes `aria-hidden`, or the link reads "DO Daisuke Onodera". A count's badge takes `aria-hidden` too, and its meaning follows the label as visually hidden text, `sep-close<span className="sr-only">, 4 open</span>`. Inside the badge, the link read "sep-close4 open".
 
 ## Not implemented
 

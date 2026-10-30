@@ -25,6 +25,7 @@ type Exception = {
   replies: Reply[];
   resolution?: { by: string; log: string };
   waiting?: { followUp: string };
+  notChecked: string[];
 };
 type Close = {
   agent: { reads: string[]; setUpBy: string };
@@ -59,6 +60,10 @@ test('everyone who speaks, resolves or belongs is a person in people.json', () =
   for (const key of named) expect(members, key).toContain(key);
 });
 
+test("every exception says what wasn't checked, [] for nothing", () => {
+  for (const e of close.exceptions) expect(Array.isArray(e.notChecked), e.id).toBe(true);
+});
+
 test('an unresolved exception waits on a follow-up that exists', () => {
   for (const e of close.exceptions.filter((x) => !x.resolution)) {
     expect(e.waiting, e.id).toBeDefined();
@@ -84,8 +89,14 @@ test('every check belongs to an exception and has something to fix', () => {
   }
 });
 
-test('no authored token is left unfilled', () => {
+test('no authored token is left unfilled, except those the demo fills at run time', () => {
+  // {resolved}: the catch-up's count, which changes as exceptions resolve.
+  const runtime = new Set(['{resolved}']);
   for (const name of ['close.json', 'people.json', 'checks.json']) {
-    expect(readFileSync(path.join(dataDir, name), 'utf8')).not.toMatch(/\{[a-zA-Z]+\}/);
+    const left = readFileSync(path.join(dataDir, name), 'utf8').match(/\{[a-zA-Z]+\}/g) ?? [];
+    expect(
+      left.filter((t) => !runtime.has(t)),
+      name,
+    ).toEqual([]);
   }
 });

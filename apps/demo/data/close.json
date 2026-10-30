@@ -43,9 +43,11 @@
   "directMessages": ["agent", "controller", "apLead"],
   "catchUp": [
     "September was locked on 8 Oct, business day 6.",
-    "6 exceptions found since. 2 are resolved.",
-    "September revenue includes ¥42.7m delivered in October."
+    "6 exceptions found since. {resolved} resolved.",
+    { "text": "September revenue includes ¥42.7m delivered in October.", "whileUntied": "revenue-cut-off" }
   ],
+  "typingMs": 1500,
+  "endStrip": { "title": "That’s the close so far." },
   "exceptions": [
     {
       "id": "close-length",
@@ -61,6 +63,7 @@
         }
       ],
       "resolution": { "by": "controller", "at": "09:33", "log": "Group close is business day 6; Japan’s is 5." },
+      "notChecked": [],
       "claim": "The CFO says the group closes in five working days.",
       "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
       "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
@@ -83,6 +86,7 @@
         "at": "11:14",
         "log": "Europe: sales 5.7% under plan, profit above. Board pack wording corrected."
       },
+      "notChecked": [],
       "claim": "FP&A says Europe is on plan in euros.",
       "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
       "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
@@ -105,6 +109,9 @@
         "by": "visitor",
         "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
       },
+      "notChecked": [
+        "The delivery note: the material has no delivery confirmations, only the invoice’s delivery date."
+      ],
       "claim": "The controller says the Sep 2026 cut-off was clean.",
       "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
       "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"]
@@ -132,6 +139,7 @@
         "delayMs": 11000,
         "log": "Duplicate payment: $48,216.40 to be credited by the supplier."
       },
+      "notChecked": [],
       "claim": "AP says the system blocks a duplicate supplier invoice number, in every entity.",
       "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
       "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"]
@@ -154,6 +162,7 @@
         "delayMs": 8000,
         "log": "Self-approved entry: JE-KUK-2608-00055 reversed; self-approval now blocked in KUK."
       },
+      "notChecked": ["The approver’s limit: the employee master isn’t in this material."],
       "claim": "The controller says every manual journal has a different approver, enforced group-wide.",
       "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in this material.",
       "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"]
@@ -172,6 +181,7 @@
         }
       ],
       "waiting": { "on": "Legal decision by 30 Oct", "followUp": "great-lakes-decision" },
+      "notChecked": ["Whether legal will pursue recovery: the decision is due 30 Oct."],
       "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
       "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
       "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"]
@@ -202,6 +212,11 @@
       "reason": "Delivered 2 Oct. The invoice is rebooked on that date, in October.",
       "postLabel": "Post the reversal",
       "cancelLabel": "Don’t post it",
+      "changes": "Five lines in KJP, dated 30 Sep: revenue, tax and the receivable come off, and the stock goes back. September reopens for this entry only.",
+      "reaches": "The KJP ledger and the H1 consolidation, which takes the new September figures.",
+      "outcome": "Posted by you. INV-KJP-2609-00363 is reversed in September.",
+      "stopped": "Not posted. Choose again, or leave it open.",
+      "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
       "entity": "KJP",
       "postingDate": "2026-09-30",
       "currency": "JPY",
@@ -217,8 +232,20 @@
       "title": "List INV-KJP-2609-00363 for the auditors?",
       "reason": "September stays as booked. The review list gains one line: ¥42.7m of revenue a month early.",
       "postLabel": "Add it to the list",
-      "cancelLabel": "Don’t add it"
+      "cancelLabel": "Don’t add it",
+      "changes": "Nothing in the books. The review list gains one line.",
+      "reaches": "The auditors' interim review, 19–30 Oct.",
+      "outcome": "Added by you. September stays as booked.",
+      "stopped": "Not added. Choose again, or leave it open.",
+      "log": "Revenue cut-off: ¥42.7m listed for the auditors' review. September stays as booked."
     },
-    "rerun": "Revenue cut-off check reran in 2s"
+    "rerun": "Revenue cut-off check reran in 2s",
+    "askedAt": "13:49",
+    "authorship": { "asked": "AI · Awaiting your answer", "proposed": "AI · Awaiting confirmation", "done": "AI" },
+    "delegate": {
+      "option": "reopen",
+      "reason": "The policy puts revenue in the month of delivery, and H1 is published on 6 Nov."
+    },
+    "skipped": "Skipped. INV-KJP-2609-00363 stays open until someone decides."
   }
 }

@@ -753,6 +753,17 @@ export type AppShellNavItemProps = React.ComponentProps<'a'> & {
   active?: boolean;
   /** A single Phosphor icon. Weight is set per §11.2 (`fill` when active, else `bold`) unless given explicitly. */
   icon?: ReactElement;
+  /**
+   * An `Avatar size="sm"`, for a link to a person, in place of `icon`. Kept
+   * apart from `icon` because the icon is cloned with a Phosphor `weight`,
+   * which an avatar would pass to the DOM.
+   */
+  avatar?: ReactElement;
+  /**
+   * Trailing edge: a `Badge` or a count, after the label. The label truncates
+   * first; the trailing content never does.
+   */
+  trailing?: React.ReactNode;
   /** Swap the `<a>` for a router link, as `AppBarNavItem` does. */
   render?: React.ReactElement<{ className?: string }>;
 };
@@ -765,7 +776,16 @@ export type AppShellNavItemProps = React.ComponentProps<'a'> & {
  * text step, no hue and no ground — plus the icon switching to `fill` (§11.2).
  * Survives grayscale.
  */
-function AppShellNavItem({ className, active = false, icon, render, children, ...props }: AppShellNavItemProps) {
+function AppShellNavItem({
+  className,
+  active = false,
+  icon,
+  avatar,
+  trailing,
+  render,
+  children,
+  ...props
+}: AppShellNavItemProps) {
   const linkClassName = cn(
     buttonVariants({ variant: 'ghost' }),
     'w-full min-w-0 justify-start px-[var(--pad-sidebar-item)]',
@@ -794,8 +814,9 @@ function AppShellNavItem({ className, active = false, icon, render, children, ..
 
   const content = (
     <>
-      {glyph}
-      <span className="min-w-0 truncate">{children}</span>
+      {avatar ?? glyph}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {trailing}
     </>
   );
 

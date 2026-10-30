@@ -962,6 +962,8 @@ must(
 const calendarText = packText(P.closeCalendar);
 const earningsRelease = calendarText.match(/earnings release[^|]*\| \w{3} (\d+ \w{3}) \d{4}/)?.[1];
 must(earningsRelease, 'close_calendar.md gives the H1 earnings release date');
+const auditFieldwork = calendarText.match(/Auditor interim review fieldwork \| ([^(|]+?) \(/)?.[1];
+must(auditFieldwork, "close_calendar.md gives the auditors' interim fieldwork dates");
 const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
 must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
 const glOverBeforeAugust = glOverLimit.filter((r) => r.period < '2026-08');
@@ -976,6 +978,8 @@ const closeTokens = {
   closeDay: String(closeDay),
   exceptionCount: String(closeSource.exceptions.length),
   resolvedAtLanding: String(closeSource.exceptions.filter((e) => e.atLanding === 'resolved').length),
+  // Filled by the demo at run time: the catch-up's count changes as exceptions resolve.
+  resolved: '{resolved}',
   cutoffInvoice: cutoff.invoice_id,
   cutoffNet: money(num(cutoff.net_amount), 'JPY'),
   cutoffInvoiceDate: shortDate(cutoff.invoice_date),
@@ -990,6 +994,7 @@ const closeTokens = {
   glLimit: money(glLimit, 'USD'),
   glOverCount: String(glOverBeforeAugust.length),
   legalDecision,
+  auditFieldwork,
   europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
 };
 const fill = (text) =>
@@ -1026,6 +1031,8 @@ const closeExceptions = closeSource.exceptions.map((e) => {
       `follow-up ${e.waiting.followUp} exists`,
     );
   for (const s of finding.sources) must(packNames.has(s), `${s} (${e.id}) is a pack file`);
+  // Sources needs it (docs/agent-voice.md principle 4): [] says every part was checked.
+  must(Array.isArray(e.notChecked), `${e.id} says what wasn't checked (notChecked, [] for nothing)`);
   return fillAll({ ...e, claim: finding.claim, evidence: finding.evidence, sources: finding.sources });
 });
 
@@ -1054,6 +1061,10 @@ must(
   `the ${cutoff.invoice_id} reversal balances`,
 );
 must(closeSource.hero.exception === 'revenue-cut-off', 'the hero decision is the revenue cut-off');
+must(
+  closeSource.hero.options.some((o) => o.id === closeSource.hero.delegate.option),
+  'the option "Choose for me" picks is one of the hero options',
+);
 
 // Checks: the before and after figure of each tie-out the close panel shows.
 const closeChecks = [
@@ -1077,6 +1088,14 @@ const closeChecks = [
   },
 ].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
+for (const line of closeSource.catchUp) {
+  if (typeof line === 'object')
+    must(
+      closeChecks.some((c) => c.id === line.whileUntied),
+      `catch-up line's check ${line.whileUntied}`,
+    );
+}
+must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
 await writeJson('apps/demo/data/people.json', closePeople);
 await writeJson('apps/demo/data/close.json', {
@@ -1085,6 +1104,8 @@ await writeJson('apps/demo/data/close.json', {
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   catchUp: fillAll(closeSource.catchUp),
+  typingMs: closeSource.typingMs,
+  endStrip: fillAll(closeSource.endStrip),
   exceptions: closeExceptions,
   hero: fillAll({
     ...closeSource.hero,

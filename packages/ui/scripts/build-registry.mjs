@@ -86,6 +86,7 @@ const descriptions = {
   LineageTree: 'A nested tree of model dependencies.',
   MetricTile: 'A KPI figure with its label and change.',
   OrgSwitcher: 'Switches between organizations.',
+  PresenceStack: 'Who is here, as overlapping avatars with a +N count.',
   ProgressBar: 'The progress of a run, in a tone.',
   ProjectSwitcher: 'Switches between projects.',
   Question: 'One question the agent can’t settle alone, answered in a press. Sits inside an AgentBlock.',

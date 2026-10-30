@@ -954,6 +954,26 @@
       ]
     },
     {
+      "name": "presence-stack",
+      "type": "registry:component",
+      "title": "PresenceStack",
+      "description": "Who is here, as overlapping avatars with a +N count.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/PresenceStack/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/PresenceStack/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "progress-bar",
       "type": "registry:component",
       "title": "ProgressBar",
@@ -1316,6 +1336,7 @@
         "https://tabularui.com/r/org-switcher.json",
         "https://tabularui.com/r/popover.json",
         "https://tabularui.com/r/popup-surface.json",
+        "https://tabularui.com/r/presence-stack.json",
         "https://tabularui.com/r/progress-bar.json",
         "https://tabularui.com/r/project-switcher.json",
         "https://tabularui.com/r/question.json",
