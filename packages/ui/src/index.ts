@@ -314,6 +314,12 @@ export { OrgSwitcher, type OrgSwitcherProps, type Org } from './components/produ
 export { ProjectSwitcher, type ProjectSwitcherProps, type Project } from './components/product/ProjectSwitcher';
 export { FilterChip, type FilterChipProps } from './components/product/FilterChip';
 export { LineageTree, type LineageTreeProps, type LineageNode } from './components/product/LineageTree';
+export {
+  PresenceStack,
+  type PresenceGround,
+  type PresenceMember,
+  type PresenceStackProps,
+} from './components/product/PresenceStack';
 export { ProgressBar, type ProgressBarProps, type ProgressBarTone } from './components/product/ProgressBar';
 export { MetricTile, type MetricTileProps } from './components/product/MetricTile';
 export { RunLogRow, type RunLogRowProps } from './components/product/RunLogRow';
