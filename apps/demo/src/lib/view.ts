@@ -1,19 +1,27 @@
 import { useSyncExternalStore, type MouseEvent } from 'react';
 
-import { channels, directMessages, type ChannelId } from './kasane';
+import { directMessages, type ChannelId } from './kasane';
 
 /**
  * What the main area shows. Views live in the URL with no router, as Part 1's
  * steps did:
  *
- *   ?view=sep-close (default) · ?view=open-items · ?view=rev-check · ?view=home
+ *   ?view=sep-close (default) · ?view=open-items
  *   ?dm=agent · ?dm=controller · ?dm=apLead
  *   ?at=end, with any of them: the end state, for screenshots and sharing
  *
  * Every view is a real URL, so a sidebar item is a link: it opens in a new tab,
  * copies, and reads as navigation to a screen reader.
+ *
+ * Only built views are reachable. Home and #rev-check (the plan's phases 9 and
+ * 10) are in the data but not here: a view that only says it isn't built yet
+ * is a dead end (docs/reviews/demo-first-pass-2026-10-30.md, issue 1). Their
+ * old URLs open the default.
  */
-export type View = { kind: 'channel'; channel: ChannelId } | { kind: 'home' } | { kind: 'dm'; member: string };
+export type View = { kind: 'channel'; channel: ChannelId } | { kind: 'dm'; member: string };
+
+/** The channels a visitor can open, in sidebar order. */
+export const BUILT_CHANNELS: readonly ChannelId[] = ['sep-close', 'open-items'];
 
 const DEFAULT_CHANNEL: ChannelId = 'sep-close';
 export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };
@@ -23,9 +31,8 @@ export function parseView(search: string): View {
   const dm = params.get('dm');
   if (dm && directMessages.includes(dm)) return { kind: 'dm', member: dm };
   const view = params.get('view');
-  if (view === 'home') return { kind: 'home' };
-  const channel = channels.find((c) => c.id === view);
-  return channel ? { kind: 'channel', channel: channel.id } : DEFAULT_VIEW;
+  const channel = BUILT_CHANNELS.find((c) => c === view);
+  return channel ? { kind: 'channel', channel } : DEFAULT_VIEW;
 }
 
 /** `?at=end`: open on the end state rather than at landing. */
@@ -35,7 +42,6 @@ export function parseAtEnd(search: string): boolean {
 
 export function hrefFor(view: View): string {
   if (view.kind === 'dm') return `?dm=${view.member}`;
-  if (view.kind === 'home') return '?view=home';
   return view.channel === DEFAULT_CHANNEL ? '/' : `?view=${view.channel}`;
 }
 

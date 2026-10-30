@@ -50,8 +50,8 @@ export type CloseState = {
   checks: Record<string, number>;
   /** How many of `timeline`'s events have applied. The next one to play is this index. */
   applied: number;
-  /** A person typing now, by member key, or null. People only: the agent never types. */
-  typing: string | null;
+  /** A person typing now, and on which exception's thread, or null. People only: the agent never types. */
+  typing: { who: string; exception: ExceptionId } | null;
   /** The scripted run is over: the end strip shows. */
   ended: boolean;
   /** What the visitor wrote in the composer. Nobody replies to it. */
@@ -148,13 +148,13 @@ function applyEvent(state: CloseState, index: number, at: string, quiet: boolean
   const effect = timeline[index].effect;
   switch (effect.kind) {
     case 'typing':
-      return quiet ? next : { ...next, typing: effect.who };
+      return quiet ? next : { ...next, typing: { who: effect.who, exception: effect.exception as ExceptionId } };
     case 'reply': {
       const id = effect.exception as ExceptionId;
       const e = next.exceptions[id];
       return {
         ...next,
-        typing: next.typing === effect.author ? null : next.typing,
+        typing: next.typing?.who === effect.author ? null : next.typing,
         exceptions: {
           ...next.exceptions,
           [id]: { ...e, replies: [...e.replies, { author: effect.author, text: effect.text, at }] },

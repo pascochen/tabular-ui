@@ -1,5 +1,5 @@
 import { ArrowClockwiseIcon } from '@phosphor-icons/react';
-import { Button, ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
+import { Button, ChannelMessage, ChannelMessageList, ChatComposer, cn } from 'tabular-ui';
 
 import { EndStrip } from '../components/EndStrip';
 import { ExceptionCard } from '../components/ExceptionCard';
@@ -8,6 +8,17 @@ import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { agent, close, memberName } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
+
+// AttachmentRow's and InlineCitation's link: the interactive role, underlined
+// on hover, the system's offset ring.
+const linkClassName = cn(
+  'text-text-interactive hover:underline',
+  'rounded-xs outline-none focus-visible:outline-ring',
+  'focus-visible:outline-solid focus-visible:outline-[length:var(--ring-width)]',
+  'focus-visible:outline-offset-[var(--ring-offset)]',
+);
+
+const titleOf = (id: string) => close.exceptions.find((e) => e.id === id)!.title;
 
 const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero === true;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
@@ -20,13 +31,13 @@ const dateTime = (at: string) => `${close.scene.date}T${at}`;
 function CatchUp() {
   const { state, dispatch } = useClose();
   const { catchUp } = state;
-  const lines = close.catchUp.flatMap((line) =>
-    typeof line === 'string'
-      ? [line.replace('{resolved}', String(catchUp.resolved))]
-      : catchUp.tiedOut.includes(line.whileUntied)
-        ? []
-        : [line.text],
-  );
+  // Waiting on the visitor: the hero question has no answer yet.
+  const asking = !state.hero.rounds[state.hero.rounds.length - 1].answer;
+  const lines = close.catchUp.flatMap((line): { text: string; href?: string }[] => {
+    if (typeof line === 'string') return [{ text: line.replace('{resolved}', String(catchUp.resolved)) }];
+    if ('whileAsking' in line) return asking ? [{ text: line.text, href: `#${line.links}` }] : [];
+    return catchUp.tiedOut.includes(line.whileUntied) ? [] : [{ text: line.text }];
+  });
   return (
     <ChannelMessage
       author={{ name: agent.name, avatar: <MemberAvatar memberKey="agent" /> }}
@@ -42,7 +53,16 @@ function CatchUp() {
     >
       <ul role="list" className="flex list-disc flex-col gap-[var(--gap-bonded)] pl-4">
         {lines.map((line) => (
-          <li key={line}>{line}</li>
+          <li key={line.text}>
+            {line.href ? (
+              // The decision is below the fold at landing; this is the way to it.
+              <a href={line.href} className={linkClassName}>
+                {line.text}
+              </a>
+            ) : (
+              line.text
+            )}
+          </li>
         ))}
       </ul>
     </ChannelMessage>
@@ -99,7 +119,8 @@ export function SepCloseChannel() {
       */}
       <div className="sticky bottom-[calc(var(--pad-page-y)*-1)] -mb-[var(--pad-page-y)] mt-auto flex flex-col gap-[var(--gap-bonded)] bg-canvas pb-[var(--pad-page-y)]">
         <p aria-hidden="true" className="min-h-[var(--text-xs--line-height)] text-xs text-text-secondary">
-          {state.typing ? `${memberName(state.typing)} is typing…` : null}
+          {/* Names the card, since its thread may be off screen. */}
+          {state.typing ? `${memberName(state.typing.who)} is replying on ${titleOf(state.typing.exception)}…` : null}
         </p>
         <ChatComposer
           label="Message sep-close"

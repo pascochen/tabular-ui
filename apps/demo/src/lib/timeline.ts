@@ -6,7 +6,7 @@
 import { close } from './kasane';
 
 export type TimelineEffect =
-  | { kind: 'typing'; who: string }
+  | { kind: 'typing'; who: string; exception: string }
   | { kind: 'reply'; exception: string; author: string; text: string }
   | { kind: 'resolve'; exception: string; by: string; log: string }
   | { kind: 'wait'; exception: string }
@@ -24,7 +24,10 @@ function build(): TimelineEvent[] {
     for (const r of e.replies) {
       if (!('delayMs' in r) || r.delayMs === undefined) continue;
       // A person types before they post; the agent never "types" (docs/agent-voice.md).
-      timed.push({ at: Math.max(0, r.delayMs - close.typingMs), effect: { kind: 'typing', who: r.author } });
+      timed.push({
+        at: Math.max(0, r.delayMs - close.typingMs),
+        effect: { kind: 'typing', who: r.author, exception: e.id },
+      });
       timed.push({ at: r.delayMs, effect: { kind: 'reply', exception: e.id, author: r.author, text: r.text } });
     }
     if (e.resolution && 'delayMs' in e.resolution && e.resolution.delayMs !== undefined) {

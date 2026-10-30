@@ -1,7 +1,7 @@
 {
   "scene": { "date": "2026-10-16", "landingTime": "14:00", "channel": "sep-close" },
   "agent": {
-    "name": "Close agent",
+    "name": "AI",
     "authorship": "AI",
     "reads": [
       "sales_invoices_2026-09.csv",
@@ -44,7 +44,8 @@
   "catchUp": [
     "September was locked on 8 Oct, business day 6.",
     "6 exceptions found since. {resolved} resolved.",
-    { "text": "September revenue includes ¥42.7m delivered in October.", "whileUntied": "revenue-cut-off" }
+    { "text": "September revenue includes ¥42.7m delivered in October.", "whileUntied": "revenue-cut-off" },
+    { "text": "1 needs your answer: Revenue cut-off.", "whileAsking": true, "links": "revenue-cut-off" }
   ],
   "typingMs": 1500,
   "endStrip": { "title": "That’s the close so far." },

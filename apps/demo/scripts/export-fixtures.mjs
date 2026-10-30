@@ -995,6 +995,8 @@ const closeTokens = {
   glOverCount: String(glOverBeforeAugust.length),
   legalDecision,
   auditFieldwork,
+  heroTitle: closeSource.exceptions.find((e) => e.id === closeSource.hero.exception)?.title ?? '',
+  heroException: closeSource.hero.exception,
   europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
 };
 const fill = (text) =>
@@ -1089,11 +1091,11 @@ const closeChecks = [
 ].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
 for (const line of closeSource.catchUp) {
-  if (typeof line === 'object')
-    must(
-      closeChecks.some((c) => c.id === line.whileUntied),
-      `catch-up line's check ${line.whileUntied}`,
-    );
+  if (typeof line !== 'object') continue;
+  must(
+    line.whileAsking === true || closeChecks.some((c) => c.id === line.whileUntied),
+    `catch-up line "${line.text}" says when it shows (whileUntied: a check id, or whileAsking)`,
+  );
 }
 must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
