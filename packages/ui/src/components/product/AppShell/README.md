@@ -124,6 +124,8 @@ The model is complete without hover: Enter or a tap pins the sidebar, which reac
 
 The sidebar-header toggle is rendered by the shell itself, after `sidebarHeader`. You don't place it.
 
+The shell's landmarks: the top nav is `AppBar`'s `banner`, the page is `main`, the panel is a `complementary` named by `panelLabel`, and the sidebar is a `region` named by `sidebarLabel` ("Sidebar"), with `AppShellNav`'s `navigation` inside it. Everything the shell renders sits in one of them. See *The sidebar is one region* below.
+
 ## Props
 
 | Prop | Default | Notes |
@@ -132,6 +134,7 @@ The sidebar-header toggle is rendered by the shell itself, after `sidebarHeader`
 | `sidebarHeader` | — | Leading edge of the sidebar header: the company switcher |
 | `sidebar` | — | Sidebar body. Scrolls on its own |
 | `sidebarFooter` | — | Pinned to the bottom: account, settings |
+| `sidebarLabel` | `"Sidebar"` | Name of the sidebar's `region` landmark, which holds the header, body and footer |
 | `defaultSidebarOpen` | `true` | Whether the sidebar starts pinned at ≥1280px. Below the floor it always starts collapsed |
 | `panel` | — | Panel content. Without it there is no panel and nothing to toggle |
 | `panelLabel` | — | Name of the `complementary` landmark. Pass it whenever `panel` is set |
@@ -179,6 +182,11 @@ Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's
 
 **Element references are refs fed by callback refs, and read only in effects and handlers.** The top-nav toggle registers itself through `registerToggle` in context. Reading a ref's element through context during render fails `react-hooks/refs`. The toggle also destructures the context before using it, because passing a context member as a ref makes React Compiler treat the whole object as a ref.
 
+**The sidebar is one region.** The `<section>` that holds the header, body and footer carries `aria-label={sidebarLabel}`, so it is a `region` landmark. Until 2026-10-29 the sidebar's only landmark was `AppShellNav`'s `<nav>`, and the header (`OrgSwitcher`), the footer (`AccountMenu`) and the project block above the nav sat outside every landmark: axe's `region` rule flags that, and a screen reader's landmark list never reached them. The story tests missed it because they scope axe to the story root; an axe run on the whole Kasane demo page found it.
+- **`region`, not `complementary` or `nav`.** It names a place to jump to and claims nothing about what is in it. `complementary` would say the workspace switcher and the navigation are supporting content, and an outer `nav` would put a second navigation landmark around the first. `AppShellNav`'s `<nav>` nests inside the region unchanged.
+- **One landmark, not one per band.** A region each for the header and footer would add two entries to the landmark list for one control each.
+- **It follows the sidebar's state.** Collapsed, the `hidden` attribute takes the region out of the accessibility tree; a peek shows it again. The toggles' `aria-controls` already point at it.
+
 **`flex` only while the sidebar is shown.** A `display` utility beats the `hidden` attribute. An unconditional `flex` would keep a "hidden" sidebar on screen.
 
 **The skip link is parked above the viewport rather than using `sr-only`.** See the failure log: `buttonVariants`' `relative` beat `sr-only`'s `absolute`, and the link took a grid cell.
@@ -209,6 +217,6 @@ These shell features are also not built yet:
 
 ## Testing
 
-`apps/storybook/tests/app-shell.spec.ts` (Playwright, 19 tests) covers the sketch geometry, the shared rule, one text-start x for every sidebar label, trigger and nav item, pin and collapse with the focus hand-off, peek (overlay geometry, survives crossing into it, closes on leave and Escape, pins on either toggle, doesn't reflow the breadcrumb, doesn't open for a toggle that reappears under a resting pointer), the panel toggle, virtualization, focus-ring room, the skip link, and pin state across the floor. Behaviour depends on the viewport, and the vitest browser runner ignores Storybook's viewport globals, so this coverage lives in Playwright rather than story play functions.
+`apps/storybook/tests/app-shell.spec.ts` (Playwright, 29 tests) covers the sketch geometry, the shared rule, one text-start x for every sidebar label, trigger and nav item, pin and collapse with the focus hand-off, peek (overlay geometry, survives crossing into it, closes on leave and Escape, pins on either toggle, doesn't reflow the breadcrumb, doesn't open for a toggle that reappears under a resting pointer), the panel toggle, virtualization, focus-ring room, the skip link, and pin state across the floor, and axe's `region` rule on the whole page, Storybook's own hidden screens removed first. Behaviour depends on the viewport, and the vitest browser runner ignores Storybook's viewport globals, so this coverage lives in Playwright rather than story play functions.
 
 Stories pin a viewport with `globals: { viewport: { value: 'laptopLg' } }` (1440, the sketch's width). The desktop viewports are defined in `apps/storybook/.storybook/preview.tsx`.
