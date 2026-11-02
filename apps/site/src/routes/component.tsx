@@ -158,9 +158,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
   return (
     <Section rule={false}>
       {/* From 1024px the list takes a column beside the reading column, the gap
-          between them the page's own margin. The pair is centred in the wide
-          rail, so the reading column keeps its 1040px where there's room. */}
-      <Rail className="lg:grid lg:grid-cols-[auto_minmax(0,var(--site-w-reading))] lg:items-start lg:justify-center lg:gap-x-[var(--site-pad-x)]">
+          between them the page's own margin. The pair starts at the wide rail's
+          left edge, where every other page's content starts, and the reading
+          column keeps its 1040px where there's room. */}
+      <Rail className="lg:grid lg:grid-cols-[auto_minmax(0,var(--site-w-reading))] lg:items-start lg:justify-start lg:gap-x-[var(--site-pad-x)]">
         <ComponentList current={c.name} />
         <div className="flex min-w-0 flex-col gap-[var(--site-gap)]">
           {/* Below 1024px only, where the list beside the page doesn't fit. The label

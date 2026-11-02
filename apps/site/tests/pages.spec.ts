@@ -337,6 +337,19 @@ test.describe('a component page', () => {
     await expect.poll(async () => Math.round((await box(column)).width)).toBe(1040);
   });
 
+  // Owner, 2026-11-02: the list starts where every other page's content starts,
+  // with the spare width to the right. Centred in the rail, it sat 73px in.
+  for (const width of [1440, 1920]) {
+    test(`at ${width}px, the component list starts on the same left edge as Foundations`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/foundations/color');
+      const edge = (await page.getByRole('heading', { level: 1 }).boundingBox())!.x;
+      await page.goto('/components/chat-starter');
+      const list = page.getByRole('navigation', { name: `All ${componentPages.length} components` });
+      expect((await list.boundingBox())!.x).toBe(edge);
+    });
+  }
+
   // Decision first (owner, 2026-10-27): when to use it and when not, before the
   // pair, and the README's own example under the install command.
   for (const route of componentPages) {
