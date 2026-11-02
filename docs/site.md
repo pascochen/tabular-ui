@@ -1,10 +1,19 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02 and are **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
 **Library changes these decisions led to**, each its own PR: "AI working" (D1, pascochen/tabular-ui#4), and the AppShell story's FX sum (D5, pascochen/tabular-ui#5).
+
+**Library changes D10–D13 depend on**, each its own decision and PR, outside the site's steps:
+
+| Change | Needed by | Status |
+|---|---|---|
+| A line in `docs/design-system.md` §7.8 for the double rule | D11 | To write |
+| `tabVariants` exported from `Tabs`, and a `bordered` variant of `TabsList`. `Tabs` is foundational, so it needs the owner's yes first (`CLAUDE.md`) | D12 | To ask |
+| A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total. `DataTable` has no totals row, `tfoot` or footer support today | Nothing blocks on it, but until it ships the site's rule echoes no library behaviour | To decide |
+| Source highlight in Inline citation and Sources. Both shipped on 2026-10-28 without one | Nothing blocks on it | Not designed |
 
 ---
 
@@ -21,6 +30,10 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D7 | Closing band | "Give an agent a finance team's files."; Home only |
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
+| D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
+| D11 | Section rules | Double rules between a page's sections, in `--color-border-strong`. Not built |
+| D12 | Foundations links | Bordered, selected in ink, still real links. Not built |
+| D13 | Highlights | None behind site copy |
 
 ### The decisions in full
 
@@ -82,7 +95,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **D3. Grounds — bands decided 2026-10-25, plates and the closing band 2026-10-26 (owner): (c), dark for single specimens.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
-1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
+1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added. *Changed 2026-11-02 (owner), not built yet:* the rule becomes a double rule (D11). No band is tinted still holds.
 2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
    - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
    - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
@@ -90,7 +103,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
    To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
 3. **The hero: a paper plate on a ruled sheet. Revised 2026-10-26 (owner), as a prototype for review on the preview.** On the live hero, the dark plate read first and the headline second in a squint test. Its ground is the headline's own ink, 16.39:1 against the page, over about 756×386px. The orchid rail and the "AI · Awaiting review" label disappeared inside it, and its 1.62:1 frame couldn't be seen beside it. A dark block on paper also reads as a hole in the page rather than a sheet on it. (a) had been turned down for paper on paper on paper. A ruled hero removes that risk, because the plate is the one place in the hero without rules:
-   - **The sheet.** The hero is ruled like a spreadsheet: 1px lines in `--color-border`, the colour of the section rules, so no token is added, on a layer at 60% opacity, which measures 1.16:1 on paper. At full strength (1.29:1) the owner found the ruling a little strong on retina and non-retina screens alike (2026-10-26). Rows are `--h-row-sm` (28px), `DataTable`'s row height. Columns are the 12-column grid's pitch, aligned to the rail, so a column line runs down the left edge of every column. Under 768px a line runs down every other column, 6 across: twelve 30px columns on a phone ruled near-square cells, which read as graph paper and crowded the lead, while every other column gives cells about 61×28, the shape of a spreadsheet's. **Column lines are element borders on a CSS grid with the rail's tracks, not a background.** A repeating gradient puts a line wherever the arithmetic lands, and between breakpoints the pitch isn't a whole pixel (100.67px at 1280px), so lines fell between device pixels and drew soft (owner, 2026-10-26). The browser snaps a border to a whole pixel. Rows stay a gradient, because 28px is always whole. The lines fade out toward the hero's edges, so the sheet has no hard border against the rule-only bands below.
+   - **The sheet.** The hero is ruled like a spreadsheet: 1px lines in `--color-border`, the colour of the section rules, so no token is added, on a layer at 60% opacity, which measures 1.16:1 on paper. At full strength (1.29:1) the owner found the ruling a little strong on retina and non-retina screens alike (2026-10-26). Rows are `--h-row-sm` (28px), `DataTable`'s row height. Columns are the 12-column grid's pitch, aligned to the rail, so a column line runs down the left edge of every column. Under 768px a line runs down every other column, 6 across: twelve 30px columns on a phone ruled near-square cells, which read as graph paper and crowded the lead, while every other column gives cells about 61×28, the shape of a spreadsheet's. **Column lines are element borders on a CSS grid with the rail's tracks, not a background.** A repeating gradient puts a line wherever the arithmetic lands, and between breakpoints the pitch isn't a whole pixel (100.67px at 1280px), so lines fell between device pixels and drew soft (owner, 2026-10-26). The browser snaps a border to a whole pixel. Rows stay a gradient, because 28px is always whole. The lines fade out toward the hero's edges, so the sheet has no hard border against the rule-only bands below. *Since 2026-11-02 (D11, not built yet)* the section rules leave this colour; the sheet keeps it.
    - **The plate** is paper, opaque over the rules, in `SpecimenFrame`'s own 1px `--color-border-strong` frame, the same as the Components cards. A frame in `--color-text-primary`, the headline's ink, read heavy (owner, 2026-10-26), as the full-ink focus ring had (design system §4). Against rules at 1.16:1, the frame's 1.62:1 reads as an edge.
    - **Settled: one filled button.** On a paper plate, "Open the demo" and the specimen's "Post entry" were both ink at the same weight (owner, 2026-10-26). The hero became a teaser the same day (D6, changed), with no Post entry, so "Open the demo" is its only filled button.
    - **Only the hero is ruled.** On the other pages a ruled band would compete with the section rules.
@@ -183,6 +196,31 @@ Specimens below the first screen play once as they scroll into view, from a fram
 2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. *Since 2026-10-28* the line also adds the item of every other component its usage snippet imports, and the snippet imports from the folders the registry writes (`@/components/tabular-ui/components/product/<Name>`), not from `tabular-ui`, so the two together compile. **Getting started** (no wireframe) covers the setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
 3. **No Icons page while the icons are Phosphor's.** *Decided 2026-10-29 (owner):* they come from a popular library, so a page for §11 would document someone else's set. A fourth Foundations tab waits until the icons are custom.
 
+**D10. Library first — decided 2026-11-02 (owner).** A pattern a product could reuse ships in `packages/ui` first, as its own decision and PR. The site never shows a pattern the library can't produce, and a library component is never restyled in `apps/site`.
+
+Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand` and `DemoAction`. A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
+
+**D11. Section rules are double rules — decided 2026-11-02 (owner).** The ledger's mark for a closed total, used as the site's section divider.
+
+1. **Construction.** A direct child of `<main>` other than the first takes `border-top: 3px double var(--color-border-strong)`. The closing band has no rule, since its change of ground separates it. Moments on Home keep their 1px rule, and so does the footer, which is outside `<main>`. Nothing sits beside the rule: no meta line, no count, no mono caps.
+2. **The token.** `--color-border-strong`, because at 1x the default border (1.29:1) reads as one faint line, and the strong one (1.62:1) just resolves into two.
+3. **Rendering.** Measured in Chromium at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2, the lines stay on whole pixels at every ratio. Safari and Firefox aren't measured. Playwright's emulated `deviceScaleFactor` draws them soft, so a test must launch with `--force-device-scale-factor`.
+4. **Order.** §7.8 of the design system gains a line for it first, because §7 of this spec says borders come from the library.
+5. **The hero's sheet** keeps `--color-border` at 60% (D3, item 3).
+
+As it stands that draws 1 on Home, none on a component page, 1 on Getting started, 3 on Vocabulary, 4 on Color and Principles, 5 on Typography and 6 on Density. **Open (owner):** the 2026-11-02 review (`docs/reviews/art-direction-2026-11-02.md`) recommends keeping the mark rare instead: build it into `DataTable` first, then use it on the site once, where something really closes. §7.8's own argument is that a border treatment "is only informative while it is rare". This decision stands until the owner says otherwise.
+
+**D12. Foundations' links look bordered — decided 2026-11-02 (owner).** They stay real `<a>` elements in a `<nav>`, one per route, with `aria-current="page"`. Library `Tabs` can't serve here: `TabsTrigger` renders a `<button>`, which does nothing before hydration (§12) or without JavaScript, and tabs switch a view where a nav changes the page (§3).
+
+- **Shared appearance (D10).** `packages/ui` exports the look as a cva, `tabVariants`, used by a new `bordered` variant of `TabsList` and by these links. `line` and `segmented` don't change.
+- **Borders.** `--color-border` on every side, with neighbours sharing one line.
+- **Hover.** `--color-bg-hover`. The raised surface can't be used: in light mode it is the same colour as the canvas (D3).
+- **Selected.** `--color-fill-interactive` with `--color-on-interactive`, and `--color-bg-hover-inverse` on hover. In forced colours the selected link keeps a visible mark other than its fill.
+- **Focus.** The library's ring, inset, so a neighbour's border can't cover it.
+- **Labels.** Sans SemiBold in sentence case at `text-site-body`, which needs a `size` on the cva. At the library's 13px beside a 64px title, most visitors missed these links (§3).
+
+**D13. No highlight behind site copy — decided 2026-11-02 (owner).** Every hue already has a role, so a highlighter would borrow one: orchid means agent, sage means links and success, ochre means warning. Emphasis is weight, or nothing. A text highlight may exist later as the source mark in Inline citation or Sources; on the site it then appears only inside their specimens.
+
 ### Approvals — given 2026-10-25 (owner)
 
 `CLAUDE.md` requires a yes before each of these. All five were approved together.
@@ -256,7 +294,7 @@ Every route is prerendered to static HTML at build time.
 
 **`<name>` is the registry item name** in `packages/ui/registry.json`: `agent-block`, `chat-thread` and so on. A component page exists only when the registry has the item, so a to-build component has a card but no page. Previous and next follow run order.
 
-**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab. *Changed again 2026-10-27 (owner, option A of a navigation critique):* each page opens with the section's name, "Foundations", then its three pages as links at 16px with the current one underlined (2px ink, the active-tab width of §7.8, `aria-current`), then the page's own title and lead. Built in the site at reading size: `AppBarNav`'s 13px suits the product, and beside a 64px title most visitors missed the links. `/foundations` redirects (307) to Color, where it had been a 404. "Density" keeps its name for now.
+**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab. *Changed again 2026-10-27 (owner, option A of a navigation critique):* each page opens with the section's name, "Foundations", then its three pages as links at 16px with the current one underlined (2px ink, the active-tab width of §7.8, `aria-current`), then the page's own title and lead. Built in the site at reading size: `AppBarNav`'s 13px suits the product, and beside a 64px title most visitors missed the links. `/foundations` redirects (307) to Color, where it had been a 404. "Density" keeps its name for now. *Changed 2026-11-02 (owner), not built yet:* the links stay links at 16px, but the 2px underline gives way to D12's bordered look, selected in ink.
 
 ## 4. Pages
 
@@ -415,7 +453,7 @@ The site is a reading page, not dense product UI, so it keeps a few values of it
 - A 1040px reading column for Principles and component pages, and 680px prose blocks.
 - Cards span 4 columns (432px), the hero splits 5/7, and the five moments are their own 5-up row with 16px gaps.
 
-**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule. The hero is ruled as a sheet in the same colour at 60% opacity: 28px rows, columns on the 12-column pitch, every other column under 768px (D3, item 3).
+**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule. The hero is ruled as a sheet in the same colour at 60% opacity: 28px rows, columns on the 12-column pitch, every other column under 768px (D3, item 3). *Changed 2026-11-02 (owner), not built yet:* the rule between sections becomes a 3px double rule in `--color-border-strong` (D11). Each one adds 2px to its band.
 
 **Tokens.** These are the site's only custom properties. The `--site-` prefix keeps them apart from the library's names, so none can shadow a library token:
 
@@ -488,12 +526,13 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - Every target is at least 24×24px, or has the spacing 2.5.8 allows. Stacked footer links need checking.
 - With reduced motion, no element animates.
 - Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned.
-- In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4).
+- In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4). Once D12 is built, the selected Foundations link keeps a mark other than its fill.
+- Once D11 is built: `Section` draws the rule in its token, checked by computed style, and the rule shows two separate lines at real device pixel ratios of 1, 1.5 and 2.
 
 **Keyboard and focus (scripted):**
 - Every link is a plain `<a>`, so every page loads as a new document, and the browser moves focus to the top and announces the new title. A test fails on any React Router `<Link>` (`data-discover`). *Changed in 5b:* this asked for focus to move to the `<h1>` after a client-side route change; the site has none to manage.
 - The jump index's links move focus to their card.
-- The component page's menu, below 1024px, is the library's `Menu`, with its keyboard behaviour; from 1024px the list beside the page is plain links. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`).
+- The component page's menu, below 1024px, is the library's `Menu`, with its keyboard behaviour; from 1024px the list beside the page is plain links. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`). D12 keeps them so: every one is an `<a>` in the HTML before hydration, which a test checks with scripts blocked.
 
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places. One exception, approved by the owner on 2026-10-27: on Home, a built component's jump-index link goes to its card and its card title to its page (step 5b, as built).
@@ -523,6 +562,10 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 5. **The rest, and the quality pass**, split in two PRs on 2026-10-26 (owner):
    - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
+6. **D10–D13 (2026-11-02), not started.** D13 needs no build, and D10 needs its list confirmed.
+   - **6a. Double rule (D11).** The §7.8 line, then `Section`, then the comment in `index.css` that calls the sheet "the section rules' colour". Waits on the open question in D11.
+   - **6b. Library (D12).** `tabVariants` and the `bordered` variant, after the owner's yes, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
+   - **6c. Foundations links (D12).** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color.
 
 **Step 2, as built (2026-10-26):**
 - `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids. The hero moved to a paper plate on a ruled sheet the same day (D3, item 3).
