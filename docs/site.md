@@ -10,9 +10,8 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 
 | Change | Needed by | Status |
 |---|---|---|
-| A line in `docs/design-system.md` §7.8 for the double rule | D11 | To write |
 | `tabVariants` exported from `Tabs`, and a `bordered` variant of `TabsList`. `Tabs` is foundational, so it needs the owner's yes first (`CLAUDE.md`) | D12 | To ask |
-| A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total. `DataTable` has no totals row, `tfoot` or footer support today | Nothing blocks on it, but until it ships the site's rule echoes no library behaviour | To decide |
+| A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total, and a line for that rule in `docs/design-system.md` §7.8. `DataTable` has no totals row, `tfoot` or footer support today | D11: the site can't use the mark until this ships | To decide |
 | Source highlight in Inline citation and Sources. Both shipped on 2026-10-28 without one | Nothing blocks on it | Not designed |
 
 ---
@@ -31,7 +30,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
-| D11 | Section rules | Double rules between a page's sections, in `--color-border-strong`. Not built |
+| D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site. Section rules stay 1px. Not built |
 | D12 | Foundations links | Bordered, selected in ink, still real links. Not built |
 | D13 | Highlights | None behind site copy |
 
@@ -95,16 +94,14 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **D3. Grounds — bands decided 2026-10-25, plates and the closing band 2026-10-26 (owner): (c), dark for single specimens.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
-1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added. *Changed 2026-11-02 (owner), not built yet:* the rule becomes a double rule (D11). No band is tinted still holds.
-2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
+1. **Section bands: rules only.** No band is tinted anywhere. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
    - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
    - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
    - *(c) Dark for single specimens:* dark on the hero and the component pages, where one specimen is the subject; paper in the Components and Home grids. The cost is two plate styles to keep consistent.
 
    To-build cards (dashed frame, "Not built yet") follow whichever ground is chosen.
 3. **The hero: a paper plate on a ruled sheet. Revised 2026-10-26 (owner), as a prototype for review on the preview.** On the live hero, the dark plate read first and the headline second in a squint test. Its ground is the headline's own ink, 16.39:1 against the page, over about 756×386px. The orchid rail and the "AI · Awaiting review" label disappeared inside it, and its 1.62:1 frame couldn't be seen beside it. A dark block on paper also reads as a hole in the page rather than a sheet on it. (a) had been turned down for paper on paper on paper. A ruled hero removes that risk, because the plate is the one place in the hero without rules:
-   - **The sheet.** The hero is ruled like a spreadsheet: 1px lines in `--color-border`, the colour of the section rules, so no token is added, on a layer at 60% opacity, which measures 1.16:1 on paper. At full strength (1.29:1) the owner found the ruling a little strong on retina and non-retina screens alike (2026-10-26). Rows are `--h-row-sm` (28px), `DataTable`'s row height. Columns are the 12-column grid's pitch, aligned to the rail, so a column line runs down the left edge of every column. Under 768px a line runs down every other column, 6 across: twelve 30px columns on a phone ruled near-square cells, which read as graph paper and crowded the lead, while every other column gives cells about 61×28, the shape of a spreadsheet's. **Column lines are element borders on a CSS grid with the rail's tracks, not a background.** A repeating gradient puts a line wherever the arithmetic lands, and between breakpoints the pitch isn't a whole pixel (100.67px at 1280px), so lines fell between device pixels and drew soft (owner, 2026-10-26). The browser snaps a border to a whole pixel. Rows stay a gradient, because 28px is always whole. The lines fade out toward the hero's edges, so the sheet has no hard border against the rule-only bands below. *Since 2026-11-02 (D11, not built yet)* the section rules leave this colour; the sheet keeps it.
-   - **The plate** is paper, opaque over the rules, in `SpecimenFrame`'s own 1px `--color-border-strong` frame, the same as the Components cards. A frame in `--color-text-primary`, the headline's ink, read heavy (owner, 2026-10-26), as the full-ink focus ring had (design system §4). Against rules at 1.16:1, the frame's 1.62:1 reads as an edge.
+   - **The sheet.** The hero is ruled like a spreadsheet: 1px lines in `--color-border`, the colour of the section rules, so no token is added, on a layer at 60% opacity, which measures 1.16:1 on paper. At full strength (1.29:1) the owner found the ruling a little strong on retina and non-retina screens alike (2026-10-26). Rows are `--h-row-sm` (28px), `DataTable`'s row height. Columns are the 12-column grid's pitch, aligned to the rail, so a column line runs down the left edge of every column. Under 768px a line runs down every other column, 6 across: twelve 30px columns on a phone ruled near-square cells, which read as graph paper and crowded the lead, while every other column gives cells about 61×28, the shape of a spreadsheet's. **Column lines are element borders on a CSS grid with the rail's tracks, not a background.** A repeating gradient puts a line wherever the arithmetic lands, and between breakpoints the pitch isn't a whole pixel (100.67px at 1280px), so lines fell between device pixels and drew soft (owner, 2026-10-26). The browser snaps a border to a whole pixel. Rows stay a gradient, because 28px is always whole. The lines fade out toward the hero's edges, so the sheet has no hard border against the rule-only bands below.   - **The plate** is paper, opaque over the rules, in `SpecimenFrame`'s own 1px `--color-border-strong` frame, the same as the Components cards. A frame in `--color-text-primary`, the headline's ink, read heavy (owner, 2026-10-26), as the full-ink focus ring had (design system §4). Against rules at 1.16:1, the frame's 1.62:1 reads as an edge.
    - **Settled: one filled button.** On a paper plate, "Open the demo" and the specimen's "Post entry" were both ink at the same weight (owner, 2026-10-26). The hero became a teaser the same day (D6, changed), with no Post entry, so "Open the demo" is its only filled button.
    - **Only the hero is ruled.** On the other pages a ruled band would compete with the section rules.
    - **The rules are decoration.** They're `aria-hidden`, and they drop out in forced colours, where the plate's frame still draws its edge (D4, §11).
@@ -200,15 +197,17 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand` and `DemoAction`. A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
 
-**D11. Section rules are double rules — decided 2026-11-02 (owner).** The ledger's mark for a closed total, used as the site's section divider.
+**D11. The double rule stays rare — decided 2026-11-02 (owner).** A double rule is the ledger's mark for a closed total. To a finance reader it says the total is final and adds up, so it's never a divider.
 
-1. **Construction.** A direct child of `<main>` other than the first takes `border-top: 3px double var(--color-border-strong)`. The closing band has no rule, since its change of ground separates it. Moments on Home keep their 1px rule, and so does the footer, which is outside `<main>`. Nothing sits beside the rule: no meta line, no count, no mono caps.
-2. **The token.** `--color-border-strong`, because at 1x the default border (1.29:1) reads as one faint line, and the strong one (1.62:1) just resolves into two.
-3. **Rendering.** Measured in Chromium at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2, the lines stay on whole pixels at every ratio. Safari and Firefox aren't measured. Playwright's emulated `deviceScaleFactor` draws them soft, so a test must launch with `--force-device-scale-factor`.
-4. **Order.** §7.8 of the design system gains a line for it first, because §7 of this spec says borders come from the library.
-5. **The hero's sheet** keeps `--color-border` at 60% (D3, item 3).
+1. **Section rules stay 1px** in `--color-border` (D3, item 1; §7).
+2. **The library comes first (D10).** The mark ships on `DataTable`'s totals row, with its line in §7.8 of the design system. It draws only when the displayed parts sum to the displayed total, computed in the component. A caller can't set it with a prop, because a mark that states a fact has to come from a check (failure log, `MetricTile`'s arrow).
+3. **Then one use on the site,** where something really closes. The place is chosen when the totals row ships. Nothing sits beside the rule: no meta line, no count, no mono caps.
+4. **What's already measured,** for whoever builds it:
+   - `3px double` stays on whole pixels in Chromium at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2. Safari and Firefox aren't measured. Playwright's emulated `deviceScaleFactor` draws it soft, so a test must launch with `--force-device-scale-factor`.
+   - At 1x, `--color-border` (1.29:1) reads as one faint line, and `--color-border-strong` (1.62:1) just resolves into two. Ink is unmistakable in the review's mock-up. The token is chosen with the totals row.
+   - It adds 2px to whatever carries it, and `DataTable`'s virtualizer estimates rows at a fixed height, so the height has to be accounted for on the cell.
 
-As it stands that draws 1 on Home, none on a component page, 1 on Getting started, 3 on Vocabulary, 4 on Color and Principles, 5 on Typography and 6 on Density. **Open (owner):** the 2026-11-02 review (`docs/reviews/art-direction-2026-11-02.md`) recommends keeping the mark rare instead: build it into `DataTable` first, then use it on the site once, where something really closes. §7.8's own argument is that a border treatment "is only informative while it is rare". This decision stands until the owner says otherwise.
+*Changed the same day (owner):* this first read "Section rules are double rules", from the v3.3 draft. On every section it would have drawn up to 6 per page, mostly on reference pages with no totals, and none on component pages. §7.8's own argument is that a border treatment "is only informative while it is rare". See `docs/reviews/art-direction-2026-11-02.md`.
 
 **D12. Foundations' links look bordered — decided 2026-11-02 (owner).** They stay real `<a>` elements in a `<nav>`, one per route, with `aria-current="page"`. Library `Tabs` can't serve here: `TabsTrigger` renders a `<button>`, which does nothing before hydration (§12) or without JavaScript, and tabs switch a view where a nav changes the page (§3).
 
@@ -453,8 +452,7 @@ The site is a reading page, not dense product UI, so it keeps a few values of it
 - A 1040px reading column for Principles and component pages, and 680px prose blocks.
 - Cards span 4 columns (432px), the hero splits 5/7, and the five moments are their own 5-up row with 16px gaps.
 
-**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule. The hero is ruled as a sheet in the same colour at 60% opacity: 28px rows, columns on the 12-column pitch, every other column under 768px (D3, item 3). *Changed 2026-11-02 (owner), not built yet:* the rule between sections becomes a 3px double rule in `--color-border-strong` (D11). Each one adds 2px to its band.
-
+**Rhythm:** sections are padded 48px under 768px, 64px from 768px and 96px from 1200px, and separated by a full-width 1px `--color-border` rule. The hero is ruled as a sheet in the same colour at 60% opacity: 28px rows, columns on the 12-column pitch, every other column under 768px (D3, item 3).
 **Tokens.** These are the site's only custom properties. The `--site-` prefix keeps them apart from the library's names, so none can shadow a library token:
 
 ```
@@ -527,7 +525,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - With reduced motion, no element animates.
 - Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned.
 - In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4). Once D12 is built, the selected Foundations link keeps a mark other than its fill.
-- Once D11 is built: `Section` draws the rule in its token, checked by computed style, and the rule shows two separate lines at real device pixel ratios of 1, 1.5 and 2.
+- Once the double rule is on the site (D11): it shows two separate lines at real device pixel ratios of 1, 1.5 and 2.
 
 **Keyboard and focus (scripted):**
 - Every link is a plain `<a>`, so every page loads as a new document, and the browser moves focus to the top and announces the new title. A test fails on any React Router `<Link>` (`data-discover`). *Changed in 5b:* this asked for focus to move to the `<h1>` after a client-side route change; the site has none to manage.
@@ -563,7 +561,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
    - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 6. **D10–D13 (2026-11-02), not started.** D13 needs no build, and D10 needs its list confirmed.
-   - **6a. Double rule (D11).** The §7.8 line, then `Section`, then the comment in `index.css` that calls the sheet "the section rules' colour". Waits on the open question in D11.
+   - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR. Then the one use on the site. `Section` doesn't change.
    - **6b. Library (D12).** `tabVariants` and the `bordered` variant, after the owner's yes, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
    - **6c. Foundations links (D12).** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color.
 
