@@ -558,8 +558,11 @@ test.describe('the Foundations pages', () => {
             await expect(link).toHaveCSS('border-bottom-width', '0px');
           }
           const list = nav.getByRole('list');
-          await expect(list).toHaveCSS('border-bottom-width', '1px');
-          await expect(list).toHaveCSS('border-bottom-color', fill);
+          const rule = await list.evaluate((el) => {
+            const s = getComputedStyle(el, '::after');
+            return { width: s.borderBottomWidth, color: s.borderBottomColor };
+          });
+          expect(rule).toEqual({ width: '1px', color: fill });
 
           const boxes = await nav.getByRole('link').evaluateAll((els) =>
             els.map((el) => {
