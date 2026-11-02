@@ -233,6 +233,256 @@ for (const mode of ['dark', 'light'] as const) {
   });
 }
 
+/** A bordered item's ::after, which draws the hover and press overlay. */
+const overlay = (t: Locator) => t.evaluate((el) => getComputedStyle(el, '::after').backgroundColor);
+
+for (const mode of ['dark', 'light'] as const) {
+  test.describe(`Tabs — bordered, in ${mode}`, () => {
+    /** The same appearance on two elements: a tab, and a link with aria-current. */
+    const surfaces = [
+      {
+        name: 'tabs',
+        story: 'foundational-tabs--bordered',
+        selected: (page: Page) => tab(page, 'Runs'),
+        other: (page: Page) => tab(page, 'Lineage'),
+        toOther: 'ArrowRight',
+      },
+      {
+        name: 'links',
+        story: 'foundational-tabs--bordered-links',
+        selected: (page: Page) => page.getByRole('link', { name: 'Runs' }),
+        other: (page: Page) => page.getByRole('link', { name: 'Lineage' }),
+        toOther: 'Tab',
+      },
+    ];
+
+    for (const { name, story, selected, other, toOther } of surfaces) {
+      test(`${name}: the rule paints unbroken, with no side border crossing it`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const list = page.locator('[data-slot="tabs-list"], nav ul');
+        const box = (await list.boundingBox())!;
+        // A computed border isn't a painted one: read the row of pixels itself.
+        // Inset at the ends, so a fractional width can't catch the canvas.
+        const row = await page.screenshot({
+          clip: {
+            x: Math.ceil(box.x) + 1,
+            y: Math.round(box.y + box.height) - 1,
+            width: Math.floor(box.width) - 3,
+            height: 1,
+          },
+        });
+        const colours = await page.evaluate(async (base64) => {
+          const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob());
+          const context = new OffscreenCanvas(image.width, 1).getContext('2d')!;
+          context.drawImage(image, 0, 0);
+          const { data } = context.getImageData(0, 0, image.width, 1);
+          const seen = new Set<string>();
+          for (let i = 0; i < data.length; i += 4) seen.add(`${data[i]},${data[i + 1]},${data[i + 2]}`);
+          return [...seen];
+        }, row.toString('base64'));
+        expect(colours).toHaveLength(1);
+      });
+
+      test(`${name}: --color-border on the top and sides, and no bottom border, on every item`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const border = await rgba(page, await token(page, '--color-border'));
+        for (const item of [selected(page), other(page)]) {
+          const sides = await item.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return (['Top', 'Right', 'Left'] as const).map((side) => ({
+              width: s[`border${side}Width`],
+              color: s[`border${side}Color`],
+            }));
+          });
+          for (const side of sides) {
+            expect(side.width).toBe('1px');
+            expect(await rgba(page, side.color)).toEqual(border);
+          }
+          expect(await item.evaluate((el) => getComputedStyle(el).borderBottomWidth)).toBe('0px');
+        }
+      });
+
+      test(`${name}: a 1px ink rule stops at the last item, and the strip stays one control height`, async ({
+        page,
+      }) => {
+        await gotoStory(page, story, mode);
+        const list = page.locator('[data-slot="tabs-list"], nav ul');
+        const rule = await list.evaluate((el) => {
+          const s = getComputedStyle(el, '::after');
+          return { width: s.borderBottomWidth, color: s.borderBottomColor };
+        });
+        expect(rule.width).toBe('1px');
+        expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+
+        const listBox = (await list.boundingBox())!;
+        const box = (await selected(page).boundingBox())!;
+        expect(listBox.height, 'the rule adds no height: the strip is one item tall').toBe(box.height);
+        expect(box.y + box.height, 'the selected fill meets the rule').toBe(listBox.y + listBox.height);
+        const lastRight = await list.evaluate((el) => {
+          const items = [...el.querySelectorAll('[data-slot="tabs-trigger"], a')];
+          return items[items.length - 1].getBoundingClientRect().right;
+        });
+        expect(listBox.x + listBox.width, 'the rule ends with the last item').toBe(lastRight);
+      });
+
+      test(`${name}: selected is the ink fill and its on-colour`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const fill = await rgba(page, await token(page, '--color-fill-interactive'));
+        const on = await rgba(page, await token(page, '--color-on-interactive'));
+        await settlesTo(page, selected(page), 'backgroundColor', fill);
+        await settlesTo(page, selected(page), 'color', on);
+        await settlesTo(page, other(page), 'backgroundColor', [0, 0, 0, 0], 'the others have no ground of their own');
+      });
+
+      test(`${name}: hover is --color-bg-hover, and its inverse on the selected item`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await other(page).hover();
+        await expect
+          .poll(async () => rgba(page, await overlay(other(page))))
+          .toEqual(await rgba(page, await token(page, '--color-bg-hover')));
+        await selected(page).hover();
+        await expect
+          .poll(async () => rgba(page, await overlay(selected(page))))
+          .toEqual(await rgba(page, await token(page, '--color-bg-hover-inverse')));
+      });
+
+      test(`${name}: the ring is inside the shared line, so a neighbour's border can't cover it`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await page.keyboard.press('Tab');
+        await expect(selected(page)).toBeFocused();
+        const ring = await selected(page).evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset };
+        });
+        expect(ring).toEqual({ style: 'solid', width: '2px', offset: '-3px' });
+      });
+
+      test(`${name}: the ring is paper on ink on the selected item, and --color-ring on the rest`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        // Polled: controlBase transitions colour, the outline's included.
+        const ringColor = (t: Locator) => t.evaluate((el) => getComputedStyle(el).outlineColor);
+        await page.keyboard.press('Tab');
+        await expect(selected(page)).toBeFocused();
+        // --color-ring on the ink fill is 1.80:1 in light and 1.29:1 in dark.
+        await expect
+          .poll(async () => rgba(page, await ringColor(selected(page))))
+          .toEqual(await rgba(page, await token(page, '--color-on-interactive')));
+        await page.keyboard.press(toOther);
+        await expect(other(page)).toBeFocused();
+        await expect
+          .poll(async () => rgba(page, await ringColor(other(page))))
+          .toEqual(await rgba(page, await token(page, '--color-ring')));
+      });
+
+      test(`${name}: in forced colours the selected item alone keeps a mark`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await page.emulateMedia({ forcedColors: 'active' });
+        const decoration = (t: Locator) =>
+          t.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return { line: s.textDecorationLine, thickness: s.textDecorationThickness };
+          });
+        expect(await decoration(selected(page))).toEqual({ line: 'underline', thickness: '2px' });
+        expect((await decoration(other(page))).line).toBe('none');
+        expect(
+          await other(page).evaluate((el) => getComputedStyle(el).borderTopStyle),
+          'every item keeps its edge',
+        ).toBe('solid');
+        expect(
+          await page
+            .locator('[data-slot="tabs-list"], nav ul')
+            .evaluate((el) => getComputedStyle(el, '::after').borderBottomStyle),
+          'the rule is a border, so it stays',
+        ).toBe('solid');
+      });
+    }
+
+    test('neighbours share one line, and selecting moves nothing', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered', mode);
+      const boxes = () => Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()));
+      const before = await boxes();
+      for (let i = 1; i < before.length; i++) {
+        expect(before[i]!.x, 'each item starts on the last pixel of the one before').toBe(
+          before[i - 1]!.x + before[i - 1]!.width - 1,
+        );
+      }
+      await tab(page, 'Lineage').click();
+      expect(await boxes()).toEqual(before);
+    });
+
+    test('vertical: the rule is on the inline edge, and neighbours share a line on the block axis', async ({
+      page,
+    }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-vertical', mode);
+      const list = page.getByRole('tablist');
+      const rule = await list.evaluate((el) => {
+        const s = getComputedStyle(el, '::after');
+        return { right: s.borderRightWidth, bottom: s.borderBottomWidth, color: s.borderRightColor };
+      });
+      expect([rule.right, rule.bottom]).toEqual(['1px', '0px']);
+      expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+      const trigger = await tab(page, 'Lineage').evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { right: s.borderRightWidth, bottom: s.borderBottomWidth };
+      });
+      expect(trigger).toEqual({ right: '0px', bottom: '1px' });
+      const listBox = (await list.boundingBox())!;
+      const item = (await tab(page, 'Lineage').boundingBox())!;
+      expect(item.x + item.width, 'the selected fill meets the rule').toBe(listBox.x + listBox.width);
+      const boxes = (await Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()))).map(
+        (b) => b!,
+      );
+      for (let i = 1; i < boxes.length; i++) {
+        expect(boxes[i].y).toBe(boxes[i - 1].y + boxes[i - 1].height - 1);
+        expect(boxes[i].x).toBe(boxes[0].x);
+        expect(boxes[i].width).toBe(boxes[0].width);
+      }
+    });
+
+    test('size="lg" is --text-lg with its tracking, SemiBold, in a 36px box, on tabs and links', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-large', mode);
+      const expected = {
+        fontSize: '16px',
+        lineHeight: '24px',
+        letterSpacing: '-0.16px',
+        fontWeight: '600',
+        height: 36,
+      };
+      for (const item of [tab(page, 'Runs'), page.getByRole('link', { name: 'Color' })]) {
+        const measured = await item.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return {
+            fontSize: s.fontSize,
+            lineHeight: s.lineHeight,
+            letterSpacing: s.letterSpacing,
+            fontWeight: s.fontWeight,
+            height: el.getBoundingClientRect().height,
+          };
+        });
+        expect(measured).toEqual(expected);
+      }
+    });
+
+    test('the default size is --text-base in a 32px box', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered', mode);
+      const measured = await tab(page, 'Runs').evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { fontSize: s.fontSize, height: el.getBoundingClientRect().height };
+      });
+      expect(measured).toEqual({ fontSize: '13px', height: 32 });
+    });
+
+    test('the links are real links, in a nav, with no tab roles', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-links', mode);
+      const nav = page.getByRole('navigation', { name: 'Run views' });
+      await expect(nav.getByRole('link')).toHaveCount(3);
+      await expect(nav.locator('[aria-current="page"]')).toHaveText('Runs');
+      await expect(page.getByRole('tab')).toHaveCount(0);
+      await expect(page.getByRole('tablist')).toHaveCount(0);
+    });
+  });
+}
+
 /**
  * §11.2's state table, enforced by TabsTrigger: selected `fill`, disabled
  * `light`, the rest `bold`. Weight is not in the DOM, but Phosphor draws each

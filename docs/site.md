@@ -10,7 +10,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 
 | Change | Needed by | Status |
 |---|---|---|
-| `tabVariants` exported from `Tabs`, and a `bordered` variant of `TabsList`. `Tabs` is foundational, so it needs the owner's yes first (`CLAUDE.md`) | D12 | To ask |
+| `tabVariants` exported from `Tabs`, and a `bordered` variant of `TabsList`. `Tabs` is foundational, so it needs the owner's yes first (`CLAUDE.md`) | D12 | Yes given 2026-11-02. Built (§13, 6b) |
 | A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total, and a line for that rule in `docs/design-system.md` §7.8. `DataTable` has no totals row, `tfoot` or footer support today | D11: the site can't use the mark until this ships | To decide |
 | Source highlight in Inline citation and Sources. Both shipped on 2026-10-28 without one | Nothing blocks on it | Not designed |
 
@@ -214,11 +214,11 @@ Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `Exte
 **D12. Foundations' links look bordered — decided 2026-11-02 (owner).** They stay real `<a>` elements in a `<nav>`, one per route, with `aria-current="page"`. Library `Tabs` can't serve here: `TabsTrigger` renders a `<button>`, which does nothing before hydration (§12) or without JavaScript, and tabs switch a view where a nav changes the page (§3).
 
 - **Shared appearance (D10).** `packages/ui` exports the look as a cva, `tabVariants`, used by a new `bordered` variant of `TabsList` and by these links. `line` and `segmented` don't change.
-- **Borders.** `--color-border` on every side, with neighbours sharing one line.
+- **Borders.** `--color-border` on the top and sides, with neighbours sharing one line, on a 1px rule in `--color-fill-interactive` that stops at the last link. *Changed 2026-11-02 (owner, after a side-by-side of four versions on Color, against a reference with a strong base rule):* this read "`--color-border` on every side", which read as a button group with nothing connecting it to the page. The rule is 1px because §7.8 keeps 2px for its three uses. It stops at the last link because at full width it was the strongest line on the page, above the title, where a section rule is `--color-border` (D11), and it promised a panel a link can't deliver. The labels stay sans, not uppercase mono, which read most like a table header.
 - **Hover.** `--color-bg-hover`. The raised surface can't be used: in light mode it is the same colour as the canvas (D3).
 - **Selected.** `--color-fill-interactive` with `--color-on-interactive`, and `--color-bg-hover-inverse` on hover. In forced colours the selected link keeps a visible mark other than its fill.
-- **Focus.** The library's ring, inset, so a neighbour's border can't cover it.
-- **Labels.** Sans SemiBold in sentence case at `text-site-body`, which needs a `size` on the cva. At the library's 13px beside a 64px title, most visitors missed these links (§3).
+- **Focus.** The library's ring, inset, so a neighbour's border can't cover it. *Changed 2026-11-02 (owner):* on the selected link only, the ring is `--color-on-interactive`, 16.39:1 in both modes, with the same width and inset. An inset ring sits on the link's own fill, where `--color-ring` measures 1.80:1 in light and 1.29:1 in dark, under the 3:1 a focus indicator needs. Every other link keeps `--color-ring`. The inset is 3px, the ring's width plus the link's border, because at 2px the next link's border covers the ring's outer pixel.
+- **Labels.** Sans SemiBold in sentence case at `text-lg`, through `size="lg"` on the cva. At the library's 13px beside a 64px title, most visitors missed these links (§3). *Changed 2026-11-02 (owner):* this said `text-site-body`, which exists only in `apps/site`, so a library cva can't use it. `--text-lg` has the same size and line height, 1rem/1.5rem, and takes its §8 tracking, `--tracking-tight`.
 
 **D13. No highlight behind site copy — decided 2026-11-02 (owner).** Every hue already has a role, so a highlighter would borrow one: orchid means agent, sage means links and success, ochre means warning. Emphasis is weight, or nothing. A text highlight may exist later as the source mark in Inline citation or Sources; on the site it then appears only inside their specimens.
 
@@ -564,7 +564,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
 6. **D10–D13 (2026-11-02), not started.** D13 needs no build, and D10 needs its list confirmed.
    - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR. Then the one use on the site. `Section` doesn't change.
-   - **6b. Library (D12).** `tabVariants` and the `bordered` variant, after the owner's yes, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
+   - **6b. Library (D12), built.** `tabVariants` and the `bordered` variant, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
    - **6c. Foundations links (D12).** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color.
 
 **Step 2, as built (2026-10-26):**

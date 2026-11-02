@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChartLineIcon, CheckCircleIcon, ListBulletsIcon, TreeStructureIcon } from '@phosphor-icons/react';
 
+import { cn } from '../../../lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './index';
+import { tabsListVariants, tabVariants } from './variants';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
@@ -94,6 +96,125 @@ export const Segmented: Story = {
         <Panel>Raw payload.</Panel>
       </TabsContent>
     </Tabs>
+  ),
+};
+
+/** Bordered: boxed tabs on a 1px ink rule, neighbours sharing one line, the selected one in ink. */
+export const Bordered: Story = {
+  render: () => (
+    <Tabs defaultValue="runs" style={{ width: 480 }}>
+      <TabsList variant="bordered">
+        <TabsTrigger value="runs">
+          <ListBulletsIcon aria-hidden="true" />
+          Runs
+        </TabsTrigger>
+        <TabsTrigger value="lineage">
+          <TreeStructureIcon aria-hidden="true" />
+          Lineage
+        </TabsTrigger>
+        <TabsTrigger value="tests" disabled>
+          <CheckCircleIcon aria-hidden="true" />
+          Tests
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="runs">
+        <Panel>184 runs in the last 7 days.</Panel>
+      </TabsContent>
+      <TabsContent value="lineage">
+        <Panel>14 downstream models.</Panel>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+/** Bordered and vertical: the rule moves to the inline edge, and neighbours share a line on the block axis. */
+export const BorderedVertical: Story = {
+  render: () => (
+    <Tabs defaultValue="lineage" orientation="vertical" style={{ width: 480 }}>
+      <TabsList variant="bordered">
+        <TabsTrigger value="runs">Runs</TabsTrigger>
+        <TabsTrigger value="lineage">Lineage</TabsTrigger>
+        <TabsTrigger value="tests">Tests</TabsTrigger>
+      </TabsList>
+      <TabsContent value="runs">
+        <Panel>184 runs in the last 7 days.</Panel>
+      </TabsContent>
+      <TabsContent value="lineage">
+        <Panel>14 downstream models.</Panel>
+      </TabsContent>
+      <TabsContent value="tests">
+        <Panel>2 failing, 31 passing.</Panel>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+/**
+ * The same appearance on links, for a nav that changes the page. Real `<a>`
+ * elements with `aria-current`, not `TabsTrigger`, whose `<button>` does
+ * nothing before hydration. No `Tabs` root and no tablist: these aren't tabs.
+ */
+export const BorderedLinks: Story = {
+  render: () => (
+    <nav aria-label="Run views">
+      <ul role="list" className={tabsListVariants({ variant: 'bordered' })}>
+        {['Runs', 'Lineage', 'Tests'].map((name) => (
+          <li key={name}>
+            <a
+              href={`#${name.toLowerCase()}`}
+              aria-current={name === 'Runs' ? 'page' : undefined}
+              className={cn(tabVariants())}
+            >
+              {name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ),
+};
+
+/**
+ * `size="lg"`, for a strip beside display type: `--text-lg` in a 36px box, on
+ * tabs and on links alike.
+ */
+export const BorderedLarge: Story = {
+  render: () => (
+    <div className="flex flex-col gap-[var(--gap-section)]">
+      <Tabs defaultValue="runs" style={{ width: 480 }}>
+        <TabsList variant="bordered" size="lg">
+          <TabsTrigger value="runs">
+            <ListBulletsIcon aria-hidden="true" />
+            Runs
+          </TabsTrigger>
+          <TabsTrigger value="lineage">
+            <TreeStructureIcon aria-hidden="true" />
+            Lineage
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="runs">
+          <Panel>184 runs in the last 7 days.</Panel>
+        </TabsContent>
+        <TabsContent value="lineage">
+          <Panel>14 downstream models.</Panel>
+        </TabsContent>
+      </Tabs>
+      <nav aria-label="Foundations">
+        <ul role="list" className={tabsListVariants({ variant: 'bordered' })}>
+          {['Color', 'Typography', 'Density'].map((name) => (
+            <li key={name}>
+              <a
+                href={`#${name.toLowerCase()}`}
+                aria-current={name === 'Color' ? 'page' : undefined}
+                className={cn(tabVariants({ size: 'lg' }))}
+              >
+                {name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   ),
 };
 
