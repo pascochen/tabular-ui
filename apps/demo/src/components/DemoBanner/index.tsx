@@ -34,7 +34,10 @@ export function DemoBanner() {
   return (
     <div
       data-slot="demo-banner"
-      className="flex min-w-0 flex-1 items-center gap-[var(--gap-inline)] text-sm text-text-secondary"
+      // --h-control: a shell band's height is its child's plus 8px each side
+      // and the rule (§7.4). The buttons here are 24px, so without this the
+      // top nav is 41px, its rule 8px above the sidebar header's.
+      className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center gap-[var(--gap-inline)] text-sm text-text-secondary"
     >
       <Badge>Demo</Badge>
       <TruncatedText side="bottom">{`You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`}</TruncatedText>

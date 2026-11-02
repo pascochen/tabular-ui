@@ -19,3 +19,4 @@ App-local: only the public demo needs it.
 | Neutral throughout, `Badge` with no tone | Being a demo is context, not a state of the data (§0 rule 1) |
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
 | "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
+| `min-h-[var(--h-control)]` on the line | A shell band's height comes from its child (`AppShell` README, Geometry). With only 24px buttons in it, the top nav was 41px against the sidebar header's 49px, so their rules didn't line up |
