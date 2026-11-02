@@ -18,6 +18,9 @@ import { useClose } from '../../lib/close-context';
 import { kasaneCompany, visitor } from '../../lib/kasane';
 import { AI_COMPONENTS_URL, STORYBOOK_URL } from '../../lib/links';
 import { useStartOver } from '../../lib/start-over';
+import { useCompactBar } from '../../lib/viewport';
+
+const whoYouAre = `You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`;
 
 /**
  * The line that tells a visitor where they are: a demo, played as Kasane's
@@ -30,6 +33,7 @@ export function DemoBanner() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const { state, dispatch } = useClose();
   const startOver = useStartOver();
+  const compact = useCompactBar();
 
   return (
     <div
@@ -39,8 +43,10 @@ export function DemoBanner() {
       // top nav is 41px, its rule 8px above the sidebar header's.
       className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center gap-[var(--gap-inline)] text-sm text-text-secondary"
     >
-      <Badge>Demo</Badge>
-      <TruncatedText side="bottom">{`You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`}</TruncatedText>
+      {/* Under 360px the three buttons need its room. About this demo still says it. */}
+      <Badge className="max-[22.5rem]:hidden">Demo</Badge>
+      {/* No room for it on a phone, where it would cut to "Y…". About this demo says it instead. */}
+      {compact ? null : <TruncatedText side="bottom">{whoYouAre}</TruncatedText>}
       <span className="flex-1" />
       {/*
         Skip and Start over work at any point (the plan, §5). Skip is disabled at
@@ -51,18 +57,25 @@ export function DemoBanner() {
         size="sm"
         variant="ghost"
         disabled={state.ended}
+        // The accessible name stays whole, and starts with what the bar shows.
+        aria-label={compact ? 'Skip to the end' : undefined}
         onClick={() => dispatch({ type: 'skip', at: sceneNow() })}
       >
         <FastForwardIcon aria-hidden="true" />
-        Skip to the end
+        {compact ? 'Skip' : 'Skip to the end'}
       </Button>
       <Button size="sm" variant="ghost" onClick={startOver}>
         <ArrowCounterClockwiseIcon aria-hidden="true" />
         Start over
       </Button>
-      <Button size="sm" variant="ghost" onClick={() => setAboutOpen(true)}>
+      <Button
+        size="sm"
+        variant="ghost"
+        aria-label={compact ? 'About this demo' : undefined}
+        onClick={() => setAboutOpen(true)}
+      >
         <InfoIcon aria-hidden="true" />
-        About this demo
+        {compact ? 'About' : 'About this demo'}
       </Button>
 
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
@@ -74,6 +87,7 @@ export function DemoBanner() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
+            {compact ? <p>{whoYouAre}</p> : null}
             <p>
               <span className="font-medium text-text-primary">The company is fictional.</span> {kasaneCompany.legalName}{' '}
               makes stencil duplicators and inkjet printers in Tokyo and sells through subsidiaries in the US, Germany,
