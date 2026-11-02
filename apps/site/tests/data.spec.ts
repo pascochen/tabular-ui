@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { expect, test } from '@playwright/test';
 
-import { money as storyMoney } from '../../../packages/ui/src/fixtures/format';
-import { money } from '../src/lib/format';
+import { percentChange, percentDelta, money as storyMoney } from '../../../packages/ui/src/fixtures/format';
+import { exactMoney, money } from '../src/lib/format';
 
 /**
  * The site formats money by the stories' rules, kept in its own copy because it
@@ -27,6 +27,20 @@ test('money() matches the library stories’ formatter', () => {
   ];
   for (const [value, currency] of cases)
     expect(money(value, currency), `${value} ${currency}`).toBe(storyMoney(value, currency));
+});
+
+/**
+ * §8.6. The test above passes if both formatters take a hyphen together, so
+ * this one names the character.
+ */
+test('a negative takes U+2212, and the text is never read back as a number', () => {
+  expect(money(-41_415_809)).toBe('\u2212¥41m');
+  expect(exactMoney(-41_415_809)).toBe('\u2212¥41,415,809');
+  expect(exactMoney(-18_400.5, 'GBP')).toBe('\u2212£18,400.50');
+  expect(percentChange(86.1, 100)).toBe('\u221213.9%');
+  expect(percentChange(107.9, 100)).toBe('+7.9%');
+  expect(percentDelta(86.1, 100)).toBe(-13.9);
+  expect(Number(percentChange(86.1, 100).replace('%', ''))).toBeNaN();
 });
 
 /**

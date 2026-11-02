@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { money, percentChange } from '../../../fixtures/format';
+import { money, percentChange, percentDelta } from '../../../fixtures/format';
 import { balance, h1 } from '../../../fixtures/kasane';
 import { MetricTile } from './index';
 
 // Kasane's first half of FY2026, against the same half a year earlier and against budget.
 const netSales = money(h1.netSales.actual);
 const salesVsPriorYear = percentChange(h1.netSales.actual, h1.netSales.priorYear);
-const salesDelta = Number(salesVsPriorYear.replace('%', ''));
+const salesDelta = percentDelta(h1.netSales.actual, h1.netSales.priorYear);
 const sga = money(-h1.sga.actual);
 const sgaVsPriorYear = percentChange(h1.sga.actual, h1.sga.priorYear);
 const opVsBudget = percentChange(h1.operatingProfit.actual, h1.operatingProfit.budget);
@@ -47,7 +47,7 @@ export const PolarityIsNotDirection: Story = {
         label="SG&A"
         value={sga}
         delta={sgaVsPriorYear}
-        deltaValue={Number(sgaVsPriorYear.replace('%', ''))}
+        deltaValue={percentDelta(h1.sga.actual, h1.sga.priorYear)}
         higherIsBetter={false}
         caption={priorYear}
       />
@@ -64,12 +64,12 @@ export const States: Story = {
         label="Operating profit"
         value={money(h1.operatingProfit.actual)}
         delta={opVsBudget}
-        deltaValue={Number(opVsBudget.replace('%', ''))}
+        deltaValue={percentDelta(h1.operatingProfit.actual, h1.operatingProfit.budget)}
       />
       <MetricTile
         label="Contract renewal"
         value={`${balance.contractRenewalPct.toFixed(1)}%`}
-        delta={`${renewalDelta >= 0 ? '+' : '-'}${Math.abs(renewalDelta).toFixed(1)}pt`}
+        delta={`${renewalDelta >= 0 ? '+' : '−'}${Math.abs(renewalDelta).toFixed(1)}pt`}
         deltaValue={renewalDelta}
       />
     </div>
@@ -96,7 +96,7 @@ export const Sizes: Story = {
           size="sm"
           label="Avg duration"
           value="4.2s"
-          delta="-0.8s"
+          delta="−0.8s"
           deltaValue={-0.8}
           higherIsBetter={false}
         />

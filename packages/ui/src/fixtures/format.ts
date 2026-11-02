@@ -5,13 +5,14 @@ const SYMBOL = { JPY: '¥', USD: '$', EUR: '€', GBP: '£', CNY: 'CN¥' } as co
 export type Currency = keyof typeof SYMBOL;
 
 /**
- * Compact money: `¥34.4bn`, `¥355m`, `$48,216.40`, `-¥41m`. Yen never shows
- * decimals; billions keep one, millions keep none unless under ¥10m.
+ * Compact money: `¥34.4bn`, `¥355m`, `$48,216.40`, `−¥41m`. Yen never shows
+ * decimals; billions keep one, millions keep none unless under ¥10m. Negatives
+ * take U+2212, not a hyphen (§8.6).
  */
 export function money(value: number, currency: Currency = 'JPY'): string {
   const symbol = SYMBOL[currency];
   const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
+  const sign = value < 0 ? '−' : '';
   if (abs >= 1e9) return `${sign}${symbol}${(abs / 1e9).toFixed(1)}bn`;
   if (abs >= 1e7) return `${sign}${symbol}${Math.round(abs / 1e6)}m`;
   if (abs >= 1e6) return `${sign}${symbol}${(abs / 1e6).toFixed(1)}m`;
@@ -19,10 +20,15 @@ export function money(value: number, currency: Currency = 'JPY'): string {
   return `${sign}${symbol}${abs.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
-/** Signed change for a delta column: `+7.9%`, `-13.9%`. */
+/** Change in percent, as a number for `MetricTile`'s `deltaValue`, to the decimal `percentChange` shows. */
+export function percentDelta(actual: number, base: number): number {
+  return Number((((actual - base) / Math.abs(base)) * 100).toFixed(1));
+}
+
+/** Signed change for a delta column: `+7.9%`, `−13.9%`. Display text: `Number()` reads it as NaN. */
 export function percentChange(actual: number, base: number): string {
-  const p = ((actual - base) / Math.abs(base)) * 100;
-  return `${p >= 0 ? '+' : '-'}${Math.abs(p).toFixed(1)}%`;
+  const p = percentDelta(actual, base);
+  return `${p >= 0 ? '+' : '−'}${Math.abs(p).toFixed(1)}%`;
 }
 
 /** Whole number with grouping: `221,381`. */

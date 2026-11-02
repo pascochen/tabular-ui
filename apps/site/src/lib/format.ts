@@ -15,11 +15,11 @@ export function isCurrency(code: string): code is Currency {
   return code in SYMBOL;
 }
 
-/** Compact: `¥34.4bn`, `¥355m`, `$48,216.40`, `-¥41m`. */
+/** Compact: `¥34.4bn`, `¥355m`, `$48,216.40`, `−¥41m`. Negatives take U+2212 (§8.6). */
 export function money(value: number, currency: Currency = 'JPY'): string {
   const symbol = SYMBOL[currency];
   const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
+  const sign = value < 0 ? '−' : '';
   if (abs >= 1e9) return `${sign}${symbol}${(abs / 1e9).toFixed(1)}bn`;
   if (abs >= 1e7) return `${sign}${symbol}${Math.round(abs / 1e6)}m`;
   if (abs >= 1e6) return `${sign}${symbol}${(abs / 1e6).toFixed(1)}m`;
@@ -31,7 +31,7 @@ export function money(value: number, currency: Currency = 'JPY'): string {
 export function exactMoney(value: number, currency: Currency = 'JPY'): string {
   const abs = Math.abs(value);
   const digits = currency === 'JPY' ? 0 : 2;
-  const sign = value < 0 ? '-' : '';
+  const sign = value < 0 ? '−' : '';
   return `${sign}${SYMBOL[currency]}${abs.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
