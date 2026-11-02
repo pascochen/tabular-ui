@@ -339,6 +339,8 @@ Two things actually protect it, and a control needs at least one:
 
 **Any control sitting within ~3px of a scroll container's edge needs an inset ring**, regardless of which mechanism draws it. `DataTable`'s sticky sort buttons, `RunLogRow` and `LineageTree` all use `outline-offset: -2px` for exactly this reason.
 
+**An inset ring on a solid ink fill takes `--color-on-interactive`.** It sits on the fill, where `--color-ring` measures 1.80:1 in light and 1.29:1 in dark, under 3:1. `Tabs`' `bordered` variant is the one case: its selected item is the only ink fill with an inset ring (owner, 2026-11-02).
+
 ### Elevation
 
 **Three tiers, and only the top one carries a shadow.** Shadows barely register on a `ledger-950` canvas, and light mode is paper on paper (§3), so depth is a background step plus a 1px border:

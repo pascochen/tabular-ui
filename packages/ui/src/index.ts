@@ -103,7 +103,7 @@ export {
   type TabsListProps,
   type TabsTriggerProps,
 } from './components/foundational/Tabs';
-export { tabsListVariants } from './components/foundational/Tabs/variants';
+export { tabsListVariants, tabVariants } from './components/foundational/Tabs/variants';
 export {
   Menu,
   MenuCheckboxItem,

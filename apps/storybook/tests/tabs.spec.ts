@@ -233,6 +233,183 @@ for (const mode of ['dark', 'light'] as const) {
   });
 }
 
+/** A bordered item's ::after, which draws the hover and press overlay. */
+const overlay = (t: Locator) => t.evaluate((el) => getComputedStyle(el, '::after').backgroundColor);
+
+for (const mode of ['dark', 'light'] as const) {
+  test.describe(`Tabs — bordered, in ${mode}`, () => {
+    /** The same appearance on two elements: a tab, and a link with aria-current. */
+    const surfaces = [
+      {
+        name: 'tabs',
+        story: 'foundational-tabs--bordered',
+        selected: (page: Page) => tab(page, 'Runs'),
+        other: (page: Page) => tab(page, 'Lineage'),
+        toOther: 'ArrowRight',
+      },
+      {
+        name: 'links',
+        story: 'foundational-tabs--bordered-links',
+        selected: (page: Page) => page.getByRole('link', { name: 'Runs' }),
+        other: (page: Page) => page.getByRole('link', { name: 'Lineage' }),
+        toOther: 'Tab',
+      },
+    ];
+
+    for (const { name, story, selected, other, toOther } of surfaces) {
+      test(`${name}: 1px --color-border on every side, on every item`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const border = await rgba(page, await token(page, '--color-border'));
+        for (const item of [selected(page), other(page)]) {
+          const sides = await item.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return (['Top', 'Right', 'Bottom', 'Left'] as const).map((side) => ({
+              width: s[`border${side}Width`],
+              color: s[`border${side}Color`],
+            }));
+          });
+          for (const side of sides) {
+            expect(side.width).toBe('1px');
+            expect(await rgba(page, side.color)).toEqual(border);
+          }
+        }
+      });
+
+      test(`${name}: selected is the ink fill and its on-colour`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const fill = await rgba(page, await token(page, '--color-fill-interactive'));
+        const on = await rgba(page, await token(page, '--color-on-interactive'));
+        await settlesTo(page, selected(page), 'backgroundColor', fill);
+        await settlesTo(page, selected(page), 'color', on);
+        await settlesTo(page, other(page), 'backgroundColor', [0, 0, 0, 0], 'the others have no ground of their own');
+      });
+
+      test(`${name}: hover is --color-bg-hover, and its inverse on the selected item`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await other(page).hover();
+        await expect
+          .poll(async () => rgba(page, await overlay(other(page))))
+          .toEqual(await rgba(page, await token(page, '--color-bg-hover')));
+        await selected(page).hover();
+        await expect
+          .poll(async () => rgba(page, await overlay(selected(page))))
+          .toEqual(await rgba(page, await token(page, '--color-bg-hover-inverse')));
+      });
+
+      test(`${name}: the ring is inside the shared line, so a neighbour's border can't cover it`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await page.keyboard.press('Tab');
+        await expect(selected(page)).toBeFocused();
+        const ring = await selected(page).evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset };
+        });
+        expect(ring).toEqual({ style: 'solid', width: '2px', offset: '-3px' });
+      });
+
+      test(`${name}: the ring is paper on ink on the selected item, and --color-ring on the rest`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        // Polled: controlBase transitions colour, the outline's included.
+        const ringColor = (t: Locator) => t.evaluate((el) => getComputedStyle(el).outlineColor);
+        await page.keyboard.press('Tab');
+        await expect(selected(page)).toBeFocused();
+        // --color-ring on the ink fill is 1.80:1 in light and 1.29:1 in dark.
+        await expect
+          .poll(async () => rgba(page, await ringColor(selected(page))))
+          .toEqual(await rgba(page, await token(page, '--color-on-interactive')));
+        await page.keyboard.press(toOther);
+        await expect(other(page)).toBeFocused();
+        await expect
+          .poll(async () => rgba(page, await ringColor(other(page))))
+          .toEqual(await rgba(page, await token(page, '--color-ring')));
+      });
+
+      test(`${name}: in forced colours the selected item alone keeps a mark`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        await page.emulateMedia({ forcedColors: 'active' });
+        const decoration = (t: Locator) =>
+          t.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return { line: s.textDecorationLine, thickness: s.textDecorationThickness };
+          });
+        expect(await decoration(selected(page))).toEqual({ line: 'underline', thickness: '2px' });
+        expect((await decoration(other(page))).line).toBe('none');
+        expect(
+          await other(page).evaluate((el) => getComputedStyle(el).borderTopStyle),
+          'every item keeps its edge',
+        ).toBe('solid');
+      });
+    }
+
+    test('neighbours share one line, and selecting moves nothing', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered', mode);
+      const boxes = () => Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()));
+      const before = await boxes();
+      for (let i = 1; i < before.length; i++) {
+        expect(before[i]!.x, 'each item starts on the last pixel of the one before').toBe(
+          before[i - 1]!.x + before[i - 1]!.width - 1,
+        );
+      }
+      await tab(page, 'Lineage').click();
+      expect(await boxes()).toEqual(before);
+    });
+
+    test('vertical: neighbours share one line on the block axis, at one width', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-vertical', mode);
+      const boxes = (await Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()))).map(
+        (b) => b!,
+      );
+      for (let i = 1; i < boxes.length; i++) {
+        expect(boxes[i].y).toBe(boxes[i - 1].y + boxes[i - 1].height - 1);
+        expect(boxes[i].x).toBe(boxes[0].x);
+        expect(boxes[i].width).toBe(boxes[0].width);
+      }
+    });
+
+    test('size="lg" is --text-lg with its tracking, SemiBold, in a 36px box, on tabs and links', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-large', mode);
+      const expected = {
+        fontSize: '16px',
+        lineHeight: '24px',
+        letterSpacing: '-0.16px',
+        fontWeight: '600',
+        height: 36,
+      };
+      for (const item of [tab(page, 'Runs'), page.getByRole('link', { name: 'Color' })]) {
+        const measured = await item.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return {
+            fontSize: s.fontSize,
+            lineHeight: s.lineHeight,
+            letterSpacing: s.letterSpacing,
+            fontWeight: s.fontWeight,
+            height: el.getBoundingClientRect().height,
+          };
+        });
+        expect(measured).toEqual(expected);
+      }
+    });
+
+    test('the default size is --text-base in a 32px box', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered', mode);
+      const measured = await tab(page, 'Runs').evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { fontSize: s.fontSize, height: el.getBoundingClientRect().height };
+      });
+      expect(measured).toEqual({ fontSize: '13px', height: 32 });
+    });
+
+    test('the links are real links, in a nav, with no tab roles', async ({ page }) => {
+      await gotoStory(page, 'foundational-tabs--bordered-links', mode);
+      const nav = page.getByRole('navigation', { name: 'Run views' });
+      await expect(nav.getByRole('link')).toHaveCount(3);
+      await expect(nav.locator('[aria-current="page"]')).toHaveText('Runs');
+      await expect(page.getByRole('tab')).toHaveCount(0);
+      await expect(page.getByRole('tablist')).toHaveCount(0);
+    });
+  });
+}
+
 /**
  * §11.2's state table, enforced by TabsTrigger: selected `fill`, disabled
  * `light`, the rest `bold`. Weight is not in the DOM, but Phosphor draws each
