@@ -473,15 +473,16 @@ test.describe('the Color page’s ramps', () => {
 });
 
 test.describe('the Foundations pages', () => {
-  // Owner, 2026-10-27 (option A of a navigation critique): the section's name,
-  // then its three pages at reading size, then the page's title. The links had
-  // sat under the lead at 13px beside a 64px title, and most visitors missed them.
+  // Owner, 2026-10-27 (option A of a navigation critique): the section's three
+  // pages at reading size, then the page's title. The links had sat under the
+  // lead at 13px beside a 64px title, and most visitors missed them. Owner,
+  // 2026-11-02: no visible "Foundations" label above them; the nav keeps the name.
   for (const [route, current] of [
     ['/foundations/color', 'Color'],
     ['/foundations/typography', 'Typography'],
     ['/foundations/density', 'Density'],
   ] as const) {
-    test(`${route}: names the section, and its pages come before the title, at 16px`, async ({ page }) => {
+    test(`${route}: its pages come before the title, at 16px, with no section label`, async ({ page }) => {
       await page.goto(route);
       const nav = page.getByRole('navigation', { name: 'Foundations' });
       await expect(nav.getByRole('link')).toHaveText(['Color', 'Typography', 'Density']);
@@ -494,7 +495,7 @@ test.describe('the Foundations pages', () => {
       const top = async (l: ReturnType<typeof page.locator>) => (await l.boundingBox())!.y;
       const h1 = page.getByRole('heading', { level: 1 });
       await expect(h1).toHaveText(current);
-      expect(await top(page.getByText('Foundations', { exact: true }).first())).toBeLessThan(await top(nav));
+      await expect(page.locator('main').getByText('Foundations', { exact: true })).toHaveCount(0);
       expect(await top(nav)).toBeLessThan(await top(h1));
     });
   }
@@ -538,7 +539,9 @@ test.describe('the Foundations pages', () => {
           await expect(page.getByRole('heading', { level: 1 })).toHaveText(target);
         });
 
-        test(`${route}: the current page alone is ink, and all are bordered on every side`, async ({ page }) => {
+        test(`${route}: the current page alone is ink, on an ink rule that stops at the last link`, async ({
+          page,
+        }) => {
           const nav = await open(page);
           const fill = await token(page, '--color-fill-interactive');
           const on = await token(page, '--color-on-interactive');
@@ -548,19 +551,32 @@ test.describe('the Foundations pages', () => {
             await expect(link).toHaveCSS('background-color', isCurrent ? fill : 'rgba(0, 0, 0, 0)');
             if (isCurrent) await expect(link).toHaveCSS('color', on);
             await expect(link).toHaveCSS('font-weight', '600');
-            for (const side of ['top', 'right', 'bottom', 'left']) {
+            for (const side of ['top', 'right', 'left']) {
               await expect(link).toHaveCSS(`border-${side}-width`, '1px');
               await expect(link).toHaveCSS(`border-${side}-color`, border);
             }
+            await expect(link).toHaveCSS('border-bottom-width', '0px');
           }
-          // Neighbours share one line.
+          const list = nav.getByRole('list');
+          await expect(list).toHaveCSS('border-bottom-width', '1px');
+          await expect(list).toHaveCSS('border-bottom-color', fill);
+
           const boxes = await nav.getByRole('link').evaluateAll((els) =>
             els.map((el) => {
-              const { left, right } = el.getBoundingClientRect();
-              return { left, right };
+              const { left, right, bottom, height } = el.getBoundingClientRect();
+              return { left, right, bottom, height };
             }),
           );
+          // Neighbours share one line.
           for (let i = 1; i < boxes.length; i++) expect(boxes[i].left).toBe(boxes[i - 1].right - 1);
+          // The strip is one control tall, and the links meet the rule at its end.
+          const strip = (await list.boundingBox())!;
+          expect(strip.height).toBe(36);
+          expect(strip.x + strip.width).toBe(boxes[boxes.length - 1].right);
+          for (const box of boxes) {
+            expect(box.height).toBe(36);
+            expect(box.bottom).toBe(strip.y + strip.height);
+          }
         });
 
         test(`${route}: the ring is inset, paper on ink on the current page`, async ({ page }) => {
