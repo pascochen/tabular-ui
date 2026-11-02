@@ -257,6 +257,32 @@ for (const mode of ['dark', 'light'] as const) {
     ];
 
     for (const { name, story, selected, other, toOther } of surfaces) {
+      test(`${name}: the rule paints unbroken, with no side border crossing it`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const list = page.locator('[data-slot="tabs-list"], nav ul');
+        const box = (await list.boundingBox())!;
+        // A computed border isn't a painted one: read the row of pixels itself.
+        // Inset at the ends, so a fractional width can't catch the canvas.
+        const row = await page.screenshot({
+          clip: {
+            x: Math.ceil(box.x) + 1,
+            y: Math.round(box.y + box.height) - 1,
+            width: Math.floor(box.width) - 3,
+            height: 1,
+          },
+        });
+        const colours = await page.evaluate(async (base64) => {
+          const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob());
+          const context = new OffscreenCanvas(image.width, 1).getContext('2d')!;
+          context.drawImage(image, 0, 0);
+          const { data } = context.getImageData(0, 0, image.width, 1);
+          const seen = new Set<string>();
+          for (let i = 0; i < data.length; i += 4) seen.add(`${data[i]},${data[i + 1]},${data[i + 2]}`);
+          return [...seen];
+        }, row.toString('base64'));
+        expect(colours).toHaveLength(1);
+      });
+
       test(`${name}: --color-border on the top and sides, and no bottom border, on every item`, async ({ page }) => {
         await gotoStory(page, story, mode);
         const border = await rgba(page, await token(page, '--color-border'));
@@ -282,7 +308,7 @@ for (const mode of ['dark', 'light'] as const) {
         await gotoStory(page, story, mode);
         const list = page.locator('[data-slot="tabs-list"], nav ul');
         const rule = await list.evaluate((el) => {
-          const s = getComputedStyle(el);
+          const s = getComputedStyle(el, '::after');
           return { width: s.borderBottomWidth, color: s.borderBottomColor };
         });
         expect(rule.width).toBe('1px');
@@ -290,7 +316,7 @@ for (const mode of ['dark', 'light'] as const) {
 
         const listBox = (await list.boundingBox())!;
         const box = (await selected(page).boundingBox())!;
-        expect(listBox.height, 'the box laps the rule, so the strip is no taller than an item').toBe(box.height);
+        expect(listBox.height, 'the rule adds no height: the strip is one item tall').toBe(box.height);
         expect(box.y + box.height, 'the selected fill meets the rule').toBe(listBox.y + listBox.height);
         const lastRight = await list.evaluate((el) => {
           const items = [...el.querySelectorAll('[data-slot="tabs-trigger"], a')];
@@ -362,6 +388,12 @@ for (const mode of ['dark', 'light'] as const) {
           await other(page).evaluate((el) => getComputedStyle(el).borderTopStyle),
           'every item keeps its edge',
         ).toBe('solid');
+        expect(
+          await page
+            .locator('[data-slot="tabs-list"], nav ul')
+            .evaluate((el) => getComputedStyle(el, '::after').borderBottomStyle),
+          'the rule is a border, so it stays',
+        ).toBe('solid');
       });
     }
 
@@ -384,7 +416,7 @@ for (const mode of ['dark', 'light'] as const) {
       await gotoStory(page, 'foundational-tabs--bordered-vertical', mode);
       const list = page.getByRole('tablist');
       const rule = await list.evaluate((el) => {
-        const s = getComputedStyle(el);
+        const s = getComputedStyle(el, '::after');
         return { right: s.borderRightWidth, bottom: s.borderBottomWidth, color: s.borderRightColor };
       });
       expect([rule.right, rule.bottom]).toEqual(['1px', '0px']);

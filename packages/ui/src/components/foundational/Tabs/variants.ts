@@ -29,15 +29,22 @@ export const tabsListVariants = cva(
           'group-data-horizontal/tabs:h-[var(--h-control)]',
         ],
         // A 1px ink rule the strip stands on, which stops at the last item: a
-        // rule running on would promise a panel a link can't deliver. Every
-        // item after the first pulls back over its neighbour, so two borders
-        // read as one line. The list does this rather than the item because it
-        // holds for any direct child: a trigger here, an <li> around a link
-        // elsewhere.
+        // rule running on would promise a panel a link can't deliver. It's on
+        // ::after, painted over the items' last pixel, so the strip stays one
+        // control height and no side border can cross it. A border, not a
+        // background, which forced colours would remove.
+        //
+        // Every item after the first pulls back over its neighbour, so two
+        // borders read as one line. The list does this rather than the item
+        // because it holds for any direct child: a trigger here, an <li> around
+        // a link elsewhere.
         bordered: [
-          'border-b border-fill-interactive',
+          "relative after:pointer-events-none after:absolute after:z-[1] after:content-['']",
+          'after:inset-x-0 after:bottom-0 after:border-b after:border-fill-interactive',
           '[&>*+*]:-ml-px',
-          'group-data-vertical/tabs:items-stretch group-data-vertical/tabs:border-b-0 group-data-vertical/tabs:border-r',
+          'group-data-vertical/tabs:items-stretch',
+          'group-data-vertical/tabs:after:inset-x-auto group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:right-0',
+          'group-data-vertical/tabs:after:border-b-0 group-data-vertical/tabs:after:border-r',
           'group-data-vertical/tabs:[&>*+*]:ml-0 group-data-vertical/tabs:[&>*+*]:-mt-px',
         ],
       },
@@ -62,10 +69,9 @@ export const tabVariants = cva(
     ...controlOverlay,
     'relative inline-flex select-none items-center justify-center whitespace-nowrap',
     'gap-[var(--gap-control-icon)] px-[var(--pad-control-x)]',
-    // No bottom border, and the box laps the list's rule by its width (as the
-    // line tab's indicator does), so the strip stays one control height, the
-    // selected fill meets the rule, and the ring below sits a pixel inside both.
-    'border border-b-0 border-border -mb-px font-semibold text-text-body',
+    // No bottom border: the list's rule takes that pixel, so the selected fill
+    // meets it, and the ring below sits one pixel in on all four sides.
+    'border border-b-0 border-border font-semibold text-text-body',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
 
     // Inset by the ring and the item's own border, so the ring clears the line

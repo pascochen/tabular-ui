@@ -118,10 +118,9 @@ function TabsTrigger({ className, ...props }: Omit<TabsPrimitive.Tab.Props, 'ren
           ? [
               tabVariants({ size: listStyle.size }),
               // Vertical turns the strip a quarter: the rule is on the inline
-              // edge, as `line`'s is. The list stretches the items: w-full here
-              // would hold the box to the list's content, short of the rule.
+              // edge, as `line`'s is.
               'group-data-vertical/tabs:justify-start',
-              'group-data-vertical/tabs:mb-0 group-data-vertical/tabs:border-b group-data-vertical/tabs:-mr-px group-data-vertical/tabs:border-r-0',
+              'group-data-vertical/tabs:border-b group-data-vertical/tabs:border-r-0',
             ]
           : lineOrSegmentedTrigger,
         className,
