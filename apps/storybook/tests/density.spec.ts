@@ -10,7 +10,7 @@ import { gotoStory } from './helpers';
 /**
  * §0 rule 6 — every figure column carries `tabular-nums`. The check that
  * matters is a variance column with mixed-width figures: if the glyphs are
- * proportional, "+18.2%" and "-4.7%" will not align and the misalignment is
+ * proportional, "+18.2%" and "−4.7%" will not align and the misalignment is
  * the correctness hazard, not the aesthetic one.
  */
 test('numeric cells render tabular figures, and the column aligns', async ({ page }) => {
@@ -46,6 +46,14 @@ test('numeric cells render tabular figures, and the column aligns', async ({ pag
   const widest = [...byColumn.values()].sort((a, b) => b.length - a.length)[0];
   expect(widest.length, 'a figure column should share one right edge').toBeGreaterThan(3);
   expect(new Set(widest.map((t) => t.length)).size, 'column should contain mixed-width figures').toBeGreaterThan(1);
+
+  // §8.6 — a negative takes U+2212. The column must hold one, or this checks nothing.
+  const variance = cells.map((c) => c.text).filter((t) => t.endsWith('%'));
+  expect(
+    variance.some((t) => t.startsWith('−')),
+    'the variance column should show a negative',
+  ).toBe(true);
+  expect(variance.filter((t) => t.startsWith('-'))).toEqual([]);
 });
 
 /**

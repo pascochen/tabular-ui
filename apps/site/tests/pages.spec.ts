@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import { componentPages, routes } from './routes';
 
@@ -100,6 +100,34 @@ for (const route of routes) {
     }
   });
 }
+
+test.describe('negative figures', () => {
+  // §8.6. One text node at a time: the page's whole textContent runs a label
+  // into its figure ("fewer yen-¥41,415,809"), and the letter before the hyphen
+  // hides it. Code is left out: a command's flag or a CSS value is not a figure.
+  const textNodes = (page: Page) =>
+    page.evaluate(() => {
+      const nodes: string[] = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        if (walker.currentNode.parentElement?.closest('pre, code, script, style')) continue;
+        nodes.push(walker.currentNode.textContent ?? '');
+      }
+      return nodes;
+    });
+
+  for (const route of routes)
+    test(`${route}: no figure is signed with a hyphen`, async ({ page }) => {
+      await page.goto(route);
+      expect((await textNodes(page)).filter((text) => /(?:^|[\s(])-[¥$€£\d]/.test(text))).toEqual([]);
+    });
+
+  // The test above passes on a page with no negatives, so one has to be seen.
+  test('the typography page shows one, with the minus', async ({ page }) => {
+    await page.goto('/foundations/typography');
+    expect(await textNodes(page)).toContain('−¥41,415,809');
+  });
+});
 
 test.describe('a path with no page', () => {
   test('answers 404 with the 404 page, rendered once', async ({ page, request }) => {
