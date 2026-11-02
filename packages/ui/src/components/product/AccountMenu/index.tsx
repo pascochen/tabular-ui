@@ -81,6 +81,7 @@ function AccountMenu({
 }: AccountMenuProps) {
   const [hovered, setHovered] = useState(false);
   const [open, setOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <div
@@ -92,8 +93,9 @@ function AccountMenu({
     >
       <Menu open={open} onOpenChange={setOpen}>
         <MenuTrigger
-          // Starts with the visible name, so label-in-name (WCAG 2.5.3) holds.
-          aria-label={`${user.name}, account`}
+          // Starts with the visible text, so label-in-name (WCAG 2.5.3) holds.
+          // That's the initials too, whenever the fallback is showing them.
+          aria-label={`${imageLoaded ? '' : `${user.initials} `}${user.name}, account`}
           className={cn(
             'group/account flex h-[var(--h-control)] min-w-0 select-none items-center',
             'gap-[var(--gap-control-icon)] text-base font-medium outline-none',
@@ -126,10 +128,12 @@ function AccountMenu({
                 alt=""
                 animatedSrc={user.avatarAnimatedSrc}
                 animate={hovered && !open}
+                onLoadingStatusChange={(status) => setImageLoaded(status === 'loaded')}
               />
               <AvatarFallback>{user.initials}</AvatarFallback>
             </Avatar>
           </span>
+          {/* Paints nothing in a flex row. Without it, the initials and the name read as one word: "MTMei". */}{' '}
           <span className="min-w-0 truncate">{user.shortName ?? user.name}</span>
         </MenuTrigger>
         <MenuContent density="spaced" side="top" align="start" className="max-w-(--available-width)">

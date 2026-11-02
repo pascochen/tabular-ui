@@ -21,12 +21,12 @@ The sidebar footer's account row. It goes in `AppShell`'s `sidebarFooter` slot.
 
 | Prop | Type | Notes |
 |---|---|---|
-| `user.name` | `string` | Menu header, and the trigger's accessible name ("Mei Tachibana, account") |
+| `user.name` | `string` | Menu header, and the trigger's accessible name ("Mei Tachibana, account"; see *Row*) |
 | `user.shortName` | `string` | What the row shows. Defaults to `name` |
 | `user.email` | `string` | Menu header |
 | `user.avatarSrc` | `string` | The still image |
 | `user.avatarAnimatedSrc` | `string` | The animated version. See `Avatar` |
-| `user.initials` | `string` | Fallback |
+| `user.initials` | `string` | Fallback, and the start of the trigger's accessible name while it shows |
 | `theme` | `'dark' \| 'light' \| 'system'` | The user's preference, which the Theme group checks. Pass `useTheme()`'s `preference` (not its resolved `theme`, or System could never show as chosen) |
 | `onThemeChange` | `(theme) => void` | The user picked a preference. Pass `useTheme()`'s `setPreference`: the hook applies it and owns `data-theme` on the root |
 | `onOpenProfile`, `onOpenHomepage`, `onSignOut` | `() => void` | Router-agnostic; the caller navigates |
@@ -51,6 +51,8 @@ A 32px row (`--h-control`, the trigger's height) inside the footer's `py-2`, so 
 | Keyboard focus | `--color-ring`, which wins over hover and open |
 
 The ring is an **outline with a negative offset** (`-2px`, the ring width), so it paints inside the 2px border and never outside the 28px box. That is §4's inset form. It is not a box-shadow, and the sidebar's overflow cannot clip it.
+
+**The name starts with what the row shows** (label-in-name, WCAG 2.5.3). While the fallback's initials show, they are visible text too, so the name is "MT Mei Tachibana, account". Once the image loads, it is "Mei Tachibana, account". `aria-hidden` on the avatar would not do this: axe compares the name with the text on screen, whatever is hidden from assistive technology. `shortName` must be how `name` starts, or the rule fails.
 
 The trigger is the `Menu` primitive's own button, styled here, not a `Button`. No `Button` variant puts its ring on a child or has no fill on hover, and bending one to do both would override most of its contract.
 
@@ -81,6 +83,7 @@ Header (32px avatar, full name, email) → Your profile → **Theme**: Dark · L
 `apps/storybook/tests/account-menu.spec.ts` (Playwright) covers:
 - the row geometry, and the trigger as the row's only control;
 - the trigger covering the name;
+- label-in-name with fallback initials showing, by running axe's rule by name;
 - when each avatar animates, including under reduced motion;
 - the ring states and its inset offset;
 - the Theme group: its label, flipping `data-theme`, keeping the menu open, System following the OS (including a live change), and its rows' text on the other rows' x;

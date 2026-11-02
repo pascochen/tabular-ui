@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { axePath, gotoStory } from './helpers';
 
 /**
  * AccountMenu owns three things a story cannot assert: when the avatar
@@ -59,6 +59,23 @@ test('the trigger is the avatar and the name, named by the full name', async ({ 
   // The name is a target too.
   await row(page).getByText('Mei', { exact: true }).click();
   await expect(menu(page)).toBeVisible();
+});
+
+test('fallback initials start the trigger’s name: label-in-name holds (axe, by name)', async ({ page }) => {
+  await gotoStory(page, 'product-accountmenu--initials');
+  // Otherwise the rule has nothing to catch: an image has no text to compare.
+  await expect(trigger(page).locator('[data-slot="avatar-fallback"]')).toBeVisible();
+  await expect(trigger(page)).toHaveAccessibleName('MT Mei Tachibana, account');
+  await page.addScriptTag({ path: axePath });
+  const targets = await page.evaluate(async () => {
+    // Named, because axe skips a rule tagged `experimental` unless asked, as
+    // this one was until axe-core 4.14.
+    const { violations } = await window.axe.run(document, {
+      runOnly: { type: 'rule', values: ['label-content-name-mismatch'] },
+    });
+    return violations.flatMap((v) => v.nodes.map((n) => n.target.join(' ')));
+  });
+  expect(targets).toEqual([]);
 });
 
 test('the avatar is still at rest and plays only while a mouse is over the row', async ({ page }) => {

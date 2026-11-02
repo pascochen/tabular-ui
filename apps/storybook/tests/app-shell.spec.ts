@@ -1,26 +1,6 @@
-import { createRequire } from 'node:module';
-
 import { expect, test, type Page } from '@playwright/test';
 
-import { focusRingStyle, gotoStory, ringOverhang, tabTo } from './helpers';
-
-/**
- * The axe the story tests run, resolved through `@storybook/addon-a11y`,
- * which depends on it. axe-core is not a dependency of this package, and
- * `@axe-core/playwright` only wraps this same script.
- */
-const axePath = createRequire(import.meta.resolve('@storybook/addon-a11y')).resolve('axe-core/axe.min.js');
-
-declare global {
-  interface Window {
-    axe: {
-      run: (
-        context: Document,
-        options: { runOnly: { type: 'rule'; values: string[] } },
-      ) => Promise<{ violations: { nodes: { target: string[] }[] }[] }>;
-    };
-  }
-}
+import { axePath, focusRingStyle, gotoStory, ringOverhang, tabTo } from './helpers';
 
 /**
  * AppShell's behaviour is a function of viewport width, so it is tested here

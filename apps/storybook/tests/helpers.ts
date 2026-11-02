@@ -1,4 +1,24 @@
+import { createRequire } from 'node:module';
+
 import type { Page, Locator } from '@playwright/test';
+
+/**
+ * The axe the story tests run, resolved through `@storybook/addon-a11y`,
+ * which depends on it. axe-core is not a dependency of this package, and
+ * `@axe-core/playwright` only wraps this same script.
+ */
+export const axePath = createRequire(import.meta.resolve('@storybook/addon-a11y')).resolve('axe-core/axe.min.js');
+
+declare global {
+  interface Window {
+    axe: {
+      run: (
+        context: Document,
+        options: { runOnly: { type: 'rule'; values: string[] } },
+      ) => Promise<{ violations: { nodes: { target: string[] }[] }[] }>;
+    };
+  }
+}
 
 /** Storybook story URL. Stories are the fixtures — see playwright.config.ts. */
 export const story = (id: string, theme: 'dark' | 'light' = 'dark') => `/iframe.html?id=${id}&globals=theme:${theme}`;
