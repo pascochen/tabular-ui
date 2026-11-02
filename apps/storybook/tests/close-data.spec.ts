@@ -32,7 +32,12 @@ type Close = {
   channels: { id: string; members: string[] }[];
   directMessages: string[];
   exceptions: Exception[];
-  hero: { exception: string; options: { id: string }[]; entry: { lines: Line[] } };
+  hero: {
+    exception: string;
+    options: { id: string; description: string }[];
+    entry: { lines: Line[] };
+    delegate: { reason: string };
+  };
 };
 
 const close = read<Close>('close.json');
@@ -93,6 +98,16 @@ test('no authored token is left unfilled', () => {
   for (const name of ['close.json', 'people.json', 'checks.json']) {
     expect(readFileSync(path.join(dataDir, name), 'utf8')).not.toMatch(/\{[a-zA-Z]+\}/);
   }
+});
+
+test('each answer says what it does before it is pressed', () => {
+  for (const option of close.hero.options) expect(option.description, option.id).toBeTruthy();
+});
+
+// The basis says the policy doesn't settle a locked month, so the reason for
+// "Choose for me" must not read as if it did.
+test('a choice the policy leaves open is said to be the agent’s own', () => {
+  expect(close.hero.delegate.reason).toMatch(/^The policy doesn’t decide this\. I chose/);
 });
 
 test('the decision comes first in the channel, so it opens above the fold', () => {

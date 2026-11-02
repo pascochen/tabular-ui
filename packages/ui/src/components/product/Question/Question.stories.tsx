@@ -60,6 +60,42 @@ export const Waiting: Story = {
   },
 };
 
+/**
+ * What each answer does, beside its button, when the label alone can't say it.
+ * The button is described by its line, so a screen reader hears both.
+ */
+export const Described: Story = {
+  args: {
+    title: 'September is locked. Where should the correction go?',
+    options: [
+      {
+        id: 'reopen',
+        label: 'Reopen September',
+        description: 'Reverse the invoice in September and rebook it on 2 Oct. H1 is right for the earnings release.',
+      },
+      {
+        id: 'keep-locked',
+        label: 'Keep September locked',
+        description: 'Post nothing. List the amount for the auditors’ interim review.',
+      },
+    ],
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const reopen = canvas.getByRole('button', { name: 'Reopen September' });
+    const keep = canvas.getByRole('button', { name: 'Keep September locked' });
+    await expect(reopen).toHaveAccessibleDescription(/^Reverse the invoice/);
+    await expect(keep).toHaveAccessibleDescription(/^Post nothing/);
+    // One column of buttons, one of lines, whatever each label's length.
+    await expect(reopen.getBoundingClientRect().width).toBe(keep.getBoundingClientRect().width);
+    await expect(canvas.getByText(/^Post nothing/).getBoundingClientRect().left).toBeGreaterThan(
+      keep.getBoundingClientRect().right,
+    );
+    await userEvent.click(keep);
+    await expect(args.onAnswer).toHaveBeenCalledWith({ kind: 'option', id: 'keep-locked' });
+  },
+};
+
 /** Once: a double press answers one time, and every control stays disabled until the outcome arrives. */
 export const Answering: Story = {
   play: async ({ args, canvasElement }) => {
