@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
 
 import { ExceptionCard } from '../components/ExceptionCard';
@@ -5,6 +6,7 @@ import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
+import { useDecisionInView } from '../lib/decision-in-view';
 import { close, memberName } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
 
@@ -22,6 +24,8 @@ const dateTime = (at: string) => `${close.scene.date}T${at}`;
 export function SepCloseChannel() {
   const { state, dispatch } = useClose();
   const heroReplies = useHeroReplies();
+  const composerBar = useRef<HTMLDivElement>(null);
+  useDecisionInView(composerBar);
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
       <ChannelMessageList aria-label="Messages in sep-close">
@@ -61,7 +65,10 @@ export function SepCloseChannel() {
         --pad-page-y at the bottom, and at bottom-0 the messages showed
         through that strip. The canvas ground covers it.
       */}
-      <div className="sticky bottom-[calc(var(--pad-page-y)*-1)] -mb-[var(--pad-page-y)] mt-auto flex flex-col gap-[var(--gap-bonded)] bg-canvas pb-[var(--pad-page-y)]">
+      <div
+        ref={composerBar}
+        className="sticky bottom-[calc(var(--pad-page-y)*-1)] -mb-[var(--pad-page-y)] mt-auto flex flex-col gap-[var(--gap-bonded)] bg-canvas pb-[var(--pad-page-y)]"
+      >
         <p aria-hidden="true" className="min-h-[var(--text-xs--line-height)] text-xs text-text-secondary">
           {/* Names the card, since its thread may be off screen. */}
           {state.typing ? `${memberName(state.typing.who)} is replying on ${titleOf(state.typing.exception)}…` : null}
