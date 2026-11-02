@@ -9,7 +9,7 @@ Two methods from Ileana Marcut's UX + AI method library, run on the Kasane close
 
 **User tests, reported by the owner on 2026-11-02.** Real sessions, so they outrank this document's hypotheses:
 
-- **The end strip:** testers missed it. Those who did see it expected Replay to start an animation. The card is removed, which settles issue 4. "Browse the AI components" now lives only in the About dialog.
+- **The end strip:** testers missed it. Those who did see it expected Replay to start an animation. The card is removed, which settles issue 4, and the top nav's Replay is now "Start over", since it returns to landing and plays nothing. "Browse the AI components" now lives only in the About dialog.
 - **The catch-up:** not essential. The card is removed, with its Refresh and its stale count, which settles issue 5. It also removes the fix to issue 2, the link "1 needs your answer".
 - **The decision:** every tester missed "Reopen September" and "Keep September locked", so issue 2's fix wasn't enough. Revenue cut-off now comes first in the channel, with the other open exceptions next and the resolved ones last, and its badge says "Needs your answer" on the card and in the panel. The options now show on landing, even at 1280×720. This hasn't been retested. The buttons are still 24px outline (`Question`'s own size).
 

@@ -27,7 +27,7 @@ function useDocumentVisible() {
  * - **Under reduced motion** every event applies at once, and typing
  *   indicators are dropped.
  * - **No timer outlives it.** One timer at a time, cleared on every state
- *   change and on unmount; Replay (a `reset`) puts `applied` back to 0.
+ *   change and on unmount; Start over (a `reset`) puts `applied` back to 0.
  */
 export function useTimeline(state: CloseState, dispatch: Dispatch<CloseAction>) {
   const visible = useDocumentVisible();

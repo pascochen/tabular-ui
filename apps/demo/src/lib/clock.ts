@@ -8,7 +8,7 @@ import { close } from './kasane';
 
 let startedAt = Date.now();
 
-/** Starts the clock again at the landing time. Replay calls it (phase 6). */
+/** Starts the clock again at the landing time. Start over calls it. */
 export function restartClock() {
   startedAt = Date.now();
 }

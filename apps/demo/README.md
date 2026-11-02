@@ -9,7 +9,7 @@ The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exc
 - Under reduced motion it applies everything at once, with no typing indicators.
 - Only one timer exists at a time, so none outlives a view.
 
-**Skip to the end** and **Replay** sit in the top nav and work at any point. Skip finishes the decision as "Choose for me" would, unless the visitor already answered, then applies every event left. `?at=end` opens on the end state.
+**Skip to the end** and **Start over** sit in the top nav and work at any point. Skip finishes the decision as "Choose for me" would, unless the visitor already answered, then applies every event left. `?at=end` opens on the end state.
 
 **One store.** `src/lib/close-state.ts` holds each exception's status and replies, the decision log and each check's figure. The panel, the tiles and the sidebar's open count are derived from it.
 

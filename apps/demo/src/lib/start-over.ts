@@ -6,7 +6,7 @@ import { useClose } from './close-context';
  * back to its landing rows, and `?at=end` dropped from the URL so a reload
  * doesn't jump to the end again. The view stays where the visitor is.
  */
-export function useReplay() {
+export function useStartOver() {
   const { dispatch } = useClose();
   return () => {
     restartClock();
