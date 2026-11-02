@@ -19,4 +19,6 @@ App-local: only the public demo needs it.
 | Neutral throughout, `Badge` with no tone | Being a demo is context, not a state of the data (§0 rule 1) |
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
 | "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
+| Under 640px the buttons read Skip, Start over and About, and the line moves into the dialog | At 375px the full bar needed 391px of 299px, which widened the whole page on a phone. Skip and About keep their full names as `aria-label`s, which start with what the bar shows. The labels change through React, not a hidden `<span>`: `Button` reads a trailing element as a trailing icon and would take 2px off its padding at every width |
+| Under 360px the `Demo` badge goes too | The three buttons need its room. About this demo still says it's a demo |
 | `min-h-[var(--h-control)]` on the line | A shell band's height comes from its child (`AppShell` README, Geometry). With only 24px buttons in it, the top nav was 41px against the sidebar header's 49px, so their rules didn't line up |
