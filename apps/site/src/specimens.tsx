@@ -83,7 +83,9 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
   const live = !hero && !fixed;
 
   // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
-  const { ref, frame, playing, play } = usePlayback({ frames: 4, autoplay: !hero && !fixed });
+  // The Agent block card leaves out the sources, to keep its row's height (owner, 2026-11-02).
+  const frames = live ? 3 : 4;
+  const { ref, frame, playing, play } = usePlayback({ frames, autoplay: !hero && !fixed });
   const { announce, message } = useAnnouncer();
   const [outcome, setOutcome] = useState<Outcome>(fixed ?? 'waiting');
   const [entry, setEntry] = useState(defaults);
@@ -141,11 +143,13 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                 Yes. Invoice <code>{d.supplierInvoice}</code> was entered twice and{' '}
                 {d.paid.every(Boolean) ? 'paid twice' : 'paid once'}, {d.amountLabel} each time.
               </p>
-              <p className="text-text-secondary" {...unreached(frame < 2)}>
-                Found in <code>{packFile(invoices)}</code>. I can reverse the second entry, <code>{d.reverse}</code>, so
-                the supplier owes it back.
-              </p>
-              <div {...unreached(frame < 3)}>
+              {live ? null : (
+                <p className="text-text-secondary" {...unreached(frame < 2)}>
+                  Found in <code>{packFile(invoices)}</code>. I can reverse the second entry, <code>{d.reverse}</code>,
+                  so the supplier owes it back.
+                </p>
+              )}
+              <div {...unreached(frame < frames - 1)}>
                 <div className="flex flex-col gap-[var(--gap-bonded)] border border-border p-[var(--pad-card)]">
                   <p className="text-xs font-medium text-text-secondary">
                     {outcome === 'posted' ? 'Journal entry' : 'Proposed journal entry'}
@@ -403,7 +407,7 @@ function SendSummary({
           <Confirmation
             key={round}
             title={sendQuestion}
-            changes="Nothing in the books. One message goes out, with the H1 variance summary."
+            changes="Nothing in the books. One message goes out."
             reaches={`${kasane.company.name}’s controller. No one else.`}
             confirmLabel="Send summary"
             stopLabel="Don’t send"
@@ -513,18 +517,23 @@ const planSteps = [
   { id: 'trace', label: 'Trace what remains to its accounts' },
 ];
 
-/** Agent plan: drafted step by step where you can see it, then ready to run. */
+/**
+ * Agent plan: drafted step by step where you can see it, then ready to run. The
+ * card has no sentence and one step less, to keep its row's height (owner,
+ * 2026-11-02); the component's page shows the whole plan.
+ */
 export function PlanSpecimen() {
-  const last = planSteps.length;
+  const steps = planSteps.filter((s) => s.id !== 'translate');
+  const last = steps.length;
   return (
     <Specimen title="Agent plan" frames={last + 1}>
       {(f) => (
         <AgentBlock authorship="AI">
           <AgentPlan
             title="Explain the H1 gap"
-            description={`Split the ${money(h1Gap.shortfall)} between exchange rates and performance, and trace each part to its entries.`}
+            description=""
             status={f === last ? 'ready' : 'streaming'}
-            steps={planSteps.slice(0, f === last ? last : f)}
+            steps={steps.slice(0, f === last ? last : f)}
           />
         </AgentBlock>
       )}
@@ -793,14 +802,17 @@ export function CitationSpecimen() {
 /**
  * Chat thread: the question asked, "Working…", and the answer grown in the same
  * place. Its scroller needs a bounded parent; the aspect ratio bounds it without
- * a height.
+ * a height. The minimum is the card's 284px floor less its frame, plate and
+ * Replay: it fills the floor, and a narrow card doesn't cut the answer off behind
+ * "Scroll to latest". `w-full` stops the ratio turning that minimum into a 396px
+ * minimum width, which scrolled the page sideways on a phone.
  */
 export function ThreadSpecimen() {
   const answer = `Yes. ${duplicatePayment.entity} paid supplier invoice ${duplicatePayment.supplierInvoice} twice, ${duplicatePayment.amountLabel} each.`;
   return (
     <Specimen title="Chat thread" frames={2}>
       {(f) => (
-        <div className="flex aspect-video flex-col">
+        <div className="flex aspect-[2/1] min-h-[198px] w-full flex-col">
           <ChatThread
             turns={[
               { id: 'q', role: 'user', text: question },

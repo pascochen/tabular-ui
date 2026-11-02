@@ -45,7 +45,14 @@ export function SpecimenFrame({
   );
 }
 
-/** A component's card: its specimen, name and decision (wireframe `78:191`). */
+/**
+ * A component's card: its specimen, name and decision (wireframe `78:191`).
+ *
+ * Two rows of a subgrid, so the cards in a row share one frame height and one
+ * caption height (owner, 2026-11-02). The parent's `<li>` is the other half of
+ * it. The frame's height is a floor, never a cap: a card that opens grows its
+ * whole row. See docs/site.md, "Components".
+ */
 export function ComponentCard({
   component,
   ground,
@@ -56,8 +63,8 @@ export function ComponentCard({
   children?: React.ReactNode;
 }) {
   return (
-    <article className="flex flex-col gap-[var(--gap-group)]">
-      <SpecimenFrame ground={ground} placeholder={!component.built} className="min-h-[280px]">
+    <article className="row-span-2 grid grid-cols-1 grid-rows-subgrid gap-[var(--gap-group)]">
+      <SpecimenFrame ground={ground} placeholder={!component.built} className="min-h-[284px]">
         {component.built ? (
           children
         ) : (

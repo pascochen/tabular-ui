@@ -296,6 +296,92 @@ test.describe('the cards', () => {
   }
 });
 
+test.describe('the cards in a row', () => {
+  /** Each card's frame and caption, in viewport pixels, for one moment's section. */
+  const cards = (page: Page, moment: string) =>
+    page.locator(`#${moment} > ul > li`).evaluateAll((items) =>
+      items.map((li) => {
+        const article = li.querySelector('article')!;
+        const frame = article.firstElementChild!.getBoundingClientRect();
+        const caption = article.lastElementChild!.getBoundingClientRect();
+        return {
+          name: li.id,
+          top: Math.round(frame.top),
+          bottom: Math.round(frame.bottom),
+          captionTop: Math.round(caption.top),
+          gap: Math.round(caption.top - frame.bottom),
+        };
+      }),
+    );
+
+  // A floor on the frame can't do this: captions wrap differently, and the row's
+  // height has to reach every frame. Frame bottoms and caption tops, not heights,
+  // because a frame can be the right height and still end out of line.
+  for (const width of [1440, 1280, 1024]) {
+    test(`end on one line, and their captions start on one, at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await open(page, '/');
+      for (const moment of ['asking', 'thinking', 'showing', 'waiting', 'recording']) {
+        const found = await cards(page, moment);
+        for (const top of new Set(found.map((c) => c.top))) {
+          const row = found.filter((c) => c.top === top);
+          const label = `${moment} at ${width}px: ${row.map((c) => c.name).join(', ')}`;
+          expect(new Set(row.map((c) => c.bottom)).size, label).toBe(1);
+          expect(new Set(row.map((c) => c.captionTop)).size, label).toBe(1);
+          for (const c of row) expect(c.gap, `${c.name} at ${width}px`).toBe(12); // --gap-group
+        }
+      }
+    });
+  }
+
+  test('share one height across the moments at the widest cards, Sources apart', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await open(page, '/');
+    for (const name of ['chat-starter', 'agent-plan', 'lineage-tree', 'agent-block', 'chat-thread', 'run-log-row']) {
+      expect(await height(page, `#${name} article > :first-child`), name).toBe(284);
+    }
+  });
+
+  // A shorter box cut the answer off behind "Scroll to latest" at 1024px, with no
+  // error, and the frame's height still passed.
+  for (const width of [1440, 1280, 1024, 390]) {
+    test(`Chat thread shows its whole answer, at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await open(page, '/');
+      const thread = card(page, 'chat-thread');
+      await thread.scrollIntoViewIfNeeded();
+      // The rest frame: the invisible copy that holds the height doesn't count, and
+      // before the answer arrives the thread holds space for it, which does scroll.
+      await expect(thread.getByText('paid supplier invoice', { exact: false }).locator('visible=true')).toHaveCount(1, {
+        timeout: 6000,
+      });
+      await expect
+        .poll(() =>
+          thread.locator('[data-plate] *').evaluateAll((els) => {
+            const scrollers = els.filter((el) => ['auto', 'scroll'].includes(getComputedStyle(el).overflowY));
+            return scrollers.length ? Math.max(...scrollers.map((el) => el.scrollHeight - el.clientHeight)) : null;
+          }),
+        )
+        .toBe(0);
+    });
+  }
+
+  test('grow together when one opens', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await open(page, '/');
+    const block = card(page, 'agent-block');
+    await block.scrollIntoViewIfNeeded();
+    await expect(block.getByRole('button', { name: 'Edit entry' })).toBeVisible({ timeout: 6000 });
+    const before = await height(page, '#question article > :first-child');
+    await block.getByRole('button', { name: 'Edit entry' }).click();
+    await expect(block.getByLabel('Memo')).toBeVisible();
+    const open_ = await height(page, '#agent-block article > :first-child');
+    expect(open_).toBeGreaterThan(before);
+    expect(await height(page, '#question article > :first-child')).toBe(open_);
+    expect(await height(page, '#confirmation article > :first-child')).toBe(open_);
+  });
+});
+
 test.describe('with reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
 

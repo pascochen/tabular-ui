@@ -58,7 +58,11 @@ function MomentSections() {
           {moment.components.map((c) => {
             const Specimen = specimens[c.name];
             return (
-              <li key={c.name} id={c.name} className="scroll-mt-[var(--site-gap)]">
+              <li
+                key={c.name}
+                id={c.name}
+                className="row-span-2 grid scroll-mt-[var(--site-gap)] grid-cols-1 grid-rows-subgrid"
+              >
                 <ComponentCard component={c}>{Specimen ? <Specimen /> : null}</ComponentCard>
               </li>
             );
