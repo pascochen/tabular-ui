@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
@@ -62,7 +62,8 @@ const MAX_BUTTONS = 4;
  * not a radio group, which CLAUDE.md rules out. Five or more go in a
  * `Select`, which costs one row however long the list (Select's README). An
  * option with a `description` takes a row of its own, its button beside what
- * the answer does, so nobody has to press to find out.
+ * the answer does, so nobody has to press to find out. Under 320px the line
+ * goes under its button, where it has the width to be read.
  *
  * Skip and Choose for me are always there (Vocabulary: "Answer, skip, or let
  * the agent decide"). They step back from answering, so they are `ghost`, at
@@ -132,35 +133,49 @@ function Question({ title, options = [], text, onAnswer, outcome, className }: Q
             <div
               role="group"
               aria-labelledby={titleId}
-              className={
-                described
-                  ? 'grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-[var(--gap-inline)] gap-y-[var(--gap-field)]'
-                  : 'flex flex-wrap gap-[var(--gap-inline)]'
-              }
+              className={described ? '@container' : 'flex flex-wrap gap-[var(--gap-inline)]'}
             >
-              {options.map((option) => {
-                const descriptionId = option.description ? `${titleId}-${option.id}` : undefined;
-                return (
-                  <Fragment key={option.id}>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      {...lock}
-                      aria-describedby={descriptionId}
-                      className={described ? 'col-start-1 w-full' : undefined}
-                      onClick={() => answer({ kind: 'option', id: option.id })}
-                    >
-                      {option.label}
-                    </Button>
-                    {option.description ? (
-                      <p id={descriptionId} className="text-sm text-text-secondary">
-                        {option.description}
-                      </p>
-                    ) : null}
-                  </Fragment>
-                );
-              })}
+              {described ? (
+                // Keyed to the space the question has, not the screen: it sits in a panel or a thread.
+                <div className="flex flex-col gap-[var(--gap-field)] @xs:grid @xs:grid-cols-[max-content_minmax(0,1fr)] @xs:items-baseline @xs:gap-x-[var(--gap-inline)]">
+                  {options.map((option) => {
+                    const descriptionId = option.description ? `${titleId}-${option.id}` : undefined;
+                    return (
+                      <div key={option.id} className="flex flex-col gap-[var(--gap-bonded)] @xs:contents">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          {...lock}
+                          aria-describedby={descriptionId}
+                          className="w-full @xs:col-start-1"
+                          onClick={() => answer({ kind: 'option', id: option.id })}
+                        >
+                          {option.label}
+                        </Button>
+                        {option.description ? (
+                          <p id={descriptionId} className="text-sm text-text-secondary">
+                            {option.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                options.map((option) => (
+                  <Button
+                    key={option.id}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    {...lock}
+                    onClick={() => answer({ kind: 'option', id: option.id })}
+                  >
+                    {option.label}
+                  </Button>
+                ))
+              )}
             </div>
           ) : null}
 

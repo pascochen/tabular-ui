@@ -46,7 +46,9 @@ The options are named by the question (`role="group"` with `aria-labelledby`, or
 
 ## `description`: what an answer does
 
-When a label can't say what the answer does, an option takes a `description`. Each option then gets a row of its own: its button, then the line, with the buttons at one width so the lines start together.
+When a label can't say what the answer does, an option takes a `description`. Each option then gets a row of its own: its button, then the line, with the buttons at one width so the lines start together. Where the question has under 320px, as in a thread on a phone, the line goes under its button instead.
+
+- **Why under 320px, and why the question's width.** Beside a 138px button, a line at 215px gets 69px and runs to ten lines. The test is a container query on the options, not the screen's width, because the same question sits in a 440px panel and in a thread.
 
 - **Why beside the button, not in a tooltip.** People choose from this, and a `Tooltip` is visual only, so a line in one would exist nowhere else (`Tooltip` README). The line is the button's `aria-describedby`, so a screen reader hears both.
 - **Why not in the title or a paragraph above.** The consequence belongs to the answer it follows from. In a paragraph, the reader has to match each sentence to a button.
@@ -78,7 +80,7 @@ type QuestionAnswer =
 |---|---|
 | Title | `<h3>`, `--text-md`, 600, `--color-text-primary`, and the section's name. As in `Confirmation` and `AgentPlan`. |
 | Options | `Button size="sm" variant="outline"`, `--gap-inline` apart, wrapping. Or a full-width `Select`. |
-| Described options | One row each, `--gap-field` apart: the button at the widest label's width, `--gap-inline`, then the line in `--text-sm`, `--color-text-secondary`, on the button's baseline. |
+| Described options | One row each, `--gap-field` apart: the button at the widest label's width, `--gap-inline`, then the line in `--text-sm`, `--color-text-secondary`, on the button's baseline. Under 320px, the button at full width with the line `--gap-bonded` under it. |
 | Text | `Field` with `Input`. |
 | Ways out | Right-aligned, `size="sm"`: Skip and Choose for me `ghost`, then Answer `default` when there is a field. |
 | Outcome | `--text-base`, `--color-text-secondary`, where the controls were. A focus target with `tabIndex={-1}` and no ring. |

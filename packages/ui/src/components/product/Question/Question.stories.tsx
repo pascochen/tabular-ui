@@ -96,6 +96,34 @@ export const Described: Story = {
   },
 };
 
+/**
+ * Under 320px, each line goes under its button. Beside it, in the 215px the
+ * demo's thread has on a 375px phone, the line got 69px and ran to ten lines.
+ */
+export const DescribedNarrow: Story = {
+  args: Described.args,
+  render: (args) => (
+    <div className="w-[215px]">
+      <Question {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const rows = [
+      [canvas.getByRole('button', { name: 'Reopen September' }), canvas.getByText(/^Reverse the invoice/)],
+      [canvas.getByRole('button', { name: 'Keep September locked' }), canvas.getByText(/^Post nothing/)],
+    ].map(([button, line]) => ({ button: button.getBoundingClientRect(), line: line.getBoundingClientRect() }));
+    for (const { button, line } of rows) {
+      // The whole width, and bonded to its own button.
+      await expect(button.width).toBe(215);
+      await expect(line.width).toBe(215);
+      await expect(line.top - button.bottom).toBe(2);
+    }
+    // The next button is further from a line than that line's own.
+    await expect(rows[1].button.top - rows[0].line.bottom).toBe(8);
+  },
+};
+
 /** Once: a double press answers one time, and every control stays disabled until the outcome arrives. */
 export const Answering: Story = {
   play: async ({ args, canvasElement }) => {
