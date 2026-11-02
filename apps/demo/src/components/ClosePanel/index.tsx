@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { AppShellPanelBody, MetricTile, ProgressBar, buttonVariants, cn } from 'tabular-ui';
 
-import { checkLabel, isTiedOut, progress, type CloseState } from '../../lib/close-state';
+import { awaitsVisitor, checkLabel, isTiedOut, progress, type CloseState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { checks, close, lastClosedMonth } from '../../lib/kasane';
@@ -80,7 +80,7 @@ export function ClosePanel() {
                   )}
                 >
                   <span className="min-w-0 truncate">{e.title}</span>
-                  <ExceptionStatus status={state.exceptions[e.id].status} />
+                  <ExceptionStatus status={state.exceptions[e.id].status} awaitsYou={awaitsVisitor(state, e.id)} />
                 </a>
               </li>
             );

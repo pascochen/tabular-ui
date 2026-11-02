@@ -41,57 +41,8 @@
     }
   ],
   "directMessages": ["agent", "controller", "apLead"],
-  "catchUp": [
-    "September was locked on 8 Oct, business day 6.",
-    "6 exceptions found since. {resolved} resolved.",
-    { "text": "September revenue includes ¥42.7m delivered in October.", "whileUntied": "revenue-cut-off" },
-    { "text": "1 needs your answer: Revenue cut-off.", "whileAsking": true, "links": "revenue-cut-off" }
-  ],
   "typingMs": 1500,
-  "endStrip": { "title": "That’s the close so far." },
   "exceptions": [
-    {
-      "id": "close-length",
-      "title": "Close length",
-      "summary": "The CFO says the group closes in five working days. September locked on business day 6.",
-      "postedAt": "09:04",
-      "atLanding": "resolved",
-      "replies": [
-        {
-          "author": "controller",
-          "at": "09:31",
-          "text": "Five is Japan. The group needs a sixth day for consolidation."
-        }
-      ],
-      "resolution": { "by": "controller", "at": "09:33", "log": "Group close is business day 6; Japan’s is 5." },
-      "notChecked": [],
-      "claim": "The CFO says the group closes in five working days.",
-      "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
-      "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
-    },
-    {
-      "id": "europe-on-plan",
-      "title": "Europe on plan",
-      "summary": "FP&A says Europe is on plan in euros. H1 sales were 5.7% under budget; profit was above it.",
-      "postedAt": "09:04",
-      "atLanding": "resolved",
-      "replies": [
-        {
-          "author": "fpaAnalyst",
-          "at": "11:12",
-          "text": "Agreed. The board pack now says sales are under plan and profit is above it."
-        }
-      ],
-      "resolution": {
-        "by": "fpaAnalyst",
-        "at": "11:14",
-        "log": "Europe: sales 5.7% under plan, profit above. Board pack wording corrected."
-      },
-      "notChecked": [],
-      "claim": "FP&A says Europe is on plan in euros.",
-      "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
-      "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
-    },
     {
       "id": "revenue-cut-off",
       "title": "Revenue cut-off",
@@ -186,6 +137,48 @@
       "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
       "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
       "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"]
+    },
+    {
+      "id": "close-length",
+      "title": "Close length",
+      "summary": "The CFO says the group closes in five working days. September locked on business day 6.",
+      "postedAt": "09:04",
+      "atLanding": "resolved",
+      "replies": [
+        {
+          "author": "controller",
+          "at": "09:31",
+          "text": "Five is Japan. The group needs a sixth day for consolidation."
+        }
+      ],
+      "resolution": { "by": "controller", "at": "09:33", "log": "Group close is business day 6; Japan’s is 5." },
+      "notChecked": [],
+      "claim": "The CFO says the group closes in five working days.",
+      "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
+      "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
+    },
+    {
+      "id": "europe-on-plan",
+      "title": "Europe on plan",
+      "summary": "FP&A says Europe is on plan in euros. H1 sales were 5.7% under budget; profit was above it.",
+      "postedAt": "09:04",
+      "atLanding": "resolved",
+      "replies": [
+        {
+          "author": "fpaAnalyst",
+          "at": "11:12",
+          "text": "Agreed. The board pack now says sales are under plan and profit is above it."
+        }
+      ],
+      "resolution": {
+        "by": "fpaAnalyst",
+        "at": "11:14",
+        "log": "Europe: sales 5.7% under plan, profit above. Board pack wording corrected."
+      },
+      "notChecked": [],
+      "claim": "FP&A says Europe is on plan in euros.",
+      "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
+      "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
     }
   ],
   "hero": {

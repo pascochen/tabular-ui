@@ -1,22 +1,12 @@
-import { ArrowClockwiseIcon } from '@phosphor-icons/react';
-import { Button, ChannelMessage, ChannelMessageList, ChatComposer, cn } from 'tabular-ui';
+import { ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
 
-import { EndStrip } from '../components/EndStrip';
 import { ExceptionCard } from '../components/ExceptionCard';
 import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
-import { agent, close, memberName } from '../lib/kasane';
+import { awaitsVisitor } from '../lib/close-state';
+import { close, memberName } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
-
-// AttachmentRow's and InlineCitation's link: the interactive role, underlined
-// on hover, the system's offset ring.
-const linkClassName = cn(
-  'text-text-interactive hover:underline',
-  'rounded-xs outline-none focus-visible:outline-ring',
-  'focus-visible:outline-solid focus-visible:outline-[length:var(--ring-width)]',
-  'focus-visible:outline-offset-[var(--ring-offset)]',
-);
 
 const titleOf = (id: string) => close.exceptions.find((e) => e.id === id)!.title;
 
@@ -24,54 +14,9 @@ const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero =
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /**
- * The catch-up, as of its last refresh. The count is the state's, filled into
- * the authored line; the cut-off line shows only while that check is untied,
- * because once it ties out the line is no longer true.
- */
-function CatchUp() {
-  const { state, dispatch } = useClose();
-  const { catchUp } = state;
-  // Waiting on the visitor: the hero question has no answer yet.
-  const asking = !state.hero.rounds[state.hero.rounds.length - 1].answer;
-  const lines = close.catchUp.flatMap((line): { text: string; href?: string }[] => {
-    if (typeof line === 'string') return [{ text: line.replace('{resolved}', String(catchUp.resolved)) }];
-    if ('whileAsking' in line) return asking ? [{ text: line.text, href: `#${line.links}` }] : [];
-    return catchUp.tiedOut.includes(line.whileUntied) ? [] : [{ text: line.text }];
-  });
-  return (
-    <ChannelMessage
-      author={{ name: agent.name, avatar: <MemberAvatar memberKey="agent" /> }}
-      time={catchUp.at}
-      dateTime={dateTime(catchUp.at)}
-      authorship={`${agent.authorship} · Catch-up`}
-      agentActions={
-        <Button size="sm" variant="ghost" onClick={() => dispatch({ type: 'refresh', at: sceneNow() })}>
-          <ArrowClockwiseIcon aria-hidden="true" />
-          Refresh
-        </Button>
-      }
-    >
-      <ul role="list" className="flex list-disc flex-col gap-[var(--gap-bonded)] pl-4">
-        {lines.map((line) => (
-          <li key={line.text}>
-            {line.href ? (
-              // The decision is below the fold at landing; this is the way to it.
-              <a href={line.href} className={linkClassName}>
-                {line.text}
-              </a>
-            ) : (
-              line.text
-            )}
-          </li>
-        ))}
-      </ul>
-    </ChannelMessage>
-  );
-}
-
-/**
- * #sep-close: the agent's catch-up, one message per exception with its replies
- * inline, whatever the visitor writes, and the composer. The decision and the
+ * #sep-close: one message per exception with its replies inline, the decision
+ * first so it opens above the fold, then whatever the visitor writes, and the
+ * composer. The decision and the
  * timeline change it all through the close state.
  */
 export function SepCloseChannel() {
@@ -80,10 +25,10 @@ export function SepCloseChannel() {
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
       <ChannelMessageList aria-label="Messages in sep-close">
-        <CatchUp />
         {close.exceptions.map((e, i) => (
           <ExceptionCard
             key={e.id}
+            awaitsYou={awaitsVisitor(state, e.id)}
             exception={e}
             state={state.exceptions[e.id]}
             // A run: the agent posted every exception at once. Same author, same
@@ -108,7 +53,6 @@ export function SepCloseChannel() {
           </ChannelMessage>
         ))}
       </ChannelMessageList>
-      {state.ended ? <EndStrip /> : null}
       {/*
         The composer stays at the foot of the channel while it scrolls. The
         typing line sits on it; aria-hidden, because a screen reader hears the

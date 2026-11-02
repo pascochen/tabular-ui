@@ -26,6 +26,8 @@ export type ExceptionCardProps = {
   exception: Exception;
   state: ExceptionState;
   defaultRepliesOpen?: boolean;
+  /** The decision is the visitor's to make: the badge says so. */
+  awaitsYou?: boolean;
   /** The agent posted the message before this one in the same minute: group it under that header. */
   continued?: boolean;
   /** Replies the close state doesn't hold as text: the hero's question, proposal and rerun. After the others. */
@@ -46,6 +48,7 @@ export function ExceptionCard({
   exception: e,
   state,
   defaultRepliesOpen = false,
+  awaitsYou = false,
   continued = false,
   extraReplies = [],
 }: ExceptionCardProps) {
@@ -86,7 +89,7 @@ export function ExceptionCard({
           <h2 id={e.id} className="scroll-mt-[var(--pad-page-y)] text-md font-semibold text-text-primary">
             {e.title}
           </h2>
-          <ExceptionStatus status={state.status} />
+          <ExceptionStatus status={state.status} awaitsYou={awaitsYou} />
         </div>
         <p>
           {lead}

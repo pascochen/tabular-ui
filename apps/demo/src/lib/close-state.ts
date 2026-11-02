@@ -52,12 +52,10 @@ export type CloseState = {
   applied: number;
   /** A person typing now, and on which exception's thread, or null. People only: the agent never types. */
   typing: { who: string; exception: ExceptionId } | null;
-  /** The scripted run is over: the end strip shows. */
+  /** The scripted run is over: Skip has nothing left to do. */
   ended: boolean;
   /** What the visitor wrote in the composer. Nobody replies to it. */
   posts: { text: string; at: string }[];
-  /** The catch-up as of its last refresh: when, and how many were resolved then. */
-  catchUp: { at: string; resolved: number; tiedOut: string[] };
 };
 
 const HERO = close.hero.exception as ExceptionId;
@@ -78,7 +76,7 @@ export function landingState(): CloseState {
     }
   }
   log.sort((a, b) => a.at.localeCompare(b.at));
-  const base = {
+  return {
     exceptions,
     hero: { rounds: [{ askedAt: close.hero.askedAt }] },
     log,
@@ -88,20 +86,11 @@ export function landingState(): CloseState {
     ended: false,
     posts: [],
   };
-  return { ...base, catchUp: snapshot(base, close.scene.landingTime) };
 }
 
 /** The end state: the decision made (Reopen, as Choose for me picks) and every event applied. `?at=end` opens here. */
 export function endState(at: string): CloseState {
   return closeReducer(landingState(), { type: 'skip', at });
-}
-
-function snapshot(state: Pick<CloseState, 'exceptions' | 'checks'>, at: string): CloseState['catchUp'] {
-  return {
-    at,
-    resolved: Object.values(state.exceptions).filter((e) => e.status === 'resolved').length,
-    tiedOut: checks.filter((c) => state.checks[c.id] === c.after).map((c) => c.id),
-  };
 }
 
 export type CloseAction =
@@ -120,8 +109,6 @@ export type CloseAction =
   | { type: 'event'; index: number; at: string; quiet?: boolean }
   /** Skip to the end: finish the decision if it's open, then apply every event left. */
   | { type: 'skip'; at: string }
-  /** Refresh the catch-up to now. */
-  | { type: 'refresh'; at: string }
   /** The visitor posted in the composer. */
   | { type: 'say'; text: string; at: string };
 
@@ -200,10 +187,8 @@ export function closeReducer(state: CloseState, action: CloseAction): CloseState
       if (current(s).stage === 'proposed') step({ type: 'post', at: action.at });
       if (current(s).stage === 'rerunning') step({ type: 'rerun', at: action.at });
       while (s.applied < timeline.length) s = applyEvent(s, s.applied, action.at, true);
-      return { ...s, catchUp: snapshot(s, action.at) };
+      return s;
     }
-    case 'refresh':
-      return { ...state, catchUp: snapshot(state, action.at) };
     case 'say':
       return action.text.trim()
         ? { ...state, posts: [...state.posts, { text: action.text.trim(), at: action.at }] }
@@ -251,6 +236,11 @@ export function progress(state: CloseState) {
 export function checkLabel(state: CloseState, id: string): string {
   const c = checks.find((x) => x.id === id)!;
   return state.checks[id] === c.after ? c.afterLabel : c.beforeLabel;
+}
+
+/** The exception waiting on the visitor: the hero, while its question has no answer. */
+export function awaitsVisitor(state: CloseState, id: string): boolean {
+  return id === HERO && !current(state).answer;
 }
 
 export function isTiedOut(state: CloseState, id: string): boolean {
