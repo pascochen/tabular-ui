@@ -257,13 +257,13 @@ for (const mode of ['dark', 'light'] as const) {
     ];
 
     for (const { name, story, selected, other, toOther } of surfaces) {
-      test(`${name}: 1px --color-border on every side, on every item`, async ({ page }) => {
+      test(`${name}: --color-border on the top and sides, and no bottom border, on every item`, async ({ page }) => {
         await gotoStory(page, story, mode);
         const border = await rgba(page, await token(page, '--color-border'));
         for (const item of [selected(page), other(page)]) {
           const sides = await item.evaluate((el) => {
             const s = getComputedStyle(el);
-            return (['Top', 'Right', 'Bottom', 'Left'] as const).map((side) => ({
+            return (['Top', 'Right', 'Left'] as const).map((side) => ({
               width: s[`border${side}Width`],
               color: s[`border${side}Color`],
             }));
@@ -272,7 +272,31 @@ for (const mode of ['dark', 'light'] as const) {
             expect(side.width).toBe('1px');
             expect(await rgba(page, side.color)).toEqual(border);
           }
+          expect(await item.evaluate((el) => getComputedStyle(el).borderBottomWidth)).toBe('0px');
         }
+      });
+
+      test(`${name}: a 1px ink rule stops at the last item, and the strip stays one control height`, async ({
+        page,
+      }) => {
+        await gotoStory(page, story, mode);
+        const list = page.locator('[data-slot="tabs-list"], nav ul');
+        const rule = await list.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { width: s.borderBottomWidth, color: s.borderBottomColor };
+        });
+        expect(rule.width).toBe('1px');
+        expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+
+        const listBox = (await list.boundingBox())!;
+        const box = (await selected(page).boundingBox())!;
+        expect(listBox.height, 'the box laps the rule, so the strip is no taller than an item').toBe(box.height);
+        expect(box.y + box.height, 'the selected fill meets the rule').toBe(listBox.y + listBox.height);
+        const lastRight = await list.evaluate((el) => {
+          const items = [...el.querySelectorAll('[data-slot="tabs-trigger"], a')];
+          return items[items.length - 1].getBoundingClientRect().right;
+        });
+        expect(listBox.x + listBox.width, 'the rule ends with the last item').toBe(lastRight);
       });
 
       test(`${name}: selected is the ink fill and its on-colour`, async ({ page }) => {
@@ -354,8 +378,25 @@ for (const mode of ['dark', 'light'] as const) {
       expect(await boxes()).toEqual(before);
     });
 
-    test('vertical: neighbours share one line on the block axis, at one width', async ({ page }) => {
+    test('vertical: the rule is on the inline edge, and neighbours share a line on the block axis', async ({
+      page,
+    }) => {
       await gotoStory(page, 'foundational-tabs--bordered-vertical', mode);
+      const list = page.getByRole('tablist');
+      const rule = await list.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { right: s.borderRightWidth, bottom: s.borderBottomWidth, color: s.borderRightColor };
+      });
+      expect([rule.right, rule.bottom]).toEqual(['1px', '0px']);
+      expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+      const trigger = await tab(page, 'Lineage').evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { right: s.borderRightWidth, bottom: s.borderBottomWidth };
+      });
+      expect(trigger).toEqual({ right: '0px', bottom: '1px' });
+      const listBox = (await list.boundingBox())!;
+      const item = (await tab(page, 'Lineage').boundingBox())!;
+      expect(item.x + item.width, 'the selected fill meets the rule').toBe(listBox.x + listBox.width);
       const boxes = (await Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()))).map(
         (b) => b!,
       );
