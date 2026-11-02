@@ -27,6 +27,43 @@ async function open(page: Page, route: string) {
   await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
 }
 
+/**
+ * D4: in forced colours, every plate and every site control or link with a
+ * ground of its own keeps a border. Marks them first, while grounds still show.
+ */
+async function keepsVisibleEdges(page: Page) {
+  const marked = await page.evaluate(() => {
+    let n = 0;
+    for (const el of document.querySelectorAll('[data-plate], button, a')) {
+      const target = el.matches('[data-plate]') ? el.parentElement! : el;
+      const bg = getComputedStyle(target).backgroundColor;
+      const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(bg);
+      const site = el.matches('[data-plate]') || !el.closest('[data-plate]');
+      if (site && (el.matches('[data-plate]') || filled) && target.getClientRects().length > 0) {
+        target.setAttribute('data-edge-check', '');
+        n++;
+      }
+    }
+    return n;
+  });
+  expect(marked).toBeGreaterThan(0);
+  await page.emulateMedia({ forcedColors: 'active' });
+  expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true);
+  const edgeless = await page.locator('[data-edge-check]').evaluateAll((els) =>
+    els
+      .filter((el) => {
+        const s = getComputedStyle(el);
+        return !(['Top', 'Right', 'Bottom', 'Left'] as const).some(
+          (side) =>
+            s.getPropertyValue(`border-${side.toLowerCase()}-style`) !== 'none' &&
+            parseFloat(s.getPropertyValue(`border-${side.toLowerCase()}-width`)) > 0,
+        );
+      })
+      .map((el) => el.outerHTML.slice(0, 100)),
+  );
+  expect(edgeless).toEqual([]);
+}
+
 const meta = (page: Page, attr: 'name' | 'property', key: string) =>
   page.locator(`meta[${attr}="${key}"]`).getAttribute('content');
 
@@ -406,36 +443,7 @@ test.describe('accessibility beyond axe', () => {
   for (const route of ['/', '/components/agent-block', '/foundations/color', '/vocabulary']) {
     test(`${route}: in forced colours, every plate and filled control keeps a visible edge`, async ({ page }) => {
       await open(page, route);
-      const marked = await page.evaluate(() => {
-        let n = 0;
-        for (const el of document.querySelectorAll('[data-plate], button, a')) {
-          const target = el.matches('[data-plate]') ? el.parentElement! : el;
-          const bg = getComputedStyle(target).backgroundColor;
-          const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(bg);
-          const site = el.matches('[data-plate]') || !el.closest('[data-plate]');
-          if (site && (el.matches('[data-plate]') || filled) && target.getClientRects().length > 0) {
-            target.setAttribute('data-edge-check', '');
-            n++;
-          }
-        }
-        return n;
-      });
-      expect(marked).toBeGreaterThan(0);
-      await page.emulateMedia({ forcedColors: 'active' });
-      expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true);
-      const edgeless = await page.locator('[data-edge-check]').evaluateAll((els) =>
-        els
-          .filter((el) => {
-            const s = getComputedStyle(el);
-            return !(['Top', 'Right', 'Bottom', 'Left'] as const).some(
-              (side) =>
-                s.getPropertyValue(`border-${side.toLowerCase()}-style`) !== 'none' &&
-                parseFloat(s.getPropertyValue(`border-${side.toLowerCase()}-width`)) > 0,
-            );
-          })
-          .map((el) => el.outerHTML.slice(0, 100)),
-      );
-      expect(edgeless).toEqual([]);
+      await keepsVisibleEdges(page);
     });
   }
 
@@ -482,4 +490,81 @@ test.describe('accessibility beyond axe', () => {
     for (const value of await ramps.evaluateAll((els) => els.map((el) => getComputedStyle(el).forcedColorAdjust)))
       expect(value).toBe('none');
   });
+});
+
+/**
+ * §11 on the Foundations pages, in both states (docs/site.md §13, 6c). A reader
+ * has the prerendered page until hydration, and a visitor without JavaScript
+ * never gets anything else. Axe already runs in both, in pages.spec.ts, as do
+ * the checks on the links themselves.
+ */
+test.describe('the Foundations pages, before and after hydration', () => {
+  for (const route of ['/foundations/color', '/foundations/typography', '/foundations/density']) {
+    for (const state of ['before hydration', 'hydrated'] as const) {
+      const hold = async (page: Page) => {
+        if (state === 'before hydration') {
+          await page.route(/\.js$/, (r) => r.abort());
+          await page.goto(route);
+          await expect(page.locator('html')).not.toHaveAttribute('data-hydrated');
+        } else {
+          await open(page, route);
+        }
+      };
+
+      test(`${route}, ${state}: one h1, the landmarks, and the skip link first`, async ({ page }) => {
+        await hold(page);
+        await expect(page.locator('h1')).toHaveCount(1);
+        await expect(page.locator('header')).toHaveCount(1);
+        await expect(page.locator('main')).toHaveCount(1);
+        await expect(page.locator('footer')).toHaveCount(1);
+        for (const nav of await page.locator('nav').all()) await expect(nav).toHaveAccessibleName(/\S/);
+        await page.keyboard.press('Tab');
+        await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+        await page.keyboard.press('Enter');
+        await expect(page.locator('main')).toBeFocused();
+      });
+
+      test(`${route}, ${state}: no sideways scroll at 320px, and the links stay on one row`, async ({ page }) => {
+        await page.setViewportSize({ width: 320, height: 800 });
+        await hold(page);
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow).toBe(0);
+        const links = page.getByRole('navigation', { name: 'Foundations' }).getByRole('link');
+        const tops = await links.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top));
+        expect(new Set(tops).size).toBe(1);
+      });
+
+      test(`${route}, ${state}: nothing fixed or sticky but the skip link (2.4.11)`, async ({ page }) => {
+        await hold(page);
+        const pinned = await page.evaluate(() =>
+          [...document.querySelectorAll('body *')]
+            .filter((el) => ['fixed', 'sticky'].includes(getComputedStyle(el).position))
+            .map((el) => el.textContent?.trim().slice(0, 40)),
+        );
+        expect(pinned).toEqual(['Skip to content']);
+      });
+
+      test(`${route}, ${state}: in forced colours, every plate and filled control keeps a visible edge`, async ({
+        page,
+      }) => {
+        await hold(page);
+        await keepsVisibleEdges(page);
+      });
+
+      test.describe('with reduced motion', () => {
+        test.use({ reducedMotion: 'reduce' });
+        test(`${route}, ${state}: nothing animates`, async ({ page }) => {
+          await hold(page);
+          await page.mouse.wheel(0, 4000);
+          await page.waitForTimeout(500);
+          const running = await page.evaluate(
+            () => document.getAnimations().filter((a) => a.playState === 'running').length,
+          );
+          expect(running).toBe(0);
+        });
+      });
+    }
+  }
 });

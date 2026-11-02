@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { componentPages, routes } from './routes';
 
@@ -304,8 +304,8 @@ test.describe('a component page', () => {
 
   // Owner, 2026-10-28 (variant A of the component-menu review): from 1024px every
   // built component is listed beside the page, and the list stays in view as the
-  // page scrolls. The page you're on is marked as the Foundations pages mark
-  // theirs: ink, semibold, a 2px ink rule, aria-current.
+  // page scrolls. The page you're on is ink, semibold, with a 2px ink rule and
+  // aria-current.
   test('from 1024px, lists every component beside the page, and the list stays in view', async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.goto('/components/agent-plan');
@@ -496,6 +496,102 @@ test.describe('the Foundations pages', () => {
       await expect(h1).toHaveText(current);
       expect(await top(page.getByText('Foundations', { exact: true }).first())).toBeLessThan(await top(nav));
       expect(await top(nav)).toBeLessThan(await top(h1));
+    });
+  }
+
+  // D12: the look of the library's bordered tab, on real links. Twice, because
+  // a reader has the prerendered page until hydration, and a visitor without
+  // JavaScript never gets anything else. A TabsTrigger would pass the hydrated
+  // run and do nothing in the other.
+  for (const state of ['before hydration', 'hydrated'] as const) {
+    test.describe(`its links, ${state}`, () => {
+      for (const [route, current, target, targetRoute] of [
+        ['/foundations/color', 'Color', 'Typography', '/foundations/typography'],
+        ['/foundations/typography', 'Typography', 'Density', '/foundations/density'],
+        ['/foundations/density', 'Density', 'Color', '/foundations/color'],
+      ] as const) {
+        const open = async (page: Page) => {
+          if (state === 'before hydration') await page.route(/\.js$/, (r) => r.abort());
+          await page.goto(route);
+          const html = page.locator('html');
+          if (state === 'before hydration') await expect(html).not.toHaveAttribute('data-hydrated');
+          else await expect(html).toHaveAttribute('data-hydrated', 'true');
+          return page.getByRole('navigation', { name: 'Foundations' });
+        };
+        const token = (page: Page, name: string) =>
+          page.evaluate((n) => {
+            // Resolved through a real element, so the value compares with computed styles.
+            const probe = document.body.appendChild(document.createElement('div'));
+            probe.style.color = `var(${n})`;
+            const color = getComputedStyle(probe).color;
+            probe.remove();
+            return color;
+          }, name);
+
+        test(`${route}: every one is an <a> with an href, and goes to its page`, async ({ page }) => {
+          const nav = await open(page);
+          const tags = await nav.getByRole('link').evaluateAll((els) => els.map((el) => el.tagName));
+          expect(tags).toEqual(['A', 'A', 'A']);
+          await expect(nav.locator('button, [role="tab"], [role="tablist"]')).toHaveCount(0);
+          await nav.getByRole('link', { name: target }).click();
+          await expect(page).toHaveURL(targetRoute);
+          await expect(page.getByRole('heading', { level: 1 })).toHaveText(target);
+        });
+
+        test(`${route}: the current page alone is ink, and all are bordered on every side`, async ({ page }) => {
+          const nav = await open(page);
+          const fill = await token(page, '--color-fill-interactive');
+          const on = await token(page, '--color-on-interactive');
+          const border = await token(page, '--color-border');
+          for (const link of await nav.getByRole('link').all()) {
+            const isCurrent = (await link.textContent()) === current;
+            await expect(link).toHaveCSS('background-color', isCurrent ? fill : 'rgba(0, 0, 0, 0)');
+            if (isCurrent) await expect(link).toHaveCSS('color', on);
+            await expect(link).toHaveCSS('font-weight', '600');
+            for (const side of ['top', 'right', 'bottom', 'left']) {
+              await expect(link).toHaveCSS(`border-${side}-width`, '1px');
+              await expect(link).toHaveCSS(`border-${side}-color`, border);
+            }
+          }
+          // Neighbours share one line.
+          const boxes = await nav.getByRole('link').evaluateAll((els) =>
+            els.map((el) => {
+              const { left, right } = el.getBoundingClientRect();
+              return { left, right };
+            }),
+          );
+          for (let i = 1; i < boxes.length; i++) expect(boxes[i].left).toBe(boxes[i - 1].right - 1);
+        });
+
+        test(`${route}: the ring is inset, paper on ink on the current page`, async ({ page }) => {
+          const nav = await open(page);
+          const ring = await token(page, '--color-ring');
+          const on = await token(page, '--color-on-interactive');
+          const links = await nav.getByRole('link').all();
+          await links[0].focus();
+          // focus() from script doesn't match :focus-visible, so step with the keyboard.
+          await page.keyboard.press('Shift+Tab');
+          for (const link of links) {
+            await page.keyboard.press('Tab');
+            await expect(link).toBeFocused();
+            await expect(link).toHaveCSS('outline-style', 'solid');
+            await expect(link).toHaveCSS('outline-width', '2px');
+            await expect(link).toHaveCSS('outline-offset', '-3px');
+            await expect(link).toHaveCSS('outline-color', (await link.textContent()) === current ? on : ring);
+          }
+        });
+
+        test(`${route}: in forced colours, the current page keeps a mark other than its fill`, async ({ page }) => {
+          const nav = await open(page);
+          await page.emulateMedia({ forcedColors: 'active' });
+          for (const link of await nav.getByRole('link').all()) {
+            const isCurrent = (await link.textContent()) === current;
+            await expect(link).toHaveCSS('text-decoration-line', isCurrent ? 'underline' : 'none');
+            await expect(link).toHaveCSS('border-top-style', 'solid');
+          }
+          await expect(nav.locator('[aria-current="page"]')).toHaveCSS('text-decoration-thickness', '2px');
+        });
+      }
     });
   }
 

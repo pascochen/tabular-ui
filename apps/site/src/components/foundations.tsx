@@ -1,6 +1,7 @@
+import { tabsListVariants, tabVariants } from 'tabular-ui';
+
 import { pages } from '../content';
 import { cn } from '../lib/cn';
-import { focusRing, standaloneLink } from '../lib/styles';
 import { Rail, Section } from './layout';
 
 const foundationPages = [pages.color, pages.typography, pages.density];
@@ -13,11 +14,10 @@ const foundationPages = [pages.color, pages.typography, pages.density];
  * visitors missed them and never knew they were inside Foundations.
  *
  * Links, not Tabs: each is a page with its own URL, and tabs switch a view
- * where a nav changes the page (AppBar's README). Built here at reading size
- * rather than by restyling AppBarNav, whose size suits the product. The
- * current page is ink and semibold, with a 2px ink rule under it (the width
- * §7.8 reserves for the active tab, in the colour the library's line Tabs
- * use), and carries aria-current.
+ * where a nav changes the page (AppBar's README). A TabsTrigger's <button> also
+ * does nothing before hydration. They wear the library's bordered tab
+ * (docs/site.md D12) at its reading size, and the current page, marked by
+ * aria-current, is ink.
  */
 export function FoundationsHeader({
   current,
@@ -36,28 +36,18 @@ export function FoundationsHeader({
             Foundations
           </p>
           <nav aria-labelledby="foundations-label">
-            <ul role="list" className="flex flex-wrap gap-x-[var(--site-gap)] border-b border-border">
-              {foundationPages.map((page) => {
-                const active = page === current;
-                return (
-                  <li key={page.href}>
-                    <a
-                      href={page.href}
-                      aria-current={active ? 'page' : undefined}
-                      className={cn(
-                        // -mb-px lays the current page's rule over the list's own 1px rule.
-                        '-mb-px inline-flex h-[var(--h-control-lg)] items-center border-b-[length:var(--border-width-2)] text-site-body',
-                        active
-                          ? 'border-fill-interactive font-semibold text-text-primary'
-                          : cn('border-transparent font-medium', standaloneLink, 'text-text-body'),
-                        focusRing,
-                      )}
-                    >
-                      {page.label}
-                    </a>
-                  </li>
-                );
-              })}
+            <ul role="list" className={cn(tabsListVariants({ variant: 'bordered' }), 'flex-wrap')}>
+              {foundationPages.map((page) => (
+                <li key={page.href}>
+                  <a
+                    href={page.href}
+                    aria-current={page === current ? 'page' : undefined}
+                    className={cn(tabVariants({ size: 'lg' }))}
+                  >
+                    {page.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
