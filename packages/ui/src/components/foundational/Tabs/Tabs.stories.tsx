@@ -99,7 +99,7 @@ export const Segmented: Story = {
   ),
 };
 
-/** Bordered: each tab boxed, neighbours sharing one line, the selected one in ink. */
+/** Bordered: boxed tabs on a 1px ink rule, neighbours sharing one line, the selected one in ink. */
 export const Bordered: Story = {
   render: () => (
     <Tabs defaultValue="runs" style={{ width: 480 }}>
@@ -127,7 +127,7 @@ export const Bordered: Story = {
   ),
 };
 
-/** Bordered and vertical: the shared line moves to the block edge. */
+/** Bordered and vertical: the rule moves to the inline edge, and neighbours share a line on the block axis. */
 export const BorderedVertical: Story = {
   render: () => (
     <Tabs defaultValue="lineage" orientation="vertical" style={{ width: 480 }}>

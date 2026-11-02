@@ -27,15 +27,15 @@ For switching **view modes** — table / chart / JSON — where the tabs read as
 
 ## `bordered`
 
-Each tab is boxed in `--color-border` on every side, and neighbours share one line: the list pulls each item back over the one before. Hover is `--color-bg-hover`. The selected tab is `--color-fill-interactive` with `--color-on-interactive`, and its overlay is `--color-bg-hover-inverse`, as a primary button's is (§4). No 2px indicator: the fill is the signal. Labels are SemiBold in the text's own case. No tab moves when the selection does.
+The strip stands on a 1px rule in `--color-fill-interactive` that stops at the last tab. Each tab has `--color-border` on its top and sides and none at the bottom, and neighbours share one line: the list pulls each item back over the one before. The box laps the rule by 1px, so the strip stays one control height and the selected fill meets the rule. Vertical turns this a quarter, with the rule on the inline edge, as `line` has it. Hover is `--color-bg-hover`. The selected tab is `--color-fill-interactive` with `--color-on-interactive`, and its overlay is `--color-bg-hover-inverse`, as a primary button's is (§4). No 2px indicator: the fill is the signal, and the rule is 1px because §7.8 keeps 2px for the three things it lists. It stops at the last tab because a rule running on would promise a panel, and a link has none (owner, after a side-by-side of four versions in place, 2026-11-02). Labels are SemiBold in the text's own case. No tab moves when the selection does.
 
-**Focus.** The ring is inset by its own width plus the item's border, `-3px`, so it sits inside the shared line. At the usual `-2px` the next item's border, painted later, covers the ring's outer pixel.
+**Focus.** The ring is inset by its own width plus the item's border, `-3px`, so it sits inside the shared line and a pixel above the rule. At the usual `-2px` the next item's border, painted later, covers the ring's outer pixel.
 
 Inset, the ring sits on the item's own ground, so on the selected item it is `--color-on-interactive`, paper on ink, at 16.39:1 in both modes. `--color-ring` measures 1.80:1 in light and 1.29:1 in dark on that fill, under the 3:1 a focus indicator needs, and in a strip Tab lands on the selected tab first (owner, 2026-11-02). Every other item keeps `--color-ring`. No other control has an `on-*` ring, because every other ring sits outside the fill.
 
 **Size.** `size` takes `default` (`--h-control`, `--text-base`, 14px icons) or `lg` (`--h-control-lg`, `--text-lg` with `--tracking-tight`, 16px icons), on `TabsList` or on `tabVariants`. `lg` is for a strip beside display type, where 13px goes unnoticed. `line` and `segmented` have no size, and the type rejects one.
 
-**Forced colours** remove the fill and force every border to one colour, so the selected tab also gets a 2px underline there, §7.8's active tab width.
+**Forced colours** remove the fill and force the rule and every border to one colour, so the selected tab also gets a 2px underline there, §7.8's active tab width.
 
 ### `tabVariants`, for links
 
