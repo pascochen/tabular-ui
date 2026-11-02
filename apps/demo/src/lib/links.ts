@@ -1,5 +1,4 @@
-// Where the demo sends a visitor who wants to see the components. One place, so the About
-// dialog and the end strip can't drift apart.
+// Where the demo sends a visitor who wants to see the components, from the About dialog.
 
 export const STORYBOOK_URL = 'https://storybook.tabularui.com';
 

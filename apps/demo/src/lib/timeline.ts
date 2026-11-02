@@ -14,7 +14,7 @@ export type TimelineEffect =
 
 export type TimelineEvent = { gap: number; effect: TimelineEffect };
 
-/** After the last scripted event, how long until the end strip. */
+/** After the last scripted event, how long until the run counts as ended. */
 const END_PAUSE_MS = 2000;
 
 function build(): TimelineEvent[] {

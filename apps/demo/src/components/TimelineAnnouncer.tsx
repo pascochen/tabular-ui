@@ -14,7 +14,7 @@ export function TimelineAnnouncer() {
   const { state } = useClose();
   const last = state.applied ? timeline[state.applied - 1].effect : null;
   let message = '';
-  if (state.ended) message = 'The scripted close has ended. Replay starts it again.';
+  if (state.ended) message = 'The scripted close has ended. Start over begins it again.';
   else if (last?.kind === 'reply')
     message = `${memberName(last.author)} replied on ${titleOf(last.exception)}: ${last.text}`;
   else if (last?.kind === 'resolve') message = `${titleOf(last.exception)} resolved by ${memberName(last.by)}.`;

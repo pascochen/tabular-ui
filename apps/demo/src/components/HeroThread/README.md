@@ -30,7 +30,7 @@ The state lives in `lib/close-state.ts` (`hero.rounds`), and the agent's timed s
 |---|---|
 | Nothing is resolved until it ran | A reopen resolves after the check reruns, not when it's posted: "Done" only once the action ran (`docs/agent-voice.md`, principle 3) |
 | A stop asks again rather than ending | The decision is the demo. One decline shouldn't strand the visitor |
-| Skip is final until Replay | Skip is a real answer, and Question answers once. Replay, in the top nav, starts over |
+| Skip is final until Start over | Skip is a real answer, and Question answers once. Start over is in the top nav |
 | The rerun posts as "System" with a neutral badge | A deterministic check, not the agent (`docs/agent-voice.md`, rule 1) |
 | The rerun row has no timestamp | The reply's header already gives the time |
 | Fixed widths for the code and figure columns | The account names never truncate at the thread's width |

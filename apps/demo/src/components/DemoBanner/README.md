@@ -8,7 +8,7 @@ links to Storybook and to the AI components on tabularui.com. It sits inside `Ap
 not above the shell, so `AppShell` keeps the full viewport height. The line
 truncates, with its full text in a tooltip.
 
-Beside the line: **Skip to the end** (disabled at the end, not hidden, so the bar doesn't shift under the pointer) and **Replay**, which start over from landing from any point.
+Beside the line: **Skip to the end** (disabled at the end, not hidden, so the bar doesn't shift under the pointer) and **Start over**, which start over from landing from any point.
 
 App-local: only the public demo needs it.
 
@@ -18,3 +18,5 @@ App-local: only the public demo needs it.
 |---|---|
 | Neutral throughout, `Badge` with no tone | Being a demo is context, not a state of the data (§0 rule 1) |
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
+| "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
+| `min-h-[var(--h-control)]` on the line | A shell band's height comes from its child (`AppShell` README, Geometry). With only 24px buttons in it, the top nav was 41px against the sidebar header's 49px, so their rules didn't line up |

@@ -974,12 +974,7 @@ const shortDate = (iso) => fmtDate(iso).replace(/ \d{4}$/, '');
 const closeTokens = {
   lastClosedLabel: longMonth(LAST_CLOSED).split(' ')[0],
   openLabel: longMonth(OPEN.period).split(' ')[0],
-  closeDate: shortDate(lastClose.close_completed_date),
   closeDay: String(closeDay),
-  exceptionCount: String(closeSource.exceptions.length),
-  resolvedAtLanding: String(closeSource.exceptions.filter((e) => e.atLanding === 'resolved').length),
-  // Filled by the demo at run time: the catch-up's count changes as exceptions resolve.
-  resolved: '{resolved}',
   cutoffInvoice: cutoff.invoice_id,
   cutoffNet: money(num(cutoff.net_amount), 'JPY'),
   cutoffInvoiceDate: shortDate(cutoff.invoice_date),
@@ -995,8 +990,6 @@ const closeTokens = {
   glOverCount: String(glOverBeforeAugust.length),
   legalDecision,
   auditFieldwork,
-  heroTitle: closeSource.exceptions.find((e) => e.id === closeSource.hero.exception)?.title ?? '',
-  heroException: closeSource.hero.exception,
   europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
 };
 const fill = (text) =>
@@ -1090,13 +1083,6 @@ const closeChecks = [
   },
 ].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
-for (const line of closeSource.catchUp) {
-  if (typeof line !== 'object') continue;
-  must(
-    line.whileAsking === true || closeChecks.some((c) => c.id === line.whileUntied),
-    `catch-up line "${line.text}" says when it shows (whileUntied: a check id, or whileAsking)`,
-  );
-}
 must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
 await writeJson('apps/demo/data/people.json', closePeople);
@@ -1105,9 +1091,7 @@ await writeJson('apps/demo/data/close.json', {
   agent: fillAll(closeSource.agent),
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
-  catchUp: fillAll(closeSource.catchUp),
   typingMs: closeSource.typingMs,
-  endStrip: fillAll(closeSource.endStrip),
   exceptions: closeExceptions,
   hero: fillAll({
     ...closeSource.hero,

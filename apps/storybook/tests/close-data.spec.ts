@@ -89,14 +89,13 @@ test('every check belongs to an exception and has something to fix', () => {
   }
 });
 
-test('no authored token is left unfilled, except those the demo fills at run time', () => {
-  // {resolved}: the catch-up's count, which changes as exceptions resolve.
-  const runtime = new Set(['{resolved}']);
+test('no authored token is left unfilled', () => {
   for (const name of ['close.json', 'people.json', 'checks.json']) {
-    const left = readFileSync(path.join(dataDir, name), 'utf8').match(/\{[a-zA-Z]+\}/g) ?? [];
-    expect(
-      left.filter((t) => !runtime.has(t)),
-      name,
-    ).toEqual([]);
+    expect(readFileSync(path.join(dataDir, name), 'utf8')).not.toMatch(/\{[a-zA-Z]+\}/);
   }
+});
+
+test('the decision comes first in the channel, so it opens above the fold', () => {
+  // User tests, 2026-11: every tester missed the options when it was fourth.
+  expect(close.exceptions[0].id).toBe(close.hero.exception);
 });

@@ -17,7 +17,7 @@ import { sceneNow } from '../../lib/clock';
 import { useClose } from '../../lib/close-context';
 import { kasaneCompany, visitor } from '../../lib/kasane';
 import { AI_COMPONENTS_URL, STORYBOOK_URL } from '../../lib/links';
-import { useReplay } from '../../lib/replay';
+import { useStartOver } from '../../lib/start-over';
 
 /**
  * The line that tells a visitor where they are: a demo, played as Kasane's
@@ -29,20 +29,23 @@ import { useReplay } from '../../lib/replay';
 export function DemoBanner() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const { state, dispatch } = useClose();
-  const replay = useReplay();
+  const startOver = useStartOver();
 
   return (
     <div
       data-slot="demo-banner"
-      className="flex min-w-0 flex-1 items-center gap-[var(--gap-inline)] text-sm text-text-secondary"
+      // --h-control: a shell band's height is its child's plus 8px each side
+      // and the rule (§7.4). The buttons here are 24px, so without this the
+      // top nav is 41px, its rule 8px above the sidebar header's.
+      className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center gap-[var(--gap-inline)] text-sm text-text-secondary"
     >
       <Badge>Demo</Badge>
       <TruncatedText side="bottom">{`You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`}</TruncatedText>
       <span className="flex-1" />
       {/*
-        Skip and Replay work at any point (the plan, §5). Skip is disabled at
+        Skip and Start over work at any point (the plan, §5). Skip is disabled at
         the end rather than hidden, so the bar doesn't shift under the
-        pointer; Replay is always there.
+        pointer; Start over is always there.
       */}
       <Button
         size="sm"
@@ -53,9 +56,9 @@ export function DemoBanner() {
         <FastForwardIcon aria-hidden="true" />
         Skip to the end
       </Button>
-      <Button size="sm" variant="ghost" onClick={replay}>
+      <Button size="sm" variant="ghost" onClick={startOver}>
         <ArrowCounterClockwiseIcon aria-hidden="true" />
-        Replay
+        Start over
       </Button>
       <Button size="sm" variant="ghost" onClick={() => setAboutOpen(true)}>
         <InfoIcon aria-hidden="true" />

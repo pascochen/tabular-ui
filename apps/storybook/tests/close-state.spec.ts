@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  awaitsVisitor,
   closeReducer,
   landingState,
   progress,
@@ -148,8 +149,6 @@ test('skip from landing finishes the decision as Choose for me would, then plays
   expect(s.checks['revenue-cut-off']).toBe(0);
   expect(s.ended).toBe(true);
   expect(progress(s).resolved).toBe(5);
-  // The catch-up is refreshed to the end state.
-  expect(s.catchUp).toMatchObject({ resolved: 5, tiedOut: ['revenue-cut-off'] });
 });
 
 test('skip keeps an answer the visitor gave: a skipped question stays open', () => {
@@ -164,18 +163,14 @@ test('replay starts over from landing', () => {
   expect(s).toEqual(landingState());
 });
 
-test('the catch-up changes only on refresh', () => {
-  const decided = run(
-    { type: 'answer', answer: 'keep-locked', at: '14:00' },
-    { type: 'read' },
-    { type: 'post', at: '14:01' },
-  );
-  expect(decided.catchUp.resolved).toBe(2);
-  expect(closeReducer(decided, { type: 'refresh', at: '14:02' }).catchUp).toEqual({
-    at: '14:02',
-    resolved: 3,
-    tiedOut: [],
-  });
+test('the decision awaits the visitor until it is answered, and nothing else does', () => {
+  const s = landingState();
+  expect(Object.keys(s.exceptions).filter((id) => awaitsVisitor(s, id))).toEqual(['revenue-cut-off']);
+  const answered = closeReducer(s, { type: 'answer', answer: 'keep-locked', at: '14:00' });
+  expect(awaitsVisitor(answered, 'revenue-cut-off')).toBe(false);
+  // After "Don't post it" the agent asks again, so it is the visitor's again.
+  const asked = closeReducer(closeReducer(answered, { type: 'read' }), { type: 'stop', at: '14:01' });
+  expect(awaitsVisitor(asked, 'revenue-cut-off')).toBe(true);
 });
 
 test('each typing indicator names the card its reply lands on', () => {
