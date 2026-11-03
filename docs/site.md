@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02 and are **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -31,7 +31,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
 | D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site. Section rules stay 1px. Not built |
-| D12 | Foundations links | Bordered, selected in ink, still real links. Not built |
+| D12 | Foundations links | Bordered, selected in ink, still real links |
 | D13 | Highlights | None behind site copy |
 
 ### The decisions in full
@@ -295,7 +295,7 @@ Every route is prerendered to static HTML at build time.
 
 **`<name>` is the registry item name** in `packages/ui/registry.json`: `agent-block`, `chat-thread` and so on. A component page exists only when the registry has the item, so a to-build component has a card but no page. Previous and next follow run order.
 
-**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab. *Changed again 2026-10-27 (owner, option A of a navigation critique):* each page opens with the section's name, "Foundations", then its three pages as links at 16px with the current one underlined (2px ink, the active-tab width of §7.8, `aria-current`), then the page's own title and lead. Built in the site at reading size: `AppBarNav`'s 13px suits the product, and beside a 64px title most visitors missed the links. `/foundations` redirects (307) to Color, where it had been a 404. "Density" keeps its name for now. *Changed 2026-11-02 (owner), not built yet:* the links stay links at 16px, but the 2px underline gives way to D12's bordered look, selected in ink.
+**Foundations is a reference layer**, reached from the nav and footer, never from the Home body (wireframe note on `79:537`). Its three pages share one header, with links between them through the library's `AppBarNav`, and `aria-current` on the page you're on. *Changed in step 3:* this said `Tabs`. Tabs switch a view on one page, and a nav changes the page (`AppBar`'s README), so a link to another URL is a nav item, not a tab. *Changed again 2026-10-27 (owner, option A of a navigation critique):* each page opens with the section's name, "Foundations", then its three pages as links at 16px with the current one underlined (2px ink, the active-tab width of §7.8, `aria-current`), then the page's own title and lead. Built in the site at reading size: `AppBarNav`'s 13px suits the product, and beside a 64px title most visitors missed the links. `/foundations` redirects (307) to Color, where it had been a 404. "Density" keeps its name for now. *Changed 2026-11-02 (owner):* the links stay links at 16px, but the 2px underline gave way to D12's bordered look, selected in ink. *Changed the same day (owner):* the "Foundations" label above the links is gone. The links are now the first thing on the page, and the nav keeps "Foundations" as its accessible name. From 768px the site nav still marks Foundations as where you are; below that it's a menu, so nothing on a phone's first screen names the section until the menu opens.
 
 ## 4. Pages
 
@@ -526,13 +526,13 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - Every target is at least 24×24px, or has the spacing 2.5.8 allows. Stacked footer links need checking.
 - With reduced motion, no element animates.
 - Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned.
-- In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4). Once D12 is built, the selected Foundations link keeps a mark other than its fill.
+- In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4). The selected Foundations link keeps a mark other than its fill, a 2px underline (D12).
 - Once the double rule is on the site (D11): it shows two separate lines at real device pixel ratios of 1, 1.5 and 2.
 
 **Keyboard and focus (scripted):**
 - Every link is a plain `<a>`, so every page loads as a new document, and the browser moves focus to the top and announces the new title. A test fails on any React Router `<Link>` (`data-discover`). *Changed in 5b:* this asked for focus to move to the `<h1>` after a client-side route change; the site has none to manage.
 - The jump index's links move focus to their card.
-- The component page's menu, below 1024px, is the library's `Menu`, with its keyboard behaviour; from 1024px the list beside the page is plain links. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`). D12 keeps them so: every one is an `<a>` in the HTML before hydration, which a test checks with scripts blocked.
+- The component page's menu, below 1024px, is the library's `Menu`, with its keyboard behaviour; from 1024px the list beside the page is plain links. The Foundations links are a nav (*changed 2026-10-27*: they had been `Tabs`). D12 keeps them so: every one is an `<a>` in the HTML before hydration, which `tests/pages.spec.ts` checks with scripts blocked, along with their borders, fill, ring and forced colours in both states, on all three pages. `tests/quality.spec.ts` runs the rest of this section in both states on those pages.
 
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places. One exception, approved by the owner on 2026-10-27: on Home, a built component's jump-index link goes to its card and its card title to its page (step 5b, as built).
@@ -540,7 +540,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - Contrast is measured on the ground the text sits on, including the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 
-**Manual, by the owner:** a VoiceOver pass in Safari on Home, one component page and Color, following the 10-step script in `docs/site-voiceover.md` (delivered in 5b; Components became a section of Home on 2026-10-26).
+**Manual, by the owner:** a VoiceOver pass in Safari on Home, one component page and Color, following the script in `docs/site-voiceover.md` (10 steps delivered in 5b; Components became a section of Home on 2026-10-26). Steps 11 to 16 cover D12's links on Color, and have not been run yet.
 
 ## 12. Performance and metadata
 
@@ -562,10 +562,10 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 5. **The rest, and the quality pass**, split in two PRs on 2026-10-26 (owner):
    - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
-6. **D10–D13 (2026-11-02), not started.** D13 needs no build, and D10 needs its list confirmed.
+6. **D10–D13 (2026-11-02).** D13 needs no build, and D10 needs its list confirmed. 6a is not started.
    - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR. Then the one use on the site. `Section` doesn't change.
    - **6b. Library (D12), built.** `tabVariants` and the `bordered` variant, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
-   - **6c. Foundations links (D12).** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color.
+   - **6c. Foundations links (D12), built.** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color (`docs/site-voiceover.md`, steps 11 to 16), for the owner to run.
 
 **Step 2, as built (2026-10-26):**
 - `/plates` held D3's comparison (the hero, the Thinking row of Components cards and the closing band, each in (a), (b) and (c)) until the owner chose (c) on the PR's preview. The page was then removed. The hero and the closing band are dark; `SpecimenFrame` defaults to paper, for the grids. The hero moved to a paper plate on a ruled sheet the same day (D3, item 3).

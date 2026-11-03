@@ -68,9 +68,8 @@ function RulesFollowed({ name }: { name: string }) {
  * Every built component, beside the page from 1024px (owner, 2026-10-28,
  * variant A of the component-menu review): it sticks as the page scrolls, so
  * another component is always one click away. Below 1024px there's no room for
- * a column, and the page keeps the menu. The page you're on is marked as the
- * Foundations pages mark theirs: ink and semibold, with a 2px ink rule laid over
- * the list's 1px rule, and aria-current.
+ * a column, and the page keeps the menu. The page you're on is ink and semibold,
+ * with a 2px ink rule laid over the list's 1px rule, and aria-current.
  */
 function ComponentList({ current }: { current: string }) {
   return (
