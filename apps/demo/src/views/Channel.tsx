@@ -10,6 +10,7 @@ import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
 import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
 import { channels, close, exceptions, findings, memberName, type ChannelId, type Exception } from '../lib/kasane';
+import { SCRIPTED_NOTE } from '../lib/scripted-note';
 import { MemberAvatar } from '../shell/members';
 import { ChannelGaps } from './Tasks';
 
@@ -18,13 +19,6 @@ const channelOf = (id: string) => exceptions.find((e) => e.id === id)!.channel;
 
 const isHero = (e: Exception) => 'hero' in e && e.hero === true;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
-
-/**
- * Said once, under the visitor's first post, by a system that isn't an agent or
- * a person (docs/agent-voice.md, rule 1). "To your message": the people do still
- * reply, in their threads.
- */
-const SCRIPTED_NOTE = 'The people and the AI are scripted, so nobody will reply to your message.';
 
 /**
  * A channel: one message per finding it holds, with its replies inline, then

@@ -1,6 +1,6 @@
 import { useSyncExternalStore, type MouseEvent } from 'react';
 
-import { directMessages, type ChannelId } from './kasane';
+import { agents, directMessages, type ChannelId } from './kasane';
 
 /**
  * What the main area shows. Views live in the URL with no router, as Part 1's
@@ -46,7 +46,7 @@ export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };
 export function parseView(search: string): View {
   const params = new URLSearchParams(search);
   const dm = params.get('dm');
-  if (dm && directMessages.includes(dm)) return { kind: 'dm', member: dm };
+  if (dm && (directMessages.includes(dm) || agents.some((a) => a.key === dm))) return { kind: 'dm', member: dm };
   const view = params.get('view');
   if (view === 'tasks' && BUILT_PLACES.includes('tasks')) {
     return { kind: 'tasks', task: params.get('task') ?? undefined };

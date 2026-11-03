@@ -2,10 +2,11 @@ import type { ReactNode } from 'react';
 import { AppShellPanelHeader } from 'tabular-ui';
 
 import { ClosePanel } from '../components/ClosePanel';
-import { channels, lastClosedMonth, memberName, selectedTask } from '../lib/kasane';
+import { channels, lastClosedMonth, member, memberName, selectedTask } from '../lib/kasane';
 import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
 import { NoMessages, Profile } from './parts';
+import { AgentProfile, AgentView } from './AgentView';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
 import { ChannelView } from './Channel';
 import { TaskPanel, TasksView } from './Tasks';
@@ -45,6 +46,23 @@ export function slotsFor(view: View): ViewSlots {
   // Only these reach here until their steps are built (`BUILT_PLACES`).
   if (view.kind !== 'channel' && view.kind !== 'dm') throw new Error(`No view for "${view.kind}" yet`);
   if (view.kind === 'dm') {
+    const m = member(view.member);
+    if (m?.kind === 'agent') {
+      return {
+        title: m.agent.name,
+        // Keyed so a half-typed message stays with the agent it was for.
+        body: <AgentView key={m.agent.key} agent={m.agent} />,
+        panel: {
+          label: 'Profile',
+          content: (
+            <>
+              <AppShellPanelHeader title="Profile" />
+              <AgentProfile agent={m.agent} />
+            </>
+          ),
+        },
+      };
+    }
     return {
       title: memberName(view.member),
       body: <NoMessages memberKey={view.member} />,

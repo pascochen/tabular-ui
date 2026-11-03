@@ -51,8 +51,8 @@ test('every built channel round-trips through its URL', () => {
   }
 });
 
-test('a direct message round-trips', () => {
-  for (const member of ['fpaHead', 'apLead']) {
+test('a direct message round-trips, a person’s or an agent’s', () => {
+  for (const member of ['fpaHead', 'apLead', 'cutoff-ai', 'payments-ai', 'approvals-ai', 'credit-ai']) {
     expect(parseView(`?dm=${member}`), member).toEqual({ kind: 'dm', member });
     expect(hrefFor({ kind: 'dm', member })).toBe(`?dm=${member}`);
   }
