@@ -114,7 +114,7 @@ export function ExceptionCard({
             onClick={() => setSourcesOpen(!sourcesOpen)}
             // ChannelMessage's replies disclosure, the same recipe, so the two
             // controls in one message read alike.
-            className="-mx-1.5 -my-0.5 cursor-pointer gap-[var(--gap-control-icon)] px-1.5 py-0.5 text-sm font-medium text-text-secondary after:block hover:text-text-body"
+            className="-mx-1.5 -my-0.5 cursor-pointer select-none gap-[var(--gap-control-icon)] px-1.5 py-0.5 text-sm font-medium text-text-secondary after:block hover:text-text-body"
           >
             <CaretRightIcon
               aria-hidden="true"

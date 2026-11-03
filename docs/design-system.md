@@ -336,6 +336,8 @@ Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selec
 
 **Text on a solid fill isn't selectable.** Primary on a fill is the wrong pair: in dark mode it's paper on the paper button. Every filled control is already `select-none` through `controlBase` and `tabVariants`. Anything else with text on a `--color-fill-*` takes `select-none` as well, as the samples on the site's Color page do.
 
+**`Button variant="inline"` is selectable, because it has no fill and it holds data.** `select-auto`, decided 2026-11-02 (owner), on clipboard measurements: under `select-none` a copied `DataTable` row lost its identifier, `LineageTree` copied statuses with no names, and an expandable `RunLogRow` vanished from the log. A selection passing over the button carries its text, and a drag that starts on the button still selects nothing. A label that isn't data passes `select-none`: sort headers and disclosures. Forgetting that costs a stray word in a paste, and the old default cost a row its name with no warning, which is why `auto` is the default. `apps/storybook/tests/data-table-copy.spec.ts` and `identifier-copy.spec.ts` read the clipboard.
+
 **A nested `[data-theme]` rescopes it,** as it does every token, so selected text in a dark band on a light page takes the dark values. The rule reads the `--tui-*` layer for that reason. `apps/storybook/tests/selection.spec.ts` measures the colours painted in both modes and in a nested band. `packages/ui/scripts/check-contrast.mjs` gates primary on the highlight over every ground.
 
 ### Focus ring
@@ -749,6 +751,7 @@ If this decision is reversed, reverse it completely — every non-interactive st
 ```
 solid     content — a real row, a real card, a real control
 dashed    a placeholder awaiting content
+double    a total whose displayed parts add up to it
 ```
 
 The default is solid and near-universal. **Dashed is reserved for a container that is
@@ -764,6 +767,8 @@ Dashed changes the **style only**. Width stays `--border-width` (1px) and colour
 utility and a token would imply the style varies independently, which it does not.
 
 Added 2026-08-23 with `AttachmentRow`'s upload target, the first and so far only user.
+
+**Double is reserved for a total that adds up.** `DataTable` draws it, `3px double` in `--color-text-primary`, under a total figure when the rows on display sum to the total it was given, at the precision printed. No prop sets it: a mark that states a fact comes from a check. If the check fails, can't run, or rows are hidden, the figure keeps only the single rule above it. There is no token: 3px is the least a double can draw, not a step in the width scale. Nothing else draws a double rule, section dividers included. Added 2026-11-02 with `DataTable`'s totals row.
 
 ### 7.9 Shell widths
 
@@ -1132,13 +1137,16 @@ Before the token set is considered done:
 - [x] Hover and press use the `--color-bg-hover` / `--color-bg-active` overlay; the primary button, whose fill is the overlay's own colour, uses the `-inverse` pair (2026-10-16). No per-role hover token exists. The 6% overlay was verified visible on 28px rows over canvas, over `--color-surface`, and over a solid fill (2026-08-02).
 - [x] Selection uses `--color-bg-interactive`; no `--color-bg-selected` is declared or used. All four selection sites (Chip, Select, Combobox, LineageTree) use it.
 - [x] Selected text uses `--color-bg-selection` with `--color-text-primary`, in both modes and inside a nested `[data-theme]`. Asserted by painting it in Chromium, in `apps/storybook/tests/selection.spec.ts`. Safari and Firefox are not in the test run: check them by hand when the rule changes (§4).
+- [x] A copied `DataTable` row keeps its identifier, on one line. `LineageTree` keeps its names and an expandable `RunLogRow` keeps its row, while sort headers and disclosure labels stay out (§4). Asserted by reading the clipboard, in `apps/storybook/tests/data-table-copy.spec.ts` and `identifier-copy.spec.ts`. Chromium only.
+- [ ] **A rich-text paste of a row with a `Button` identifier (§4).** The HTML flavour holds a `<button>` for the name. Not pasted into Excel, Google Sheets or Docs: check that the name arrives as text.
 - [x] Every `--text-*` size has its `--line-height` partner — 9 sizes, 9 partners, none missing.
 - [x] `--radius-*` declared in px — 0px for `xs` through `lg` plus `9999px` for `full` (2/4/6/8px until 2026-10-16, §7.7); `xl` through `4xl` are stripped to `initial` so the 8px ceiling is structural.
 - [x] No chromatic 900/950 background — zero occurrences in `packages/ui/src/`, and `tui/no-deep-chromatic-background` rejects them in CSS including `theme.css` itself.
 - [x] Focus rings use `outline` and survive inside `overflow: hidden` — **verified 2026-08-03** by keyboard on three surfaces that put a control against a scroll boundary: `DataTable` (checkbox first column, icon button last), `Chip`/`FilterChip`, and a scrollable `TabsList`. See §4 on why padding and inset offsets — not `outline` itself — are what prevent clipping.
 - [x] Numeric cells carry `tabular-nums` and share a right edge — asserted in `apps/storybook/tests/density.spec.ts` on a `DataTable` variance column with mixed-width figures. The column's header label shares that edge too, at rest, hovered and sorted (same file).
+- [x] The double rule (§7.8) draws only when a total foots, and paints two separate lines on whole pixels at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2 — asserted in `apps/storybook/tests/data-table-totals.spec.ts`, Chromium only. Safari and Firefox aren't measured.
 - [x] Negatives render U+2212, not a hyphen (§8.6) — asserted in `apps/storybook/tests/density.spec.ts` on that same column, in `apps/site/tests/data.spec.ts` on the formatters, and on every page in `apps/site/tests/pages.spec.ts`.
-- [x] A figure copied from `DataTable` carries a hyphen, and a double-click in a numeric cell takes the whole figure (§8.6) — asserted by reading the clipboard in `apps/storybook/tests/data-table-copy.spec.ts`.
+- [x] A figure copied from `DataTable` carries a hyphen, and a double-click in a numeric cell takes the whole figure (§8.6) — asserted by reading the clipboard in `apps/storybook/tests/data-table-copy.spec.ts`, and for `figure` columns, totals and differences in `data-table-totals.spec.ts`.
 - [ ] **Paste into Excel, Google Sheets and Numbers (§8.6).** Not tested: Excel isn't on the machine this was checked on, no account was signed in to, and Numbers was driven through its parser, not by a real paste. Paste `-1,234`, `−1,234`, `(1,234)`, `-¥41,415,809` and `−¥41,415,809` into a column and check each with `=ISNUMBER()`. Record the result in §8.6's table.
 - [x] **Source Serif 4 and Source Sans 3 ship `tnum`** — verified 2026-10-16 by glyph-width diff: with `tabular-nums`, `111111` and `000000` both measure 97.96px in the serif and 98.46px in the sans at 32px/600. (Archivo measured 111.17px for both, 2026-10-08, and Inter Tight 121.47px, 2026-08-02.)
 - [x] Source Serif 4 is loaded *with* its `opsz` axis, and the metric tier renders in the display cut — verified 2026-10-16: `Hamburgefonstiv` at 32px/600 measures 288.35px at `'opsz' 8` and 232.13px at `'opsz' 60`, and `$847.2M` measures 118.75px with `font-optical-sizing: auto` against 127.78px at the text cut. Asserted in `apps/storybook/tests/density.spec.ts`. **Import `@fontsource-variable/source-serif-4/opsz.css`, not the package default:** the default entry point ships wght-only files and silently turns optical sizing off, the same trap the Google Fonts URL sets in §9. (Until 2026-10-16 this row checked Archivo's `"wdth" 90`, removed with the family, §8.3.)

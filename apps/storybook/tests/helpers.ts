@@ -24,7 +24,9 @@ declare global {
 export const story = (id: string, theme: 'dark' | 'light' = 'dark') => `/iframe.html?id=${id}&globals=theme:${theme}`;
 
 /**
- * Navigates and waits for the theme to actually be applied.
+ * Navigates and waits for the theme to actually be applied, but not the fonts.
+ * Reach for `gotoStory` unless real time matters from the moment the story
+ * mounts, as it does for elapsed.spec.ts's running clock.
  *
  * `page.goto` resolves on `load`, but Storybook's decorator sets
  * `data-theme` when the story renders — later. Reading tokens in that gap
@@ -32,7 +34,7 @@ export const story = (id: string, theme: 'dark' | 'light' = 'dark') => `/iframe.
  * silently compare against light figures. Worse, a token read before the
  * switch and one read after could be mixed in a single assertion.
  */
-export async function gotoStory(page: Page, id: string, theme: 'dark' | 'light' = 'dark') {
+export async function gotoStoryBeforeFonts(page: Page, id: string, theme: 'dark' | 'light' = 'dark') {
   await page.goto(story(id, theme));
   // 20s, not 10: the first page of a run waits on a cold dev server. With two
   // workers that measured ~8s on main on 2026-10-15, and ~11s once
@@ -42,6 +44,37 @@ export async function gotoStory(page: Page, id: string, theme: 'dark' | 'light' 
   // hides no failure. Inside Playwright's 30s test timeout.
   await page.waitForFunction((t) => document.documentElement.getAttribute('data-theme') === t, theme, {
     timeout: 20_000,
+  });
+}
+
+/**
+ * `gotoStoryBeforeFonts`, then waits for the fonts.
+ *
+ * They land after the story renders, and they're `font-display: swap`, so text
+ * is laid out in the fallback until then and reflows when they arrive: a
+ * bordered Tabs strip, whose width is its text, shrank by about 16px on macOS.
+ * A box measured in that gap is wrong by the time anything reads it.
+ * `page.screenshot` waits for the fonts itself, so a clip measured first runs
+ * past the element's new edge.
+ */
+export async function gotoStory(page: Page, id: string, theme: 'dark' | 'light' = 'dark') {
+  await gotoStoryBeforeFonts(page, id, theme);
+  await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Presses the real shortcut and reads every flavour on the clipboard. The spec
+ * needs `test.use({ permissions: ['clipboard-read', 'clipboard-write'] })`.
+ */
+export async function copy(page: Page) {
+  await page.evaluate(() => navigator.clipboard.writeText('NOTHING COPIED'));
+  await page.keyboard.press('ControlOrMeta+c');
+  return page.evaluate(async () => {
+    const flavours: Record<string, string> = {};
+    for (const item of await navigator.clipboard.read()) {
+      for (const type of item.types) flavours[type] = await (await item.getType(type)).text();
+    }
+    return flavours;
   });
 }
 

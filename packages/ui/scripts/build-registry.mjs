@@ -78,7 +78,7 @@ const descriptions = {
     'Permission for one action before it runs: what it changes and who it reaches. Sits inside an AgentBlock.',
   ContextSwitcher: 'A menu for switching the current context, with actions.',
   CountBadge: 'A count beside a label or icon.',
-  DataTable: 'A sortable, filterable, virtualized table with 28px rows.',
+  DataTable: 'A sortable, filterable, virtualized table with 28px rows, and a totals row that checks its sum.',
   EmptyState: 'What a screen shows before it has content.',
   Field: 'A label, help text and error, wired to one control.',
   FilterChip: 'An active filter that can be removed.',

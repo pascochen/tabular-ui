@@ -58,7 +58,7 @@ Benchmarks (2026-10-28): AI Elements' `Tool` draws each call as a card with its 
 
 | Part | Treatment |
 |---|---|
-| Line | `--text-sm`, 500, `--color-text-secondary`, `tabular-nums`, as `AgentReasoning`'s summary. With `detail` it's `Button variant="inline"` with a 1em `bold` caret, `aria-expanded` and `aria-controls`; without, a `<p>`. |
+| Line | `--text-sm`, 500, `--color-text-secondary`, `tabular-nums`, as `AgentReasoning`'s summary. With `detail` it's `Button variant="inline"` with a 1em `bold` caret, `aria-expanded` and `aria-controls`, and `select-none`, so a copy of the turn leaves it out; without, a `<p>`. |
 | Spinner | After the label while running, its colour. Under reduced motion it stands still, and the figure keeps counting. |
 | Detail | Under the label (a hanging indent of 1em plus `--gap-control-icon`), `--gap-field` below the line, `--text-sm`, secondary, `tabular-nums`: what a call read is often figures. Rendered only when open. |
 | Failure | An `XCircle` in `--color-text-danger`, `bold`, 1em, in the caret's slot. `error` in `--color-text-body`, 500; `next` under it in secondary, `--gap-bonded` apart. |
