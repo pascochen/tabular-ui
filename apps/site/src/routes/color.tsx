@@ -108,7 +108,7 @@ function RoleRow({ role }: { role: Role }) {
                 <TokenLabel name={`text-${role}`} detail={`${stepLabel(text)}, ${onCanvas(text, mode)}`} />
               </div>
               <div className="flex flex-col gap-[var(--gap-control-icon)]">
-                <p className={cn('px-[var(--pad-card)] py-2 text-site-title font-semibold', c.fill)}>Aa</p>
+                <p className={cn('select-none px-[var(--pad-card)] py-2 text-site-title font-semibold', c.fill)}>Aa</p>
                 <TokenLabel
                   name={`fill-${role}`}
                   detail={`${stepLabel(fill)}, text ${stepLabel(on)} at ${contrast(on.hex, fill.hex).toFixed(2)}:1`}
