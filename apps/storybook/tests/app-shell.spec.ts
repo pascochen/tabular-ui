@@ -16,8 +16,9 @@ import { focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo } from './hel
 const SKETCH = { width: 1440, height: 900 };
 const BELOW_FLOOR = { width: 1024, height: 768 };
 
-const navItem = (page: Page, name: string) => page.getByRole('link', { name });
-const textOf = (page: Page, name: string) =>
+// A regex, because sr-only is positioned, so Chromium's name has a space before it: "payables , unread".
+const navItem = (page: Page, name: RegExp) => page.getByRole('link', { name });
+const textOf = (page: Page, name: RegExp) =>
   navItem(page, name).evaluate((el) => {
     const { color, fontWeight } = getComputedStyle(el);
     return { color, fontWeight };
@@ -587,9 +588,10 @@ test.describe('an unread nav item', () => {
       probe.remove();
       return color;
     });
-    const unread = await textOf(page, 'payables, unread');
-    const read = await textOf(page, 'cash');
-    const active = await textOf(page, 'revenue');
+    await expect(navItem(page, /^payables\s*, unread$/)).toBeVisible();
+    const unread = await textOf(page, /^payables/);
+    const read = await textOf(page, /^cash$/);
+    const active = await textOf(page, /^revenue$/);
     expect(unread.color).toBe(primary);
     expect(read.color).not.toBe(primary);
     expect(unread.fontWeight).toBe(read.fontWeight);
