@@ -114,6 +114,24 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * Sorted by a figure column. The label stays on the figures' edge, and the
+ * caret takes the label's inner side, in the space it held at rest. A left-aligned
+ * column's caret sits on the inner side too: to the label's right.
+ */
+export const SortedByFigure: Story = {
+  render: () => (
+    <div style={{ height: 240 }}>
+      <DataTable columns={columns} data={makeRows(8)} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Rows' }));
+    await expect(canvas.getByRole('columnheader', { name: 'Rows' })).toHaveAttribute('aria-sort', 'descending');
+  },
+};
+
 /** 50,000 rows, windowed. Scroll — the row height must not drift. */
 export const Virtualized: Story = {
   render: function VirtualizedStory() {

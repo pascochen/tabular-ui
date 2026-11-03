@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { gotoStory } from './helpers';
 
@@ -54,6 +54,138 @@ test('numeric cells render tabular figures, and the column aligns', async ({ pag
     'the variance column should show a negative',
   ).toBe(true);
   expect(variance.filter((t) => t.startsWith('-'))).toEqual([]);
+});
+
+/**
+ * The same edge, one row up: a figure column's label sits on its figures'
+ * right edge. Until 2026-11-02 a sortable label stopped 12px short, because the
+ * caret's reserved space sat between it and the cell's padding, while a
+ * non-sortable label lined up exactly. The caret now takes the label's inner
+ * side and still holds its space, so drawing it moves nothing and resizes
+ * nothing. Read at rest, hovered and sorted, since each draws the caret
+ * differently; the hover caret was dead from the first build, its `group-hover:`
+ * looking for a `.group` that Button names `group/button`. Every label's top is
+ * read too: `row-reverse` on an inline-flex button takes its baseline from the
+ * caret, which lifted the label 1px above its neighbours with the edge correct.
+ */
+const readHeaders = (page: Page) =>
+  page.evaluate(async () => {
+    // A label's width is final only once its face has loaded. Read before that,
+    // the fallback's width says a label moved when the font arrived.
+    await document.fonts.load('500 10px "Source Sans 3 Variable"', 'A');
+    await document.fonts.ready;
+    const table = document.querySelector('#storybook-root table')!;
+    const rows = Array.from(table.querySelectorAll('tbody tr[data-row-id]'));
+    const textBox = (node: Node) => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      return range.getBoundingClientRect();
+    };
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gap-icon-label'));
+    const headers = Array.from(table.querySelectorAll('thead th')).map((th, i) => {
+      const button = th.querySelector('button')!;
+      const label = textBox(Array.from(button.childNodes).find((n) => n.nodeType === Node.TEXT_NODE)!);
+      const caret = button.querySelector('svg')!;
+      const caretBox = caret.getBoundingClientRect();
+      return {
+        name: th.textContent ?? '',
+        numeric: getComputedStyle(th).textAlign === 'right',
+        width: th.getBoundingClientRect().width,
+        labelLeft: label.left,
+        labelRight: label.right,
+        labelTop: label.top,
+        caretLeft: caretBox.left,
+        caretRight: caretBox.right,
+        caretOpacity: getComputedStyle(caret).opacity,
+        figureRights: rows.map((row) => textBox(row.children[i]).right),
+        cellLefts: rows.map((row) => textBox(row.children[i]).left),
+      };
+    });
+    const scroller = table.parentElement!;
+    return { gap, headers, overflow: scroller.scrollWidth - scroller.clientWidth };
+  });
+
+type Headers = Awaited<ReturnType<typeof readHeaders>>;
+
+const expectLabelsOnTheirEdges = ({ gap, headers }: Headers, figureColumns: string[]) => {
+  expect(headers.filter((h) => h.numeric).map((h) => h.name)).toEqual(figureColumns);
+  for (const h of headers) {
+    if (h.numeric) {
+      for (const right of h.figureRights) expect(h.labelRight, `${h.name} over its figures`).toBeCloseTo(right, 1);
+      expect(h.labelLeft - h.caretRight, `${h.name}'s caret on its inner side`).toBeCloseTo(gap, 1);
+    } else {
+      for (const left of h.cellLefts) expect(h.labelLeft, `${h.name} over its cells`).toBeCloseTo(left, 1);
+      expect(h.caretLeft - h.labelRight, `${h.name}'s caret on its inner side`).toBeCloseTo(gap, 1);
+    }
+  }
+  expect(new Set(headers.map((h) => h.labelTop)).size, 'every label on one line').toBe(1);
+};
+
+const expectNothingMoved = (now: Headers, before: Headers) => {
+  for (const [i, h] of now.headers.entries()) {
+    expect(h.labelRight, `${h.name}'s label moved`).toBeCloseTo(before.headers[i].labelRight, 1);
+    expect(h.width, `${h.name}'s column resized`).toBeCloseTo(before.headers[i].width, 1);
+  }
+};
+
+for (const theme of ['dark', 'light'] as const) {
+  test(`a figure column's label shares its figures' right edge, and a caret moves nothing — ${theme}`, async ({
+    page,
+  }) => {
+    const figureColumns = ['Rows', 'Duration', 'Variance'];
+    const opacityOf = (read: Headers, name: string) => read.headers.find((h) => h.name === name)?.caretOpacity;
+
+    await gotoStory(page, 'product-datatable--default', theme);
+    await page.mouse.move(0, 0);
+    const rest = await readHeaders(page);
+    expectLabelsOnTheirEdges(rest, figureColumns);
+    for (const h of rest.headers) expect(h.caretOpacity, `${h.name}'s caret at rest`).toBe('0');
+
+    await page.getByRole('button', { name: 'Duration' }).hover();
+    const hovered = await readHeaders(page);
+    expect(opacityOf(hovered, 'Duration'), 'hover draws the caret').toBe('1');
+    expect(opacityOf(hovered, 'Variance'), 'only on the hovered header').toBe('0');
+    expectLabelsOnTheirEdges(hovered, figureColumns);
+    expectNothingMoved(hovered, rest);
+
+    await page.getByRole('button', { name: 'Rows' }).click();
+    await page.mouse.move(0, 0);
+    const sorted = await readHeaders(page);
+    expect(opacityOf(sorted, 'Rows'), 'a sort draws the caret').toBe('1');
+    expectLabelsOnTheirEdges(sorted, figureColumns);
+    expectNothingMoved(sorted, rest);
+  });
+}
+
+/**
+ * Where the reservation earns its keep. Squeezed, a column is as wide as its
+ * header's content, so a caret that took no space until drawn would resize the
+ * column it appears in. Labels only: a squeezed cell clips its figure, so the
+ * figure has no edge to share here.
+ */
+test('in a squeezed table, a sort resizes no column', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 700 });
+  await gotoStory(page, 'product-datatable--default');
+  await page.mouse.move(0, 0);
+  const rest = await readHeaders(page);
+  await page.getByRole('button', { name: 'Variance' }).click();
+  await page.mouse.move(0, 0);
+  expectNothingMoved(await readHeaders(page), rest);
+});
+
+/**
+ * A figure column last in the table has no neighbour to overhang: a caret past
+ * its cell's edge would make the whole table scroll sideways.
+ */
+test('a figure column at the table edge lines up without a sideways scroll', async ({ page }) => {
+  await gotoStory(page, 'product-appbar--in-dashboard');
+  await page.mouse.move(0, 0);
+  await page.getByRole('button', { name: 'Duration' }).click();
+  await page.mouse.move(0, 0);
+  const sorted = await readHeaders(page);
+  expect(sorted.headers.at(-1)?.name).toBe('Duration');
+  expectLabelsOnTheirEdges(sorted, ['Rows', 'Duration']);
+  expect(sorted.overflow, 'the table scrolls sideways').toBe(0);
 });
 
 /**
