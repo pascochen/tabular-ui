@@ -20,7 +20,7 @@ Product. Composes `Badge` — it does not restyle it.
 | `stale` | stale | warning | Warning |
 | `needs-review` | needs review | warning | Eye |
 | `agent-working` | AI working | agent | `Spinner` |
-| `agent-proposed` | proposed | agent | Sparkle |
+| `agent-proposed` | proposed | agent | PencilSimpleLine |
 | `skipped` | skipped | neutral | MinusCircle |
 
 ## Icons are not decoration
@@ -28,6 +28,8 @@ Product. Composes `Badge` — it does not restyle it.
 Every status ships an icon as well as a hue, because §10 requires a **grayscale pass**: convert a run log to grayscale and every state must remain distinguishable. Colour alone fails that, and fails deuteranopia too. `hideIcon` exists for tight layouts but must not be used in a run log.
 
 The two working states draw `Spinner` (§11.5), which moves only under `motion-safe` and stands on its still frame under `prefers-reduced-motion`. Every other mark is a circle or a figure, so the square stays distinct in grayscale. `running` and `agent-working` share it (decided 2026-10-20): in a badge they differ by hue and label, and for a deuteranope in dark mode the label is what separates them. Until then `agent-working` spun the Robot glyph, which tumbled. Its label reads "AI working" since 2026-10-25 (owner): "AI" is `docs/agent-voice.md`'s one word for the agent role, and the label is now the badge's only non-colour authorship signal. It was "agent working"; the status key did not change.
+
+`agent-proposed` draws PencilSimpleLine since 2026-11-03 (owner, after a side-by-side in both modes, in colour and in grayscale): pencilled in, on the line and not yet in ink, which is `docs/agent-voice.md`'s "never blur proposed and done" as a mark. Until then it drew Sparkle, which said "AI" and nothing about the state, and the hue already says whose it is. A pencil can also mean "edit", and `ProjectSwitcher`'s Edit project draws the plain `PencilSimple`. That cost was accepted: the baseline makes it a different glyph, and a badge is not a control. GitPullRequest and Signpost lost: the first collapses into dotted columns at 10px (§11.3) and means nothing to a finance reader, and the second says little on a file. CircleDashed wasn't shown: it would be a fifth circle among these marks, and §7.8 reserves dashes for placeholders, naming "suggest draft" as the misuse.
 
 The status map's `working` flag says which statuses draw the `Spinner`. `spin` is its deprecated alias, kept for callers that read the map.
 

@@ -7,7 +7,7 @@ import type { Page, Locator } from '@playwright/test';
  * which depends on it. axe-core is not a dependency of this package, and
  * `@axe-core/playwright` only wraps this same script.
  */
-export const axePath = createRequire(import.meta.resolve('@storybook/addon-a11y')).resolve('axe-core/axe.min.js');
+const axePath = createRequire(import.meta.resolve('@storybook/addon-a11y')).resolve('axe-core/axe.min.js');
 
 declare global {
   interface Window {
@@ -25,8 +25,7 @@ export const story = (id: string, theme: 'dark' | 'light' = 'dark') => `/iframe.
 
 /**
  * Navigates and waits for the theme to actually be applied, but not the fonts.
- * Reach for `gotoStory` unless real time matters from the moment the story
- * mounts, as it does for elapsed.spec.ts's running clock.
+ * Reach for `gotoStory` unless the test reads only text, as elapsed.spec.ts does.
  *
  * `page.goto` resolves on `load`, but Storybook's decorator sets
  * `data-theme` when the story renders — later. Reading tokens in that gap
@@ -60,6 +59,32 @@ export async function gotoStoryBeforeFonts(page: Page, id: string, theme: 'dark'
 export async function gotoStory(page: Page, id: string, theme: 'dark' | 'light' = 'dark') {
   await gotoStoryBeforeFonts(page, id, theme);
   await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Waits for Storybook's render to reach `finished`, after play and afterEach.
+ * `currentRender.phase` is internal to Storybook's preview: if an upgrade
+ * renames it, this times out, loudly.
+ */
+export async function storyFinished(page: Page) {
+  await page.waitForFunction(() => {
+    const preview = (window as { __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } } })
+      .__STORYBOOK_PREVIEW__;
+    return ['finished', 'errored', 'aborted'].includes(preview?.currentRender?.phase ?? '');
+  });
+}
+
+/**
+ * Puts axe on the page for a test to run by name, once the story has finished.
+ *
+ * The a11y addon runs axe in the story's `afterEach`, on a copy it imports then,
+ * and that copy sets `window.axe` too. Injected any sooner, a test can call the
+ * addon's copy mid-run, and axe throws "Axe is already running". After `finished`
+ * the addon is done, and this copy goes on last.
+ */
+export async function injectAxe(page: Page) {
+  await storyFinished(page);
+  await page.addScriptTag({ path: axePath });
 }
 
 /**

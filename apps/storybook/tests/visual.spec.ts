@@ -2,7 +2,7 @@ import { globSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { gotoStory, storyFinished } from './helpers';
 
 /**
  * Visual regression: every story, in both modes, compared pixel for pixel
@@ -67,14 +67,7 @@ for (const file of storyFiles) {
           // ChatComposer's type whole messages. Screenshotting then races the
           // typing, and the baseline records whichever frame it caught, so
           // the same story failed by 2px on one run and passed on the next.
-          // Wait for Storybook's render to reach `finished` (after play and
-          // afterEach). `currentRender.phase` is internal to Storybook's
-          // preview: if an upgrade renames it, this times out, loudly.
-          await page.waitForFunction(() => {
-            const preview = (window as { __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } } })
-              .__STORYBOOK_PREVIEW__;
-            return ['finished', 'errored', 'aborted'].includes(preview?.currentRender?.phase ?? '');
-          });
+          await storyFinished(page);
           // Fonts are self-hosted and load after first paint; images (Avatar)
           // after that. Screenshot only once both have settled. Not
           // `networkidle`: it idles 500ms per story whatever the page does,
