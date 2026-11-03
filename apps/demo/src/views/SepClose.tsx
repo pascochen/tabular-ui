@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { Fragment, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
 
 import { ExceptionCard } from '../components/ExceptionCard';
@@ -6,7 +7,7 @@ import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
-import { useDecisionInView } from '../lib/decision-in-view';
+import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
 import { close, memberName } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
 
@@ -14,6 +15,13 @@ const titleOf = (id: string) => close.exceptions.find((e) => e.id === id)!.title
 
 const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero === true;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
+
+/**
+ * Said once, under the visitor's first post, by a system that isn't the agent or
+ * a person (docs/agent-voice.md, rule 1). "To your message": the people do still
+ * reply, in their threads.
+ */
+const SCRIPTED_NOTE = 'The people and the AI are scripted, so nobody will reply to your message.';
 
 /**
  * #sep-close: one message per exception with its replies inline, the decision
@@ -26,6 +34,8 @@ export function SepCloseChannel() {
   const heroReplies = useHeroReplies();
   const composerBar = useRef<HTMLDivElement>(null);
   useDecisionInView(composerBar);
+  useExceptionLink();
+  const [heard, setHeard] = useState('');
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
       <ChannelMessageList aria-label="Messages in sep-close">
@@ -46,17 +56,32 @@ export function SepCloseChannel() {
           />
         ))}
         {state.posts.map((p, i) => (
-          <ChannelMessage
-            key={i}
-            author={{ name: memberName('visitor'), avatar: <MemberAvatar memberKey="visitor" /> }}
-            time={p.at}
-            dateTime={dateTime(p.at)}
-            continued={i > 0 && state.posts[i - 1].at === p.at}
-          >
-            {p.text}
-          </ChannelMessage>
+          <Fragment key={i}>
+            <ChannelMessage
+              author={{ name: memberName('visitor'), avatar: <MemberAvatar memberKey="visitor" /> }}
+              time={p.at}
+              dateTime={dateTime(p.at)}
+              // The second post follows the note: headerless, it would read as System's.
+              continued={i > 1 && state.posts[i - 1].at === p.at}
+            >
+              {p.text}
+            </ChannelMessage>
+            {i === 0 ? (
+              <ChannelMessage
+                author={{ name: 'System', avatar: <MemberAvatar memberKey="system" /> }}
+                time={p.at}
+                dateTime={dateTime(p.at)}
+              >
+                {SCRIPTED_NOTE}
+              </ChannelMessage>
+            ) : null}
+          </Fragment>
         ))}
       </ChannelMessageList>
+      {/* Focus stays in the composer, so the note is said as well. Then emptied, or reading the channel hears it twice. */}
+      <p role="status" className="sr-only">
+        {heard}
+      </p>
       {/*
         The composer stays at the foot of the channel while it scrolls. The
         typing line sits on it; aria-hidden, because a screen reader hears the
@@ -76,7 +101,16 @@ export function SepCloseChannel() {
         <ChatComposer
           label="Message sep-close"
           placeholder="Message #sep-close"
-          onSend={(text) => dispatch({ type: 'say', text, at: sceneNow() })}
+          onSend={(text) => {
+            flushSync(() => dispatch({ type: 'say', text, at: sceneNow() }));
+            // A post lands at the channel's foot, off screen from anywhere above it.
+            const scroller = composerBar.current?.closest('[data-slot="app-shell-main-body"]');
+            scroller?.scrollTo({ top: scroller.scrollHeight });
+            if (state.posts.length === 0) {
+              setHeard(SCRIPTED_NOTE);
+              setTimeout(() => setHeard(''), 7000);
+            }
+          }}
         />
       </div>
     </div>

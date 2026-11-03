@@ -25,22 +25,30 @@ const dateTime = (at: string) => `${close.scene.date}T${at}`;
 const yen = (n: number) => (n === 0 ? '' : `¥${n.toLocaleString('en-US')}`);
 
 // Fixed widths for the code and the figures, so the account name takes the
-// rest and no name truncates at the thread's width.
+// rest. Nothing here truncates, since a cut cell can't be read in full: the name
+// wraps, and on a phone a figure holds its width and the table scrolls inside its
+// card. A wrapped cell has no padding of its own, so the name carries --pad-cell-y,
+// less the row's 1px rule: at the full 6px a one-line row measures 29px, not 28.
 const columns: DataTableProps<Line>['columns'] = [
   { accessorKey: 'account', header: 'Account', size: 80, meta: { content: 'mono' } },
-  { accessorKey: 'name', header: 'Name' },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    meta: { truncate: false },
+    cell: ({ getValue }) => <span className="block py-[calc(var(--pad-cell-y)-1px)]">{getValue<string>()}</span>,
+  },
   {
     accessorKey: 'debit',
     header: 'Debit',
-    size: 128,
-    meta: { align: 'numeric' },
+    size: 96,
+    meta: { align: 'numeric', truncate: false },
     cell: ({ getValue }) => yen(getValue<number>()),
   },
   {
     accessorKey: 'credit',
     header: 'Credit',
-    size: 128,
-    meta: { align: 'numeric' },
+    size: 96,
+    meta: { align: 'numeric', truncate: false },
     cell: ({ getValue }) => yen(getValue<number>()),
   },
 ];

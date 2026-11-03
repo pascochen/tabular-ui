@@ -7,7 +7,7 @@ import { ExceptionStatus } from '../ExceptionStatus';
 import { checks, close, lastClosedMonth } from '../../lib/kasane';
 
 /** §8.1's micro-label tier, as AppShell's sidebar section labels. A heading, so the panel has an outline. */
-function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-[var(--gap-field)]">
       <h3 className="text-2xs font-medium uppercase tracking-[var(--tracking-wide)] text-text-secondary">{title}</h3>

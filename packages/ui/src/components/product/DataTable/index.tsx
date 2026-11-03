@@ -94,7 +94,7 @@ const ROW_CONTROLS =
  * bubbles through the `<tr>`. Without this, clicking a cell's link would
  * activate the row as well, and selecting a row would open it.
  */
-function isClickForControl(event: React.MouseEvent<HTMLTableRowElement>) {
+function isClickForControl(event: React.MouseEvent<HTMLElement>) {
   const target = event.target as Element;
   if (!event.currentTarget.contains(target)) return true;
   const control = target.closest(ROW_CONTROLS);
@@ -131,12 +131,16 @@ function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<T
         {columns.slice(first).map((column, index) => {
           const total = row.cells.get(column.id);
           return (
-            <td key={column.id} className={cn(FOOT_CELL, TOTAL_CELL, 'text-right font-normal tabular-nums')}>
-              {first === 0 && index === 0 ? <span className="sr-only">{row.label}</span> : null}
+            <td
+              key={column.id}
+              onDoubleClick={total ? selectWholeFigure : undefined}
+              className={cn(FOOT_CELL, TOTAL_CELL, 'text-right font-normal tabular-nums')}
+            >
+              {/* Hidden words stay out of a copied selection: people paste these figures. */}
+              {first === 0 && index === 0 ? <span className="sr-only select-none">{row.label}</span> : null}
               {total ? (
                 <span className={cn(RULE_SLOT, total.foots && 'border-double border-text-primary')}>
                   {total.text}
-                  {/* Hidden from a copied selection too: people paste these figures. */}
                   {total.foots ? <span className="sr-only select-none"> adds up</span> : null}
                 </span>
               ) : null}
@@ -152,8 +156,12 @@ function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<T
             </th>
           ) : null}
           {columns.slice(first).map((column, index) => (
-            <td key={column.id} className={cn(FOOT_CELL, 'text-right tabular-nums text-text-danger')}>
-              {first === 0 && index === 0 ? <span className="sr-only">Difference</span> : null}
+            <td
+              key={column.id}
+              onDoubleClick={row.cells.get(column.id)?.difference ? selectWholeFigure : undefined}
+              className={cn(FOOT_CELL, 'text-right tabular-nums text-text-danger')}
+            >
+              {first === 0 && index === 0 ? <span className="sr-only select-none">Difference</span> : null}
               {row.cells.get(column.id)?.difference}
             </td>
           ))}
@@ -161,6 +169,37 @@ function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<T
       ) : null}
     </tfoot>
   );
+}
+
+/**
+ * A copy leaves the screen, so it leaves U+2212 behind (§8.6). Excel is reported
+ * to read `−1,234` as text. A `1,234` beside it stays a number, so SUM skips only
+ * the negatives, with no error. Numbers reads either sign, so a hyphen is never
+ * the worse choice.
+ *
+ * Only a selection holding the minus is rewritten: setting one clipboard flavour
+ * drops the browser's others, including the HTML a rich-text paste needs. The
+ * swap runs on the selection's joined text because a cell can render its sign and
+ * its figure as separate text nodes. `toString()` applies `text-transform`, so a
+ * `StatusBadge` copies as it reads on screen. What someone typed into a field in
+ * a cell is theirs, and §8.6 leaves it alone.
+ */
+function copyWithPlainSign(event: React.ClipboardEvent<HTMLTableElement>) {
+  if ((event.target as Element).closest('input, textarea, [contenteditable="true"]')) return;
+  const text = document.getSelection()?.toString() ?? '';
+  if (!text.includes('−')) return;
+  event.clipboardData.setData('text/plain', text.replaceAll('−', '-'));
+  event.preventDefault();
+}
+
+/**
+ * A browser's double-click selects a word, and neither the sign nor the currency
+ * symbol is part of it: `−¥41,415,809` copies as `41,415,809`, a positive figure
+ * that pastes as a number and raises nothing. In a numeric cell it takes the
+ * whole figure.
+ */
+function selectWholeFigure(event: React.MouseEvent<HTMLTableCellElement>) {
+  if (!isClickForControl(event)) document.getSelection()?.selectAllChildren(event.currentTarget);
 }
 
 /**
@@ -272,7 +311,7 @@ function DataTable<TData>({
           footRows === 2 && 'scroll-pb-[calc(var(--h-row-sm)*2)]',
         )}
       >
-        <table className="w-full border-separate border-spacing-0 text-sm">
+        <table className="w-full border-separate border-spacing-0 text-sm" onCopy={copyWithPlainSign}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
@@ -378,6 +417,7 @@ function DataTable<TData>({
                   return (
                     <td
                       key={cell.id}
+                      onDoubleClick={meta?.align === 'numeric' || meta?.figure ? selectWholeFigure : undefined}
                       className={cn(
                         // Height on the CELL, not padding. A fixed --pad-cell-y
                         // plus an 18px StatusBadge renders a 31px row while the

@@ -127,6 +127,32 @@ export const Virtualized: Story = {
   },
 };
 
+const bridgeColumns: ColumnDef<(typeof operatingBridge.steps)[number], unknown>[] = [
+  { accessorKey: 'label', header: 'Step', size: 400 },
+  {
+    accessorKey: 'value',
+    header: 'Against budget',
+    meta: { align: 'numeric' },
+    size: 140,
+    cell: ({ getValue }) => {
+      const v = getValue() as number;
+      return `${v < 0 ? '−' : ''}¥${Math.abs(v).toLocaleString('en-US')}`;
+    },
+  },
+];
+
+/**
+ * Exact, signed figures. A negative takes U+2212 on screen and a hyphen on the
+ * clipboard, and a double-click takes the whole figure, sign included (§8.6).
+ */
+export const SignedFigures: Story = {
+  render: () => (
+    <div style={{ height: 198 }}>
+      <DataTable columns={bridgeColumns} data={operatingBridge.steps} />
+    </div>
+  ),
+};
+
 /** Filtering, selection and a row action — the full dense surface. */
 export const WithSelectionAndFilter: Story = {
   render: function FullStory() {
@@ -281,7 +307,7 @@ const bridgeLines: BridgeLine[] = [
   ...operatingBridge.steps.map((step) => ({ id: step.id, label: step.label, yen: step.value })),
 ];
 
-const bridgeColumns: ColumnDef<BridgeLine, unknown>[] = [
+const bridgeLineColumns: ColumnDef<BridgeLine, unknown>[] = [
   { accessorKey: 'label', header: 'H1 operating profit' },
   { accessorKey: 'yen', header: 'Yen', size: 140, meta: { figure: { decimals: 0, unit: 'JPY' } } },
 ];
@@ -300,7 +326,7 @@ export const TotalThatFoots: Story = {
   render: () => (
     <div style={{ height: 320 }}>
       <DataTable
-        columns={bridgeColumns}
+        columns={bridgeLineColumns}
         data={bridgeLines}
         totals={{ label: 'Actual', stated: { yen: operatingBridge.actual } }}
       />
@@ -358,7 +384,7 @@ export const OneColumnDoesNotFoot: Story = {
 
 /**
  * D5's footing error, caught. Each step prints rounded to the million, so the
- * table adds what shows: 41 + 275 is 316, against a stated 317. A rounding gap is
+ * table adds what shows: −41 and −275 make −316, against a stated −317. A rounding gap is
  * still a gap, so it gets no tolerance. `docs/site.md` D5 is why figures beside
  * their parts are exact.
  */
@@ -377,15 +403,15 @@ export const RoundedPartsDoNotFoot: Story = {
               meta: { figure: { decimals: 0, unit: 'JPY' } },
             },
           ]}
-          data={fx.map((step) => ({ label: step.label, millions: Math.abs(step.value) / 1e6 }))}
-          totals={{ stated: { millions: fx.reduce((sum, step) => sum + Math.abs(step.value), 0) / 1e6 } }}
+          data={fx.map((step) => ({ label: step.label, millions: step.value / 1e6 }))}
+          totals={{ stated: { millions: fx.reduce((sum, step) => sum + step.value, 0) / 1e6 } }}
         />
       </div>
     );
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('317')).toBeVisible();
+    await expect(canvas.getByText('−317')).toBeVisible();
     await expect(canvas.getByText('Difference')).toBeVisible();
     await noDoubleRule(canvasElement);
   },
@@ -411,7 +437,7 @@ export const TotalWhileFiltered: Story = {
         />
         <div style={{ flex: 1, minHeight: 0 }}>
           <DataTable
-            columns={bridgeColumns}
+            columns={bridgeLineColumns}
             data={bridgeLines}
             globalFilter={query}
             totals={{ label: 'Actual', stated: { yen: operatingBridge.actual } }}
