@@ -241,6 +241,10 @@ function DataTable<TData>({
                           onClick={header.column.getToggleSortingHandler()}
                           className={cn(
                             'w-full gap-[var(--gap-icon-label)] rounded-xs font-medium hover:text-text-body',
+                            // Stays out of a copy. `inline` is `select-auto`,
+                            // which does not take the <th>'s `select-none` in
+                            // Chromium: the labels ran together on one line.
+                            'select-none',
                             // Offset is negative so the ring sits INSIDE the
                             // cell: an outset ring on a sticky header inside
                             // overflow:hidden gets clipped (§4).

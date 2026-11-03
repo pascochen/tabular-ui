@@ -1,13 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { copy, gotoStory } from './helpers';
 
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
 /**
  * §8.6 — a negative takes U+2212 on screen and a hyphen on the clipboard, and a
- * double-click in a numeric cell takes the whole figure. These read the
- * clipboard, because the page shows the right figure either way.
+ * double-click in a numeric cell takes the whole figure. §4 — a row's identifier
+ * stays in a copy of the row. These read the clipboard, because the page looks
+ * right either way.
  *
  * Every selector is scoped to the story root. Storybook's hidden docs skeleton
  * holds a table of its own, and a bare `tbody` finds that one first: a selection
@@ -15,19 +16,6 @@ test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
  */
 const MINUS = '−';
 const BODY = '#storybook-root tbody';
-
-/** Presses the real shortcut and reads every flavour on the clipboard. */
-async function copy(page: Page) {
-  await page.evaluate(() => navigator.clipboard.writeText('NOTHING COPIED'));
-  await page.keyboard.press('ControlOrMeta+c');
-  return page.evaluate(async () => {
-    const flavours: Record<string, string> = {};
-    for (const item of await navigator.clipboard.read()) {
-      for (const type of item.types) flavours[type] = await (await item.getType(type)).text();
-    }
-    return flavours;
-  });
-}
 
 /** Selects rows `from` to `to` of the body, whole cells, as a drag would. */
 const selectRows = (page: Page, from: number, to: number) =>
@@ -155,4 +143,120 @@ test('a field in a numeric cell keeps its double-click and what was typed', asyn
 
   await page.keyboard.press('ControlOrMeta+a');
   expect((await copy(page))['text/plain']).toBe(`${MINUS}412.00`);
+});
+
+test.describe('an identifier in a copied row', () => {
+  const status = (page: Page) => page.locator('#storybook-root [role=status]');
+  const identifier = (page: Page, name: string) => page.locator(BODY).getByRole('button', { name });
+
+  /** The story's play function ends on this, and a click in it would clear a selection. */
+  async function gotoClickableRows(page: Page) {
+    await gotoStory(page, 'product-datatable--clickable-rows');
+    await expect(status(page)).toHaveText('Opened stg_sap_bkpf_2');
+  }
+
+  /** One line per row, one cell per column, and the row's own name first. */
+  function expectRows(copied: string, rows: string[][]) {
+    const lines = copied.trimEnd().split('\n');
+    expect(lines, copied).toHaveLength(rows.length);
+    lines.forEach((line, i) => {
+      const cells = line.split('\t');
+      expect(cells, line).toHaveLength(rows[i].length);
+      expect(cells[0]).toBe(rows[i][0]);
+    });
+  }
+
+  test('every row keeps its name, on one line', async ({ page }) => {
+    await gotoClickableRows(page);
+    const rows = await cellText(page);
+    await selectRows(page, 0, rows.length - 1);
+    expectRows((await copy(page))['text/plain'], rows);
+  });
+
+  test('a row with no minus keeps its name in both flavours', async ({ page }) => {
+    await gotoClickableRows(page);
+    const rows = await cellText(page);
+    const positive = rows.findIndex((row) => !row.join('').includes(MINUS));
+    expect(positive).toBeGreaterThanOrEqual(0);
+
+    await selectRows(page, positive, positive);
+    const clipboard = await copy(page);
+    expectRows(clipboard['text/plain'], [rows[positive]]);
+    expect(clipboard['text/html']).toContain(rows[positive][0]);
+  });
+
+  test('a drag from the first cell’s padding takes the names with it', async ({ page }) => {
+    await gotoClickableRows(page);
+    const rows = (await cellText(page)).slice(0, 3);
+    const cell = (r: number, c: number) => page.locator(`${BODY} tr`).nth(r).locator('td').nth(c);
+    const from = (await cell(0, 0).boundingBox())!;
+    const to = (await cell(2, rows[2].length - 1).boundingBox())!;
+
+    await page.mouse.move(from.x + 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width - 4, to.y + to.height / 2, { steps: 10 });
+    await page.mouse.up();
+
+    expectRows((await copy(page))['text/plain'], rows);
+  });
+
+  test('a name cut off on screen copies whole, and still draws its ellipsis', async ({ page }) => {
+    await page.setViewportSize({ width: 420, height: 800 });
+    await gotoClickableRows(page);
+    const box = await identifier(page, 'int_fx_rates_daily_3').evaluate((el) => ({
+      overflows: el.scrollWidth > el.clientWidth,
+      textOverflow: getComputedStyle(el).textOverflow,
+    }));
+    expect(box).toEqual({ overflows: true, textOverflow: 'ellipsis' });
+
+    const rows = await cellText(page);
+    await selectRows(page, 0, rows.length - 1);
+    expect((await copy(page))['text/plain']).toContain('int_fx_rates_daily_3\t');
+  });
+
+  test('sort headers stay out of a copy', async ({ page }) => {
+    await gotoClickableRows(page);
+    const rows = await cellText(page);
+    await page.evaluate(() => {
+      const selection = getSelection()!;
+      selection.removeAllRanges();
+      selection.selectAllChildren(document.querySelector('#storybook-root table')!);
+    });
+    const copied = (await copy(page))['text/plain'];
+    expect(copied).not.toMatch(/model|status|duration|variance|owner/i);
+    expectRows(copied.trimStart(), rows);
+  });
+
+  test('it is still a button, to the pointer and the keyboard', async ({ page }) => {
+    await gotoClickableRows(page);
+    const selected = () => page.evaluate(() => getSelection()!.toString());
+
+    const clicked = identifier(page, 'fct_ap_aging_4');
+    await clicked.click();
+    await expect(status(page)).toHaveText('Opened fct_ap_aging_4');
+    await expect(clicked).toBeFocused();
+    expect(await clicked.evaluate((el) => el.matches(':focus-visible')), 'no ring on a mouse click').toBe(false);
+
+    // A drag or a double-click on it selects nothing, as they did under `select-none`.
+    const box = (await clicked.boundingBox())!;
+    await page.mouse.move(box.x + 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 2, box.y + box.height / 2, { steps: 8 });
+    await page.mouse.up();
+    expect(await selected()).toBe('');
+    await page.mouse.dblclick(box.x + 6, box.y + box.height / 2);
+    expect(await selected()).toBe('');
+
+    const entered = identifier(page, 'dim_accounts_1');
+    await entered.focus();
+    await page.keyboard.press('Enter');
+    await expect(status(page)).toHaveText('Opened dim_accounts_1');
+    await expect(entered, 'an open leaves focus where it was').toBeFocused();
+
+    const spaced = identifier(page, 'int_accounts_7');
+    await spaced.focus();
+    await page.keyboard.press('Space');
+    await expect(status(page)).toHaveText('Opened int_accounts_7');
+    await expect(spaced).toBeFocused();
+  });
 });
