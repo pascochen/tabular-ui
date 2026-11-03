@@ -807,7 +807,7 @@
       "dependencies": [
         "@phosphor-icons/react@^2.1.10",
         "@tanstack/react-table@^8.21.3",
-        "@tanstack/react-virtual@^3.14.17"
+        "@tanstack/react-virtual@^3.14.23"
       ],
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
