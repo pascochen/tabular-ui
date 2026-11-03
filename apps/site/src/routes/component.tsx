@@ -1,6 +1,7 @@
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
+import { BridgeTable } from '../components/bridge-table';
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
 import { componentGrid, componentPage, components, pages, principles, storybookDocs } from '../content';
@@ -218,6 +219,19 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
             </h2>
             <ComponentPair name={c.name} />
           </section>
+
+          {c.name === 'lineage-tree' ? (
+            <section aria-labelledby="bridge-title" className="flex flex-col gap-[var(--gap-group)]">
+              <h2 id="bridge-title" className="text-site-title font-semibold text-text-primary">
+                The same figures, in a Data table
+              </h2>
+              <p className="max-w-[var(--site-w-prose)] text-site-body text-text-body">
+                A double rule under a total means its lines add up. The table checks this itself, and draws the rule
+                only when they do.
+              </p>
+              <BridgeTable />
+            </section>
+          ) : null}
 
           <div className="flex flex-col gap-[var(--gap-group)]">
             <h2 className="text-site-title font-semibold text-text-primary">Install</h2>
