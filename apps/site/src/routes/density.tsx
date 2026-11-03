@@ -135,7 +135,7 @@ export default function Density() {
           <SectionHeader
             id="borders-title"
             title="Borders"
-            lead="Borders do the work whitespace does elsewhere. Every line is 1px; 2px is kept for the agent rail, the focus ring and the active tab. Dashed means a placeholder."
+            lead="Borders do the work whitespace does elsewhere. Every line is 1px; 2px is kept for the agent rail, the focus ring and the active tab. Dashed means a placeholder. A double rule means a total adds up."
           />
           <TokenRows
             tokens={[themeToken('--border-width'), themeToken('--border-width-2'), themeToken('--ring-width')]}

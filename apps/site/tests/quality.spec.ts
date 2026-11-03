@@ -409,7 +409,10 @@ test.describe('accessibility beyond axe', () => {
   // scrolls away (D8); the skip link is fixed, but shows only while it has
   // focus itself, above the page. From 1024px a component page's list of
   // components is sticky (owner, 2026-10-28): it sits in its own column, so it
-  // can't cover anything beside it.
+  // can't cover anything beside it. Lineage tree's bridge table has a sticky
+  // header and foot (D11), but they stick only inside the table's own scroller,
+  // so they can't cover anything while it doesn't overflow and holds nothing
+  // focusable. This checks both.
   for (const route of routes) {
     const isComponent = componentPages.includes(route);
     test(`${route}: nothing fixed or sticky but the skip link${isComponent ? ' and the component list' : ''} (2.4.11)`, async ({
@@ -422,10 +425,27 @@ test.describe('accessibility beyond axe', () => {
           .map((el) =>
             el.getAttribute('aria-labelledby') === 'component-list-title'
               ? 'Component list'
-              : el.textContent?.trim().slice(0, 40),
+              : el.closest('[aria-labelledby="bridge-title"]')
+                ? 'Bridge table'
+                : el.textContent?.trim().slice(0, 40),
           ),
       );
-      expect(pinned).toEqual(isComponent ? ['Skip to content', 'Component list'] : ['Skip to content']);
+      const hasBridge = route === '/components/lineage-tree';
+      expect(pinned).toEqual([
+        'Skip to content',
+        ...(isComponent ? ['Component list'] : []),
+        ...(hasBridge ? ['Bridge table', 'Bridge table'] : []),
+      ]);
+      if (hasBridge) {
+        const scroller = await page.locator('[aria-labelledby="bridge-title"] table').evaluate((table) => {
+          const el = table.parentElement!;
+          return {
+            overflows: el.scrollHeight > el.clientHeight,
+            focusable: el.querySelectorAll('a, button, input, select, textarea, [tabindex]').length,
+          };
+        });
+        expect(scroller).toEqual({ overflows: false, focusable: 0 });
+      }
       if (isComponent) {
         const list = (await page.locator('nav[aria-labelledby="component-list-title"]').boundingBox())!;
         const column = (await page.locator('nav[aria-labelledby="component-list-title"] + div').boundingBox())!;

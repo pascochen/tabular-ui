@@ -5,7 +5,7 @@ Two parts, using methods from Ileana Marcut's UX + AI method library. Her AI pro
 1. **Site spec v3.3.** Spec check-up and Regression guard, on `site-v3.3.md` and `site-spec-v3.3.diff`, read against `main` at `10a65ff`.
 2. **Art direction.** Analogous inspiration, Divergent concepts, Constraint reframe, Concept stress test and Prioritize what to build.
 
-**Status, 2026-11-02:** the owner approved the port. v3.3's decisions 16 to 19 are in `docs/site.md` as D10 to D13. D12 is built, and so is D11's totals row in the library; D11's one use on the site is not (§13, step 6). The owner then took this review's recommendation on D11, so the double rule stays rare and section rules stay 1px: the live D11 replaces the version in "Refined spec" below. D10's list of site-only components stays open. Part 2 hasn't been decided.
+**Status, 2026-11-02:** the owner approved the port. v3.3's decisions 16 to 19 are in `docs/site.md` as D10 to D13. D11 and D12 are built (§13, step 6). The owner then took this review's recommendation on D11, so the double rule stays rare and section rules stay 1px: the live D11 replaces the version in "Refined spec" below. D10's list of site-only components stays open. Part 2 hasn't been decided.
 
 Line references to `docs/site.md` are to that commit, before the port moved them. Measurements are from the live tabularui.com in Chromium 1248. Nothing in the repo has changed except this file and its images. The mock-ups are throwaways, not components. The art direction concepts are hypotheses: no finance user has seen them.
 
