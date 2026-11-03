@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11's totals row is built in the library, and its one use on the site is **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is built: `DataTable`'s totals row in the library, and its one use on the site (§13, 6a).
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -30,7 +30,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
-| D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site. Section rules stay 1px. Totals row built; the site's use is not |
+| D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site, on Lineage tree's page. Section rules stay 1px |
 | D12 | Foundations links | Bordered, selected in ink, still real links |
 | D13 | Highlights | None behind site copy |
 
@@ -197,13 +197,13 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 **D10. Library first — decided 2026-11-02 (owner).** A pattern a product could reuse ships in `packages/ui` first, as its own decision and PR. The site never shows a pattern the library can't produce, and a library component is never restyled in `apps/site`.
 
-Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand` and `DemoAction`. A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
+Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand`, `DemoAction` and `BridgeTable`. A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
 
 **D11. The double rule stays rare — decided 2026-11-02 (owner).** A double rule is the ledger's mark for a closed total. To a finance reader it says the total is final and adds up, so it's never a divider.
 
 1. **Section rules stay 1px** in `--color-border` (D3, item 1; §7).
 2. **The library comes first (D10).** The mark ships on `DataTable`'s totals row, with its line in §7.8 of the design system. It draws only when the displayed parts sum to the displayed total, computed in the component. A caller can't set it with a prop, because a mark that states a fact has to come from a check (failure log, `MetricTile`'s arrow).
-3. **Then one use on the site,** where something really closes. The place is chosen when the totals row ships. Nothing sits beside the rule: no meta line, no count, no mono caps.
+3. **Then one use on the site,** where something really closes. *Chosen 2026-11-02 (owner, approving the proposal):* Lineage tree's page, below its pair, where the bridge closes on the actual as a `DataTable` (`BridgeTable`). It sits on the page's paper rather than a dark plate, because it's a use and not a specimen. Its rows print through the library's printer rather than `exactMoney`, because what the table adds has to be what it prints, so they carry no ¥ and the header says Yen. Nothing sits beside the rule: no meta line, no count, no mono caps. The heading and the sentence above the table were approved as written on 2026-11-03 (owner).
 4. **What's already measured,** for whoever builds it:
    - `3px double` stays on whole pixels in Chromium at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2. Safari and Firefox aren't measured. Playwright's emulated `deviceScaleFactor` draws it soft, so a test must launch with `--force-device-scale-factor`.
    - At 1x, `--color-border` (1.29:1) reads as one faint line, and `--color-border-strong` (1.62:1) just resolves into two. Ink is unmistakable in the review's mock-up. The token is chosen with the totals row.
@@ -329,6 +329,7 @@ The outline ("3 principles", "5 moments", "15 components"), the principles cards
 - **Use it when** and **Don't use it when**, side by side, two lines each (`useWhen` and `avoidWhen` in `src/component-list.ts`, owner copy). Each "don't" names the component to use instead, so a no still moves the visitor on. On a phone they stack.
 - **The rules it follows** (owner, 2026-10-27): each principle the component carries (`carriedBy` in `src/content.ts`), with its check, and a link to all three. Shown only where there is one: Agent block (1 and 3), Lineage tree, Attachment row, Inline citation and Sources (2), Run log row and Status badge (3). The Principles page stays, linked from here, out of the nav and the footer. Not merged into Vocabulary: principles are rules, Vocabulary is words.
 - The before/after pair in one frame, with one caption beneath it (D2).
+- On Lineage tree's page only, the bridge as a `DataTable`, closing on the actual under the double rule (D11).
 - Its install command, one line with a copy button, built from the registry name, then **Usage**: the first tsx example in the component's own README, read at build time (`src/component-usage.ts`), with an import line built from the names it uses. The page and the README can't disagree, and the site types no figure. All ten examples type-checked against the package on 2026-10-27. Inline citation's and Sources' type-check with the site since 2026-10-28.
 - "Set up your app first" linking to Getting started (D9), and a link named for the component, to its Docs page in Storybook.
 - Previous and next, which walk the run in order. Components in the nav opens the run at its first component.
@@ -534,9 +535,9 @@ Components already pass axe in Storybook in both modes. These checks are what th
 - At 320px wide the document doesn't scroll sideways. A data table may scroll inside its own container (1.4.10 exempts two-dimensional data).
 - Every target is at least 24×24px, or has the spacing 2.5.8 allows. Stacked footer links need checking.
 - With reduced motion, no element animates.
-- Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned.
+- Nothing fixed or sticky covers a focused element (2.4.11). The nav scrolls away (D8), and this check keeps it honest if anything is ever pinned. The one table on the site (D11) has a sticky header and foot, which stick only inside its own scroller, so the check allows them only while that scroller doesn't overflow and holds nothing focusable.
 - In forced colours (`forced-colors: active`, emulated in Playwright), every section, plate and control keeps a visible edge, and nothing the page says is lost with its background (D4). The selected Foundations link keeps a mark other than its fill, a 2px underline (D12).
-- Once the double rule is on the site (D11): it shows two separate lines at real device pixel ratios of 1, 1.5 and 2.
+- The double rule (D11) shows two separate lines at real device pixel ratios of 1, 1.5 and 2, and nothing else on the site draws one (`tests/double-rule.spec.ts`).
 
 **Keyboard and focus (scripted):**
 - Every link is a plain `<a>`, so every page loads as a new document, and the browser moves focus to the top and announces the new title. A test fails on any React Router `<Link>` (`data-discover`). *Changed in 5b:* this asked for focus to move to the `<h1>` after a client-side route change; the site has none to manage.
@@ -571,8 +572,8 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 5. **The rest, and the quality pass**, split in two PRs on 2026-10-26 (owner):
    - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
-6. **D10–D13 (2026-11-02).** D13 needs no build, and D10 needs its list confirmed. 6a's library half is built.
-   - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR, is built. Then the one use on the site, which is next. `Section` doesn't change.
+6. **D10–D13 (2026-11-02).** D13 needs no build, and D10 needs its list confirmed.
+   - **6a. Double rule (D11), built.** `DataTable`'s totals row with its §7.8 line, as a library decision and PR. Then the one use on the site, `BridgeTable` on Lineage tree's page, and one sentence on Density with no second drawing. `Section` doesn't change. VoiceOver steps 17 to 19 (`docs/site-voiceover.md`) are for the owner to run.
    - **6b. Library (D12), built.** `tabVariants` and the `bordered` variant, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
    - **6c. Foundations links (D12), built.** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color (`docs/site-voiceover.md`, steps 11 to 16), for the owner to run.
 

@@ -112,6 +112,10 @@ Headers are neutral (§0 rule 1: structure never takes a hue), uppercase `--text
 
 Sort affordances are real `<button>`s with `aria-sort` on the header cell. Their focus ring uses a **negative** `outline-offset`, so it sits inside the cell — an outset ring on a sticky header inside `overflow: hidden` gets clipped, which is the exact failure §4 exists to prevent.
 
+**A label sits on its column's edge, and the caret on the inner side:** to the left of a right-aligned label, to the right of a left-aligned one. So a figure column's label shares its figures' right edge, sortable or not (owner, 2026-11-02). The caret stays in the layout at opacity 0 until hover or a sort draws it, so drawing it moves no label and, in a squeezed table, resizes no column. It does not go in the cell's padding: at 10px it is wider than `--pad-cell-x`, so it would overhang the cell, fall outside the focus ring, and make a table whose last column holds figures scroll 2px sideways.
+
+The button reaches `--ring-width` into the cell's padding on each side and pads it back. An inset ring paints over the button's outer 2px, so without that it would sit on the label's first or last letter.
+
 Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per-state background swap.
 
 ## Clickable rows

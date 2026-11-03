@@ -115,6 +115,24 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * Sorted by a figure column. The label stays on the figures' edge, and the
+ * caret takes the label's inner side, in the space it held at rest. A left-aligned
+ * column's caret sits on the inner side too: to the label's right.
+ */
+export const SortedByFigure: Story = {
+  render: () => (
+    <div style={{ height: 240 }}>
+      <DataTable columns={columns} data={makeRows(8)} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Rows' }));
+    await expect(canvas.getByRole('columnheader', { name: 'Rows' })).toHaveAttribute('aria-sort', 'descending');
+  },
+};
+
 /** 50,000 rows, windowed. Scroll — the row height must not drift. */
 export const Virtualized: Story = {
   render: function VirtualizedStory() {
@@ -277,8 +295,12 @@ export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-field)', height: 320 }}>
         {/* `data-opens` is what data-table-selection.spec.ts counts: the text reads
             the same when one row opens twice. */}
+        {/* Every state starts with the same letter, or the screenshot isn't
+            deterministic. An `O`'s subpixel fringe reaches 1px left of what a text
+            change repaints, so that pixel keeps the letter the first raster drew,
+            and whether that came before play's first click is timing. */}
         <p role="status" data-opens={opens} className="text-xs text-text-secondary">
-          {opened ? `Opened ${opened}` : 'No model open'}
+          {opened ? `Opened ${opened}` : 'Opened nothing yet'}
         </p>
         <div style={{ flex: 1, minHeight: 0 }}>
           <DataTable columns={cols} data={data} onRowClick={(row) => open(row.original.model)} />
