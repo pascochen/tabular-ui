@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11's totals row is built in the library, and its one use on the site is **not built yet**: where a section below describes the site as it is today, a *Changed 2026-11-02* note says what will replace it (§13, step 6).
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -11,7 +11,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | Change | Needed by | Status |
 |---|---|---|
 | `tabVariants` exported from `Tabs`, and a `bordered` variant of `TabsList`. `Tabs` is foundational, so it needs the owner's yes first (`CLAUDE.md`) | D12 | Yes given 2026-11-02. Built (§13, 6b) |
-| A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total, and a line for that rule in `docs/design-system.md` §7.8. `DataTable` has no totals row, `tfoot` or footer support today | D11: the site can't use the mark until this ships | To decide |
+| A totals row on `DataTable`, with a double rule that only draws when the displayed parts sum to the displayed total, and a line for that rule in `docs/design-system.md` §7.8. `DataTable` has no totals row, `tfoot` or footer support today | D11: the site can't use the mark until this ships | Decided and built 2026-11-02 (D11, *Built 2026-11-02*) |
 | Source highlight in Inline citation and Sources. Both shipped on 2026-10-28 without one | Nothing blocks on it | Not designed |
 
 ---
@@ -30,7 +30,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
-| D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site. Section rules stay 1px. Not built |
+| D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site. Section rules stay 1px. Totals row built; the site's use is not |
 | D12 | Foundations links | Bordered, selected in ink, still real links |
 | D13 | Highlights | None behind site copy |
 
@@ -208,6 +208,15 @@ Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `Exte
    - `3px double` stays on whole pixels in Chromium at real device pixel ratios of 1, 1.25, 1.5, 1.75 and 2. Safari and Firefox aren't measured. Playwright's emulated `deviceScaleFactor` draws it soft, so a test must launch with `--force-device-scale-factor`.
    - At 1x, `--color-border` (1.29:1) reads as one faint line, and `--color-border-strong` (1.62:1) just resolves into two. Ink is unmistakable in the review's mock-up. The token is chosen with the totals row.
    - It adds 2px to whatever carries it, and `DataTable`'s virtualizer estimates rows at a fixed height, so the height has to be accounted for on the cell.
+
+*Built 2026-11-02 (owner, approving the proposal):* the totals row, in `packages/ui/src/components/product/DataTable/`, with its line in §7.8. What the build settled:
+
+- **The caller states the total and the table checks it.** `totals.stated` maps a column to the total as the records state it, and the table adds the rows on display. If the table worked out the total itself, the check could never fail. `totals.sum` adds with nothing to check against and never draws the rule.
+- **Total of what:** every row left after filtering, scrolled into view or not. Rows hidden by a filter or pagination make it "Subtotal, n of m rows", with no double rule.
+- **The table prints what it adds.** A `figure` column ignores its `cell`, and each value goes through `toFixed` once, so there's no float addition and no tolerance. A ¥1 gap shows as "Difference 1".
+- **The rule goes under the figure, not across the row** as in the review's mock-up. Each figure has its own check, and across the row it would land on the table's bottom border and read as three lines. It's `--color-text-primary`: item 4's `--color-border-strong` is under the 3:1 a graphic carrying meaning needs. No new token.
+- **The check proves "adds up", not "final".** D11's opening sentence is what a reader takes from the mark, and the table can't know whether a set is closed. §7.8 says "adds up", and the README says to use `sum` until a set is closed.
+- **Item 4's 2px doesn't arise.** The rule sits inside the cell's 28px, and the row is outside the virtualized rows.
 
 *Changed the same day (owner):* this first read "Section rules are double rules", from the v3.3 draft. On every section it would have drawn up to 6 per page, mostly on reference pages with no totals, and none on component pages. §7.8's own argument is that a border treatment "is only informative while it is rare". See `docs/reviews/art-direction-2026-11-02.md`.
 
@@ -562,8 +571,8 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 5. **The rest, and the quality pass**, split in two PRs on 2026-10-26 (owner):
    - **5a.** Principles, the component pages with their before/after pairs, Vocabulary, Getting started and the 404.
    - **5b.** §11 and §12 with evidence (metadata, the OG image, sitemap, robots, Lighthouse, a link check and a VoiceOver script), and `apps/site/README.md`: how to run it, where data comes from, and how to add a page when a to-build component ships.
-6. **D10–D13 (2026-11-02).** D13 needs no build, and D10 needs its list confirmed. 6a is not started.
-   - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR. Then the one use on the site. `Section` doesn't change.
+6. **D10–D13 (2026-11-02).** D13 needs no build, and D10 needs its list confirmed. 6a's library half is built.
+   - **6a. Double rule (D11).** `DataTable`'s totals row with its §7.8 line, as a library decision and PR, is built. Then the one use on the site, which is next. `Section` doesn't change.
    - **6b. Library (D12), built.** `tabVariants` and the `bordered` variant, with its stories, README, `docs/components.md` entry and registry build. `line` and `segmented` must show no visual change.
    - **6c. Foundations links (D12), built.** `FoundationsHeader` uses the cva. Then the site's tests, the §11 checks before and after hydration on all three pages, and the VoiceOver script on Color (`docs/site-voiceover.md`, steps 11 to 16), for the owner to run.
 

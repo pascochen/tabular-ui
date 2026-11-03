@@ -34,14 +34,77 @@ Rows virtualize past `virtualizeAfter` (default 100). Below that every row rende
 | `align: 'numeric'` | Right-aligns and applies `tabular-nums` |
 | `content: 'mono'` | `--font-mono` one step down (§8.3) — model names, IDs, account codes |
 | `truncate: false` | Opts a cell out of truncation |
+| `figure: { decimals, unit }` | The table prints the column itself: right-aligned, tabular, never truncated. Needed for a [totals row](#totals-row) |
 
-**Every figure column needs `align: 'numeric'`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
+**Every figure column needs `align: 'numeric'` or `figure`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
 
 ## What the table does not decide
 
 **Row treatments come from the caller** via `rowClassName`. §5 assigns a `--color-bg-danger` tint to failed rows and, to agent proposals, the `--color-bg-agent` tint with a solid `--color-text-agent` left rail; those live in `runStatusRowTreatment`, exported from `StatusBadge`. The table is `border-separate`, which paints no border on a `<tr>`, so the treatment draws the rail on the row's first cell and takes 2px off that cell's left padding. The table applies whatever it is handed and owns none of that mapping.
 
 **Polarity colour belongs to the cell renderer**, and §5 restricts it to variance and delta columns — never every figure. A table where every number is green or red is unreadable and destroys the signal on the rows that need attention. Zero is neutral, never a hue.
+
+## Totals row
+
+A double rule tells a finance reader that a total adds up, so the table draws it from a check, and no prop sets it (§7.8). You give the table the total as your records state it. It adds up the rows on display and compares.
+
+```tsx
+const columns = [
+  { accessorKey: 'label', header: 'H1 operating profit' },
+  { accessorKey: 'yen', header: 'Yen', meta: { figure: { decimals: 0, unit: 'JPY' } } },
+];
+
+<DataTable columns={columns} data={rows} totals={{ label: 'Actual', stated: { yen: bridge.actual } }} />;
+```
+
+- **`totals.stated`** maps a column id to its stated total. Naming a column asks for the check and can't answer it.
+- **`totals.sum`** lists columns to simply add (`sum: ['hours']`). They never get the rule.
+- **`meta.figure`** is required on a totalled column. `decimals` is how many digits it prints after the point. `unit` is what the column holds, a string or `(row) => string`, and isn't printed, so name a single unit in the header.
+
+A `totals` key must be the column's id. TanStack turns `accessorKey: 'cost.yen'` into the id `cost_yen`, so give such a column an `id`. A key that matches nothing warns in development.
+
+**A figure column prints through the table, and its `cell` is ignored**, with a warning in development. A custom `cell` could print something other than what gets checked. So a figure column has no polarity colour and no per-row symbol. A zero prints as `0`.
+
+**A figure past 15 significant digits prints empty**, and warns in development, because a double can't hold it exactly: 80000000000000.01 would print as .02. At 2 decimals, the limit is 9,999,999,999,999.99.
+
+**A figure is never truncated, so it can widen its column.** A windowed table measures only the rows it renders, so each figure column reserves room for its widest figure across every row. The columns hold still as you scroll.
+
+### What shows
+
+| The table finds | Figure | Under it | Also |
+|---|---|---|---|
+| All rows shown, sum equals stated | Stated | Double rule | Hidden "adds up" text for screen readers |
+| All rows shown, sum differs | Stated, never replaced by the sum | Nothing | A "Difference" row in `--color-text-danger` |
+| The stated total isn't a figure (`NaN`, a runtime `null`) | "Incomplete", never the sum | Nothing | |
+| Rows hidden | Sum of the rows shown | Nothing | "Subtotal, n of m rows" |
+| `sum` column | Sum | Nothing | |
+| A part is empty or not a number | Stated, or "Incomplete" for `sum` | Nothing | No Difference: a check that couldn't run hasn't failed |
+| Rows in more than one unit | Stated, or "Mixed" for `sum` | Nothing | No sum attempted |
+| No rows | No totals row | | |
+
+Every state has the 1px ink rule above the row. The result is worked out during render, so prerendered HTML already carries the mark.
+
+### Total of what
+
+Every row left after filtering, scrolled into view or not. The sum never reads the virtualizer's window, and the row sits outside the virtualized rows, so scrolling can't drift. Sorting changes nothing. Rows are hidden when the row model holds fewer rows than the data, by a filter or by pagination through `tableOptions`, so a filter that hides nothing still closes.
+
+**On a server-side table,** one page isn't every row. With `manualPagination`, pass `rowCount`: the row reads "Subtotal, 50 of 1,284 rows" until every row is on the page. Without `rowCount`, or while `manualFiltering` has a filter set, only the server knows the whole, so it reads "Subtotal, 50 rows". Neither draws the rule or a Difference.
+
+### Rounding
+
+The table adds what it prints: each value goes through `toFixed(decimals)` once, and that is both the cell's text and the integer it adds. There is no tolerance. A ¥1 gap from rounding shows as "Difference 1", because a total that doesn't match its printed parts is a footing error (`docs/site.md`, D5). The arithmetic is in `totals.ts`.
+
+### What the check can't prove
+
+**"Final."** It proves a total adds up. A total can foot and still include rows that aren't posted, because the table doesn't know a row's status. Use `sum` until a set is closed.
+
+**That your figure is independent.** `stated: { yen: sum(rows) }` can only ever match, so it draws a true but empty rule, and nothing can detect it. If you have no figure from elsewhere, use `sum`.
+
+### Geometry
+
+The row is 28px in every state. The rule sits inside the cell, under the figure, and clears the table's own bottom border by 4px: across the whole row it would land on that border once the table scrolls, and read as three lines. Every cell keeps the rule's 3px as padding, so text doesn't move when the rule comes and goes. Not as a transparent border, which forced colours paint solid. Figures stay at the body's weight, because tabular digits are wider at a heavier one, and a bold total drifts out of its column.
+
+**A totals row needs a text column ahead of its first figure.** Without one, its label is for screen readers only. A filtered total then shows as a bare number, and a miss as an unlabelled red one.
 
 ## Structure
 
@@ -53,7 +116,7 @@ Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per
 
 ## Clickable rows
 
-`onRowClick` makes the whole row a pointer target. It is a shortcut for the mouse, not the way in: a `<tr>` is not a control, and it gets no `tabIndex`, because in a table of 50,000 rows that is 50,000 tab stops. **Whenever you pass `onRowClick`, render the row's identifier as a link or a `Button variant="inline"` that does the same thing.** That control is the keyboard path, the screen reader's path, and the thing a user can middle-click or copy.
+`onRowClick` makes the whole row a pointer target. It is a shortcut for the mouse, not the way in: a `<tr>` is not a control, and it gets no `tabIndex`, because in a table of 50,000 rows that is 50,000 tab stops. **Whenever you pass `onRowClick`, render the row's identifier as a link or a `Button variant="inline"` that does the same thing.** That control is the keyboard path and the screen reader's path. Use a link when the row has a URL, because only a link can be middle-clicked.
 
 ```tsx
 {
@@ -61,12 +124,16 @@ Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per
   header: 'Model',
   meta: { content: 'mono' },
   cell: ({ row }) => (
-    <Button variant="inline" onClick={() => open(row.original)}>
+    <Button variant="inline" className="inline-block max-w-full truncate" onClick={() => open(row.original)}>
       {row.original.model}
     </Button>
   ),
 }
 ```
+
+- **Give the button its text directly,** with `inline-block truncate` for the ellipsis. A `<span>` inside it splits every copied row in two (see Copying).
+- **A link is a plain `<a>`**, with the focus ring `AttachmentRow`'s filename carries but not its `block`. `buttonVariants` brings `select-none`, whichever variant you pass, so a link styled with it drops out of a copy.
+- **Keep `columns` stable:** outside the component, or in `useMemo`. TanStack renders `cell` as a component, so a new function on every render remounts the identifier, and opening a row dropped focus to `<body>`.
 
 A click on any control inside a row stays with that control: the identifier's own button, a selection checkbox or a row action never also fires `onRowClick`, and neither does a click inside a popup opened from the row. So the identifier's handler and `onRowClick` can be the same function without opening the row twice. The `ClickableRows` story shows the pattern and tests all three paths.
 
@@ -85,10 +152,12 @@ A negative takes U+2212 on screen and a hyphen on the clipboard (§8.6). Excel i
 
 - **A selection holding a minus** is written as tab-separated plain text, with a hyphen in place of each minus. The screen, the DOM and the selection don't change. It pastes into a document as tabs, not as a table, and a `StatusBadge` copies as it reads, `PASSED`.
 - **A selection with no minus** keeps the browser's own copy.
-- **A double-click in a `numeric` column** takes the whole figure. A browser's double-click would select only a word, so `−¥41,415,809` would copy as `41,415,809`, a positive figure. A figure inside a control stays with that control.
+- **A double-click in a `numeric` or `figure` column**, or on a total or a difference, takes the whole figure. A browser's double-click would select only a word, so `−¥41,415,809` would copy as `41,415,809`, a positive figure. A figure inside a control stays with that control.
 - **A field in a cell** keeps what was typed.
+- **An identifier stays in its row, on one line,** because the figures mean nothing without it. A child of `Button` is a flex item, so it lays out as a block, and Chromium writes a line break either side of a block. With a `<span className="truncate">` inside the button, every row copied as `dim_accounts_1\nfailed\t2,019,530…`, with a blank line after it. A `<div>` or a `flex` element directly in a cell breaks a row the same way.
+- **One name on its own is awkward.** A drag or a double-click that starts on the button clicks it and selects nothing, as on any button, so start the drag in the cell's padding or the cell beside it.
 
-The limits are in §8.6: `¥` and comma-decimal locales, rendered rows only in a virtualized table, no header row, no single column, and a selection that starts outside the table keeps U+2212. `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard, and the `SignedFigures` story has the figures.
+The limits are in §8.6: `¥` and comma-decimal locales, rendered rows only in a virtualized table, no header row, no single column, and a selection that starts outside the table keeps U+2212. A selection with no minus keeps the browser's HTML, which holds a `<button>` for the identifier, and that hasn't been pasted into Excel or Docs (§10). `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard, and the `SignedFigures` story has the figures.
 
 ## Columns with no visible header
 

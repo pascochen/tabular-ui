@@ -46,6 +46,22 @@ export async function gotoStory(page: Page, id: string, theme: 'dark' | 'light' 
 }
 
 /**
+ * Presses the real shortcut and reads every flavour on the clipboard. The spec
+ * needs `test.use({ permissions: ['clipboard-read', 'clipboard-write'] })`.
+ */
+export async function copy(page: Page) {
+  await page.evaluate(() => navigator.clipboard.writeText('NOTHING COPIED'));
+  await page.keyboard.press('ControlOrMeta+c');
+  return page.evaluate(async () => {
+    const flavours: Record<string, string> = {};
+    for (const item of await navigator.clipboard.read()) {
+      for (const type of item.types) flavours[type] = await (await item.getType(type)).text();
+    }
+    return flavours;
+  });
+}
+
+/**
  * Presses Tab until `target` is focused, so the ring is driven by real
  * keyboard focus. `element.focus()` does not reliably match `:focus-visible`,
  * which is the whole thing under test.

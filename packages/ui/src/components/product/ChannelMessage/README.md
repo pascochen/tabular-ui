@@ -57,7 +57,7 @@ One member's message in a channel of several people, with its replies inline ben
 | The avatar is `aria-hidden` | The name is beside it. With the initials exposed, a message is read "DO Daisuke Onodera" |
 | The header is as tall as the avatar (32px; 24px in a reply) | The name sits level with the avatar's centre, and the body starts under both. `min-h`, so a long name wraps instead of overlapping. Primitive steps, the avatar's own: `Avatar` has no size tokens |
 | Name `--text-base` 600, time `--text-xs` secondary | The body's size, one weight up, so the author leads. The time is read, so secondary, never tertiary (§3). In a reply the name drops to `--text-sm` with the 24px avatar |
-| Replies fold behind `Button variant="inline"` | `AgentReasoning`'s disclosure, with its recipe unchanged, so the two read as one control. `aria-expanded`, and `aria-controls` once the replies exist. The count stays the label, open or closed |
+| Replies fold behind `Button variant="inline"` | `AgentReasoning`'s disclosure, with its recipe unchanged, so the two read as one control. `aria-expanded`, and `aria-controls` once the replies exist. The count stays the label, open or closed, and `select-none` keeps it out of a copy of the thread |
 | Replies render only when open | As `AgentReasoning` and `RunLogRow`. Nothing hidden sits in the tab order |
 | A 1px `--color-border` rule left of the replies | It marks the thread as structure, so it is neutral |
 | `continued` drops the avatar and header, not the name | A run from one author reads as one voice, as every team chat groups it. The name and time stay as visually hidden text, first, so each message still says who wrote it and when, read alone |

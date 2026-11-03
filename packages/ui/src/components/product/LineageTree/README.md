@@ -28,4 +28,4 @@ Nested lists with disclosure buttons promise only what they deliver, and keep wh
 
 Status comes from `StatusBadge`; the tree does not decide what a failed model looks like. Selection uses `--color-bg-interactive` — selection *is* the interactive role, and §4 is explicit that no `--color-bg-selected` exists.
 
-Identifiers render in `--font-mono` at `--text-xs` with the slashed zero (§8.3), because they are read as data.
+Identifiers render in `--font-mono` at `--text-xs` with the slashed zero (§8.3), because they are read as data. They copy as data too: a selection over the tree carries each node's name, its meta and its status, a line each. Until 2026-11-02 the name was `select-none`, and a copied lineage was a list of statuses. See `Button`'s README, and `apps/storybook/tests/identifier-copy.spec.ts`.

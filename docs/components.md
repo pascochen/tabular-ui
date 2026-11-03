@@ -30,7 +30,7 @@ foundational component without asking. Never re-implement one inline.**
 
 | Component | Status | Notes |
 |---|---|---|
-| Button | **built** | 32px via `--h-control`. Variants: default / outline / ghost / danger / inline (embedded in a header cell or tree row: no ground, padding or size; inherits type). Sizes: sm 24 / default 32 / lg 36. No icon-only size — that is `IconButton`. |
+| Button | **built** | 32px via `--h-control`. Variants: default / outline / ghost / danger / inline (embedded in a header cell or tree row: no ground, padding or size; inherits type; `select-auto`, so what it holds stays in a copy). Sizes: sm 24 / default 32 / lg 36. No icon-only size — that is `IconButton`. |
 | IconButton | **built** | Square 24/32/36 with 14/16/20px icons. `aria-label` required at the type level. Defaults to `ghost`. Weight injected per §11.2. Auto-wraps in `Tooltip` using its `aria-label`; `tooltip={false}` opts out. |
 | Input | **built** | `content` variants: text / numeric (tabular-nums, right-aligned) / mono. Sizes sm 24 / default 32 / lg 36. Transparent + border. Labels are the caller's job. |
 | Textarea | **built** | Added 2026-10-13 (approved), for `ChatComposer`. A native `<textarea>` (Base UI has no part; shadcn's is a `cn-*` class, so written, not added) styled as `Input`: same border, type and states. Grows with its text (`field-sizing: content`) between `minRows` (default 3) and `maxRows`, then scrolls; one line is exactly `--h-control`. `variant="borderless"` (approved the same day) drops border, padding, ring and disabled fade for a container that draws them, and fades hidden lines at the edge (§4 scroll cue, `data-overflow-y-*` as on Combobox). No `size` or `content` yet. |
@@ -62,7 +62,7 @@ variant.
 | Component | Status | Notes |
 |---|---|---|
 | CountBadge | **built** | Static summary marker — a category and its count. Composes `Badge`; tint ground, no border, because §7.7 makes border the *interactive* signal. Neutral even when counting failures. `99+` truncation is visual only; the true figure stays in the accessible name. Becomes a `Chip` if it ever filters. |
-| DataTable | **built** | TanStack Table + Virtual (headless). 28px rows, sticky neutral header, virtualizes past 100 rows. `meta.align: 'numeric'` drives tabular-nums; `meta.content: 'mono'` for identifiers. A copied negative carries a hyphen, and a double-click takes the whole figure (§8.6). |
+| DataTable | **built** | TanStack Table + Virtual (headless). 28px rows, sticky neutral header, virtualizes past 100 rows. `meta.align: 'numeric'` drives tabular-nums; `meta.content: 'mono'` for identifiers. A copied negative carries a hyphen, and a double-click takes the whole figure (§8.6). `totals` adds a sticky totals row; `meta.figure` columns draw §7.8's double rule only when the rows on display sum to the stated total. |
 | MetricTile | **built** | The only user of `--font-display`. 32px hero / 24px grid tier, tracking 0. `higherIsBetter` decides delta polarity — direction is not goodness. |
 | RunLogRow | **built** | 24px via `--h-row-xs`. Composes `StatusBadge` + `runStatusRowTreatment`. Expands to show error detail when given `detail`. |
 | LineageTree | **built** | 24px rows, 12px indent per level via `--gap-tree-indent`. Nested lists with disclosure carets, so depth is announced, not only drawn. Not `role="tree"`, whose keyboard pattern it does not implement (2026-10-28). |
