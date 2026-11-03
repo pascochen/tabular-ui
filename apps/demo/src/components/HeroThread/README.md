@@ -33,4 +33,5 @@ The state lives in `lib/close-state.ts` (`hero.rounds`), and the agent's timed s
 | Skip is final until Start over | Skip is a real answer, and Question answers once. Start over is in the top nav |
 | The rerun posts as "System" with a neutral badge | A deterministic check, not the agent (`docs/agent-voice.md`, rule 1) |
 | The rerun row has no timestamp | The reply's header already gives the time |
+| On a phone, #sep-close opens scrolled to the whole decision | At 375×812 the second answer lands under the composer, and testers missed these answers. It scrolls by the least that clears it, once on opening, and never a page already scrolled (`lib/decision-in-view.ts`). The cost: the top of the Revenue cut-off card is off screen on landing |
 | Fixed widths for the code and figure columns | The account names never truncate at the thread's width |
