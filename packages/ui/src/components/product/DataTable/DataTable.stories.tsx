@@ -602,9 +602,11 @@ export const TotalOverManyRows: Story = {
           accessorKey: 'model',
           header: 'Model',
           meta: { content: 'mono' },
+          // The text directly, with no <span>: a child of Button is a flex item,
+          // and a copied row breaks in two around one. See the README.
           cell: ({ row }) => (
-            <Button variant="inline" className="max-w-full shrink">
-              <span className="truncate">{row.original.model}</span>
+            <Button variant="inline" className="inline-block max-w-full truncate">
+              {row.original.model}
             </Button>
           ),
         },
