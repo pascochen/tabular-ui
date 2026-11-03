@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test';
 import {
   awaitsVisitor,
   closeReducer,
+  holdsOpen,
+  isUnread,
   isReopened,
   openCount,
   landingState,
@@ -71,6 +73,46 @@ test('the Tasks count is the open contradictions: 4 at landing, 0 at the end, an
   expect(progress(end).resolved).toBe(3);
   // A skipped question stays the visitor's to settle.
   expect(openCount(run({ type: 'answer', answer: 'skip', at: '14:00' }, { type: 'skip', at: '14:01' }))).toBe(1);
+});
+
+test('a channel’s dot is its open finding, and clears when that resolves or starts waiting', () => {
+  const landing = landingState();
+  const dots = (s: CloseState) =>
+    (['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const).filter((c) => holdsOpen(s, c));
+  expect(dots(landing)).toEqual(['close', 'receivables', 'payables', 'revenue']);
+  const end = closeReducer(landing, { type: 'skip', at: '14:00' });
+  expect(dots(end)).toEqual([]);
+  expect(openCount(end)).toBe(0);
+});
+
+test('a reply marks its channel unread until it’s opened, and everything before landing counts as read', () => {
+  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const unread = (s: CloseState) => channels.filter((c) => isUnread(s, c));
+  expect(unread(landingState())).toEqual([]);
+  // A person typing isn't a reply: nothing is unread until it lands.
+  const replyAt = timeline.findIndex((e) => e.effect.kind === 'reply');
+  let s = landingState();
+  for (let i = 0; i < replyAt; i++) s = closeReducer(s, { type: 'event', index: i, at: '14:00' });
+  expect(unread(s)).toEqual([]);
+  s = closeReducer(s, { type: 'event', index: replyAt, at: '14:00' });
+  expect(unread(s)).toEqual(['payables']);
+  s = closeReducer(s, { type: 'seen', channel: 'payables' });
+  expect(unread(s)).toEqual([]);
+});
+
+test('Skip leaves the replies it applied unread, and Start over clears them', () => {
+  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const end = closeReducer(landingState(), { type: 'skip', at: '14:00' });
+  expect(channels.filter((c) => isUnread(end, c))).toEqual(['close', 'receivables', 'payables']);
+  const over = closeReducer(end, { type: 'reset' });
+  expect(channels.filter((c) => isUnread(over, c))).toEqual([]);
+});
+
+test('a post stays in the place it was written, and Start over clears it', () => {
+  const s = closeReducer(landingState(), { type: 'say', where: 'cash', text: ' A note ', at: '14:00' });
+  expect(s.posts).toEqual([{ where: 'cash', text: 'A note', at: '14:00' }]);
+  expect(closeReducer(s, { type: 'say', where: 'cash', text: '   ', at: '14:00' }).posts).toHaveLength(1);
+  expect(closeReducer(s, { type: 'reset' }).posts).toEqual([]);
 });
 
 test('September reads as reopened only once the reversal is posted, and Start over locks it again', () => {

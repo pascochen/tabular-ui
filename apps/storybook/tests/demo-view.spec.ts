@@ -25,6 +25,11 @@ test('`/` opens #revenue, and #revenue’s link is `/`', () => {
   expect(parseView('?view=revenue')).toEqual(DEFAULT_VIEW);
 });
 
+test('the six channels open by their URLs, in the sidebar’s order', () => {
+  expect(BUILT_CHANNELS).toEqual(['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany']);
+  expect(parseView('?view=payables')).toEqual({ kind: 'channel', channel: 'payables' });
+});
+
 test('old and unknown URLs open the default', () => {
   for (const search of [
     '?view=sep-close',

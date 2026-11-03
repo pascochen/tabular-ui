@@ -5,7 +5,7 @@ import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, TruncatedText } 
 import { agents, channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
 import { BUILT_CHANNELS, BUILT_PLACES, hrefFor, onViewLinkClick, placeOf, useView, type View } from '../lib/view';
 import { useClose } from '../lib/close-context';
-import { openCount } from '../lib/close-state';
+import { holdsOpen, isUnread, openCount } from '../lib/close-state';
 import { MemberAvatar } from './members';
 
 function NavLink({
@@ -13,9 +13,11 @@ function NavLink({
   icon,
   avatar,
   trailing,
+  unread,
   children,
 }: {
   view: View;
+  unread?: boolean;
   icon?: ReactElement;
   avatar?: ReactElement;
   trailing?: ReactNode;
@@ -30,10 +32,20 @@ function NavLink({
       icon={icon}
       avatar={avatar}
       trailing={trailing}
+      unread={unread}
     >
       {children}
     </AppShellNavItem>
   );
+}
+
+/**
+ * A channel holds an open finding: the review state's warning fill, as its badge's
+ * tone (§5). A 6px circle, because a status dot is one (§7.7). Its meaning follows
+ * the label as hidden text, since colour alone says nothing to a screen reader.
+ */
+function OpenDot() {
+  return <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-fill-warning" />;
 }
 
 const PLACES = {
@@ -49,7 +61,8 @@ const PLACES = {
  * so a section with nothing built isn't drawn.
  */
 export function Sidebar() {
-  const open = openCount(useClose().state);
+  const { state } = useClose();
+  const open = openCount(state);
   const builtAgents: typeof agents = [];
   return (
     <AppShellNav aria-label="Workspace">
@@ -76,8 +89,15 @@ export function Sidebar() {
       ) : null}
       <AppShellNavGroup label="Channels">
         {BUILT_CHANNELS.map((id) => channels.find((c) => c.id === id)!).map((c) => (
-          <NavLink key={c.id} view={{ kind: 'channel', channel: c.id }} icon={<HashIcon />}>
+          <NavLink
+            key={c.id}
+            view={{ kind: 'channel', channel: c.id }}
+            icon={<HashIcon />}
+            unread={isUnread(state, c.id)}
+            trailing={holdsOpen(state, c.id) ? <OpenDot /> : undefined}
+          >
             {c.name}
+            {holdsOpen(state, c.id) ? <span className="sr-only">, open finding</span> : null}
           </NavLink>
         ))}
       </AppShellNavGroup>

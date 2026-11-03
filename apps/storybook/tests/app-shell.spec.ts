@@ -16,6 +16,13 @@ import { focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo } from './hel
 const SKETCH = { width: 1440, height: 900 };
 const BELOW_FLOOR = { width: 1024, height: 768 };
 
+const navItem = (page: Page, name: string) => page.getByRole('link', { name });
+const textOf = (page: Page, name: string) =>
+  navItem(page, name).evaluate((el) => {
+    const { color, fontWeight } = getComputedStyle(el);
+    return { color, fontWeight };
+  });
+
 const headerToggle = (page: Page) => page.locator('[data-slot="app-shell-sidebar-header-toggle"]');
 const navToggle = (page: Page) => page.locator('[data-slot="app-shell-sidebar-toggle"]');
 const dockedSidebar = (page: Page) => page.locator('[data-slot="app-shell-sidebar"]');
@@ -566,4 +573,28 @@ test('a nav item is named by its label: no avatar initials, no count run into it
   await expect(sidebar.getByRole('link', { name: /^sep-close ?, 4 open$/ })).toBeVisible();
   await expect(sidebar.getByRole('link', { name: 'Daisuke Onodera', exact: true })).toBeVisible();
   await expect(sidebar.getByRole('link', { name: 'Close agent AI', exact: true })).toBeVisible();
+});
+
+test.describe('an unread nav item', () => {
+  test('is the primary text at the resting weight, and says so to assistive technology', async ({ page }) => {
+    await page.setViewportSize(SKETCH);
+    await gotoStory(page, 'product-appshell--unread');
+    const primary = await page.evaluate(() => {
+      const probe = document.createElement('span');
+      probe.className = 'text-text-primary';
+      document.body.append(probe);
+      const { color } = getComputedStyle(probe);
+      probe.remove();
+      return color;
+    });
+    const unread = await textOf(page, 'payables, unread');
+    const read = await textOf(page, 'cash');
+    const active = await textOf(page, 'revenue');
+    expect(unread.color).toBe(primary);
+    expect(read.color).not.toBe(primary);
+    expect(unread.fontWeight).toBe(read.fontWeight);
+    // Semibold is what active draws, so a bold unread name would look selected.
+    expect(active.fontWeight).toBe('600');
+    expect(unread.fontWeight).not.toBe(active.fontWeight);
+  });
 });

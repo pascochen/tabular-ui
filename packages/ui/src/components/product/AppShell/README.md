@@ -203,6 +203,12 @@ Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's
 - **`trailing`**: what follows the label, such as a `Badge shape="count"` or the `agent` badge that marks the AI as a member. The label truncates and the trailing content keeps its width.
 - **The link's name is its label**, so what sits beside the label must not repeat it or run into it. An avatar beside a name takes `aria-hidden`, or the link reads "DO Daisuke Onodera". A count's badge takes `aria-hidden` too, and its meaning follows the label as visually hidden text, `sep-close<span className="sr-only">, 4 open</span>`. Inside the badge, the link read "sep-close4 open".
 
+## Unread
+
+`unread` marks a link with something the reader hasn't seen, such as a reply in a channel (`Unread` story). The label steps from `--color-text-secondary` to `--color-text-primary` at the item's resting weight, and a visually hidden ", unread" follows it, so the link reads "payables, unread". No token and no hue: having a message waiting is not a state of the data.
+
+It isn't semibold. `active` already draws semibold in `--color-text-primary`, and a bold unread name would look selected. It isn't lighter either: a nav item rests at 500 (`Button`'s weight), and an unread name at 400 would read as fainter than the read names around it. The caller clears it when the page is opened. An item that is both shows as active, since the reader is on that page.
+
 ## Not implemented
 
 These are needed by the sketch but fall outside the shell. The stories use fixtures for them:

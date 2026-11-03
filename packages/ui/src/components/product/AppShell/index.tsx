@@ -751,6 +751,13 @@ type IconWeight = (typeof iconWeightForSize)[keyof typeof iconWeightForSize];
 export type AppShellNavItemProps = React.ComponentProps<'a'> & {
   /** Marks the current page. Drives `aria-current` as well as the styling. */
   active?: boolean;
+  /**
+   * Something here hasn't been seen: a reply in a channel. The label steps up to
+   * `--color-text-primary` at the item's resting weight, and adds ", unread" for
+   * assistive technology. Not semibold, which is what `active` draws: a bold
+   * unread name would look selected. The caller clears it when the page is opened.
+   */
+  unread?: boolean;
   /** A single Phosphor icon. Weight is set per §11.2 (`fill` when active, else `bold`) unless given explicitly. */
   icon?: ReactElement;
   /**
@@ -774,11 +781,14 @@ export type AppShellNavItemProps = React.ComponentProps<'a'> & {
  *
  * Active is neutral, matching `AppBarNavItem` — `aria-current`, weight and
  * text step, no hue and no ground — plus the icon switching to `fill` (§11.2).
- * Survives grayscale.
+ * Survives grayscale. Unread takes only the text step, so the two stay apart:
+ * unread is a brighter name at the resting weight, and active is semibold with
+ * a filled icon.
  */
 function AppShellNavItem({
   className,
   active = false,
+  unread = false,
   icon,
   avatar,
   trailing,
@@ -794,12 +804,14 @@ function AppShellNavItem({
     // Bracketed data-[active] — the shorthand compiles inside :where() and
     // loses to the base colour on source order.
     'data-[active]:font-semibold data-[active]:text-text-primary',
+    'data-[unread]:text-text-primary',
     className,
   );
 
   const linkProps = {
     'data-slot': 'app-shell-nav-item',
     'data-active': active ? '' : undefined,
+    'data-unread': unread ? '' : undefined,
     'aria-current': active ? ('page' as const) : undefined,
     ...props,
   };
@@ -815,7 +827,10 @@ function AppShellNavItem({
   const content = (
     <>
       {avatar ?? glyph}
-      <span className="min-w-0 flex-1 truncate">{children}</span>
+      <span className="min-w-0 flex-1 truncate">
+        {children}
+        {unread ? <span className="sr-only">, unread</span> : null}
+      </span>
       {trailing}
     </>
   );

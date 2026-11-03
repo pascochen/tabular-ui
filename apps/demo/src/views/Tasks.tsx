@@ -22,6 +22,7 @@ import {
   memberName,
   selectedTask,
   sourcesOf,
+  type ChannelId,
   type Exception,
 } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
@@ -107,7 +108,13 @@ const itemColumns = (label: string, withChannel: boolean): DataTableProps<Item>[
           size: 112,
           cell: ({ row }) => {
             const channel = channelOfGap(row.original.id);
-            return channel ? `#${channel.name}` : null;
+            if (!channel) return null;
+            const view: View = { kind: 'channel', channel: channel.id as ChannelId };
+            return (
+              <a href={hrefFor(view)} onClick={onViewLinkClick(view)} className={linkClassName}>
+                #{channel.name}
+              </a>
+            );
           },
         },
       ] satisfies DataTableProps<Item>['columns'])
@@ -122,6 +129,12 @@ const itemColumns = (label: string, withChannel: boolean): DataTableProps<Item>[
 
 const gapColumns = itemColumns('Gap', true);
 const questionColumns = itemColumns('Question', false);
+const channelGapColumns = itemColumns('Gap', false);
+
+/** Gaps as rows: the sentence and its exhibits. In a channel, whose name would only repeat the page's. */
+export function ChannelGaps({ gaps }: { gaps: Item[] }) {
+  return <DataTable columns={channelGapColumns} data={gaps} />;
+}
 
 function Heading({ children }: { children: string }) {
   return <h2 className="text-md font-semibold text-text-primary">{children}</h2>;
@@ -190,7 +203,7 @@ function Part({ label, children }: { label: string; children: React.ReactNode })
 export function TaskPanel({ task }: { task: Exception }) {
   const { state } = useClose();
   const sources: Source[] = sourcesOf(task);
-  const channel = { kind: 'channel', channel: task.channel } as View;
+  const channel: View = { kind: 'channel', channel: task.channel };
   const hash = `#${task.id}`;
   return (
     <AppShellPanelBody className="flex flex-col items-start gap-[var(--gap-group)]">
