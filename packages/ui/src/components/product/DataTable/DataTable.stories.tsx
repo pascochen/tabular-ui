@@ -484,6 +484,40 @@ export const TotalWithCents: Story = {
   },
 };
 
+/**
+ * One wide figure, thousands of rows down. A windowed table measures only the rows
+ * it renders, so each figure column reserves room for its widest figure, and the
+ * columns hold still when this one scrolls in. It's never clipped, even in a
+ * column sized narrower than it.
+ */
+export const WideFigureFarDown: Story = {
+  render: function WideFigureStory() {
+    const data = useMemo(
+      () =>
+        Array.from({ length: 5000 }, (_, i) => ({ label: `Line ${i + 1}`, yen: i === 3000 ? 123456789012345 : 12 })),
+      [],
+    );
+    return (
+      <div style={{ height: 300 }}>
+        <DataTable
+          columns={[
+            { accessorKey: 'label', header: 'Line' },
+            { accessorKey: 'yen', header: 'Yen', meta: { figure: { decimals: 0, unit: 'JPY' } } },
+            {
+              id: 'narrow',
+              accessorFn: (row) => row.yen,
+              header: 'Sized 80',
+              size: 80,
+              meta: { figure: { decimals: 0, unit: 'JPY' } },
+            },
+          ]}
+          data={data}
+        />
+      </div>
+    );
+  },
+};
+
 type Charge = {
   team: string;
   hours: number;

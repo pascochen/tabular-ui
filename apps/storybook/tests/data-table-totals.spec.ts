@@ -7,6 +7,7 @@ import {
   printFigure,
   printUnits,
   toUnits,
+  unmatchedTotals,
   type DataTableTotals,
 } from '../../../packages/ui/src/components/product/DataTable/totals';
 import { gotoStory } from './helpers';
@@ -39,6 +40,39 @@ const tokenColour = (page: Page, token: string) =>
     return colour;
   }, token);
 
+/** A column of pixels down through `locator`, 2 device pixels in from its left, where no glyph reaches. */
+async function pixelColumn(page: Page, locator: Locator) {
+  const png = await locator.screenshot();
+  return page.evaluate(async (base64) => {
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(bitmap, 0, 0);
+    const { data } = context.getImageData(2, 0, 1, bitmap.height);
+    return Array.from({ length: bitmap.height }, (_, y) => data[y * 4]);
+  }, png.toString('base64'));
+}
+
+/** The lines of ink down a column of pixels, and how many pixels sit between ink and paper. */
+function inkRuns(painted: number[]) {
+  const paper = painted[0];
+  const ink = Math.min(...painted);
+  const runs: number[] = [];
+  let soft = 0;
+  let inRun = false;
+  for (const value of painted) {
+    const isInk = Math.abs(value - ink) <= 2;
+    if (!isInk && Math.abs(value - paper) > 2) soft++;
+    if (isInk && !inRun) runs.push(0);
+    if (isInk) runs[runs.length - 1]++;
+    inRun = isInk;
+  }
+  return { runs, soft, contrast: paper - ink };
+}
+
 test.describe('the figure arithmetic', () => {
   test('counts the digits it prints, so a total adds what shows', () => {
     expect(toUnits(1234.5, 2)).toBe(123450n);
@@ -52,6 +86,24 @@ test.describe('the figure arithmetic', () => {
   test('a value that cannot print is not a part', () => {
     for (const value of [null, undefined, NaN, Infinity, '12', 1e21]) expect(toUnits(value, 0)).toBeNull();
     expect(printFigure(null, 0)).toBe('');
+  });
+
+  test('past 15 significant digits it refuses a figure a double can’t hold exactly', () => {
+    expect(printFigure(9999999999999.99, 2)).toBe('9,999,999,999,999.99');
+    expect(printFigure(999999999999999, 0)).toBe('999,999,999,999,999');
+    // Prints as .02 through toFixed.
+    expect(toUnits(Number('80000000000000.01'), 2)).toBeNull();
+    expect(toUnits(1e15, 0)).toBeNull();
+    // A double reads this as ...992, so a ¥1 gap would vanish before any check.
+    expect(toUnits(Number('9007199254740993'), 0)).toBeNull();
+  });
+
+  test('a totals key that names no column is found', () => {
+    expect(unmatchedTotals({ stated: { yen: 1, 'cost.yen': 2 }, sum: ['hours', 'rows'] }, ['yen', 'rows'])).toEqual([
+      'cost.yen',
+      'hours',
+    ]);
+    expect(unmatchedTotals({}, ['yen'])).toEqual([]);
   });
 
   test('prints grouped, with a true minus, and never a negative zero', () => {
@@ -111,6 +163,46 @@ test.describe('server-rendered, as a prerendered page ships it', () => {
     expect(html).toContain('>100<');
   });
 
+  test('a stated total that isn’t a figure reads "Incomplete", never the sum under the caller’s label', () => {
+    for (const stated of [NaN, null, Infinity]) {
+      const html = render({ totals: { label: 'Actual', stated: { yen: stated } } });
+      expect(html).toContain('>Actual<');
+      expect(html).toContain('>Incomplete<');
+      expect(html).not.toContain('>123<');
+      expect(html).not.toContain('border-double');
+      expect(html).not.toContain('Difference');
+    }
+  });
+
+  test('a server-side table never calls one page every row', () => {
+    const totals = { stated: { yen: 999 } };
+    const paged = render({ tableOptions: { manualPagination: true, rowCount: 1284 }, totals });
+    expect(paged).toContain('Subtotal, 2 of 1,284 rows');
+    expect(paged).not.toContain('Difference');
+    expect(paged).not.toContain('border-double');
+
+    expect(render({ tableOptions: { manualPagination: true }, totals })).toContain('Subtotal, 2 rows');
+    const filtered = render({ tableOptions: { manualFiltering: true }, globalFilter: 'a', totals });
+    expect(filtered).toContain('Subtotal, 2 rows');
+    expect(filtered).not.toContain('Difference');
+
+    // A filter the server has applied is still a filter, however many rows it left.
+    expect(render({ tableOptions: { manualFiltering: true }, totals })).toContain('Difference');
+
+    // Every row on the one page: this one really closes.
+    const whole = render({ tableOptions: { manualPagination: true, rowCount: 2 }, totals: { stated: { yen: 123 } } });
+    expect(whole).toContain('border-double');
+  });
+
+  test('a mono figure column keeps its total and difference in the same type as its rows', () => {
+    const mono = [columns[0], { ...columns[1], meta: { ...columns[1].meta, content: 'mono' as const } }];
+    const html = renderToStaticMarkup(
+      createElement(DataTable<Line>, { columns: mono, data, totals: { stated: { yen: 124 } } }),
+    );
+    const foot = html.slice(html.indexOf('<tfoot'));
+    expect(foot.match(/<td[^>]*font-mono text-xs/g)).toHaveLength(2);
+  });
+
   test('no rows, no total', () => {
     const html = renderToStaticMarkup(
       createElement(DataTable<Line>, { columns, data: [], totals: { stated: { yen: 123 } } }),
@@ -147,11 +239,11 @@ test.describe('the rule', () => {
     });
   }
 
-  test('a rounding gap gets no tolerance: 41 + 275 against a stated 317', async ({ page }) => {
+  test('a rounding gap gets no tolerance: −41 and −275 against a stated −317', async ({ page }) => {
     await gotoStory(page, `${STORY}rounded-parts-do-not-foot`);
     await expect(page.getByRole('rowheader', { name: 'Difference' })).toBeVisible();
     expect(await ruled(page)).toEqual([]);
-    await expect(page.locator('tfoot tr').nth(1).locator('td')).toHaveText('1');
+    await expect(page.locator('tfoot tr').nth(1).locator('td')).toHaveText('−1');
   });
 
   test('a check that could not run neither passes nor fails', async ({ page }) => {
@@ -246,6 +338,25 @@ test.describe('total of what', () => {
     expect(box.footBottom).toBe(box.end);
   });
 
+  test('columns hold still when a wide figure far down scrolls in, and it is never clipped', async ({ page }) => {
+    await gotoStory(page, `${STORY}wide-figure-far-down`);
+    const headers = page.locator('#storybook-root thead th');
+    const widths = () => headers.evaluateAll((ths) => ths.map((th) => th.getBoundingClientRect().width));
+    await expect(page.locator('#storybook-root tbody tr[data-row-id="0"]')).toBeVisible();
+    const before = await widths();
+
+    await page.locator('#storybook-root table').evaluate((table) => {
+      table.parentElement!.scrollTop = 3000 * 28;
+    });
+    const wide = page.locator('#storybook-root tbody tr[data-row-id="3000"]');
+    await expect(wide).toBeVisible();
+    await expect(wide.locator('td').nth(1)).toHaveText('123,456,789,012,345');
+
+    expect(await widths()).toEqual(before);
+    const clipped = await wide.locator('td').evaluateAll((tds) => tds.map((td) => td.scrollWidth > td.clientWidth));
+    expect(clipped).toEqual([false, false, false]);
+  });
+
   test('a control tabbed to in a row never lands under the sticky foot', async ({ page }) => {
     await gotoStory(page, `${STORY}total-over-many-rows`);
     await expect(page.locator('tfoot')).toBeVisible();
@@ -258,6 +369,99 @@ test.describe('total of what', () => {
       }));
       expect(bottom).toBeLessThanOrEqual(footTop);
     }
+  });
+});
+
+/**
+ * §8.6: a double-click in a numeric cell takes the whole figure, and a copied
+ * negative carries a hyphen. A browser's own double-click selects a word, and the
+ * sign isn't part of one, so a negative would copy as a positive, with no error.
+ * Each double-click lands on the sign, where that's easiest to see.
+ */
+test.describe('copying', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  const copy = async (page: Page) => {
+    await page.evaluate(() => navigator.clipboard.writeText('NOTHING COPIED'));
+    await page.keyboard.press('ControlOrMeta+C');
+    return page.evaluate(async () => {
+      const flavours: Record<string, string> = {};
+      for (const item of await navigator.clipboard.read()) {
+        for (const type of item.types) flavours[type] = await (await item.getType(type)).text();
+      }
+      return flavours;
+    });
+  };
+
+  const doubleClickStartOfFigure = async (page: Page, cell: Locator) => {
+    const box = await cell.evaluate((td) => {
+      const text = document.createTreeWalker(td, NodeFilter.SHOW_TEXT).nextNode()!;
+      const range = document.createRange();
+      range.selectNode(text);
+      const { x, y, height } = range.getBoundingClientRect();
+      return { x, y, height };
+    });
+    await page.mouse.click(1, 1);
+    await page.mouse.dblclick(box.x + 1, box.y + box.height / 2);
+    return page.evaluate(() => getSelection()!.toString());
+  };
+
+  test('a double-click takes the whole figure with its sign: a part, a total and a difference', async ({ page }) => {
+    await gotoStory(page, `${STORY}rounded-parts-do-not-foot`);
+    await expect(page.getByRole('rowheader', { name: 'Difference' })).toBeVisible();
+
+    const part = page.locator('tbody tr[data-row-id] td:last-child').first();
+    expect(await doubleClickStartOfFigure(page, part)).toBe('−41');
+    expect((await copy(page))['text/plain']).toBe('-41');
+
+    const total = page.locator('tfoot tr').first().locator('td');
+    expect(await doubleClickStartOfFigure(page, total)).toBe('−317');
+    expect((await copy(page))['text/plain']).toBe('-317');
+
+    const difference = page.locator('tfoot tr').nth(1).locator('td');
+    expect(await doubleClickStartOfFigure(page, difference)).toBe('−1');
+    expect((await copy(page))['text/plain']).toBe('-1');
+  });
+
+  test('the hidden "adds up" stays out of what a person copies, in every flavour', async ({ page }) => {
+    await gotoStory(page, `${STORY}total-that-foots`);
+    const total = page.locator('tfoot td').first();
+    await expect(total).toContainText('adds up');
+
+    expect(await doubleClickStartOfFigure(page, total)).toBe('2,192,778,193');
+    const figure = await copy(page);
+    expect(figure['text/plain']).toBe('2,192,778,193');
+    for (const [type, text] of Object.entries(figure)) expect(text, type).not.toContain('adds up');
+
+    // A drag across the row is the other way in, and the row holds no minus, so
+    // this one is the browser's own copy.
+    await page.evaluate(() => {
+      const row = document.querySelector('tfoot tr') as HTMLTableRowElement;
+      const range = document.createRange();
+      range.setStartBefore(row.cells[0]);
+      range.setEndAfter(row.cells[row.cells.length - 1]);
+      getSelection()!.removeAllRanges();
+      getSelection()!.addRange(range);
+    });
+    for (const [type, text] of Object.entries(await copy(page))) expect(text, type).not.toContain('adds up');
+  });
+
+  test('a selection across negative rows and a total carries hyphens, and keeps the total', async ({ page }) => {
+    await gotoStory(page, `${STORY}total-while-filtered`);
+    await expect(page.locator('tfoot')).toBeVisible();
+    await page.evaluate(() => {
+      const first = document.querySelector('tbody tr[data-row-id]') as HTMLTableRowElement;
+      const foot = document.querySelector('tfoot tr') as HTMLTableRowElement;
+      const range = document.createRange();
+      range.setStartBefore(first.cells[0]);
+      range.setEndAfter(foot.cells[foot.cells.length - 1]);
+      getSelection()!.removeAllRanges();
+      getSelection()!.addRange(range);
+    });
+    const copied = await copy(page);
+    expect(copied['text/plain']).toContain('-41,415,809');
+    expect(copied['text/plain']).toContain('-316,748,831');
+    expect(copied['text/plain']).not.toContain('−');
   });
 });
 
@@ -314,6 +518,8 @@ test.describe('the row', () => {
     expect(widths.actualRight).toBeCloseTo(widths.budgetRight, 2);
     await expect(figureOf(page, '2,192,778,193')).toHaveCSS('font-weight', '400');
     await expect(figureOf(page, '2,192,778,193')).toHaveCSS('font-variant-numeric', /tabular-nums/);
+    // Rule 7 covers a label's figures too. It inherits this from `html` (§8.6).
+    await expect(page.getByRole('rowheader', { name: 'Actual' })).toHaveCSS('font-variant-numeric', /tabular-nums/);
   });
 
   test('a figure column prints a true minus, and a screen reader hears the mark', async ({ page }) => {
@@ -330,9 +536,16 @@ test.describe('the row', () => {
   test.describe('in forced colours', () => {
     test.use({ forcedColors: 'active' });
 
-    test('the rule still draws', async ({ page }) => {
-      await gotoStory(page, `${STORY}total-that-foots`);
-      await expect(figureOf(page, '2,192,778,193')).toHaveCSS('border-bottom-style', 'double');
+    test('the double rule draws, and a figure with no rule gets no line at all', async ({ page }) => {
+      await gotoStory(page, `${STORY}one-column-does-not-foot`);
+      const foots = figureOf(page, '34,436,068,352');
+      const misses = figureOf(page, '2,192,778,193');
+      await expect(misses).toBeVisible();
+
+      expect(inkRuns(await pixelColumn(page, foots)).runs).toHaveLength(2);
+      // Forced colours paint a transparent border solid. If the slot were one, a
+      // total that misses would get a heavier line than one that foots.
+      expect(new Set(await pixelColumn(page, misses)).size).toBe(1);
     });
   });
 });
@@ -366,34 +579,10 @@ test.describe('painted', () => {
         const figure = figureOf(page, '2,192,778,193');
         await expect(figure).toBeVisible();
 
-        const png = await figure.screenshot();
-        const painted = await page.evaluate(async (base64) => {
-          const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-          const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
-          const canvas = document.createElement('canvas');
-          canvas.width = bitmap.width;
-          canvas.height = bitmap.height;
-          const context2d = canvas.getContext('2d')!;
-          context2d.drawImage(bitmap, 0, 0);
-          const { data } = context2d.getImageData(2, 0, 1, bitmap.height);
-          return Array.from({ length: bitmap.height }, (_, y) => data[y * 4]);
-        }, png.toString('base64'));
-
-        const paper = painted[0];
-        const ink = Math.min(...painted);
-        const runs: number[] = [];
-        let soft = 0;
-        let inRun = false;
-        for (const value of painted) {
-          const isInk = Math.abs(value - ink) <= 2;
-          if (!isInk && Math.abs(value - paper) > 2) soft++;
-          if (isInk && !inRun) runs.push(0);
-          if (isInk) runs[runs.length - 1]++;
-          inRun = isInk;
-        }
+        const { runs, soft, contrast } = inkRuns(await pixelColumn(page, figure));
         expect(runs, 'two lines of ink').toHaveLength(2);
         expect(soft, 'no pixel between ink and paper').toBe(0);
-        expect(paper - ink, 'ink on paper').toBeGreaterThan(150);
+        expect(contrast, 'ink on paper').toBeGreaterThan(150);
       } finally {
         await browser.close();
       }

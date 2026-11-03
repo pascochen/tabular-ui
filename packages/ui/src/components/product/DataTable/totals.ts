@@ -53,19 +53,33 @@ export type TotalsRow = {
   cells: Map<string, ColumnTotal>;
 };
 
-/** `value` as a whole count of its last printed digit: 1234.5 at 2 decimals is 123450n. Null if it can't print. */
+// A call, not a literal: an installed copy may compile below ES2020, where
+// TypeScript refuses `0n`.
+const ZERO = BigInt(0);
+
+// A double holds 15 significant digits exactly. Past that, `toFixed` prints digits
+// that were never in the figure (80000000000000.01 prints as .02), and a ¥1 gap can
+// vanish before any check sees it, so the table won't print or add such a value.
+const MAX_UNITS = 1e15;
+
+/** `value` as a whole count of its last printed digit: 1234.5 at 2 decimals is 123450n. Null if it can't print exactly. */
 export function toUnits(value: unknown, decimals: number): bigint | null {
-  // `toFixed` falls back to exponent form at 1e21, which BigInt can't read.
-  if (typeof value !== 'number' || !Number.isFinite(value) || Math.abs(value) >= 1e21) return null;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  if (Math.abs(value) * 10 ** decimals >= MAX_UNITS) {
+    warnOnce(
+      'DataTable: a figure past 15 significant digits can’t print exactly, so it prints empty and its total reads "Incomplete".',
+    );
+    return null;
+  }
   return BigInt(value.toFixed(decimals).replace('.', ''));
 }
 
 /** Those units as a cell shows them: grouped, with U+2212 on a negative (§8.6). A rounded -0.4 prints as 0. */
 export function printUnits(units: bigint, decimals: number): string {
-  const digits = (units < 0n ? -units : units).toString().padStart(decimals + 1, '0');
+  const digits = (units < ZERO ? -units : units).toString().padStart(decimals + 1, '0');
   const whole = digits.slice(0, digits.length - decimals).replace(/\B(?=(\d{3})+$)/g, ',');
   const fraction = decimals > 0 ? `.${digits.slice(-decimals)}` : '';
-  return `${units < 0n ? '−' : ''}${whole}${fraction}`;
+  return `${units < ZERO ? '−' : ''}${whole}${fraction}`;
 }
 
 /** A body cell's text. A value that can't print leaves the cell empty, and the total counts it as missing. */
@@ -86,7 +100,7 @@ export function columnTotal<TData>(
   stated: number | undefined,
   allShown: boolean,
 ): ColumnTotal {
-  let sum = 0n;
+  let sum = ZERO;
   let incomplete = false;
   const units = new Set<string>();
   for (const row of rows) {
@@ -101,8 +115,11 @@ export function columnTotal<TData>(
   const print = (value: bigint) => printUnits(value, figure.decimals);
 
   // A stated total describes every row, so it stands only while every row is shown.
-  const statedUnits = allShown ? toUnits(stated, figure.decimals) : null;
-  if (statedUnits !== null) {
+  if (allShown && stated !== undefined) {
+    const statedUnits = toUnits(stated, figure.decimals);
+    // Never the sum in its place: under the caller's label, it would read as the
+    // records' own figure.
+    if (statedUnits === null) return { text: 'Incomplete', foots: false, difference: null };
     const checkable = !incomplete && !mixed;
     return {
       text: print(statedUnits),
@@ -118,12 +135,13 @@ export function columnTotal<TData>(
 /**
  * The totals row for what the table is showing. `rows` is the whole row model,
  * every row left after filtering, scrolled into view or not: never the
- * virtualizer's window. Null when there is nothing to total.
+ * virtualizer's window. `rowCount` is how many rows there are in all, or null
+ * when only a server knows. Null when there is nothing to total.
  */
 export function totalsRow<TData>(
   totals: DataTableTotals,
   rows: Row<TData>[],
-  rowCount: number,
+  rowCount: number | null,
   columns: Column<TData, unknown>[],
 ): TotalsRow | null {
   if (rows.length === 0) return null;
@@ -147,9 +165,35 @@ export function totalsRow<TData>(
   return {
     label: allShown
       ? (totals.label ?? 'Total')
-      : `Subtotal, ${printUnits(BigInt(rows.length), 0)} of ${printUnits(BigInt(rowCount), 0)} rows`,
+      : rowCount === null
+        ? `Subtotal, ${printUnits(BigInt(rows.length), 0)} rows`
+        : `Subtotal, ${printUnits(BigInt(rows.length), 0)} of ${printUnits(BigInt(rowCount), 0)} rows`,
     cells,
   };
+}
+
+/** Characters in each figure column's widest figure, across every row. For a windowed table, which renders only some. */
+export function widestFigures<TData>(rows: Row<TData>[], columns: Column<TData, unknown>[]) {
+  const widest = new Map<string, number>();
+  for (const column of columns) {
+    const figure = column.columnDef.meta?.figure;
+    if (!figure) continue;
+    let longest = 0;
+    for (const row of rows) longest = Math.max(longest, printFigure(row.getValue(column.id), figure.decimals).length);
+    widest.set(column.id, longest);
+  }
+  return widest;
+}
+
+/** Keys in `totals` that name no column. TanStack turns `accessorKey: 'cost.yen'` into the id `cost_yen`, so this happens quietly. */
+export function unmatchedTotals(totals: DataTableTotals, columnIds: string[]) {
+  return [...Object.keys(totals.stated ?? {}), ...(totals.sum ?? [])].filter((key) => !columnIds.includes(key));
+}
+
+export function warnOnUnmatchedTotals(totals: DataTableTotals, columnIds: string[]) {
+  for (const key of unmatchedTotals(totals, columnIds)) {
+    warnOnce(`DataTable: totals names "${key}", which is no column's id, so it has no total.`);
+  }
 }
 
 /** A column with `meta.figure` and its own `cell` could print something other than what gets checked. */

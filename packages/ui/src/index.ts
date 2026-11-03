@@ -308,7 +308,7 @@ export {
   type ContextSwitcherProps,
 } from './components/product/ContextSwitcher';
 export { DataTable, type DataTableProps } from './components/product/DataTable';
-export type { DataTableTotals } from './components/product/DataTable/totals';
+export type { DataTableTotals, Figure as DataTableFigure } from './components/product/DataTable/totals';
 export { EmptyState, type EmptyStateProps } from './components/product/EmptyState';
 export { Field, type FieldControlProps, type FieldProps } from './components/product/Field';
 export { OrgSwitcher, type OrgSwitcherProps, type Org } from './components/product/OrgSwitcher';

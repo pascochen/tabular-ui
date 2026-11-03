@@ -61,7 +61,13 @@ const columns = [
 - **`totals.sum`** lists columns to simply add (`sum: ['hours']`). They never get the rule.
 - **`meta.figure`** is required on a totalled column. `decimals` is how many digits it prints after the point. `unit` is what the column holds, a string or `(row) => string`, and isn't printed, so name a single unit in the header.
 
+A `totals` key must be the column's id. TanStack turns `accessorKey: 'cost.yen'` into the id `cost_yen`, so give such a column an `id`. A key that matches nothing warns in development.
+
 **A figure column prints through the table, and its `cell` is ignored**, with a warning in development. A custom `cell` could print something other than what gets checked. So a figure column has no polarity colour and no per-row symbol. A zero prints as `0`.
+
+**A figure past 15 significant digits prints empty**, and warns in development, because a double can't hold it exactly: 80000000000000.01 would print as .02. At 2 decimals, the limit is 9,999,999,999,999.99.
+
+**A figure is never truncated, so it can widen its column.** A windowed table measures only the rows it renders, so each figure column reserves room for its widest figure across every row. The columns hold still as you scroll.
 
 ### What shows
 
@@ -69,6 +75,7 @@ const columns = [
 |---|---|---|---|
 | All rows shown, sum equals stated | Stated | Double rule | Hidden "adds up" text for screen readers |
 | All rows shown, sum differs | Stated, never replaced by the sum | Nothing | A "Difference" row in `--color-text-danger` |
+| The stated total isn't a figure (`NaN`, a runtime `null`) | "Incomplete", never the sum | Nothing | |
 | Rows hidden | Sum of the rows shown | Nothing | "Subtotal, n of m rows" |
 | `sum` column | Sum | Nothing | |
 | A part is empty or not a number | Stated, or "Incomplete" for `sum` | Nothing | No Difference: a check that couldn't run hasn't failed |
@@ -80,6 +87,8 @@ Every state has the 1px ink rule above the row. The result is worked out during 
 ### Total of what
 
 Every row left after filtering, scrolled into view or not. The sum never reads the virtualizer's window, and the row sits outside the virtualized rows, so scrolling can't drift. Sorting changes nothing. Rows are hidden when the row model holds fewer rows than the data, by a filter or by pagination through `tableOptions`, so a filter that hides nothing still closes.
+
+**On a server-side table,** one page isn't every row. With `manualPagination`, pass `rowCount`: the row reads "Subtotal, 50 of 1,284 rows" until every row is on the page. Without `rowCount`, or while `manualFiltering` has a filter set, only the server knows the whole, so it reads "Subtotal, 50 rows". Neither draws the rule or a Difference.
 
 ### Rounding
 
@@ -93,7 +102,9 @@ The table adds what it prints: each value goes through `toFixed(decimals)` once,
 
 ### Geometry
 
-The row is 28px in every state. The rule sits inside the cell, under the figure, and clears the table's own bottom border by 4px: across the whole row it would land on that border once the table scrolls, and read as three lines. Every cell keeps the rule's 3px as transparent border, so text doesn't move when the rule comes and goes. Figures stay at the body's weight, because tabular digits are wider at a heavier one, and a bold total drifts out of its column. A totals row needs a text column ahead of its first figure to show its label; without one the label is for screen readers only.
+The row is 28px in every state. The rule sits inside the cell, under the figure, and clears the table's own bottom border by 4px: across the whole row it would land on that border once the table scrolls, and read as three lines. Every cell keeps the rule's 3px as padding, so text doesn't move when the rule comes and goes. Not as a transparent border, which forced colours paint solid. Figures stay at the body's weight, because tabular digits are wider at a heavier one, and a bold total drifts out of its column.
+
+**A totals row needs a text column ahead of its first figure.** Without one, its label is for screen readers only. A filtered total then shows as a bare number, and a miss as an unlabelled red one.
 
 ## Structure
 
