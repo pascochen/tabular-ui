@@ -45,9 +45,9 @@ Neutral: surfaces, borders, text. Replaces `olive`. Warm paper (85°) at the lig
 
 ◆ chroma limited by sRGB at this step (see Gamut report).
 
-## sage
+## ivy
 
-Primary, success. Replaces `emerald`.
+Primary, success. Replaces `emerald`. Hue and chroma from RISO Green. Named for RISO Ivy (347 U), the next-closest ink to step 500.
 
 | Step | oklch() | Hex | WCAG vs paper | WCAG vs ink | APCA Lc vs paper | APCA Lc vs ink |
 |---|---|---|---|---|---|---|
@@ -172,7 +172,7 @@ Source: riso-colors (npm) by Matt DesLauriers, compiled from stencil.wiki/colors
 | Ramp | RISO ink | Ink hex | Pantone | Ink OKLCH | Ramp hue | Peak chroma |
 |---|---|---|---|---|---|---|
 | ledger | Midnight | `#435060` | 296 U | `oklch(42.6% 0.031 253.8)` | 85° → 253.8° | 0.018 |
-| sage | Green | `#00a95c` | 354 U | `oklch(64.5% 0.164 153.6)` | 153.6° | 0.156 |
+| ivy | Green | `#00a95c` | 354 U | `oklch(64.5% 0.164 153.6)` | 153.6° | 0.156 |
 | vermilion | Crimson | `#e45d50` | 485 U | `oklch(64.9% 0.171 28.2)` | 28.2° | 0.171 |
 | ochre | Sunflower | `#ffb511` | 116 U | `oklch(82.2% 0.169 78.5)` | 78.5° | 0.152 |
 | federal | Medium Blue | `#3255a4` | 286 U | `oklch(46.7% 0.134 264.0)` | 264.0° | 0.134 |
@@ -182,8 +182,8 @@ Source: riso-colors (npm) by Matt DesLauriers, compiled from stencil.wiki/colors
 Accent hues around the OKLCH wheel, with the gap to the next one:
 
 - vermilion 28.2° → ochre 78.5°: 50°
-- ochre 78.5° → sage 153.6°: 75°
-- sage 153.6° → teal 201.2°: 48°
+- ochre 78.5° → ivy 153.6°: 75°
+- ivy 153.6° → teal 201.2°: 48°
 - teal 201.2° → federal 264.0°: 63°
 - federal 264.0° → orchid 318.4°: 54°
 - orchid 318.4° → vermilion 28.2°: 70°
@@ -194,9 +194,9 @@ Accent hues around the OKLCH wheel, with the gap to the next one:
 
 | Token | Wanted chroma | Used (sRGB limit) |
 |---|---|---|
-| sage-500 | 0.164 | 0.156 |
-| sage-600 | 0.164 | 0.132 |
-| sage-700 | 0.131 | 0.115 |
+| ivy-500 | 0.164 | 0.156 |
+| ivy-600 | 0.164 | 0.132 |
+| ivy-700 | 0.131 | 0.115 |
 | vermilion-50 | 0.017 | 0.012 |
 | vermilion-100 | 0.034 | 0.027 |
 | vermilion-200 | 0.068 | 0.057 |
@@ -246,7 +246,7 @@ The current Tabular UI ramps (Tailwind defaults) against their replacements. ✕
 
 olive: 0 of 11 outside sRGB. ledger: 0 of 12.
 
-### emerald → sage
+### emerald → ivy
 
 | Step | Old oklch() | Old hex | New oklch() | New hex | ΔL |
 |---|---|---|---|---|---|
@@ -262,7 +262,7 @@ olive: 0 of 11 outside sRGB. ledger: 0 of 12.
 | 900 | `oklch(37.8% 0.077 168.94)` ✕ | `#004f3b` | `oklch(30.5% 0.066 153.6)` | `#0d381f` | -7.3 |
 | 950 | `oklch(26.2% 0.051 172.552)` ✕ | `#002c22` | `oklch(21.0% 0.049 153.6)` | `#021f0d` | -5.2 |
 
-emerald: 7 of 11 outside sRGB. sage: 0 of 11.
+emerald: 7 of 11 outside sRGB. ivy: 0 of 11.
 
 ### red → vermilion
 

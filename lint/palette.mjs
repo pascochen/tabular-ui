@@ -16,10 +16,17 @@
  * The Riso Ledger ramps (2026-10-16), generated into src/styles/palette.css
  * by scripts/generate-palette.mjs. The only colour scales that exist.
  */
-export const RAMPS = ['ledger', 'sage', 'vermilion', 'ochre', 'federal', 'orchid', 'teal'];
+export const RAMPS = ['ledger', 'ivy', 'vermilion', 'ochre', 'federal', 'orchid', 'teal'];
+
+/**
+ * Old ramp names and what replaced them. Each stays as a deprecated alias in
+ * theme.css (§9), so it still paints, and stays banned below: without that, a
+ * new `bg-sage-500` would pass every gate.
+ */
+export const DEPRECATED_RAMPS = { sage: 'ivy' };
 
 /** The five hues the UI uses (CLAUDE.md, §1). */
-export const UI_HUES = ['sage', 'vermilion', 'ochre', 'federal', 'orchid'];
+export const UI_HUES = ['ivy', 'vermilion', 'ochre', 'federal', 'orchid'];
 
 /** The one neutral ramp. */
 export const NEUTRAL = 'ledger';
@@ -59,13 +66,16 @@ export const STRIPPED = ALL_SCALES;
 
 /**
  * Every scale name banned as a raw `<scale>-<step>` outside theme.css and
- * palette.css: Tailwind's, and the Riso ramps. A component reaches colour
- * through the semantic tokens, never a ramp (CLAUDE.md rule 10).
+ * palette.css: Tailwind's, the Riso ramps, and their deprecated names. A
+ * component reaches colour through the semantic tokens, never a ramp (CLAUDE.md
+ * rule 10).
  */
-export const BANNED_SCALES = [...new Set([...ALL_SCALES, ...RAMPS])];
+export const BANNED_SCALES = [...new Set([...ALL_SCALES, ...RAMPS, ...Object.keys(DEPRECATED_RAMPS)])];
 
 /** Chromatic scales whose 900/950 steps must never be a background (§0 rule 3). */
-export const CHROMATIC_SCALES = [...new Set([...CHROMATIC, ...RAMPS.filter((ramp) => ramp !== NEUTRAL)])];
+export const CHROMATIC_SCALES = [
+  ...new Set([...CHROMATIC, ...RAMPS.filter((ramp) => ramp !== NEUTRAL), ...Object.keys(DEPRECATED_RAMPS)]),
+];
 
 /** Every step name. 925 exists in ledger only. */
 export const STEPS = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '925', '950'];

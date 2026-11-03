@@ -492,7 +492,7 @@ test.describe('the Color page’s ramps', () => {
         .locator('li', { has: page.locator(`code:text-is("${step}")`) })
         .first()
         .evaluate((el) => Math.round(el.getBoundingClientRect().left));
-    for (const step of ['50', '500', '900', '950']) expect(await x('ledger', step)).toBe(await x('sage', step));
+    for (const step of ['50', '500', '900', '950']) expect(await x('ledger', step)).toBe(await x('ivy', step));
     await expect(page.locator('main')).not.toContainText('925');
     // The ramp's name is capitalised; its note in brackets is not.
     // (getByText reads the DOM, not the rendered case, so check the computed style.)
@@ -730,13 +730,13 @@ test.describe('the footer', () => {
 
 test.describe('standalone links', () => {
   // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
-  // index) is ink at rest and turns the sage of a text link on hover, with no
-  // underline. A link inside a sentence stays sage and underlined. The nav's
+  // index) is ink at rest and turns the ivy of a text link on hover, with no
+  // underline. A link inside a sentence stays ivy and underlined. The nav's
   // links are ghost buttons, not standalone links.
-  test('are ink at rest, and sage with no underline on hover', async ({ page }) => {
+  test('are ink at rest, and ivy with no underline on hover', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
-    const sage = await page.locator('#components p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
+    const ivy = await page.locator('#components p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
     const links = [
       page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }),
       page.getByRole('navigation', { name: 'Components by moment' }).getByRole('link', { name: 'Agent plan' }),
@@ -750,10 +750,10 @@ test.describe('standalone links', () => {
         });
       await page.mouse.move(0, 0);
       const rest = await style();
-      expect(rest.color).not.toBe(sage);
+      expect(rest.color).not.toBe(ivy);
       expect(rest.line).toBe('none');
       await link.hover();
-      await expect.poll(style).toEqual({ color: sage, line: 'none' });
+      await expect.poll(style).toEqual({ color: ivy, line: 'none' });
     }
   });
 

@@ -17,7 +17,7 @@ These matter more than any individual token value. A generator that gets the val
 
 1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary and tertiary buttons, dividers, empty states: all neutral. A hue appears only when something is true about the data, the run, or the user's focus. In a dense interface every colored pixel that isn't communicating state is stealing attention from one that is.
 
-2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `sage`, `vermilion`, `ochre`, `federal` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens only (§6) and never marks UI state.
+2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `ivy`, `vermilion`, `ochre`, `federal` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens only (§6) and never marks UI state.
 
 3. **Never use the 900 or 950 step of a chromatic scale as a background.** Under Tailwind's ramps those steps drifted in lightness by hue, so a `red-950` chip and a `blue-950` chip did not sit at the same visual depth. The Riso ramps share one lightness curve, but a dark chromatic slab still reads as a hole in the page. Use alpha over the canvas instead: `{hue}-500 / 10%`. This guarantees consistent depth and keeps the UI quiet. `ledger` is the neutral and exempt: its 900–950 steps are surfaces.
 
@@ -41,14 +41,14 @@ These matter more than any individual token value. A generator that gets the val
 
 ## 1. The Five
 
-Five hues, six roles. The interactive role is split (decided 2026-10-16): its solid parts, the primary action and the focus ring, are `ledger` ink, and its marks, links, selected text and the selection tint, are `sage`, the same green as success.
+Five hues, six roles. The interactive role is split (decided 2026-10-16): its solid parts, the primary action and the focus ring, are `ledger` ink, and its marks, links, selected text and the selection tint, are `ivy`, the same green as success.
 
 | Role | Ramp | RISO anchor | Applies to |
 |---|---|---|---|
-| **Interactive** | `ledger` (fill, ring) · `sage` (text, tint) | Midnight, 296 U · Green, 354 U | Primary action, focus ring, checked controls, active tab · links, selected row in a single-selection list |
+| **Interactive** | `ledger` (fill, ring) · `ivy` (text, tint) | Midnight, 296 U · Green, 354 U | Primary action, focus ring, checked controls, active tab · links, selected row in a single-selection list |
 | **Danger** | `vermilion` | Crimson, 485 U | Failed run, validation error, destructive action, negative variance, reconciliation mismatch |
 | **Warning** | `ochre` | Sunflower, 116 U | Stale data, degraded run, needs review, unverified figure, approaching threshold |
-| **Success** | `sage` | Green, 354 U | Passed test, verified figure, deployed, positive variance, numbers match |
+| **Success** | `ivy` | Green, 354 U | Passed test, verified figure, deployed, positive variance, numbers match |
 | **Agent** | `orchid` | Orchid, 2592 U | Agent-authored content, generated dbt code, agent questions, agent activity, pending human review |
 | **Info** | `federal` | Federal Blue's hue, Medium Blue's chroma | "Running" state, work in progress, informational notices |
 
@@ -56,11 +56,15 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **Palette change, 2026-10-16 (user decision): Riso Ledger.** The Tailwind ramps were replaced: `olive` → `ledger`, `emerald` → `sage`, `red` → `vermilion`, `amber` → `ochre`, `sky` → `federal`, `violet` → `orchid`. Two reasons. 30 of the 55 old accent colours sat outside sRGB, so an sRGB screen clipped them to something other than what was specified. And every Tailwind ramp had its own lightness curve, which is the problem §2's lightness bands existed to work around. The Riso ramps are generated in OKLCH from one shared lightness curve and a chroma curve per ramp, each anchored to a RISO spot ink and kept inside sRGB. A step number now means the same contrast in every hue. Values, anchors and the gamut report are in `docs/palette.md`. *(The previous change, 2026-10-08, moved the accent from `blue` to `emerald` and the neutral to `olive`, and brought `sky` back as info. Its reasoning is in Appendix A.)*
 
+**`sage` renamed `ivy` — decided 2026-11-03 (owner).** Names only: no value moved. The ramp's chroma is 0.115–0.156 at the steps the tokens use, which is leaf strength, not a sage's grey-green. RISO Ivy (347 U) is the next-closest ink to step 500 after Green. Green stays the anchor, so the ramp's name isn't its anchor's, as with `federal`. `--color-sage-*` stays as a deprecated alias (§9), and lint rejects it in new code. Text recording what happened under the old name keeps it. `fir` was considered and rejected: a fir is dark and muted, and 13 of the ramp's 18 token references are steps 400 and 500.
+
+**`ledger` keeps its name — decided 2026-11-03 (owner).** It names both ends of the ramp, paper and ink: `ledger-50` is the most-used step, and 26 of the ramp's 46 references in `theme.css` are paper-hue steps. `lacquer` and `midnight` name only the dark end, and `riso` already names all seven ramps.
+
 ### Why these ramps
 
 **The accent is ink — decided 2026-10-16, after review in Storybook.** The primary action, the focus ring, checked controls and the active-tab indicator are `ledger`: ink on paper in light mode, paper on ink in dark (16.39:1 either way), as a riso print puts its strongest ink on the one thing to press. The focus ring is a step softer, `ledger-800` / `ledger-200`, since 2026-10-22 (§4). They were `sage` until the same day; the owner preferred the ink accent of the `experiment/riso` art direction. A primary button and a success badge no longer share a hue.
 
-**Links and selection stay `sage`, shared with success.** `--color-text-interactive`, `--color-bg-interactive` and `--color-border-interactive` keep the green. A ledger link would be the body-text colour, and a ledger selection tint measured 1.04:1 against the hover tint, so a selected row would look hovered. Interactive and success stay separate tokens; today only the text, tint and border values coincide. Where success and selection meet, **shape carries the difference**: a selected row is a full-width tint, a success state is an 18px badge with an icon.
+**Links and selection stay `ivy`, shared with success.** `--color-text-interactive`, `--color-bg-interactive` and `--color-border-interactive` keep the green. A ledger link would be the body-text colour, and a ledger selection tint measured 1.04:1 against the hover tint, so a selected row would look hovered. Interactive and success stay separate tokens; today only the text, tint and border values coincide. Where success and selection meet, **shape carries the difference**: a selected row is a full-width tint, a success state is an 18px badge with an icon.
 
 **The active nav item takes no hue — corrected 2026-10-22 (owner).** It is marked by weight and shape: its label steps up from `--color-text-secondary` to `--color-text-primary` at `--font-semibold`, its icon switches to Phosphor's `fill` weight (§11.2), and it carries `aria-current="page"`. That is how `AppShellNavItem` and `AppBarNavItem` have always drawn it. Until this date the table above listed "active nav item" under sage, which no component did. A sidebar is navigation, and colour means state (§0 rule 1): which page you are on is your place, not something true about the data.
 
@@ -74,7 +78,7 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **`orchid` for agent.** Moved off violet so agent does not read as a second blue next to info: 54° apart on the hue wheel.
 
-**`teal` for charts only.** Hue 201°, filling the gap between `sage` and `federal`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
+**`teal` for charts only.** Hue 201°, filling the gap between `ivy` and `federal`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
 
 ### Colour-vision limits of this palette
 
@@ -110,7 +114,7 @@ Every Tailwind colour scale, chromatic and grey, is stripped (§9). The only col
 
 ### Brand assets are outside these rules — decided 2026-10-22 (owner)
 
-The Tabular wordmark and favicon are brand marks, and they stay exactly as drawn. They take their colours from this palette: orchid-500, sage-700, a dark teal close to teal-900, and ledger-50 paper. But they are not UI, so none of the colour rules in §0 and here apply to them. Their orchid is not the agent role, and their green is not success. They may appear wherever the brand does, the product's app bar included.
+The Tabular wordmark and favicon are brand marks, and they stay exactly as drawn. They take their colours from this palette: orchid-500, ivy-700, a dark teal close to teal-900, and ledger-50 paper. But they are not UI, so none of the colour rules in §0 and here apply to them. Their orchid is not the agent role, and their green is not success. They may appear wherever the brand does, the product's app bar included.
 
 What keeps the exception from leaking into the UI:
 
@@ -138,13 +142,13 @@ So one step serves every role: **400 in dark mode, 700 in light mode** (§0 rule
 
 | Role | Dark text | On `ledger-950` | Light text | On `ledger-50` |
 |---|---|---|---|---|
-| interactive (text), success | `sage-400` | 7.84:1 | `sage-700` | 6.23:1 |
+| interactive (text), success | `ivy-400` | 7.84:1 | `ivy-700` | 6.23:1 |
 | danger | `vermilion-400` | 6.95:1 | `vermilion-700` | 7.15:1 |
 | warning | `ochre-400` | 7.24:1 | `ochre-700` | 6.74:1 |
 | agent | `orchid-400` | 6.96:1 | `orchid-700` | 7.13:1 |
 | info | `federal-400` | 7.31:1 | `federal-700` | 6.75:1 |
 
-The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:1 in dark mode before. What spread remains is chroma, not lightness: sage and federal read slightly stronger than vermilion and orchid at the same L. **Dark warning is no longer an exception**: `amber-500` sat about 6 L above its band; `ochre-400` sits on the shared curve with the other four.
+The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:1 in dark mode before. What spread remains is chroma, not lightness: ivy and federal read slightly stronger than vermilion and orchid at the same L. **Dark warning is no longer an exception**: `amber-500` sat about 6 L above its band; `ochre-400` sits on the shared curve with the other four.
 
 **What each step guarantees** (from `docs/palette.md`, for every ramp):
 
@@ -195,7 +199,7 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-text-secondary` | `ledger-700` | **6.64:1** |
 | `--color-text-tertiary` | `ledger-600` | **4.89:1** |
 
-**Paper on paper — decided 2026-10-16.** Canvas, surface and raised are all `ledger-50`. A card or a popup separates from the page by its border, not by a white fill or a shadow. *(Overlays add the sheet, §4.)* No `#fff` remains in the theme: text on a fill is paper too (§4). So there is one column of ratios, measured on paper, and measuring on white instead overstates them by about 8% (`sage-700` is 6.72:1 on white, 6.23:1 on paper).
+**Paper on paper — decided 2026-10-16.** Canvas, surface and raised are all `ledger-50`. A card or a popup separates from the page by its border, not by a white fill or a shadow. *(Overlays add the sheet, §4.)* No `#fff` remains in the theme: text on a fill is paper too (§4). So there is one column of ratios, measured on paper, and measuring on white instead overstates them by about 8% (`ivy-700` is 6.72:1 on white, 6.23:1 on paper).
 
 **Secondary and tertiary moved a step darker than olive's.** On the shared curve, step 500 is 3.3:1 on paper, too low for text, so tertiary is `ledger-600` and secondary `ledger-700`. Primary and body take the ink end of the ramp, `ledger-950` and `ledger-900`.
 
@@ -251,14 +255,14 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | on raised | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `sage-400` | 7.84:1 | 6.95:1 | `ledger-50` | `ledger-950` | 16.39:1 | `sage-500 / 10%` | `sage-500 / 25%` |
+| interactive | `ivy-400` | 7.84:1 | 6.95:1 | `ledger-50` | `ledger-950` | 16.39:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
 | danger | `vermilion-400` | 6.95:1 | 6.16:1 | `vermilion-600` | `ledger-50` | 5.36:1 | `vermilion-500 / 10%` | `vermilion-500 / 25%` |
 | warning | `ochre-400` | 7.24:1 | 6.42:1 | `ochre-400` | `ledger-950` | 7.24:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
-| success | `sage-400` | 7.84:1 | 6.95:1 | `sage-600` | `ledger-50` | 4.59:1 | `sage-500 / 10%` | `sage-500 / 25%` |
+| success | `ivy-400` | 7.84:1 | 6.95:1 | `ivy-600` | `ledger-50` | 4.59:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
 | agent | `orchid-400` | 6.96:1 | 6.17:1 | `orchid-600` | `ledger-50` | 5.30:1 | `orchid-500 / 10%` | `orchid-500 / 25%` |
 | info | `federal-400` | 7.31:1 | 6.48:1 | `federal-600` | `ledger-50` | 4.97:1 | `federal-500 / 10%` | `federal-500 / 25%` |
 
-**Solid-fill rule, dark.** The interactive fill is paper, `ledger-50`, with ink text (16.39:1): the accent is ink in light mode and its inverse here (§1). The role fills are step **600**, not 700. A 700 fill is 2.3–2.6:1 against the canvas, under the 3:1 a solid control needs to read as a shape; a 600 fill is 3.06–3.57:1 (2.71–3.16:1 on a raised surface), with paper text on it at 4.59–5.36:1. Sage (success), the tightest, clears AA by 0.09. Warning is the only fill that takes ink: `ochre-400` under `ledger-950` measures 7.24:1, and paper on it fails. Text on every other fill is paper, `ledger-50`, never `#fff`.
+**Solid-fill rule, dark.** The interactive fill is paper, `ledger-50`, with ink text (16.39:1): the accent is ink in light mode and its inverse here (§1). The role fills are step **600**, not 700. A 700 fill is 2.3–2.6:1 against the canvas, under the 3:1 a solid control needs to read as a shape; a 600 fill is 3.06–3.57:1 (2.71–3.16:1 on a raised surface), with paper text on it at 4.59–5.36:1. Ivy (success), the tightest, clears AA by 0.09. Warning is the only fill that takes ink: `ochre-400` under `ledger-950` measures 7.24:1, and paper on it fails. Text on every other fill is paper, `ledger-50`, never `#fff`.
 
 ### Light mode
 
@@ -266,14 +270,14 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | worst ground | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `sage-700` | 6.23:1 | 4.71:1 | `ledger-950` | `ledger-50` | 16.39:1 | `sage-500 / 8%` | `sage-500 / 20%` |
+| interactive | `ivy-700` | 6.23:1 | 4.71:1 | `ledger-950` | `ledger-50` | 16.39:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
 | danger | `vermilion-700` | 7.15:1 | 5.35:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
 | warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.89:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
-| success | `sage-700` | 6.23:1 | 4.71:1 | `sage-700` | `ledger-50` | 6.23:1 | `sage-500 / 8%` | `sage-500 / 20%` |
+| success | `ivy-700` | 6.23:1 | 4.71:1 | `ivy-700` | `ledger-50` | 6.23:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
 | agent | `orchid-700` | 7.13:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.13:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
 | info | `federal-700` | 6.75:1 | 5.12:1 | `federal-700` | `ledger-50` | 6.75:1 | `federal-500 / 8%` | `federal-500 / 20%` |
 
-"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`sage-700`) are the tightest roles, at 6.23:1 on the canvas and 4.71:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.39:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.23:1, and the 600 steps (4.59–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
+"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`ivy-700`) are the tightest roles, at 6.23:1 on the canvas and 4.71:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.39:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.23:1, and the 600 steps (4.59–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
 
 **Light warning fill is `ochre-500`, not `-400` — decided 2026-10-16.** `ochre-400` takes ink at 7.24:1, but against paper the fill itself is 2.26:1, under the 3:1 a fill needs (`packages/ui/scripts/check-contrast.mjs` fails it). `ochre-500` is 3.35:1 against paper, with ink on it at 4.89:1. The cost is a browner, less sunny fill. Paper on `ochre-500` is 3.35:1 and fails, so warning takes ink in both modes. *(Tailwind's `amber-500` fill measured 2.06:1 against the olive canvas; nothing checked it.)*
 
@@ -312,13 +316,13 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 
 **The inverse overlay — added 2026-10-16, with the ink accent.** The overlay is ink in light mode and paper in dark, which is exactly the primary fill's colour in each mode, so on a primary button it changed nothing (ΔE 0.00; a sage fill had moved 1.78 light, 2.82 dark). `--color-bg-hover-inverse` and `--color-bg-active-inverse` are the other mode's overlay, at the same 6% and 10%: paper over the ink button in light mode, ink over the paper button in dark. The button moves ΔE 4.19 in light and 2.80 in dark, the same as a hovered row in the other mode, and its label stays at 12.5:1 or more when pressed. Only the primary ground uses them: `controlGrounds.default` points `--tui-bg-hover` and `--tui-bg-active` at the inverse values on the element, so the shared overlay utility picks them up (§9, contextual overrides target the `--tui-*` layer). It is not a per-role hover token: one pair, for a fill at the overlay's own end of the ramp.
 
-**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (sage), 4.42:1 (federal), 4.76:1 (orchid) and 4.86:1 (vermilion), so sage and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.47:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
+**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (ivy), 4.42:1 (federal), 4.76:1 (orchid) and 4.86:1 (vermilion), so ivy and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.47:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
 
 ### Text selection — added 2026-11-02 (owner, after a side-by-side)
 
 ```
                               Dark                 Light
---color-bg-selection          sage-500 / 30%       sage-500 / 30%
+--color-bg-selection          ivy-500 / 30%        ivy-500 / 30%
 ```
 
 ```css
@@ -328,7 +332,7 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 }
 ```
 
-Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selection is already `sage` (§1). Until now the browser painted its own blue, off-palette.
+Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selection is already `ivy` (§1). Until now the browser painted its own blue, off-palette.
 
 **Not `--color-bg-interactive`.** That tint is for a selected row, at 8% and 10%. Selecting text inside a row has to show on top of it, so this token is a separate one, not a duplicate of it: against a selected row it measures 1.27:1 in light and 1.37:1 in dark, and against the canvas 1.39:1 and 1.56:1.
 
@@ -439,7 +443,7 @@ Map product concepts onto the six roles. Do not introduce new hues here.
 | State | Role | Treatment |
 |---|---|---|
 | Queued | neutral | neutral `StatusBadge` (`--color-text-secondary`), no hue |
-| Running | info | `--color-text-info` + `Spinner` (§11.5) — not interactive, which is sage and would read as passed (§1) |
+| Running | info | `--color-text-info` + `Spinner` (§11.5) — not interactive, which is ivy and would read as passed (§1) |
 | Passed / verified | success | `--color-text-success` |
 | Failed | danger | `--color-text-danger` + `--color-bg-danger` row tint |
 | Degraded / stale | warning | `--color-text-warning` |
@@ -491,11 +495,11 @@ Governed separately from UI state colour. Seven series, one step per mode: **600
 | 4 | `orchid` | 318.4 | 5.30:1 | 6.96:1 | 6.17:1 |
 | 5 | `ledger` | neutral | 4.89:1 | 7.37:1 | 6.53:1 |
 | 6 | `vermilion` | 28.2 | 5.36:1 | 6.95:1 | 6.16:1 |
-| 7 | `sage` | 153.6 | 4.59:1 | 7.84:1 | 6.95:1 |
+| 7 | `ivy` | 153.6 | 4.59:1 | 7.84:1 | 6.95:1 |
 
 Every series clears the 3:1 graphical minimum with room to spare, 4.59:1 at worst; the old ramp's most fragile series was 3.09:1.
 
-**Polarity guard — decided 2026-10-16.** Series 6 and 7 are `vermilion` and `sage`, the danger and success hues. **A chart that shows gain and loss, or sits beside figures that do, uses series 1–5 only.** Most charts carry two or three series and never reach 6. Until 2026-10-16 the ramp excluded red and emerald outright (Appendix A); with seven Riso ramps, a seven-series cap needs them, so they go last. shadcn's chart aliases cover series 1–5 only.
+**Polarity guard — decided 2026-10-16.** Series 6 and 7 are `vermilion` and `ivy`, the danger and success hues. **A chart that shows gain and loss, or sits beside figures that do, uses series 1–5 only.** Most charts carry two or three series and never reach 6. Until 2026-10-16 the ramp excluded red and emerald outright (Appendix A); with seven Riso ramps, a seven-series cap needs them, so they go last. shadcn's chart aliases cover series 1–5 only.
 
 **The ramp is capped at seven series — decided 2026-08-02.** An eighth series is a signal that the chart needs grouping rather than another colour.
 
@@ -505,7 +509,7 @@ Every series clears the 3:1 graphical minimum with room to spare, 4.59:1 at wors
 - Series 5 is the neutral. It reads as "other" or a baseline; do not give it the series the chart is about.
 - Ochre and orchid double as warning and agent. Acceptable inside a plot frame because the context is unambiguous, but avoid ochre as series 2 on a chart that also renders threshold-breach markers.
 
-**Sequential and diverging ramps** for heatmaps and variance matrices: build from a single ramp's own steps (`federal-100` → `federal-900`), or `vermilion` ↔ `sage` through `ledger` at matching steps. Never build a sequential ramp by walking the categorical list.
+**Sequential and diverging ramps** for heatmaps and variance matrices: build from a single ramp's own steps (`federal-100` → `federal-900`), or `vermilion` ↔ `ivy` through `ledger` at matching steps. Never build a sequential ramp by walking the categorical list.
 
 ---
 
@@ -1017,6 +1021,17 @@ Until then the feature was `--font-mono-features`, a reference variable outside 
 
 Every Tailwind colour scale is stripped since the Riso Ledger palette (2026-10-16); until then the five UI hues and `olive` were kept. `mauve`, `mist`, `taupe` and `olive` arrived in Tailwind 4.2, and until 2026-10-08 the first three were missing from this list and so were live utilities. **When Tailwind adds a scale, add it here**, or it ships as a usable hue. `apps/storybook/tests/palette.spec.ts` fails until it is.
 
+### Deprecated ramp names
+
+```css
+@theme static {
+  --color-sage-50: var(--color-ivy-50);
+  /* ... one alias per ivy step, 50 to 950 ... */
+}
+```
+
+`sage` became `ivy` on 2026-11-03 (§1). The aliases are `static` so they exist at runtime whatever an app's source names: a copy installed from the registry that names the old ramp keeps resolving. They hold references, not values, so they can't drift from the ramp. Lint rejects `sage` as it rejects every ramp name, and `apps/storybook/tests/palette.spec.ts` fails if an alias is missing.
+
 ### Stock shadows are stripped too
 
 ```css
@@ -1045,7 +1060,7 @@ Follow the Tailwind v4 documented pattern — raw values on `:root` and `[data-t
 :root {
   --tui-canvas: var(--color-ledger-50);
   --tui-text-primary: var(--color-ledger-950);
-  --tui-text-interactive: var(--color-sage-700);
+  --tui-text-interactive: var(--color-ivy-700);
   --tui-ring: var(--color-ledger-800);
   /* ... light mode values ... */
 }
@@ -1053,7 +1068,7 @@ Follow the Tailwind v4 documented pattern — raw values on `:root` and `[data-t
 [data-theme="dark"] {
   --tui-canvas: var(--color-ledger-950);
   --tui-text-primary: var(--color-ledger-50);
-  --tui-text-interactive: var(--color-sage-400);
+  --tui-text-interactive: var(--color-ivy-400);
   --tui-ring: var(--color-ledger-200);
   /* ... dark mode values ... */
 }
@@ -1108,7 +1123,7 @@ Before the token set is considered done:
 - [x] **Riso Ledger re-verification (2026-10-16). Human checks done 2026-10-22 (owner, in Storybook, both modes).** Automated contrast passes: `packages/ui/scripts/check-contrast.mjs` and `apps/storybook/tests/contrast.spec.ts`, both modes, every ground in §4. Passed by eye: the five role colours read as equal weight in both modes (§2); ochre reads as warning, apart from vermilion; paper-on-paper menus separate by border alone (§3); dark menus on `ledger-925` lift off the page; the 6% hover is visible over paper and ink, and the inverse overlay shows on the ink and paper primary buttons; a sage selected row (`Select`) reads as selected beside the ink controls; grayscale `RunLogRow` keeps every state distinct; under deuteranopia simulation, chart series 1 and 4 and danger beside success stay separable; sustained reading on `ledger-950` is comfortable. Two findings, below, stay open.
 - [x] **Light-mode warning reads brownish (owner, 2026-10-22). Decided the same day: keep it.** `ochre-700` text reads as equal weight but on the brownish side, and the `ochre-500` fill read brownish under ink text. A side-by-side in Storybook compared four fills beside the other roles, as a label and as a progress bar: today's `ochre-500` with ink (4.89:1, fill 3.35:1 on paper), `ochre-500` with `ochre-950` text (4.93:1), `ochre-600` with paper (4.97:1) and `ochre-700` with paper (6.74:1). The owner kept today's. The deeper steps read browner still, and the yellower ones fail the 3:1 a fill needs. The text step is fixed by §0 rule 4.
 - [x] **The ink focus ring read heavy, in both modes (owner, 2026-10-22). Resolved the same day.** The 2px width read right; full-strength ink (16.39:1) did not. After a side-by-side of four steps per mode, the ring is `ledger-800` in light (9.10:1 on paper) and `ledger-200` in dark (12.68:1 on the canvas), the gentlest of the candidates (§4).
-- [x] **`DataTable` checked rows take no selection tint — decided 2026-10-22 (owner), after a side-by-side in both modes.** The ink checkbox marks a checked row, and the row keeps its status tint (failed, agent proposed). A sage tint would have replaced that status tint on every checked row, and turned an agent proposal green. The sage selection tint stays for single-selection lists: `Select`, `Combobox`, `Chip` and `LineageTree` (§4).
+- [x] **`DataTable` checked rows take no selection tint — decided 2026-10-22 (owner), after a side-by-side in both modes.** The ink checkbox marks a checked row, and the row keeps its status tint (failed, agent proposed). An ivy tint would have replaced that status tint on every checked row, and turned an agent proposal green. The ivy selection tint stays for single-selection lists: `Select`, `Combobox`, `Chip` and `LineageTree` (§4).
 - [x] **Overlay sheet (2026-10-19). Human checks done 2026-10-22 (owner, both modes, at 1x and 2x).** On Dialog and the sidebar peek: the sheet reads as a second sheet, not a heavier border; the peek's sheet reads as a sheet, not a stripe; nothing in a dialog's footer rhymes with the sheet's corner. Automated: `--shadow-overlay`'s two layers compute to `--color-surface-raised` and `--color-border-strong` on both overlays in both modes, in `apps/storybook/tests/elevation.spec.ts`; and no other element in any story paints a shadow layer, in `apps/storybook/.storybook/elevation-sweep.ts`, which runs after every story test in both modes.
 - [x] All five `--color-text-{role}` tokens sit within OKLCH L 66–71 in dark mode — verified side by side on the Tokens story 2026-08-02: none dominates. *(Tailwind ramps. Since 2026-10-16 every role is one step per mode, §2; see the re-verification item above.)*
 - [x] *(Tailwind ramps; for ochre see the re-verification item above.)* Dark warning reads as warning, not as decorative orange. `amber-600` verified 2026-08-02; reopened 2026-10-09 for contrast on row states and replaced by `amber-500` after a side-by-side, accepting that it reads ~6 L brighter than the other roles (§2).
@@ -1255,7 +1270,7 @@ Two things override that principle, and both are optical rather than aesthetic. 
 
 **Both `size="var(--size-icon-sm)"` and `size={14}` work.** Phosphor forwards `size` to the SVG `width`/`height`, which are parsed as CSS values, so a `var()` reference resolves — verified in Chromium, rendering 14×14. Prefer the token form. If a target browser ever fails to resolve it, the numeric fallback is the same value, not a different one.
 
-`currentColor` inheritance is verified in the same way: an icon inside `text-text-success` renders sage, inside `text-text-warning` ochre, with no colour set on the icon itself.
+`currentColor` inheritance is verified in the same way: an icon inside `text-text-success` renders ivy, inside `text-text-warning` ochre, with no colour set on the icon itself.
 
 **Icon weight is not font weight.** Phosphor's `bold` is a stroke axis on an SVG and is unrelated to §8.5's "never 700". Do not "correct" `weight="bold"` to `semibold`; do not read the §8.5 cap as applying here.
 

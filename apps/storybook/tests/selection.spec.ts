@@ -78,7 +78,7 @@ async function expectSelection(page: Page, sample: Locator) {
 }
 
 for (const mode of ['dark', 'light'] as const) {
-  test(`selected text paints the sage highlight and primary text (${mode})`, async ({ page }) => {
+  test(`selected text paints the ivy highlight and primary text (${mode})`, async ({ page }) => {
     await gotoStory(page, STORY, mode);
     await expectSelection(page, await selectedSample(page));
   });

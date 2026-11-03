@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { expect, test } from '@playwright/test';
 
-import { ALL_SCALES, BANNED_SCALES, RAMPS, STRIPPED } from '../../../lint/palette.mjs';
+import { ALL_SCALES, BANNED_SCALES, DEPRECATED_RAMPS, RAMPS, STRIPPED } from '../../../lint/palette.mjs';
 
 /**
  * The colour-scale list is shared by the lint rules (lint/palette.mjs). Five
@@ -66,6 +66,24 @@ test('palette.css loads after theme.css, so the strip cannot erase the Riso teal
   const palette = index.indexOf("@import './styles/palette.css'");
   expect(theme, 'index.css imports theme.css').toBeGreaterThan(-1);
   expect(palette, 'index.css imports palette.css after theme.css').toBeGreaterThan(theme);
+});
+
+test('a deprecated ramp name still resolves at every step, and lint still bans it', () => {
+  const theme = read('packages/ui/src/styles/theme.css');
+  const json = JSON.parse(read('docs/palette.json')) as { ramps: Record<string, Record<string, unknown>> };
+  for (const [old, current] of Object.entries(DEPRECATED_RAMPS)) {
+    const aliases = [
+      ...theme.matchAll(new RegExp(`--color-${old}-(\\d+):\\s*var\\(--color-${current}-(\\d+)\\);`, 'g')),
+    ];
+    expect(
+      aliases.filter((m) => m[1] !== m[2]).map((m) => m[0]),
+      `${old} aliases pointing at a different step`,
+    ).toEqual([]);
+    expect(sorted(aliases.map((m) => m[1])), `${old} aliases in theme.css`).toEqual(
+      sorted(Object.keys(json.ramps[current])),
+    );
+    expect(BANNED_SCALES, 'lint/palette.mjs').toContain(old);
+  }
 });
 
 test("the design-review skill's raw-hue grep names every scale", () => {

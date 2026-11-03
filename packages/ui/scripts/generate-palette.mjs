@@ -36,8 +36,8 @@ const LIGHTNESS = [97.5, 94.5, 89, 82, 73, 62.5, 53, 46, 38.5, 30.5, 21];
 // Chroma curves: share of the ramp's peak chroma at each step, peaking in the middle.
 const SHAPES = {
   mid: [0.1, 0.2, 0.4, 0.65, 0.88, 1.0, 1.0, 0.9, 0.75, 0.6, 0.45],
-  // Sage character at the light and dark ends, leaf-strength chroma at 400–600.
-  sage: [0.08, 0.15, 0.3, 0.55, 0.85, 1.0, 1.0, 0.8, 0.55, 0.4, 0.3],
+  // Muted at the light and dark ends, leaf-strength chroma at 400–600.
+  leaf: [0.08, 0.15, 0.3, 0.55, 0.85, 1.0, 1.0, 0.8, 0.55, 0.4, 0.3],
   // Yellow can only be vivid when light, so its chroma peaks earlier.
   yellow: [0.15, 0.35, 0.65, 0.9, 1.0, 0.95, 0.85, 0.75, 0.65, 0.55, 0.45],
 };
@@ -87,7 +87,14 @@ const RAMPS = [
     neutral: true,
     note: 'Warm paper (85°) at the light end, RISO Midnight at the dark end.',
   },
-  { name: 'sage', role: 'Primary, success', replaces: 'emerald', anchor: INKS.green, shape: 'sage' },
+  {
+    name: 'ivy',
+    role: 'Primary, success',
+    replaces: 'emerald',
+    anchor: INKS.green,
+    shape: 'leaf',
+    note: 'Hue and chroma from RISO Green. Named for RISO Ivy (347 U), the next-closest ink to step 500.',
+  },
   {
     name: 'vermilion',
     role: 'Danger',

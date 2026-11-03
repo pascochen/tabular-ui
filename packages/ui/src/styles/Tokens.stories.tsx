@@ -28,8 +28,8 @@ const ROLES = ['interactive', 'danger', 'warning', 'success', 'agent', 'info'] a
 /* One step per mode for every role (§0 rule 4): 400 dark, 700 light. */
 const TEXT_ROLES: Record<(typeof ROLES)[number], Record<Mode, { step: Step; ratio: string }>> = {
   interactive: {
-    dark: { step: { hue: 'sage', step: 400 }, ratio: '7.84:1' },
-    light: { step: { hue: 'sage', step: 700 }, ratio: '6.23:1' },
+    dark: { step: { hue: 'ivy', step: 400 }, ratio: '7.84:1' },
+    light: { step: { hue: 'ivy', step: 700 }, ratio: '6.23:1' },
   },
   danger: {
     dark: { step: { hue: 'vermilion', step: 400 }, ratio: '6.95:1' },
@@ -40,8 +40,8 @@ const TEXT_ROLES: Record<(typeof ROLES)[number], Record<Mode, { step: Step; rati
     light: { step: { hue: 'ochre', step: 700 }, ratio: '6.74:1' },
   },
   success: {
-    dark: { step: { hue: 'sage', step: 400 }, ratio: '7.84:1' },
-    light: { step: { hue: 'sage', step: 700 }, ratio: '6.23:1' },
+    dark: { step: { hue: 'ivy', step: 400 }, ratio: '7.84:1' },
+    light: { step: { hue: 'ivy', step: 700 }, ratio: '6.23:1' },
   },
   agent: {
     dark: { step: { hue: 'orchid', step: 400 }, ratio: '6.96:1' },
@@ -72,8 +72,8 @@ const FILL_ROLES: Record<(typeof ROLES)[number], Record<Mode, { fill: Step; on: 
     light: { fill: { hue: 'ochre', step: 500 }, on: ink, ratio: '4.89:1' },
   },
   success: {
-    dark: { fill: { hue: 'sage', step: 600 }, on: paper, ratio: '4.59:1' },
-    light: { fill: { hue: 'sage', step: 700 }, on: paper, ratio: '6.23:1' },
+    dark: { fill: { hue: 'ivy', step: 600 }, on: paper, ratio: '4.59:1' },
+    light: { fill: { hue: 'ivy', step: 700 }, on: paper, ratio: '6.23:1' },
   },
   agent: {
     dark: { fill: { hue: 'orchid', step: 600 }, on: paper, ratio: '5.30:1' },
@@ -202,7 +202,7 @@ const CHART: {
   },
   {
     n: 7,
-    step: { dark: { hue: 'sage', step: 400 }, light: { hue: 'sage', step: 600 } },
+    step: { dark: { hue: 'ivy', step: 400 }, light: { hue: 'ivy', step: 600 } },
     ratio: { dark: '7.84:1', light: '4.59:1' },
   },
 ];
@@ -425,7 +425,7 @@ function TokensPage({ mode }: { mode: Mode }) {
           ))}
         </div>
         <Caption>
-          Capped at seven. Series 6 and 7 are vermilion and sage, the gain and loss hues: a chart that shows polarity
+          Capped at seven. Series 6 and 7 are vermilion and ivy, the gain and loss hues: a chart that shows polarity
           uses series 1–5 only (§6). An eighth series is a signal that the chart needs grouping, not another colour.
         </Caption>
       </section>
