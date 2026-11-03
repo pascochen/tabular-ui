@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import { AppShellPanelHeader } from 'tabular-ui';
 
 import { ClosePanel } from '../components/ClosePanel';
-import { channels, lastClosedMonth, memberName } from '../lib/kasane';
+import { channels, lastClosedMonth, memberName, selectedTask } from '../lib/kasane';
 import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
-import { OpenItemsChannel } from './OpenItems';
 import { NoMessages, Profile } from './parts';
 import { SepCloseChannel } from './SepClose';
+import { TaskPanel, TasksView } from './Tasks';
 
 /**
  * What one view puts in the shell's slots: the page header, the main body and,
@@ -24,7 +24,24 @@ export type ViewSlots = {
 };
 
 export function slotsFor(view: View): ViewSlots {
-  // Only channels and direct messages reach here until their steps are built (`BUILT_PLACES`).
+  if (view.kind === 'tasks') {
+    const task = selectedTask(view.task);
+    return {
+      title: 'Tasks',
+      body: <TasksView />,
+      contentWidth: 'full',
+      panel: {
+        label: 'Task',
+        content: (
+          <>
+            <AppShellPanelHeader title={task.title} />
+            <TaskPanel task={task} />
+          </>
+        ),
+      },
+    };
+  }
+  // Only these reach here until their steps are built (`BUILT_PLACES`).
   if (view.kind !== 'channel' && view.kind !== 'dm') throw new Error(`No view for "${view.kind}" yet`);
   if (view.kind === 'dm') {
     return {
@@ -43,9 +60,6 @@ export function slotsFor(view: View): ViewSlots {
   }
   const channel = channels.find((c) => c.id === view.channel)!;
   const title = `# ${channel.name}`;
-  if (view.channel === 'open-items') {
-    return { title, body: <OpenItemsChannel />, contentWidth: 'full' };
-  }
   return {
     title,
     actions: <ChannelPresence channel="revenue" />,

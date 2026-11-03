@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tabular-ui';
 
 import { DemoBanner } from './components/DemoBanner';
@@ -8,6 +8,7 @@ import { CloseContext } from './lib/close-context';
 import { sceneNow } from './lib/clock';
 import { closeReducer, endState, landingState } from './lib/close-state';
 import { useHeroScript } from './lib/hero-script';
+import { PanelSheetContext } from './lib/panel-sheet';
 import { useTimeline } from './lib/timeline-script';
 import { parseAtEnd, placeOf, useView } from './lib/view';
 import { useNoRoomForPanel } from './lib/viewport';
@@ -34,46 +35,54 @@ export function App() {
   useHeroScript(state, dispatch);
   useTimeline(state, dispatch);
   const panelAsSheet = useNoRoomForPanel() && slots.panel != null;
+  const place = placeOf(view);
+  // Which place's sheet is open, so one never stays open over the next view.
+  const [sheetFor, setSheetFor] = useState<string | null>(null);
 
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
-      <AppShell
-        className="font-sans text-base text-text-body"
-        topNav={
-          <AppBar brand={<AppShellSidebarToggle />}>
-            <DemoBanner />
-            {/* In the top nav, which every view keeps, so a change is heard anywhere. */}
-            <HeroAnnouncer />
-            <TimelineAnnouncer />
-          </AppBar>
-        }
-        sidebarHeader={<SidebarHeader />}
-        sidebar={<Sidebar />}
-        sidebarFooter={<SidebarFooter />}
-        pageHeader={
-          <AppShellPageHeader
-            title={slots.title}
-            actions={
-              panelAsSheet ? (
-                <>
-                  {slots.actions}
-                  {/* Keyed so a view's sheet doesn't stay open over the next view. */}
-                  <PanelSheet key={placeOf(view)} label={slots.panel!.label}>
-                    {slots.panel!.content}
-                  </PanelSheet>
-                </>
-              ) : (
-                slots.actions
-              )
-            }
-          />
-        }
-        panel={panelAsSheet ? undefined : slots.panel?.content}
-        panelLabel={panelAsSheet ? undefined : slots.panel?.label}
-        contentWidth={slots.contentWidth}
-      >
-        {slots.body}
-      </AppShell>
+      <PanelSheetContext.Provider value={() => panelAsSheet && setSheetFor(place)}>
+        <AppShell
+          className="font-sans text-base text-text-body"
+          topNav={
+            <AppBar brand={<AppShellSidebarToggle />}>
+              <DemoBanner />
+              {/* In the top nav, which every view keeps, so a change is heard anywhere. */}
+              <HeroAnnouncer />
+              <TimelineAnnouncer />
+            </AppBar>
+          }
+          sidebarHeader={<SidebarHeader />}
+          sidebar={<Sidebar />}
+          sidebarFooter={<SidebarFooter />}
+          pageHeader={
+            <AppShellPageHeader
+              title={slots.title}
+              actions={
+                panelAsSheet ? (
+                  <>
+                    {slots.actions}
+                    <PanelSheet
+                      label={slots.panel!.label}
+                      open={sheetFor === place}
+                      onOpenChange={(open) => setSheetFor(open ? place : null)}
+                    >
+                      {slots.panel!.content}
+                    </PanelSheet>
+                  </>
+                ) : (
+                  slots.actions
+                )
+              }
+            />
+          }
+          panel={panelAsSheet ? undefined : slots.panel?.content}
+          panelLabel={panelAsSheet ? undefined : slots.panel?.label}
+          contentWidth={slots.contentWidth}
+        >
+          {slots.body}
+        </AppShell>
+      </PanelSheetContext.Provider>
     </CloseContext.Provider>
   );
 }

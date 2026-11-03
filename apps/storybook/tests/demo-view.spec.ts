@@ -28,6 +28,7 @@ test('`/` opens #revenue, and #revenue’s link is `/`', () => {
 test('old and unknown URLs open the default', () => {
   for (const search of [
     '?view=sep-close',
+    '?view=open-items',
     '?view=rev-check',
     '?view=nope',
     '?dm=controller',
@@ -50,6 +51,11 @@ test('a direct message round-trips', () => {
     expect(parseView(`?dm=${member}`), member).toEqual({ kind: 'dm', member });
     expect(hrefFor({ kind: 'dm', member })).toBe(`?dm=${member}`);
   }
+});
+
+test('Tasks opens by its URL, with or without a task', () => {
+  expect(parseView('?view=tasks')).toEqual({ kind: 'tasks' });
+  expect(parseView('?view=tasks&task=credit-limit')).toEqual({ kind: 'tasks', task: 'credit-limit' });
 });
 
 test('a view’s link carries what it selects, and encodes it', () => {

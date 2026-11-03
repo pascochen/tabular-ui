@@ -1,25 +1,13 @@
 import { useId, useState, type ReactElement } from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
-import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn, type Source } from 'tabular-ui';
+import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn } from 'tabular-ui';
 
 import type { ExceptionState } from '../../lib/close-state';
-import { close, memberName, packFile } from '../../lib/kasane';
+import { close, memberName, sourcesOf, type Exception } from '../../lib/kasane';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
 
-type Exception = (typeof close.exceptions)[number];
-
 const authorOf = (key: string) => ({ name: memberName(key), avatar: <MemberAvatar memberKey={key} /> });
-
-const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
-
-/** An exception's files as `Sources` rows, numbered in the order the finding cites them. */
-function sourcesOf(e: Exception): Source[] {
-  return e.sources.map((name) => {
-    const f = packFile(name);
-    return { id: name, name, size: f ? kb(f.bytes) : undefined };
-  });
-}
 
 export type ExceptionCardProps = {
   exception: Exception;

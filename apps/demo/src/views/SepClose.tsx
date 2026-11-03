@@ -8,12 +8,12 @@ import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
 import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
-import { close, memberName } from '../lib/kasane';
+import { close, exceptions, memberName, type Exception } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
 
-const titleOf = (id: string) => close.exceptions.find((e) => e.id === id)!.title;
+const titleOf = (id: string) => exceptions.find((e) => e.id === id)!.title;
 
-const isHero = (e: (typeof close.exceptions)[number]) => 'hero' in e && e.hero === true;
+const isHero = (e: Exception) => 'hero' in e && e.hero === true;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /**
@@ -39,7 +39,7 @@ export function SepCloseChannel() {
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
       <ChannelMessageList aria-label="Messages in revenue">
-        {close.exceptions.map((e) => (
+        {exceptions.map((e) => (
           <ExceptionCard
             key={e.id}
             awaitsYou={awaitsVisitor(state, e.id)}

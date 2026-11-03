@@ -5,7 +5,7 @@ import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, TruncatedText } 
 import { agents, channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
 import { BUILT_CHANNELS, BUILT_PLACES, hrefFor, onViewLinkClick, placeOf, useView, type View } from '../lib/view';
 import { useClose } from '../lib/close-context';
-import { progress } from '../lib/close-state';
+import { openCount } from '../lib/close-state';
 import { MemberAvatar } from './members';
 
 function NavLink({
@@ -49,36 +49,35 @@ const PLACES = {
  * so a section with nothing built isn't drawn.
  */
 export function Sidebar() {
-  const { resolved, total } = progress(useClose().state);
-  const open = total - resolved;
+  const open = openCount(useClose().state);
   const builtAgents: typeof agents = [];
   return (
     <AppShellNav aria-label="Workspace">
       {BUILT_PLACES.length ? (
         <AppShellNavGroup>
           {BUILT_PLACES.map((place) => (
-            <NavLink key={place} view={PLACES[place].view} icon={PLACES[place].icon}>
+            <NavLink
+              key={place}
+              view={PLACES[place].view}
+              icon={PLACES[place].icon}
+              trailing={
+                place === 'tasks' ? (
+                  <Badge shape="count" aria-hidden="true">
+                    {open}
+                  </Badge>
+                ) : undefined
+              }
+            >
               {PLACES[place].label}
+              {place === 'tasks' ? <span className="sr-only">, {open} open</span> : null}
             </NavLink>
           ))}
         </AppShellNavGroup>
       ) : null}
       <AppShellNavGroup label="Channels">
         {BUILT_CHANNELS.map((id) => channels.find((c) => c.id === id)!).map((c) => (
-          <NavLink
-            key={c.id}
-            view={{ kind: 'channel', channel: c.id }}
-            icon={<HashIcon />}
-            trailing={
-              c.id === 'revenue' ? (
-                <Badge shape="count" aria-hidden="true">
-                  {open}
-                </Badge>
-              ) : undefined
-            }
-          >
+          <NavLink key={c.id} view={{ kind: 'channel', channel: c.id }} icon={<HashIcon />}>
             {c.name}
-            {c.id === 'revenue' ? <span className="sr-only">, {open} open</span> : null}
           </NavLink>
         ))}
       </AppShellNavGroup>

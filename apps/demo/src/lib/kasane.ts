@@ -2,12 +2,15 @@
 // The data is in apps/demo/data/, written by scripts/export-fixtures.mjs from the full Kasane
 // dataset, which is not in this repository. Kasane Corporation is fictional.
 
+import type { Source } from 'tabular-ui';
+
 import checksData from '../../data/checks.json' with { type: 'json' };
 import closeData from '../../data/close.json' with { type: 'json' };
 import company from '../../data/company.json' with { type: 'json' };
 import findingsData from '../../data/findings.json' with { type: 'json' };
 import pack from '../../data/pack.json' with { type: 'json' };
 import peopleData from '../../data/people.json' with { type: 'json' };
+import sourcesData from '../../data/sources.json' with { type: 'json' };
 
 export const kasaneCompany = company;
 
@@ -32,19 +35,17 @@ export const visitor = people.visitor;
 export const close = closeData;
 
 export type Channel = (typeof close.channels)[number];
-export type ChannelId = 'close' | 'cash' | 'receivables' | 'payables' | 'revenue' | 'intercompany' | 'open-items';
+export type ChannelId = 'close' | 'cash' | 'receivables' | 'payables' | 'revenue' | 'intercompany';
 
-/** #open-items isn't in the data: Tasks absorbs it, and it goes when Tasks is built. */
-const openItems: Channel = {
-  id: 'open-items',
-  name: 'open-items',
-  topic: 'Gaps and follow-ups from onboarding',
-  owner: 'visitor',
-  members: ['visitor'],
-  gaps: [],
-};
+export const channels = close.channels as (Channel & { id: ChannelId })[];
 
-export const channels = [...close.channels, openItems] as (Channel & { id: ChannelId })[];
+export type Exception = Omit<(typeof close.exceptions)[number], 'channel'> & { channel: ChannelId };
+
+/** The contradictions, the hero first. Each is a task, raised by one agent, and sits in one channel. */
+export const exceptions = close.exceptions as Exception[];
+
+/** The task Tasks' panel shows. Nothing chosen, or a task that doesn't exist: the hero, which is first. */
+export const selectedTask = (id?: string): Exception => exceptions.find((e) => e.id === id) ?? exceptions[0];
 
 /** The agents are members like any other, each keyed by its role: `cutoff-ai`… */
 export const agents = close.agents;
@@ -74,6 +75,26 @@ export const checks = checksData;
 /** A file in Kasane's pack: its name and size, for a `Sources` row. No contents. */
 export function packFile(name: string): { name: string; bytes: number } | undefined {
   return pack.find((f) => f.name === name);
+}
+
+const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
+
+/** A finding's files as `Sources` rows, numbered in the order the finding cites them. */
+export function sourcesOf(e: Exception): Source[] {
+  return e.sources.map((name) => {
+    const f = packFile(name);
+    return { id: name, name, size: f ? kb(f.bytes) : undefined };
+  });
+}
+
+/** The binder: every file a finding, gap or question cites, or an agent reads (`sources.json`). */
+export const binder = sourcesData;
+
+/** A file's exhibit ID: "S-17". The export puts every cited file in the binder, so one that isn't is a bug. */
+export function exhibitOf(name: string): string {
+  const source = binder.find((s) => s.name === name);
+  if (!source) throw new Error(`${name} isn't in sources.json`);
+  return source.id;
 }
 
 export const findings: {
