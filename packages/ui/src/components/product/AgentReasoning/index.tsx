@@ -116,6 +116,10 @@ function AgentReasoning({
           // keeps the gap visible rather than borrowing a chip's padding.
           'cursor-pointer after:block',
           'px-1.5 py-0.5 -mx-1.5 -my-0.5',
+          // A control's label, not content: "Thought for 4s" stays out of a
+          // copy of the reply. `inline` is `select-auto`, for the data it holds
+          // elsewhere.
+          'select-none',
         )}
       >
         {/* Same 1em, bold caret as RunLogRow's disclosure. Button sets bold. */}

@@ -336,6 +336,8 @@ Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selec
 
 **Text on a solid fill isn't selectable.** Primary on a fill is the wrong pair: in dark mode it's paper on the paper button. Every filled control is already `select-none` through `controlBase` and `tabVariants`. Anything else with text on a `--color-fill-*` takes `select-none` as well, as the samples on the site's Color page do.
 
+**`Button variant="inline"` is selectable, because it has no fill and it holds data.** `select-auto`, decided 2026-11-02 (owner), on clipboard measurements: under `select-none` a copied `DataTable` row lost its identifier, `LineageTree` copied statuses with no names, and an expandable `RunLogRow` vanished from the log. A selection passing over the button carries its text, and a drag that starts on the button still selects nothing. A label that isn't data passes `select-none`: sort headers and disclosures. Forgetting that costs a stray word in a paste, and the old default cost a row its name with no warning, which is why `auto` is the default. `apps/storybook/tests/data-table-copy.spec.ts` and `identifier-copy.spec.ts` read the clipboard.
+
 **A nested `[data-theme]` rescopes it,** as it does every token, so selected text in a dark band on a light page takes the dark values. The rule reads the `--tui-*` layer for that reason. `apps/storybook/tests/selection.spec.ts` measures the colours painted in both modes and in a nested band. `packages/ui/scripts/check-contrast.mjs` gates primary on the highlight over every ground.
 
 ### Focus ring
@@ -1132,6 +1134,8 @@ Before the token set is considered done:
 - [x] Hover and press use the `--color-bg-hover` / `--color-bg-active` overlay; the primary button, whose fill is the overlay's own colour, uses the `-inverse` pair (2026-10-16). No per-role hover token exists. The 6% overlay was verified visible on 28px rows over canvas, over `--color-surface`, and over a solid fill (2026-08-02).
 - [x] Selection uses `--color-bg-interactive`; no `--color-bg-selected` is declared or used. All four selection sites (Chip, Select, Combobox, LineageTree) use it.
 - [x] Selected text uses `--color-bg-selection` with `--color-text-primary`, in both modes and inside a nested `[data-theme]`. Asserted by painting it in Chromium, in `apps/storybook/tests/selection.spec.ts`. Safari and Firefox are not in the test run: check them by hand when the rule changes (§4).
+- [x] A copied `DataTable` row keeps its identifier, on one line. `LineageTree` keeps its names and an expandable `RunLogRow` keeps its row, while sort headers and disclosure labels stay out (§4). Asserted by reading the clipboard, in `apps/storybook/tests/data-table-copy.spec.ts` and `identifier-copy.spec.ts`. Chromium only.
+- [ ] **A rich-text paste of a row with a `Button` identifier (§4).** The HTML flavour holds a `<button>` for the name. Not pasted into Excel, Google Sheets or Docs: check that the name arrives as text.
 - [x] Every `--text-*` size has its `--line-height` partner — 9 sizes, 9 partners, none missing.
 - [x] `--radius-*` declared in px — 0px for `xs` through `lg` plus `9999px` for `full` (2/4/6/8px until 2026-10-16, §7.7); `xl` through `4xl` are stripped to `initial` so the 8px ceiling is structural.
 - [x] No chromatic 900/950 background — zero occurrences in `packages/ui/src/`, and `tui/no-deep-chromatic-background` rejects them in CSS including `theme.css` itself.

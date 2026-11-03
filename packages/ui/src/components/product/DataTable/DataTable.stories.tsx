@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '../../foundational/Button';
@@ -234,28 +234,42 @@ export const WithSelectionAndFilter: Story = {
  */
 export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
   args: { onOpen: fn() },
-  render: function ClickableStory(args) {
+  render: function ClickableStory({ onOpen }) {
     const [opened, setOpened] = useState<string | null>(null);
     const data = useMemo(() => makeRows(8), []);
-    const open = (model: string) => {
-      setOpened(model);
-      args.onOpen(model);
-    };
-
-    const cols: ColumnDef<Model, unknown>[] = [
-      {
-        accessorKey: 'model',
-        header: 'Model',
-        meta: { content: 'mono' },
-        size: 260,
-        cell: ({ row }) => (
-          <Button variant="inline" className="max-w-full shrink" onClick={() => open(row.original.model)}>
-            <span className="truncate">{row.original.model}</span>
-          </Button>
-        ),
+    const open = useCallback(
+      (model: string) => {
+        setOpened(model);
+        onOpen(model);
       },
-      ...columns.slice(1),
-    ];
+      [onOpen],
+    );
+
+    // Stable, because TanStack renders `cell` as a component: a new function on
+    // every render remounts the identifier, and each open dropped focus to <body>.
+    const cols = useMemo<ColumnDef<Model, unknown>[]>(
+      () => [
+        {
+          accessorKey: 'model',
+          header: 'Model',
+          meta: { content: 'mono' },
+          size: 260,
+          // The text directly, with no <span>: a child of Button is a flex item,
+          // and a copied row breaks in two around one. See the README.
+          cell: ({ row }) => (
+            <Button
+              variant="inline"
+              className="inline-block max-w-full truncate"
+              onClick={() => open(row.original.model)}
+            >
+              {row.original.model}
+            </Button>
+          ),
+        },
+        ...columns.slice(1),
+      ],
+      [open],
+    );
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-field)', height: 320 }}>

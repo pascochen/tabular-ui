@@ -214,10 +214,12 @@ function ChannelMessage({
                 className={cn(
                   // AgentReasoning's disclosure, unchanged: a summary line one
                   // step below the body, medium weight so it reads as the
-                  // control, and the inline hover fill padded off the glyphs.
+                  // control, the inline hover fill padded off the glyphs, and
+                  // a label that stays out of a copy of the thread.
                   'gap-[var(--gap-control-icon)] text-sm font-medium text-text-secondary hover:text-text-body',
                   'cursor-pointer after:block',
                   'px-1.5 py-0.5 -mx-1.5 -my-0.5',
+                  'select-none',
                 )}
               >
                 <CaretRightIcon

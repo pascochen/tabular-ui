@@ -161,9 +161,11 @@ function Line({
         wraps,
         // AgentReasoning's recipe: `inline` hides the hover fill, and nothing
         // here owns hover, so it comes back, padded and cancelled by an equal
-        // negative margin, so the caret and label stay where they were.
+        // negative margin, so the caret and label stay where they were. The
+        // label stays out of a copy of the turn, as its summary line does.
         'cursor-pointer after:block',
         'px-1.5 py-0.5 -mx-1.5 -my-0.5',
+        'select-none',
       )}
     >
       {/* Same 1em, bold caret as AgentReasoning and RunLogRow. Button sets bold. */}
