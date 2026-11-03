@@ -76,7 +76,8 @@ export type DataTableProps<TData> = {
    * Whole-row activation, for the pointer. A `<tr>` is not a control, so the
    * keyboard path is a link or button in the row's identifier cell that does
    * the same thing. A click on any control inside the row belongs to that
-   * control and does not reach this. See the README.
+   * control and does not reach this, and neither does a press that selects text.
+   * See the README.
    */
   onRowClick?: (row: Row<TData>) => void;
   /**
@@ -110,6 +111,30 @@ function isClickForControl(event: React.MouseEvent<HTMLElement>) {
   if (!event.currentTarget.contains(target)) return true;
   const control = target.closest(ROW_CONTROLS);
   return control !== null && event.currentTarget.contains(control);
+}
+
+/**
+ * How far a press travels before it counts as a drag, in px. Under this it is a
+ * click that wobbled, and those open the row even when they select a character:
+ * 1px of travel did in 3 presses of 16, and 3px in 8 (measured 2026-11-02).
+ */
+const DRAG_DISTANCE = 4;
+
+/**
+ * Whether a click inside a row is the end of selecting text: a drag that left a
+ * selection, a Shift-click that extended one, or the later clicks of a double or
+ * triple click. The browser sends each of them a click, and a drag across two
+ * cells sends it to the `<tr>`.
+ *
+ * A selection alone doesn't say so. Chromium clears one on release, after the
+ * click, so a click on text that is already selected still finds it there, and a
+ * click on `user-select: none` content never clears it. Those are plain clicks,
+ * and they open the row.
+ */
+function isClickForSelection(event: React.MouseEvent<HTMLTableRowElement>, pressedAt: { x: number; y: number } | null) {
+  if (document.getSelection()?.isCollapsed !== false) return false;
+  if (event.shiftKey || event.detail > 1) return true;
+  return pressedAt !== null && Math.hypot(event.clientX - pressedAt.x, event.clientY - pressedAt.y) >= DRAG_DISTANCE;
 }
 
 /**
@@ -284,6 +309,7 @@ function DataTable<TData>({
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
   // React Compiler cannot memoize TanStack Table's API (its functions are
   // stable objects that change internally), so it skips this component and
@@ -476,10 +502,19 @@ function DataTable<TData>({
               <tr
                 key={row.id}
                 data-row-id={row.id}
+                onPointerDown={
+                  onRowClick
+                    ? (event) => {
+                        pressedAt.current = { x: event.clientX, y: event.clientY };
+                      }
+                    : undefined
+                }
                 onClick={
                   onRowClick
                     ? (event) => {
-                        if (!isClickForControl(event)) onRowClick(row);
+                        if (!isClickForControl(event) && !isClickForSelection(event, pressedAt.current)) {
+                          onRowClick(row);
+                        }
                       }
                     : undefined
                 }

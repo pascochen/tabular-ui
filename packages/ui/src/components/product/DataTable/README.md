@@ -137,6 +137,14 @@ Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per
 
 A click on any control inside a row stays with that control: the identifier's own button, a selection checkbox or a row action never also fires `onRowClick`, and neither does a click inside a popup opened from the row. So the identifier's handler and `onRowClick` can be the same function without opening the row twice. The `ClickableRows` story shows the pattern and tests all three paths.
 
+**Selecting text doesn't open the row.** Filenames, GL references and model names are copied constantly, and a row that navigates would take the page away first. A drag that leaves a selection, a Shift-click that extends one, and the later clicks of a double or triple click don't fire `onRowClick`. `tests/data-table-selection.spec.ts` drives each with real pointer events, in Chromium only.
+
+- **A double-click still opens the row, on its first click.** That click can't know a second is coming, and waiting to find out would delay every open. In a table whose rows navigate, drag to select: the whole figure a double-click takes (see Copying) never arrives there. A total sits outside the rows, so a click in the totals row opens nothing.
+- **A selection alone doesn't decide it.** Chromium clears a selection on release, after the click, so a click on selected text, or anywhere after select-all, still finds one, and a click on `user-select: none` content never clears it. Those are plain clicks, and they open the row. So a press that leaves a selection also has to travel 4px. 1px of wobble selected a character in 3 presses of 16, and 3px in 8, and those are clicks too.
+- **A drag that selects nothing is still a click**, across a cell's padding, say.
+- **A drag ending on the identifier is the same case as any other.** The browser sends the click to the `<tr>`, the control never gets it, and the row stays closed, with as much of the name as the drag reached in the selection.
+- **A press that starts and ends on the identifier is the control's own click.** A drag that starts on `Button variant="inline"` selects nothing, and it opens the row. A double-click there opens it twice, through the control's own handler. The row can't see those clicks, so `select-text` on an identifier would select and open, and its handler would need a guard of its own.
+
 `AttachmentRow` follows the same split outside a table: the filename is the link, and whole-row activation is left to `DataTable`.
 
 ## Copying
