@@ -4,6 +4,7 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
+  type Column,
   type ColumnDef,
   type Row,
   type SortingState,
@@ -15,6 +16,7 @@ import { useMemo, useRef, useState } from 'react';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
+import { printFigure, totalsRow, warnOnFigureCells, type DataTableTotals, type Figure, type TotalsRow } from './totals';
 
 /**
  * Column metadata the table reads. Declared as a module augmentation so
@@ -29,8 +31,8 @@ import { Button } from '../../foundational/Button';
  * type-check in every consuming app. Found by the journey app's first build.
  */
 declare module '@tanstack/react-table' {
-  // TData/TValue are required by the interface signature we are augmenting,
-  // even though this declaration does not reference them.
+  // TValue is required by the interface signature we are augmenting, even though
+  // this declaration does not reference it.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData, TValue> {
     /** `numeric` right-aligns and applies tabular-nums. Use for every figure. */
@@ -39,6 +41,12 @@ declare module '@tanstack/react-table' {
     content?: 'text' | 'mono';
     /** Cells truncate by default; set false for cells that must wrap. */
     truncate?: boolean;
+    /**
+     * The table prints this column itself, and its `cell` is ignored, so what
+     * `totals` checks is what shows. Right-aligned and tabular, and never
+     * truncated: a clipped figure reads as a different figure.
+     */
+    figure?: Figure<TData>;
   }
 }
 
@@ -60,6 +68,12 @@ export type DataTableProps<TData> = {
    * control and does not reach this. See the README.
    */
   onRowClick?: (row: Row<TData>) => void;
+  /**
+   * A totals row, sticky at the bottom. Its columns need `meta.figure`. A figure
+   * gets the double rule only when the rows on display sum to its stated total:
+   * no prop sets it (§7.8). See the README.
+   */
+  totals?: DataTableTotals;
   /** Rendered in place of the body when there are no rows. */
   empty?: React.ReactNode;
   className?: string;
@@ -87,6 +101,68 @@ function isClickForControl(event: React.MouseEvent<HTMLTableRowElement>) {
   return control !== null && event.currentTarget.contains(control);
 }
 
+const FOOT_CELL = 'h-[var(--h-row-sm)] bg-surface px-[var(--pad-cell-x)] align-middle whitespace-nowrap';
+const TOTAL_CELL = 'border-t border-text-primary text-text-primary';
+// The double rule's slot, on every cell of the totals row: 3px of transparent
+// border where it doesn't draw, so the text stays at one height whichever state
+// the row is in, and a label stays on its figure's line. It is inside the cell's
+// 28px, so the row doesn't grow, and clear of the table's own bottom border,
+// where a rule across the cell would read as three lines once the table scrolls.
+const RULE_SLOT = 'block border-b-3 border-transparent';
+
+/**
+ * The totals row, and a Difference row under it when a figure misses. A rule
+ * can't say why it isn't there, so the difference is text a reader can see,
+ * select and hear. Figures stay at the body's weight: tabular digits are wider at
+ * a heavier one (ten at 12px: 59.65px at 400, 61.55px at 600), so a bold total
+ * would drift out of its column.
+ */
+function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<TData, unknown>[] }) {
+  const first = columns.findIndex((column) => row.cells.has(column.id));
+  const misses = [...row.cells.values()].some((total) => total.difference !== null);
+  return (
+    <tfoot className="sticky bottom-0 z-10">
+      <tr>
+        {first > 0 ? (
+          <th scope="row" colSpan={first} className={cn(FOOT_CELL, TOTAL_CELL, 'text-left font-medium')}>
+            <span className={RULE_SLOT}>{row.label}</span>
+          </th>
+        ) : null}
+        {columns.slice(first).map((column, index) => {
+          const total = row.cells.get(column.id);
+          return (
+            <td key={column.id} className={cn(FOOT_CELL, TOTAL_CELL, 'text-right font-normal tabular-nums')}>
+              {first === 0 && index === 0 ? <span className="sr-only">{row.label}</span> : null}
+              {total ? (
+                <span className={cn(RULE_SLOT, total.foots && 'border-double border-text-primary')}>
+                  {total.text}
+                  {/* Hidden from a copied selection too: people paste these figures. */}
+                  {total.foots ? <span className="sr-only select-none"> adds up</span> : null}
+                </span>
+              ) : null}
+            </td>
+          );
+        })}
+      </tr>
+      {misses ? (
+        <tr>
+          {first > 0 ? (
+            <th scope="row" colSpan={first} className={cn(FOOT_CELL, 'text-left font-normal text-text-danger')}>
+              Difference
+            </th>
+          ) : null}
+          {columns.slice(first).map((column, index) => (
+            <td key={column.id} className={cn(FOOT_CELL, 'text-right tabular-nums text-text-danger')}>
+              {first === 0 && index === 0 ? <span className="sr-only">Difference</span> : null}
+              {row.cells.get(column.id)?.difference}
+            </td>
+          ))}
+        </tr>
+      ) : null}
+    </tfoot>
+  );
+}
+
 /**
  * DataTable — product.
  *
@@ -105,6 +181,10 @@ function isClickForControl(event: React.MouseEvent<HTMLTableRowElement>) {
  * **Numeric columns must set `meta.align: 'numeric'`.** That is what applies
  * `tabular-nums` and right-alignment; §0 rule 6 calls misaligned figure
  * columns a correctness hazard, not an aesthetic one.
+ *
+ * **The double rule comes from a check, never a prop (§7.8).** `totals` gives the
+ * table the total as your records state it; the table adds the rows on display
+ * and draws the rule only when the two match. See `totals.ts`.
  */
 function DataTable<TData>({
   columns,
@@ -112,6 +192,7 @@ function DataTable<TData>({
   virtualizeAfter = 100,
   rowClassName,
   onRowClick,
+  totals,
   empty,
   className,
   tableOptions,
@@ -119,6 +200,8 @@ function DataTable<TData>({
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  if (import.meta.env?.DEV) warnOnFigureCells(columns);
 
   // React Compiler cannot memoize TanStack Table's API (its functions are
   // stable objects that change internally), so it skips this component and
@@ -157,6 +240,17 @@ function DataTable<TData>({
     [shouldVirtualize, virtualRows, rows],
   );
 
+  // Worked out during render, not in an effect, so prerendered HTML already says
+  // whether a total foots. It reads `rows`, never `renderedRows`: the window isn't
+  // what the table is showing, only what's in the DOM. About 5ms over 50,000 rows.
+  const leafColumns = table.getVisibleLeafColumns();
+  const rowCount = table.getCoreRowModel().rows.length;
+  const totalsFoot = useMemo(
+    () => (totals ? totalsRow(totals, rows, rowCount, leafColumns) : null),
+    [totals, rows, rowCount, leafColumns],
+  );
+  const footRows = totalsFoot ? ([...totalsFoot.cells.values()].some((total) => total.difference !== null) ? 2 : 1) : 0;
+
   return (
     <div
       className={cn(
@@ -169,13 +263,22 @@ function DataTable<TData>({
         className,
       )}
     >
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
+      <div
+        ref={scrollRef}
+        className={cn(
+          'min-h-0 flex-1 overflow-auto',
+          // A control tabbed to in a row must not land under the sticky foot.
+          footRows === 1 && 'scroll-pb-[var(--h-row-sm)]',
+          footRows === 2 && 'scroll-pb-[calc(var(--h-row-sm)*2)]',
+        )}
+      >
         <table className="w-full border-separate border-spacing-0 text-sm">
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
                 {group.headers.map((header) => {
-                  const align = header.column.columnDef.meta?.align;
+                  const headerMeta = header.column.columnDef.meta;
+                  const numeric = headerMeta?.align === 'numeric' || headerMeta?.figure !== undefined;
                   const sortable = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
                   return (
@@ -199,7 +302,7 @@ function DataTable<TData>({
                         'border-b border-border text-2xs font-medium uppercase',
                         'tracking-[var(--tracking-wide)] text-text-secondary',
                         'whitespace-nowrap select-none',
-                        align === 'numeric' ? 'text-right' : 'text-left',
+                        numeric ? 'text-right' : 'text-left',
                       )}
                     >
                       {header.isPlaceholder ? null : sortable ? (
@@ -214,7 +317,7 @@ function DataTable<TData>({
                             // cell: an outset ring on a sticky header inside
                             // overflow:hidden gets clipped (§4).
                             'focus-visible:outline-offset-[-2px]',
-                            align === 'numeric' ? 'justify-end' : 'justify-start',
+                            numeric ? 'justify-end' : 'justify-start',
                           )}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
@@ -286,12 +389,14 @@ function DataTable<TData>({
                         'h-[var(--h-row-sm)] border-b border-border px-[var(--pad-cell-x)] align-middle',
                         // §0 rule 6 — every figure column is tabular. Mono
                         // runs one step below adjacent sans (§8.3).
-                        meta?.align === 'numeric' && 'text-right tabular-nums',
+                        (meta?.align === 'numeric' || meta?.figure) && 'text-right tabular-nums',
                         meta?.content === 'mono' && 'font-mono text-xs',
-                        meta?.truncate !== false && 'max-w-0 truncate',
+                        meta?.figure ? 'whitespace-nowrap' : meta?.truncate !== false && 'max-w-0 truncate',
                       )}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {meta?.figure
+                        ? printFigure(cell.getValue(), meta.figure.decimals)
+                        : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   );
                 })}
@@ -304,6 +409,9 @@ function DataTable<TData>({
               </tr>
             ) : null}
           </tbody>
+
+          {/* Outside the virtualized rows: the virtualizer never counts or measures it. */}
+          {totalsFoot ? <TotalsFoot row={totalsFoot} columns={leafColumns} /> : null}
         </table>
 
         {rows.length === 0 ? (

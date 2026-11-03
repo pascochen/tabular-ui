@@ -801,13 +801,13 @@
       "name": "data-table",
       "type": "registry:component",
       "title": "DataTable",
-      "description": "A sortable, filterable, virtualized table with 28px rows.",
+      "description": "A sortable, filterable, virtualized table with 28px rows, and a totals row that checks its sum.",
       "categories": ["product"],
       "author": "Pascal Chenier",
       "dependencies": [
         "@phosphor-icons/react@^2.1.10",
         "@tanstack/react-table@^8.21.3",
-        "@tanstack/react-virtual@^3.14.17"
+        "@tanstack/react-virtual@^3.14.23"
       ],
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
@@ -819,6 +819,11 @@
           "path": "src/components/product/DataTable/index.tsx",
           "type": "registry:file",
           "target": "@components/tabular-ui/components/product/DataTable/index.tsx"
+        },
+        {
+          "path": "src/components/product/DataTable/totals.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/totals.ts"
         }
       ]
     },

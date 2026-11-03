@@ -136,7 +136,7 @@ Chat           ChatThread · ChatComposer · ChatStarter · ChannelMessage · Pr
 Shell          AppShell · AppBar · AccountMenu · EmptyState
 ```
 
-- `DataTable` — sortable, filterable, virtualized. 28px rows.
+- `DataTable` — sortable, filterable, virtualized. 28px rows. Its totals row draws the double rule only when the rows on display sum to the stated total: no prop sets it (§7.8).
 - `MetricTile` — KPI figure. `--font-display`, metric type tier, `tabular-nums`.
 - `RunLogRow` — pipeline execution entry, 24px.
 - `LineageTree` — nested dbt dependencies, 12px indent per level.

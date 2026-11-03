@@ -34,14 +34,66 @@ Rows virtualize past `virtualizeAfter` (default 100). Below that every row rende
 | `align: 'numeric'` | Right-aligns and applies `tabular-nums` |
 | `content: 'mono'` | `--font-mono` one step down (§8.3) — model names, IDs, account codes |
 | `truncate: false` | Opts a cell out of truncation |
+| `figure: { decimals, unit }` | The table prints the column itself: right-aligned, tabular, never truncated. Needed for a [totals row](#totals-row) |
 
-**Every figure column needs `align: 'numeric'`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
+**Every figure column needs `align: 'numeric'` or `figure`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
 
 ## What the table does not decide
 
 **Row treatments come from the caller** via `rowClassName`. §5 assigns a `--color-bg-danger` tint to failed rows and, to agent proposals, the `--color-bg-agent` tint with a solid `--color-text-agent` left rail; those live in `runStatusRowTreatment`, exported from `StatusBadge`. The table is `border-separate`, which paints no border on a `<tr>`, so the treatment draws the rail on the row's first cell and takes 2px off that cell's left padding. The table applies whatever it is handed and owns none of that mapping.
 
 **Polarity colour belongs to the cell renderer**, and §5 restricts it to variance and delta columns — never every figure. A table where every number is green or red is unreadable and destroys the signal on the rows that need attention. Zero is neutral, never a hue.
+
+## Totals row
+
+A double rule tells a finance reader that a total adds up, so the table draws it from a check, and no prop sets it (§7.8). You give the table the total as your records state it. It adds up the rows on display and compares.
+
+```tsx
+const columns = [
+  { accessorKey: 'label', header: 'H1 operating profit' },
+  { accessorKey: 'yen', header: 'Yen', meta: { figure: { decimals: 0, unit: 'JPY' } } },
+];
+
+<DataTable columns={columns} data={rows} totals={{ label: 'Actual', stated: { yen: bridge.actual } }} />;
+```
+
+- **`totals.stated`** maps a column id to its stated total. Naming a column asks for the check and can't answer it.
+- **`totals.sum`** lists columns to simply add (`sum: ['hours']`). They never get the rule.
+- **`meta.figure`** is required on a totalled column. `decimals` is how many digits it prints after the point. `unit` is what the column holds, a string or `(row) => string`, and isn't printed, so name a single unit in the header.
+
+**A figure column prints through the table, and its `cell` is ignored**, with a warning in development. A custom `cell` could print something other than what gets checked. So a figure column has no polarity colour and no per-row symbol. A zero prints as `0`.
+
+### What shows
+
+| The table finds | Figure | Under it | Also |
+|---|---|---|---|
+| All rows shown, sum equals stated | Stated | Double rule | Hidden "adds up" text for screen readers |
+| All rows shown, sum differs | Stated, never replaced by the sum | Nothing | A "Difference" row in `--color-text-danger` |
+| Rows hidden | Sum of the rows shown | Nothing | "Subtotal, n of m rows" |
+| `sum` column | Sum | Nothing | |
+| A part is empty or not a number | Stated, or "Incomplete" for `sum` | Nothing | No Difference: a check that couldn't run hasn't failed |
+| Rows in more than one unit | Stated, or "Mixed" for `sum` | Nothing | No sum attempted |
+| No rows | No totals row | | |
+
+Every state has the 1px ink rule above the row. The result is worked out during render, so prerendered HTML already carries the mark.
+
+### Total of what
+
+Every row left after filtering, scrolled into view or not. The sum never reads the virtualizer's window, and the row sits outside the virtualized rows, so scrolling can't drift. Sorting changes nothing. Rows are hidden when the row model holds fewer rows than the data, by a filter or by pagination through `tableOptions`, so a filter that hides nothing still closes.
+
+### Rounding
+
+The table adds what it prints: each value goes through `toFixed(decimals)` once, and that is both the cell's text and the integer it adds. There is no tolerance. A ¥1 gap from rounding shows as "Difference 1", because a total that doesn't match its printed parts is a footing error (`docs/site.md`, D5). The arithmetic is in `totals.ts`.
+
+### What the check can't prove
+
+**"Final."** It proves a total adds up. A total can foot and still include rows that aren't posted, because the table doesn't know a row's status. Use `sum` until a set is closed.
+
+**That your figure is independent.** `stated: { yen: sum(rows) }` can only ever match, so it draws a true but empty rule, and nothing can detect it. If you have no figure from elsewhere, use `sum`.
+
+### Geometry
+
+The row is 28px in every state. The rule sits inside the cell, under the figure, and clears the table's own bottom border by 4px: across the whole row it would land on that border once the table scrolls, and read as three lines. Every cell keeps the rule's 3px as transparent border, so text doesn't move when the rule comes and goes. Figures stay at the body's weight, because tabular digits are wider at a heavier one, and a bold total drifts out of its column. A totals row needs a text column ahead of its first figure to show its label; without one the label is for screen readers only.
 
 ## Structure
 
