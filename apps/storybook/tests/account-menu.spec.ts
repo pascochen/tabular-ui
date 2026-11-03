@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { axePath, gotoStory } from './helpers';
+import { gotoStory, injectAxe } from './helpers';
 
 /**
  * AccountMenu owns three things a story cannot assert: when the avatar
@@ -66,7 +66,7 @@ test('fallback initials start the trigger’s name: label-in-name holds (axe, by
   // Otherwise the rule has nothing to catch: an image has no text to compare.
   await expect(trigger(page).locator('[data-slot="avatar-fallback"]')).toBeVisible();
   await expect(trigger(page)).toHaveAccessibleName('MT Mei Tachibana, account');
-  await page.addScriptTag({ path: axePath });
+  await injectAxe(page);
   const targets = await page.evaluate(async () => {
     // Named, because axe skips a rule tagged `experimental` unless asked, as
     // this one was until axe-core 4.14.
