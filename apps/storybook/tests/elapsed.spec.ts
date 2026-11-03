@@ -8,24 +8,26 @@ import { gotoStoryBeforeFonts } from './helpers';
  * than whatever second the run happened to reach. The visual tests never see
  * the figure: they screenshot well inside the first three seconds.
  *
- * The clock is paused straight after load, at the page's own "now", so the
- * only real time counted is mount to pause, well under a second, plus
- * 200ms of margin. That is why these tests don't wait for the fonts: the clock
- * runs through that wait, and with the fonts 800ms late every figure here read
- * a second or more ahead. They read text, not boxes, so a swap moves nothing
- * they check.
+ * The clock stops before the page loads, so the story mounts with time standing
+ * still and its figure counts only what `runFor` adds. However long the load or
+ * a round trip takes, none of it reaches the figure, and an exact boundary holds:
+ * 3,000ms reads 0:03. These tests read text, not boxes, so they don't wait for
+ * the fonts.
  */
 
-async function freeze(page: import('@playwright/test').Page) {
-  // A little ahead of the page's "now": the clock keeps running between the
-  // read and the pause, and pauseAt refuses a time in the past.
-  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 200);
+/**
+ * A minute ahead because the clock runs from `install` until the pause lands, and
+ * `pauseAt` refuses a time in the past. A test's 30s timeout ends before that.
+ */
+async function gotoWithClockStopped(page: import('@playwright/test').Page, id: string) {
+  const now = Date.now();
+  await page.clock.install({ time: now });
+  await page.clock.pauseAt(now + 60_000);
+  await gotoStoryBeforeFonts(page, id);
 }
 
 test('the waiting turn gains its elapsed figure after 3 seconds', async ({ page }) => {
-  await page.clock.install();
-  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
-  await freeze(page);
+  await gotoWithClockStopped(page, 'product-chatthread--awaiting-response');
 
   const visible = page.locator('[aria-hidden="true"]', { hasText: /^Working/ });
   await expect(visible).toHaveText('Working…');
@@ -38,9 +40,7 @@ test('the waiting turn gains its elapsed figure after 3 seconds', async ({ page 
 });
 
 test('assistive technology reads the bare label, which never ticks', async ({ page }) => {
-  await page.clock.install();
-  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
-  await freeze(page);
+  await gotoWithClockStopped(page, 'product-chatthread--awaiting-response');
   await page.clock.runFor(10_000);
 
   // The log is a live region: a ticking text node in it would be read out
@@ -52,9 +52,7 @@ test('assistive technology reads the bare label, which never ticks', async ({ pa
 
 test('the figure keeps counting under reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.clock.install();
-  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
-  await freeze(page);
+  await gotoWithClockStopped(page, 'product-chatthread--awaiting-response');
   expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
 
   // The spinner stands still; the figure is then the only sign of progress.
@@ -63,9 +61,7 @@ test('the figure keeps counting under reduced motion', async ({ page }) => {
 });
 
 test('the drafting step gains its elapsed figure', async ({ page }) => {
-  await page.clock.install();
-  await gotoStoryBeforeFonts(page, 'product-agentplan--streaming');
-  await freeze(page);
+  await gotoWithClockStopped(page, 'product-agentplan--streaming');
   await page.clock.runFor(4_000);
   await expect(page.locator('[aria-hidden="true"]', { hasText: /^Drafting step/ })).toHaveText(/ · 0:04$/);
 });
