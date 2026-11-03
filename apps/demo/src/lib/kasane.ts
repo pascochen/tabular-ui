@@ -1,4 +1,4 @@
-// The close demo's script: Kasane's people, the #sep-close channel and its checks.
+// The Kasane app's script: Kasane's people, its agents, its channels and their checks.
 // The data is in apps/demo/data/, written by scripts/export-fixtures.mjs from the full Kasane
 // dataset, which is not in this repository. Kasane Corporation is fictional.
 
@@ -23,7 +23,7 @@ export type Person = {
   handle: string;
 };
 
-/** The people in the script, by role: `visitor`, `controller`, `apLead`… */
+/** The people in the script, by role: `visitor`, `apLead`, `fpaHead`… */
 export const people: Record<string, Person> = peopleData;
 
 /** The visitor plays this person. */
@@ -32,18 +32,30 @@ export const visitor = people.visitor;
 export const close = closeData;
 
 export type Channel = (typeof close.channels)[number];
-export type ChannelId = 'sep-close' | 'open-items' | 'rev-check';
+export type ChannelId = 'close' | 'cash' | 'receivables' | 'payables' | 'revenue' | 'intercompany' | 'open-items';
 
-export const channels = close.channels as (Channel & { id: ChannelId })[];
+/** #open-items isn't in the data: Tasks absorbs it, and it goes when Tasks is built. */
+const openItems: Channel = {
+  id: 'open-items',
+  name: 'open-items',
+  topic: 'Gaps and follow-ups from onboarding',
+  owner: 'visitor',
+  members: ['visitor'],
+  gaps: [],
+};
 
-/** The agent is a member like any other, keyed `agent`. */
-export const agent = close.agent;
+export const channels = [...close.channels, openItems] as (Channel & { id: ChannelId })[];
 
-/** A member of a channel or a direct message: a person, or the agent. */
-export type Member = { kind: 'person'; person: Person } | { kind: 'agent' };
+/** The agents are members like any other, each keyed by its role: `cutoff-ai`… */
+export const agents = close.agents;
+export type Agent = (typeof agents)[number];
+
+/** A member of a channel or a direct message: a person, or an agent. */
+export type Member = { kind: 'person'; person: Person } | { kind: 'agent'; agent: Agent };
 
 export function member(key: string): Member | null {
-  if (key === 'agent') return { kind: 'agent' };
+  const agent = agents.find((a) => a.key === key);
+  if (agent) return { kind: 'agent', agent };
   const person = people[key];
   return person ? { kind: 'person', person } : null;
 }
@@ -52,7 +64,7 @@ export function member(key: string): Member | null {
 export function memberName(key: string): string {
   const m = member(key);
   if (!m) throw new Error(`No member "${key}" in close.json or people.json`);
-  return m.kind === 'agent' ? agent.name : m.person.name;
+  return m.kind === 'agent' ? m.agent.name : m.person.name;
 }
 
 export const directMessages = close.directMessages;

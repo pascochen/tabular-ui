@@ -16,13 +16,15 @@
 //   apps/demo/data/discovery.json        what the agent says it learned, and from which files
 //   apps/demo/data/findings.json         contradictions, gaps and follow-ups, and their files
 //   apps/demo/data/people.json           the close demo's people, by role, from employees.csv
-//   apps/demo/data/close.json            the scripted #sep-close channel: exceptions, replies, the hero
-//                                        decision and its proposed entry (copy from
+//   apps/demo/data/close.json            the scripted workspace: agents, channels, exceptions, replies,
+//                                        the hero decision and its proposed entry (copy from
 //                                        onboarding/close-demo.json, figures from the data)
 //   apps/demo/data/checks.json           each close check's figure before and after its fix
+//   apps/demo/data/sources.json          the binder: each file a finding cites or an agent reads, its
+//                                        exhibit ID and a trimmed excerpt
 //   apps/site/data/kasane.json           the public site's specimen records (docs/site.md §5)
 //
-// Only what the demo's screens read is written: no file contents, no rows.
+// Only what the demo's screens read is written: no whole files, only the binder's excerpts.
 // Re-running it on an unchanged dataset produces no diff.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -236,8 +238,6 @@ const fx = Object.fromEntries(
 // Entity ledgers (local currency, credit-positive P&L)
 // ---------------------------------------------------------------------------
 
-const SALES_ACCTS = ['4000', '4100', '4200', '4300', '4900'];
-const isPl = (a) => /^[4-8]/.test(a);
 const isOperating = (a) => /^[456]/.test(a);
 function ledger(entity, periods, accounts) {
   return sum(
@@ -246,21 +246,6 @@ function ledger(entity, periods, accounts) {
       .map((l) => num(l.credit) - num(l.debit)),
   );
 }
-function planned(entity, periods, accounts, version = BUDGET) {
-  return -sum(
-    plan
-      .filter(
-        (r) =>
-          r.version_id === version &&
-          r.measure === 'amount' &&
-          r.entity_id === entity &&
-          periods.includes(r.period) &&
-          accounts(r.account_id),
-      )
-      .map((r) => num(r.value)),
-  );
-}
-
 // ---------------------------------------------------------------------------
 // H1 operating profit bridge, budget → actual (JPY). Each step computed, "other" is the remainder.
 // ---------------------------------------------------------------------------
@@ -404,7 +389,7 @@ const byKey = {};
 for (const s of supplierInvoices) (byKey[`${s.supplier_id}|${s.supplier_invoice_number}`] ??= []).push(s);
 const dup = Object.values(byKey).find((g) => g.length > 1 && !g[0].supplier_invoice_number.startsWith('INV-'));
 const dupPaid = (dup ?? []).map((d) => supplierPayments.filter((p) => p.ap_invoice_id === d.ap_invoice_id).length > 0);
-// 5. Close length: the CFO says five days; the calendar says business day six.
+// The September lock: #close's panel says when it happened, and on which business day.
 const lastClose = calendar.find((r) => r.period === LAST_CLOSED);
 const closeDay = (() => {
   const d = new Date(`${lastClose.close_completed_date}T00:00:00Z`);
@@ -414,13 +399,6 @@ const closeDay = (() => {
   }
   return n;
 })();
-// 6. "Europe is on plan in euros."
-const kdeSales = ledger('KDE', H1, (a) => SALES_ACCTS.includes(a));
-const kdeSalesBudget = planned('KDE', H1, (a) => SALES_ACCTS.includes(a));
-const kdeEquipment = ledger('KDE', H1, (a) => a === '4000');
-const kdeEquipmentBudget = planned('KDE', H1, (a) => a === '4000');
-const kdeProfit = ledger('KDE', H1, isOperating);
-const kdeProfitBudget = planned('KDE', H1, isOperating);
 
 // Each contradiction must still be true, on both sides: the data shows it, and the transcript still
 // says the thing the data contradicts. Change either one and the build stops here.
@@ -439,24 +417,17 @@ must(
 );
 must(glLastReceipt, 'a receipt from Great Lakes Duplicating Supply');
 must(dup && dupPaid.some(Boolean), 'a supplier invoice number entered twice and paid');
-must(closeDay > 5, `${LAST_CLOSED} locked after business day 5 (it was day ${closeDay})`);
-must(kdeSales < kdeSalesBudget, 'Kasane Europe H1 external sales under budget');
-must(kdeEquipment < kdeEquipmentBudget, 'Kasane Europe H1 equipment sales under budget');
-must(kdeProfit > kdeProfitBudget, 'Kasane Europe H1 operating profit above budget');
 const transcript = (file) => readFileSync(join(data, 'onboarding/transcripts', file), 'utf8').replace(/\s+/g, ' ');
 const SAID = {
   'self-approved-entry': [T.controller, 'You cannot approve your own entry. Group-wide.'],
   'revenue-cut-off': [T.controller, 'September cut-off was clean.'],
   'credit-limit': [T.arap, 'They were never over their limit until August.'],
   'duplicate-payment': [T.arap, 'The system blocks a duplicate supplier invoice number'],
-  'close-length': [T.cfo, 'We close in five working days.'],
-  'europe-on-plan': [T.fpa, 'Europe is on plan in euros.'],
 };
 for (const [id, [file, words]] of Object.entries(SAID)) {
   must(transcript(file).includes(words), `${file} still says "${words}" (${id})`);
 }
 
-const pct = (a, b) => Math.round(((a - b) / Math.abs(b)) * 1000) / 10;
 const SYMBOL = { JPY: '¥', USD: '$', EUR: '€', GBP: '£', CNY: 'CN¥' };
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 // Whole units below a million; one decimal in millions (two for non-yen) above it. Yen never shows decimals.
@@ -474,6 +445,9 @@ const fmtDate = (iso) => {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 };
 const fmtPeriod = (p) => `${MONTHS[Number(p.slice(5)) - 1]} ${p.slice(0, 4)}`;
+const longMonth = (p) =>
+  new Date(`${p}-01T00:00:00Z`).toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const shortDate = (iso) => fmtDate(iso).replace(/ \d{4}$/, '');
 // "Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026"
 const fmtPeriods = (ps) => {
   const idx = (p) => Number(p.slice(0, 4)) * 12 + Number(p.slice(5));
@@ -492,13 +466,14 @@ const fmtPeriods = (ps) => {
 const contradictions = [
   {
     id: 'self-approved-entry',
-    claim: 'The controller says every manual journal has a different approver, enforced group-wide.',
+    // The visitor is the controller (D2): the agents check what you told them against the books.
+    claim: 'You said every manual journal has a different approver, enforced group-wide.',
     evidence: `${sa.je_id} (${sa.entity_id}, ${fmtDate(sa.posting_date)}) moves ${money(num(sa.debit), sa.currency)} from advertising to prepaid expenses. The same person, ${sa.created_by}, created and approved it. Whether it was over their limit needs the employee master, which isn't in this material.`,
     sources: [T.controller, P.manualJournals],
   },
   {
     id: 'revenue-cut-off',
-    claim: `The controller says the ${fmtPeriod(LAST_CLOSED)} cut-off was clean.`,
+    claim: `You said the ${longMonth(LAST_CLOSED)} cut-off was clean, in the controller interview on ${shortDate(T.controller.match(/\d{4}-\d{2}-\d{2}/)[0])}.`,
     evidence: `${cutoff.invoice_id} (${money(num(cutoff.net_amount), 'JPY')} net) is dated ${fmtDate(cutoff.invoice_date)} but delivered ${fmtDate(cutoff.delivery_date)}. Revenue belongs to the next month.`,
     sources: [T.controller, P.salesInvoices],
   },
@@ -515,18 +490,6 @@ const contradictions = [
     claim: 'AP says the system blocks a duplicate supplier invoice number, in every entity.',
     evidence: `${dup[0].entity_id} entered supplier invoice ${dup[0].supplier_invoice_number} twice (${dup.map((d) => d.ap_invoice_id).join(' and ')}), ${money(num(dup[0].gross_amount), dup[0].currency)} each, and ${dupPaid.every(Boolean) ? 'paid both' : 'paid one'}.`,
     sources: [T.arap, P.supplierInvoices],
-  },
-  {
-    id: 'close-length',
-    claim: 'The CFO says the group closes in five working days.',
-    evidence: `${fmtPeriod(LAST_CLOSED)} was locked on ${fmtDate(lastClose.close_completed_date)}, business day ${closeDay}, not 5.`,
-    sources: [T.cfo, P.closeCalendar],
-  },
-  {
-    id: 'europe-on-plan',
-    claim: 'FP&A says Europe is on plan in euros.',
-    evidence: `Kasane Europe's H1 external sales were ${money(kdeSales, 'EUR')} against a budget of ${money(kdeSalesBudget, 'EUR')} (${-pct(kdeSales, kdeSalesBudget)}% under). Equipment was ${-pct(kdeEquipment, kdeEquipmentBudget)}% under. Profit is above plan; sales are not.`,
-    sources: [T.fpa, P.trialBalance, P.budget],
   },
 ];
 
@@ -655,36 +618,12 @@ addPack(P.coa, 'spreadsheet', copy('01_master_data/chart_of_accounts.csv'));
 addPack(P.aging, 'spreadsheet', copy('05_reporting/ar_aging_monthly.csv'));
 addPack(P.budget, 'spreadsheet', copy('04_planning/budget_forecast_monthly.csv'));
 const jeCols = Object.keys(journal[0]);
-addPack(
-  P.manualJournals,
-  'spreadsheet',
-  writeText(
-    toCsv(
-      journal.filter((l) => l.je_type === 'Manual' && H1.includes(l.period)),
-      jeCols,
-    ),
-  ),
-);
-addPack(
-  P.supplierInvoices,
-  'spreadsheet',
-  writeText(
-    toCsv(
-      supplierInvoices.filter((r) => H1.includes(r.period)),
-      Object.keys(supplierInvoices[0]),
-    ),
-  ),
-);
-addPack(
-  P.salesInvoices,
-  'spreadsheet',
-  writeText(
-    toCsv(
-      salesInvoices.filter((r) => r.period === LAST_CLOSED),
-      Object.keys(salesInvoices[0]),
-    ),
-  ),
-);
+const manualRows = journal.filter((l) => l.je_type === 'Manual' && H1.includes(l.period));
+const supplierRows = supplierInvoices.filter((r) => H1.includes(r.period));
+const salesRows = salesInvoices.filter((r) => r.period === LAST_CLOSED);
+addPack(P.manualJournals, 'spreadsheet', writeText(toCsv(manualRows, jeCols)));
+addPack(P.supplierInvoices, 'spreadsheet', writeText(toCsv(supplierRows, Object.keys(supplierInvoices[0]))));
+addPack(P.salesInvoices, 'spreadsheet', writeText(toCsv(salesRows, Object.keys(salesInvoices[0]))));
 // The bank export has no header row, as the bank portal produces it (treasury interview).
 const opening = num(
   trialBalance.find((r) => r.entity_id === 'KJP' && r.period === LAST_CLOSED && r.account_id === '1000')
@@ -906,8 +845,8 @@ await writeJson('apps/site/data/kasane.json', {
 });
 
 // ---------------------------------------------------------------------------
-// Close demo: the scripted #sep-close channel. The copy is authored in onboarding/close-demo.json;
-// every figure in it is a {token} filled here from the data, and the people are employee ids.
+// The Kasane app: the scripted workspace. The copy is authored in onboarding/close-demo.json; every
+// figure in it is a {token} filled here from the data, and the people are employee ids.
 // ---------------------------------------------------------------------------
 
 const closeSource = JSON.parse(readFileSync(join(data, 'onboarding/close-demo.json'), 'utf8'));
@@ -919,6 +858,7 @@ function packPath(name) {
     [P.policies]: 'docs/06_accounting_policies.md',
     [P.closeCalendar]: 'docs/07_close_calendar.md',
     [P.closeMemo]: 'docs/commentary/2026-09_month_end_close_memo.md',
+    [P.forecastMemo]: 'docs/commentary/FY2026_6+6_forecast_memo.md',
   };
   must(docs[name], `a path for ${name}`);
   return [docs[name]];
@@ -967,9 +907,38 @@ must(auditFieldwork, "close_calendar.md gives the auditors' interim fieldwork da
 const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
 must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
 const glOverBeforeAugust = glOverLimit.filter((r) => r.period < '2026-08');
-const longMonth = (p) =>
-  new Date(`${p}-01T00:00:00Z`).toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const shortDate = (iso) => fmtDate(iso).replace(/ \d{4}$/, '');
+// What the agents' scripted answers claim, each read from the file the answer cites.
+const lateInvoices = salesRows.filter((r) => r.delivery_date.slice(0, 7) > LAST_CLOSED);
+must(lateInvoices.length === 1, `one ${LAST_CLOSED} invoice delivered after the month`);
+const numbersEnteredTwice = Object.values(
+  supplierRows.reduce((acc, r) => {
+    (acc[`${r.supplier_id}|${r.supplier_invoice_number}`] ??= []).push(r);
+    return acc;
+  }, {}),
+).filter((g) => g.length > 1);
+must(numbersEnteredTwice.length === 1, `one supplier invoice number entered twice in FY${FY} H1`);
+const [dupFirst, dupSecond] = dup;
+must(
+  dup.length === 2 &&
+    dupFirst.supplier_id === dupSecond.supplier_id &&
+    num(dupFirst.gross_amount) === num(dupSecond.gross_amount) &&
+    dupFirst.invoice_date !== dupSecond.invoice_date &&
+    dupFirst.description !== dupSecond.description,
+  'the two duplicate entries differ only in date and description',
+);
+const selfApprovedInFile = new Set(manualRows.filter((l) => l.created_by === l.approved_by).map((l) => l.je_id));
+must(selfApprovedInFile.size === 1 && selfApprovedInFile.has(sa.je_id), `${sa.je_id} is the one self-approved entry`);
+const manualEntryCount = new Set(manualRows.map((l) => l.je_id)).size;
+const agingPeriods = arAging.map((r) => r.period).sort();
+must(
+  glHistory.at(-1).period === agingPeriods.at(-1) && glHistory[0].period === agingPeriods[0],
+  'the aging file and the Great Lakes history span the same months',
+);
+must(
+  /revenue belongs to the period in which delivery occurs/i.test(packText(P.policies)) &&
+    /`delivery_date` on each invoice is the control field/.test(packText(P.policies)),
+  'the accounting policies still put revenue in the month of delivery, with the delivery date as the control',
+);
 
 const closeTokens = {
   lastClosedLabel: longMonth(LAST_CLOSED).split(' ')[0],
@@ -990,7 +959,29 @@ const closeTokens = {
   glOverCount: String(glOverBeforeAugust.length),
   legalDecision,
   auditFieldwork,
-  europeSalesGap: `${Math.abs(pct(kdeSales, kdeSalesBudget))}%`,
+  openPeriod: longMonth(OPEN.period),
+  lastClosedPeriod: longMonth(LAST_CLOSED),
+  lockDate: fmtDate(lastClose.close_completed_date),
+  sceneDate: fmtDate(closeSource.scene.date),
+  fiscalYear: `FY${FY}`,
+  fiscalHalf: `FY${FY} H1`,
+  sepInvoiceCount: salesRows.length.toLocaleString('en-US'),
+  supplierInvoiceCount: supplierRows.length.toLocaleString('en-US'),
+  dupFirst: dupFirst.ap_invoice_id,
+  dupFirstDate: fmtDate(dupFirst.invoice_date),
+  dupFirstDescription: dupFirst.description,
+  dupSecond: dupSecond.ap_invoice_id,
+  dupSecondDate: fmtDate(dupSecond.invoice_date),
+  dupSecondDescription: dupSecond.description,
+  manualEntryCount: manualEntryCount.toLocaleString('en-US'),
+  saCreator: sa.created_by,
+  saDate: fmtDate(sa.posting_date),
+  saDebitAccount: saLines.find((l) => num(l.debit) > 0).account_id,
+  saCreditAccount: saLines.find((l) => num(l.credit) > 0).account_id,
+  glOverPeriods: fmtPeriods(glOverBeforeAugust.map((r) => r.period)),
+  glFirstPeriod: fmtPeriod(glHistory[0].period),
+  glLastPeriod: fmtPeriod(glHistory.at(-1).period),
+  glOpen: money(glHistory.at(-1).open, 'USD'),
 };
 const fill = (text) =>
   curly(
@@ -1008,9 +999,362 @@ const fillAll = (v) =>
         ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fillAll(x)]))
         : v;
 
+// Each finding's entity and period, for its task row.
+const FINDING_SCOPE = {
+  'revenue-cut-off': `${cutoff.entity_id}, ${fmtPeriod(cutoff.period)}`,
+  'duplicate-payment': `${dupFirst.entity_id}, ${fmtPeriod(dupFirst.period)}`,
+  'self-approved-entry': `${sa.entity_id}, ${fmtPeriod(sa.period)}`,
+  'credit-limit': `${gl.entity_id}, up to ${fmtPeriod(glHistory.at(-1).period)}`,
+};
+
+// The binder (pages spec, D6): every file a finding, gap or question cites, or an agent reads. Each
+// gets an exhibit ID in a fixed order: transcripts, then documents (an image sorts with them), then
+// CSVs, each alphabetical. The same dataset always produces the same IDs.
+const BINDER_GROUP = { transcript: 0, document: 1, image: 1, spreadsheet: 2 };
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const binderFiles = [
+  ...new Set([
+    ...[...contradictions, ...gaps, ...followUps].flatMap((f) => f.sources),
+    ...closeSource.agents.flatMap((a) => a.reads),
+  ]),
+]
+  .map((name) => {
+    const file = pack.find((f) => f.name === name);
+    must(file, `${name} (a finding's source or an agent's read) is a pack file`);
+    return file;
+  })
+  .sort((a, b) => BINDER_GROUP[a.kind] - BINDER_GROUP[b.kind] || byCodeUnit(a.name, b.name));
+const exhibitOf = Object.fromEntries(binderFiles.map((f, i) => [f.name, `S-${i + 1}`]));
+
+// What each CSV excerpt shows. Only the columns a reader needs to follow the citation: the count above
+// the excerpt says how many were left out. Headers are the file's own names (docs/agent-voice.md).
+const mono = (key) => ({ key, mono: true });
+const text = (key) => ({ key });
+const figure = (key) => ({ key, numeric: true });
+const CSV_TABLES = {
+  [P.aging]: {
+    rows: arAging,
+    all: Object.keys(arAging[0]).length,
+    columns: [
+      text('period'),
+      mono('customer_id'),
+      text('currency'),
+      figure('current'),
+      figure('past_due_1_30'),
+      figure('past_due_31_60'),
+      figure('total_open'),
+      text('oldest_due_date'),
+    ],
+  },
+  [P.bank]: {
+    rows: bankRows,
+    all: 6,
+    columns: [text('date'), mono('ref'), text('desc'), figure('out'), figure('in'), figure('balance')],
+    covers: `KJP, ${fmtPeriod(LAST_CLOSED)}`,
+  },
+  [P.budget]: {
+    rows: plan,
+    all: Object.keys(plan[0]).length,
+    columns: [
+      mono('version_id'),
+      text('entity_id'),
+      text('period'),
+      text('measure'),
+      mono('account_id'),
+      text('product_line'),
+      figure('value'),
+      text('currency'),
+    ],
+  },
+  [P.coa]: {
+    rows: readCsv('01_master_data/chart_of_accounts.csv'),
+    all: Object.keys(readCsv('01_master_data/chart_of_accounts.csv')[0]).length,
+    columns: [
+      mono('account_id'),
+      text('account_name'),
+      text('account_class'),
+      text('statement'),
+      text('normal_balance'),
+    ],
+  },
+  [P.manualJournals]: {
+    rows: manualRows,
+    all: jeCols.length,
+    columns: [
+      mono('je_id'),
+      figure('line_no'),
+      text('entity_id'),
+      text('posting_date'),
+      mono('account_id'),
+      text('account_name'),
+      figure('debit'),
+      figure('credit'),
+      text('currency'),
+      mono('created_by'),
+      mono('approved_by'),
+    ],
+  },
+  [P.salesInvoices]: {
+    rows: salesRows,
+    all: Object.keys(salesInvoices[0]).length,
+    columns: [
+      mono('invoice_id'),
+      text('entity_id'),
+      mono('customer_id'),
+      text('invoice_date'),
+      text('delivery_date'),
+      figure('net_amount'),
+      text('currency'),
+    ],
+  },
+  [P.supplierInvoices]: {
+    rows: supplierRows,
+    all: Object.keys(supplierInvoices[0]).length,
+    columns: [
+      mono('ap_invoice_id'),
+      text('entity_id'),
+      mono('supplier_id'),
+      mono('supplier_invoice_number'),
+      text('invoice_date'),
+      text('description'),
+      figure('gross_amount'),
+      figure('amount_paid'),
+      text('currency'),
+    ],
+  },
+};
+
+// Which records in a CSV a finding cites. When they aren't next to each other, the excerpt is the
+// file's rows for `whole` instead (pages spec §4), and the count says so.
+const dupSupplierName = readCsv('01_master_data/suppliers.csv').find(
+  (r) => r.supplier_id === dupFirst.supplier_id,
+)?.supplier_name;
+must(dupSupplierName, `supplier ${dupFirst.supplier_id} in suppliers.csv`);
+const CITED_RECORDS = {
+  'revenue-cut-off': {
+    file: P.salesInvoices,
+    ids: [cutoff.invoice_id],
+    isCited: (r) => r.invoice_id === cutoff.invoice_id,
+  },
+  'duplicate-payment': {
+    file: P.supplierInvoices,
+    ids: dup.map((d) => d.ap_invoice_id),
+    isCited: (r) => dup.some((d) => d.ap_invoice_id === r.ap_invoice_id),
+    whole: { label: dupSupplierName, match: (r) => r.supplier_id === dupFirst.supplier_id },
+  },
+  'self-approved-entry': { file: P.manualJournals, ids: [sa.je_id], isCited: (r) => r.je_id === sa.je_id },
+  'credit-limit': {
+    file: P.aging,
+    ids: [gl.customer_id],
+    isCited: (r) => r.customer_id === gl.customer_id && glOverBeforeAugust.some((m) => m.period === r.period),
+    whole: { label: gl.customer_name, match: (r) => r.customer_id === gl.customer_id },
+  },
+};
+
+const EXCERPT_ROWS_EITHER_SIDE = 10;
+const EXCERPT_LINES_EITHER_SIDE = 5;
+const EXCERPT_FIRST_ROWS = 21;
+const count = (n) => n.toLocaleString('en-US');
+
+function csvExcerpt(name) {
+  const table = CSV_TABLES[name];
+  must(table, `an excerpt layout for ${name}`);
+  const citedBy = Object.values(CITED_RECORDS).find((c) => c.file === name);
+  let rows = table.rows.slice(0, EXCERPT_FIRST_ROWS);
+  let whole;
+  if (citedBy) {
+    const hits = table.rows.flatMap((r, i) => (citedBy.isCited(r) ? [i] : []));
+    must(hits.length > 0, `${name} holds what it is cited for (${citedBy.ids.join(', ')})`);
+    if (hits.at(-1) - hits[0] + 1 === hits.length) {
+      rows = table.rows.slice(
+        Math.max(0, hits[0] - EXCERPT_ROWS_EITHER_SIDE),
+        hits.at(-1) + EXCERPT_ROWS_EITHER_SIDE + 1,
+      );
+    } else {
+      must(citedBy.whole, `${name}'s cited rows are apart, so its excerpt needs whole rows to show`);
+      rows = table.rows.filter(citedBy.whole.match);
+      whole = citedBy.whole.label;
+    }
+  }
+  const columns = table.columns.map((c) => c.key);
+  return {
+    type: 'table',
+    count:
+      `Showing ${count(rows.length)} of ${count(table.rows.length)} rows, ` +
+      `${count(columns.length)} of ${count(table.all)} columns` +
+      (whole ? `: every row for ${whole}` : ''),
+    columns: table.columns,
+    rows: rows.map((r) => Object.fromEntries(columns.map((k) => [k, r[k]]))),
+    citedRows: citedBy ? rows.flatMap((r, i) => (citedBy.isCited(r) ? [i] : [])) : [],
+  };
+}
+
+function fileLines(name) {
+  const lines = packText(name).split('\n');
+  return lines.at(-1) === '' ? lines.slice(0, -1) : lines;
+}
+
+// The cited lines plus up to five either side. Which lines a finding rests on is authored: its claim
+// is a paraphrase. A line range that doesn't exist, or that no longer holds the words, stops the build.
+function transcriptExcerpt(name) {
+  const lines = fileLines(name);
+  const ranges = closeSource.exceptions.filter((e) => e.quote.file === name).map((e) => e.quote.lines);
+  if (ranges.length === 0) return textExcerpt(lines, 0, EXCERPT_FIRST_ROWS, []);
+  const shown = new Set();
+  const cited = new Set();
+  for (const [from, to] of ranges) {
+    for (
+      let n = Math.max(1, from - EXCERPT_LINES_EITHER_SIDE);
+      n <= Math.min(lines.length, to + EXCERPT_LINES_EITHER_SIDE);
+      n++
+    )
+      shown.add(n);
+    for (let n = from; n <= to; n++) cited.add(n);
+  }
+  return {
+    type: 'text',
+    count: `Showing ${count(shown.size)} of ${count(lines.length)} lines`,
+    lines: [...shown]
+      .sort((a, b) => a - b)
+      .map((n) => ({ n, text: lines[n - 1], ...(cited.has(n) ? { cited: true } : {}) })),
+  };
+}
+
+function textExcerpt(lines, from, to, cited, label = '') {
+  const shown = lines.slice(from, to);
+  return {
+    type: 'text',
+    count: `Showing ${label}${count(shown.length)} of ${count(lines.length)} lines`,
+    lines: shown.map((text, i) => ({
+      n: from + i + 1,
+      text,
+      ...(cited.includes(from + i + 1) ? { cited: true } : {}),
+    })),
+  };
+}
+
+// A document's named section, as close-demo.json gives it, or its first section. A section runs to the
+// next heading at its level or above.
+function documentExcerpt(name) {
+  const lines = fileLines(name);
+  const section = closeSource.sources[name]?.section;
+  const level = (line) => line.match(/^(#+) /)?.[1].length ?? 0;
+  if (section) {
+    const start = lines.findIndex((l) => level(l) > 0 && l.replace(/^#+ /, '').startsWith(section));
+    must(start >= 0, `${name} has a section named "${section}"`);
+    const rest = lines.slice(start + 1).findIndex((l) => level(l) > 0 && level(l) <= level(lines[start]));
+    return textExcerpt(lines, start, rest < 0 ? lines.length : start + 1 + rest, [], `the ${section} section: `);
+  }
+  const second = lines.slice(1).findIndex((l) => level(l) > 0);
+  return textExcerpt(lines, 0, second < 0 ? lines.length : second + 1, []);
+}
+
+// A transcript says what it covers on its second line and in its file name.
+function transcriptCovers(name) {
+  const subject = fileLines(name)[1].split(': ').slice(1).join(': ').replace(' — ', ': ');
+  must(subject, `${name} names its session on its second line`);
+  return `${subject}, ${fmtDate(name.match(/\d{4}-\d{2}-\d{2}/)[0])}`;
+}
+
+function csvCovers(name) {
+  const { rows, covers } = CSV_TABLES[name];
+  if (covers) return covers;
+  const ents = [...new Set(rows.map((r) => r.entity_id))];
+  const periods = rows.map((r) => r.period).sort();
+  must(ents[0] && periods[0], `${name} has entity and period columns, or close-demo.json says what it covers`);
+  const who = ents.length === entities.length ? `All ${entities.length} entities` : ents.join(', ');
+  const when =
+    periods[0] === periods.at(-1) ? fmtPeriod(periods[0]) : `${fmtPeriod(periods[0])} to ${fmtPeriod(periods.at(-1))}`;
+  return `${who}, ${when}`;
+}
+
+const SOURCE_KIND = { transcript: 'transcript', document: 'document', image: 'image', spreadsheet: 'csv' };
+const binder = binderFiles.map((file, i) => {
+  const kind = SOURCE_KIND[file.kind];
+  const authored = closeSource.sources[file.name]?.covers;
+  const excerpt =
+    kind === 'csv'
+      ? csvExcerpt(file.name)
+      : kind === 'transcript'
+        ? transcriptExcerpt(file.name)
+        : kind === 'document'
+          ? documentExcerpt(file.name)
+          : null;
+  const covers = authored
+    ? fill(authored)
+    : kind === 'transcript'
+      ? transcriptCovers(file.name)
+      : kind === 'csv'
+        ? csvCovers(file.name)
+        : undefined;
+  must(covers, `close-demo.json says what ${file.name} covers`);
+  const records = [
+    ...Object.values(CITED_RECORDS)
+      .filter((c) => c.file === file.name)
+      .flatMap((c) => c.ids),
+    ...closeSource.exceptions.filter((e) => e.quote.file === file.name).map((e) => lineRecord(e.quote.lines)),
+  ];
+  return {
+    id: `S-${i + 1}`,
+    name: file.name,
+    kind,
+    covers,
+    total:
+      kind === 'csv'
+        ? { count: CSV_TABLES[file.name].rows.length, unit: 'rows' }
+        : kind === 'image'
+          ? null
+          : { count: fileLines(file.name).length, unit: 'lines' },
+    records,
+    excerpt,
+  };
+});
+
+function lineRecord([from, to]) {
+  return from === to ? `L${from}` : `L${from}-${to}`;
+}
+
+// How a finding cites each of its files: the exhibit, and the record or the lines in it.
+function citationsOf(e, finding) {
+  return finding.sources.map((name) => {
+    const exhibit = exhibitOf[name];
+    if (name === e.quote.file) {
+      const [from, to] = e.quote.lines;
+      return {
+        source: name,
+        exhibit,
+        record: lineRecord(e.quote.lines),
+        locator: from === to ? `${exhibit}, line ${from}` : `${exhibit}, lines ${from} to ${to}`,
+      };
+    }
+    const cited = CITED_RECORDS[e.id];
+    must(cited?.file === name, `${e.id} says which record in ${name} it cites`);
+    return { source: name, exhibit, record: cited.ids[0], locator: `${exhibit}, ${cited.ids.join(' and ')}` };
+  });
+}
+
+// A claim rests on what someone said, so the lines it cites must still say it.
+const said = (e) => {
+  const [file, words] = SAID[e.id];
+  must(e.quote?.file === file, `${e.id} quotes ${file}`);
+  const lines = fileLines(file);
+  const [from, to] = e.quote.lines;
+  must(from >= 1 && to >= from && to <= lines.length, `${file} has lines ${from} to ${to} (${e.id})`);
+  must(
+    lines
+      .slice(from - 1, to)
+      .join(' ')
+      .includes(words),
+    `${file} says "${words}" in lines ${from} to ${to}`,
+  );
+};
+
 // Exceptions: one per contradiction, in the order the channel shows them, each with its evidence.
-const memberKeys = new Set([...Object.keys(closePeople), 'agent']);
-const mustBeMember = (key, where) => must(memberKeys.has(key), `${key} (${where}) is a person in close-demo.json`);
+const agentKeys = closeSource.agents.map((a) => a.key);
+const memberKeys = new Set([...Object.keys(closePeople), ...agentKeys]);
+const mustBeMember = (key, where) =>
+  must(memberKeys.has(key), `${key} (${where}) is a person or an agent in close-demo.json`);
+const channelIds = closeSource.channels.map((c) => c.id);
 must(
   closeSource.exceptions.length === contradictions.length &&
     contradictions.every((c) => closeSource.exceptions.some((e) => e.id === c.id)),
@@ -1018,6 +1362,8 @@ must(
 );
 const closeExceptions = closeSource.exceptions.map((e) => {
   const finding = contradictions.find((c) => c.id === e.id);
+  must(agentKeys.includes(e.agent), `${e.id} is raised by an agent in close-demo.json`);
+  must(channelIds.includes(e.channel), `${e.id} sits in a channel in close-demo.json`);
   for (const r of e.replies) mustBeMember(r.author, `${e.id} reply`);
   if (e.resolution) mustBeMember(e.resolution.by, `${e.id} resolution`);
   if (e.waiting)
@@ -1028,13 +1374,42 @@ const closeExceptions = closeSource.exceptions.map((e) => {
   for (const s of finding.sources) must(packNames.has(s), `${s} (${e.id}) is a pack file`);
   // Sources needs it (docs/agent-voice.md principle 4): [] says every part was checked.
   must(Array.isArray(e.notChecked), `${e.id} says what wasn't checked (notChecked, [] for nothing)`);
-  return fillAll({ ...e, claim: finding.claim, evidence: finding.evidence, sources: finding.sources });
+  said(e);
+  const { quote: _quote, ...authored } = e;
+  return fillAll({
+    ...authored,
+    scope: FINDING_SCOPE[e.id],
+    claim: finding.claim,
+    evidence: finding.evidence,
+    sources: finding.sources,
+    citations: citationsOf(e, finding),
+  });
 });
 
-for (const c of closeSource.channels) for (const m of c.members) mustBeMember(m, `#${c.name}`);
-for (const m of closeSource.directMessages) mustBeMember(m, 'direct messages');
-mustBeMember(closeSource.agent.setUpBy, 'agent profile');
-for (const f of closeSource.agent.reads) must(packNames.has(f), `${f} (agent profile) is a pack file`);
+for (const c of closeSource.channels) {
+  for (const m of c.members) mustBeMember(m, `#${c.name}`);
+  mustBeMember(c.owner, `#${c.name}'s owner`);
+  for (const g of c.gaps)
+    must(
+      gaps.some((x) => x.id === g),
+      `gap ${g} (#${c.name}) exists`,
+    );
+}
+for (const m of closeSource.directMessages) must(m in closePeople, `${m} (direct messages) is a person`);
+must(closeSource.agentRules.setUpBy in closePeople, 'the agents are set up by a person');
+for (const a of closeSource.agents) {
+  must(
+    contradictions.some((c) => c.id === a.finding),
+    `${a.key}'s finding ${a.finding} exists`,
+  );
+  must(a.starters.length === 2, `${a.key} has two suggested questions`);
+  for (const f of a.reads) must(packNames.has(f), `${f} (${a.key} reads) is a pack file`);
+  for (const q of a.starters) {
+    // Sources needs it (docs/agent-voice.md principle 4).
+    must(Array.isArray(q.notChecked), `${a.key}: "${q.question}" says what wasn't checked`);
+    for (const f of q.sources) must(a.reads.includes(f), `${f} (${a.key}: "${q.question}") is in ${a.key}'s reads`);
+  }
+}
 
 // The proposed reversal: the invoice's own lines, from the chart of accounts. Debits equal credits.
 const coa = readCsv('01_master_data/chart_of_accounts.csv');
@@ -1086,12 +1461,16 @@ for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something
 must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
 await writeJson('apps/demo/data/people.json', closePeople);
+await writeJson('apps/demo/data/sources.json', binder);
 await writeJson('apps/demo/data/close.json', {
   scene: closeSource.scene,
-  agent: fillAll(closeSource.agent),
+  period: fillAll(closeSource.period),
+  agentRules: closeSource.agentRules,
+  agents: fillAll(closeSource.agents),
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   typingMs: closeSource.typingMs,
+  searchSuggestions: fillAll(closeSource.searchSuggestions),
   exceptions: closeExceptions,
   hero: fillAll({
     ...closeSource.hero,

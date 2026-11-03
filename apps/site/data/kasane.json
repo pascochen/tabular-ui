@@ -13,12 +13,12 @@
     { "name": "04_interview_treasury_2026-10-14.txt", "kind": "transcript", "bytes": 4250 },
     { "name": "05_interview_ar_ap_2026-10-14.txt", "kind": "transcript", "bytes": 4376 },
     { "name": "06_interview_plant_cost_2026-10-15.txt", "kind": "transcript", "bytes": 4077 },
-    { "name": "company_profile.md", "kind": "document", "bytes": 5899 },
+    { "name": "company_profile.md", "kind": "document", "bytes": 5912 },
     { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
     { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
     { "name": "close_memo_2026-09.md", "kind": "document", "bytes": 4804 },
     { "name": "forecast_memo_fy2026_6+6.md", "kind": "document", "bytes": 3702 },
-    { "name": "trial_balance_monthly.csv", "kind": "spreadsheet", "bytes": 564953 },
+    { "name": "trial_balance_monthly.csv", "kind": "spreadsheet", "bytes": 564991 },
     { "name": "chart_of_accounts.csv", "kind": "spreadsheet", "bytes": 13475 },
     { "name": "ar_aging_monthly.csv", "kind": "spreadsheet", "bytes": 690470 },
     { "name": "budget_forecast_monthly.csv", "kind": "spreadsheet", "bytes": 1369105 },
@@ -28,7 +28,7 @@
     { "name": "bank_export_kjp_2026-09.csv", "kind": "spreadsheet", "bytes": 2904 },
     { "name": "org_chart_finance_2026-10.png", "kind": "image", "bytes": 119615 }
   ],
-  "findings": { "contradictions": 6, "gaps": 8, "followUps": 10 },
+  "findings": { "contradictions": 4, "gaps": 8, "followUps": 10 },
   "duplicatePayment": {
     "entity": "KUS",
     "supplierInvoice": "MFL-58821",

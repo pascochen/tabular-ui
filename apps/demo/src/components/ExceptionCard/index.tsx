@@ -3,13 +3,12 @@ import { CaretRightIcon } from '@phosphor-icons/react';
 import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn, type Source } from 'tabular-ui';
 
 import type { ExceptionState } from '../../lib/close-state';
-import { agent, close, memberName, packFile } from '../../lib/kasane';
+import { close, memberName, packFile } from '../../lib/kasane';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
 
 type Exception = (typeof close.exceptions)[number];
 
-const agentAuthor = { name: agent.name, avatar: <MemberAvatar memberKey="agent" /> };
 const authorOf = (key: string) => ({ name: memberName(key), avatar: <MemberAvatar memberKey={key} /> });
 
 const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
@@ -28,15 +27,13 @@ export type ExceptionCardProps = {
   defaultRepliesOpen?: boolean;
   /** The decision is the visitor's to make: the badge says so. */
   awaitsYou?: boolean;
-  /** The agent posted the message before this one in the same minute: group it under that header. */
-  continued?: boolean;
   /** Replies the close state doesn't hold as text: the hero's question, proposal and rerun. After the others. */
   extraReplies?: ReactElement[];
 };
 
 /**
- * One close exception, as the agent posted it in #sep-close: what was said,
- * what the data shows, and the files that show it. A message by the agent, so
+ * One close exception, as the agent that raised it posted it: what was said,
+ * what the data shows, and the files that show it. A message by an agent, so
  * its body is an `AgentBlock` (ChannelMessage does that). Its status is a
  * `StatusBadge`, so a resolved exception says so in words and icon, not only
  * colour. Replies follow inline.
@@ -49,7 +46,6 @@ export function ExceptionCard({
   state,
   defaultRepliesOpen = false,
   awaitsYou = false,
-  continued = false,
   extraReplies = [],
 }: ExceptionCardProps) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
@@ -67,13 +63,12 @@ export function ExceptionCard({
 
   return (
     <ChannelMessage
-      author={agentAuthor}
+      author={authorOf(e.agent)}
       time={e.postedAt}
       dateTime={`${close.scene.date}T${e.postedAt}`}
-      authorship={close.agent.authorship}
+      authorship={memberName(e.agent)}
       repliesOpen={repliesOpen}
       onRepliesOpenChange={setChosen}
-      continued={continued}
       replies={[
         ...state.replies.map((r, i) => (
           <ChannelMessageReply key={i} author={authorOf(r.author)} time={r.at} dateTime={`${close.scene.date}T${r.at}`}>

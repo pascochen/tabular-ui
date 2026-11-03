@@ -12,13 +12,15 @@ import {
 import { sceneNow } from '../../lib/clock';
 import { useClose } from '../../lib/close-context';
 import type { HeroRound } from '../../lib/close-state';
-import { agent, checks, close } from '../../lib/kasane';
+import { checks, close, memberName } from '../../lib/kasane';
 import { MemberAvatar } from '../../shell/members';
 
 const hero = close.hero;
 type Line = (typeof hero.entry.lines)[number];
 
-const agentAuthor = { name: agent.name, avatar: <MemberAvatar memberKey="agent" /> };
+// The agent that raised the finding asks about it.
+const heroAgent = close.exceptions.find((e) => e.id === hero.exception)!.agent;
+const agentAuthor = { name: memberName(heroAgent), avatar: <MemberAvatar memberKey={heroAgent} /> };
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /** ¥42,720,000. Yen has no minor unit; the figure is whole. */
@@ -66,7 +68,9 @@ const optionLabel = (id: string) => hero.options.find((o) => o.id === id)!.label
 function answeredLine(round: HeroRound) {
   if (round.answer === 'skip') return hero.skipped;
   const label = optionLabel(round.answer!);
-  return round.delegated ? `Chosen by AI: ${label}. ${hero.delegate.reason}` : `Answered by you: ${label}.`;
+  return round.delegated
+    ? `Chosen by ${agentAuthor.name}: ${label}. ${hero.delegate.reason}`
+    : `Answered by you: ${label}.`;
 }
 
 export function QuestionReply({ round }: { round: HeroRound }) {

@@ -23,12 +23,13 @@ const run = (...actions: CloseAction[]) => actions.reduce(closeReducer, landingS
 const hero = (s: CloseState) => s.exceptions['revenue-cut-off'];
 const last = (s: CloseState) => s.hero.rounds[s.hero.rounds.length - 1];
 
-test('the landing state: 2 of 6 resolved, the question asked, the cut-off at ¥42.7m', () => {
+test('the landing state: 0 of 4 resolved, the question asked, the cut-off at ¥42.7m', () => {
   const s = landingState();
-  expect(progress(s)).toEqual({ resolved: 2, total: 6 });
+  expect(progress(s)).toEqual({ resolved: 0, total: 4 });
+  expect(Object.values(s.exceptions).map((e) => e.status)).toEqual(['open', 'open', 'open', 'open']);
   expect(s.hero.rounds).toEqual([{ askedAt: '13:49' }]);
   expect(s.checks['revenue-cut-off']).toBe(42720000);
-  expect(s.log.map((l) => l.exception)).toEqual(['close-length', 'europe-on-plan']);
+  expect(s.log).toEqual([]);
 });
 
 test('reopen: read, propose, post, rerun; only then resolved and tied out', () => {
@@ -42,7 +43,7 @@ test('reopen: read, propose, post, rerun; only then resolved and tied out', () =
   const done = closeReducer(posted, { type: 'rerun', at: '14:01' });
   expect(hero(done).status).toBe('resolved');
   expect(done.checks['revenue-cut-off']).toBe(0);
-  expect(progress(done).resolved).toBe(3);
+  expect(progress(done).resolved).toBe(1);
   expect(done.log.at(-1)).toMatchObject({ exception: 'revenue-cut-off', by: 'visitor', at: '14:01' });
 });
 
@@ -108,7 +109,7 @@ test('the timeline is one fixed order, ending once, with the gaps it was scripte
   expect(typing.length).toBe(timeline.filter((e) => e.effect.kind === 'reply').length);
 });
 
-test('played after a reopen: 5 of 6 resolved, the credit limit waiting, the end reached', () => {
+test('played after a reopen: 3 of 4 resolved, the credit limit waiting, the end reached', () => {
   const s = playAll(
     run(
       { type: 'answer', answer: 'reopen', at: '14:00' },
@@ -117,7 +118,7 @@ test('played after a reopen: 5 of 6 resolved, the credit limit waiting, the end 
       { type: 'rerun', at: '14:01' },
     ),
   );
-  expect(progress(s).resolved).toBe(5);
+  expect(progress(s).resolved).toBe(3);
   expect(s.exceptions['credit-limit'].status).toBe('waiting');
   expect(s.ended).toBe(true);
   expect(s.typing).toBeNull();
@@ -148,13 +149,19 @@ test('skip from landing finishes the decision as Choose for me would, then plays
   expect(last(s)).toMatchObject({ answer: 'reopen', delegated: true, stage: 'done' });
   expect(s.checks['revenue-cut-off']).toBe(0);
   expect(s.ended).toBe(true);
-  expect(progress(s).resolved).toBe(5);
+  expect(progress(s).resolved).toBe(3);
+});
+
+test('the self-approved entry resolves in a teammate’s name, never the visitor’s', () => {
+  // D2: left on Daisuke, the timeline would resolve it in the visitor's name while he does nothing.
+  const s = closeReducer(landingState(), { type: 'skip', at: '14:00' });
+  expect(s.log.find((l) => l.exception === 'self-approved-entry')?.by).toBe('glAccountant');
 });
 
 test('skip keeps an answer the visitor gave: a skipped question stays open', () => {
   const s = run({ type: 'answer', answer: 'skip', at: '14:00' }, { type: 'skip', at: '14:01' });
   expect(hero(s).status).toBe('open');
-  expect(progress(s).resolved).toBe(4);
+  expect(progress(s).resolved).toBe(2);
   expect(s.ended).toBe(true);
 });
 

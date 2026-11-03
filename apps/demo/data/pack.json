@@ -5,7 +5,7 @@
   { "name": "04_interview_treasury_2026-10-14.txt", "kind": "transcript", "bytes": 4250 },
   { "name": "05_interview_ar_ap_2026-10-14.txt", "kind": "transcript", "bytes": 4376 },
   { "name": "06_interview_plant_cost_2026-10-15.txt", "kind": "transcript", "bytes": 4077 },
-  { "name": "company_profile.md", "kind": "document", "bytes": 5899 },
+  { "name": "company_profile.md", "kind": "document", "bytes": 5912 },
   { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
   { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
   { "name": "close_memo_2026-09.md", "kind": "document", "bytes": 4804 },
@@ -13,7 +13,7 @@
   {
     "name": "trial_balance_monthly.csv",
     "kind": "spreadsheet",
-    "bytes": 564953,
+    "bytes": 564991,
     "firstLine": "entity_id,period,fiscal_period,period_status,account_id,account_name,statement,opening_balance,period_debits,period_credits,closing_balance,currency"
   },
   {

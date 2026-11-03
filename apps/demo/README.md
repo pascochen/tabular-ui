@@ -1,8 +1,10 @@
-# Demo: Kasane September close
+# Demo: the Kasane app
 
-The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exceptions workbench for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
+The public demo at [demo.tabularui.com](https://demo.tabularui.com): a finance workspace for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
 
-**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. Phase 4 is `#sep-close` in its landing state: six exception cards, the decision first, and the close panel. Phase 5 is the decision in the Revenue cut-off thread (`src/components/HeroThread/README.md`). Phase 6 is the timeline: once the visitor decides, the teammates reply and resolve in the background, and the run ends at 5 of 6. Phases 0–6 are the demo. Only built views are reachable: Home and `#rev-check` (phases 9 and 10) are out of the sidebar until they're built, and their URLs open `#sep-close`. `#open-items` lists the gaps and follow-ups as a plain table, and each direct message opens on an empty state with the member's profile.
+**Being reworked** into a workspace with Tasks, six channels, four specialist agents, a Sources binder and Search, one step per PR. Step 1 is the data: the four findings, the agents, the channels, the visitor swap and the binder's `sources.json`. Until the channels step splits them, `#revenue` holds all four findings, and `#open-items` holds the gaps and questions until Tasks absorbs it.
+
+**Being built in phases** (`kasane-close-demo-plan.md` §6). Phase 2 is the shell: the sidebar, view switching by URL, and the right panel's place in each view. Phase 4 is `#sep-close` in its landing state: six exception cards, the decision first, and the close panel. Phase 5 is the decision in the Revenue cut-off thread (`src/components/HeroThread/README.md`). Phase 6 is the timeline: once the visitor decides, the teammates reply and resolve in the background, and the run ends at 3 of 4. Phases 0–6 are the demo. Only built views are reachable, and old URLs (`?view=sep-close`, `?view=rev-check`) open `#revenue`. `#open-items` lists the gaps and follow-ups as a plain table, and each direct message opens on an empty state with the member's profile.
 
 **The timeline** (`src/lib/timeline.ts`) is one list in one fixed order, built from `close.json`'s delays, so every run plays the same. `src/lib/timeline-script.ts` plays it one event at a time.
 - It pauses while the tab is hidden, and the waiting event starts its gap again on return.
@@ -15,20 +17,22 @@ The public demo at [demo.tabularui.com](https://demo.tabularui.com): a close exc
 
 ## Playing it
 
-A visitor plays Mei Tachibana, Head of FP&A at **Kasane Corporation**, a fictional Tokyo printer maker. The people in the channel and the agent are scripted, and every figure they quote comes from the generated data (below).
+A visitor plays Daisuke Onodera, Group Controller at **Kasane Corporation**, a fictional Tokyo printer maker. The people in the channel and the agents are scripted, and every figure they quote comes from the generated data (below). Two of the findings contradict what the visitor said in the controller interview, and the agents say so in the second person.
 
-- **Views by URL, with no router.** `?view=sep-close` (the default, `/`), `?view=open-items`, and `?dm=agent|controller|apLead` for a direct message. Every sidebar item is a real link, so it opens in a new tab and Back works. `src/lib/view.ts`.
-- **The right panel follows the view**: the close panel in `#sep-close`, the member's profile in a direct message. The agent's profile lists what it does, what it never does and what it reads, from `close.json`. `#open-items` is a table page and has none until its row detail is built.
+- **Views by URL, with no router.** `?view=revenue` (the default, `/`), `?view=open-items`, and `?dm=fpaHead|apLead` for a direct message. Every sidebar item is a real link, so it opens in a new tab and Back works. `src/lib/view.ts`.
+- **The right panel follows the view**: the close panel in `#revenue`, the member's profile in a direct message. `#open-items` is a table page and has none until its row detail is built.
 - **Nobody replies to what the visitor writes.** The first post gets a one-line note from System that says so, and each post scrolls the channel to its foot, where it lands. The note is derived from the post, so Start over clears it.
 - **Under 1024px the panel is a dialog** (`src/shell/PanelSheet.tsx`), opened from a button in the page header. `AppShell`'s panel pushes main at every width and is 440px, so at 375px main measured 0 and the decision couldn't be seen. Beside the panel, main is 583px at 1023px and narrower than a 375px phone from 815px. A dialog covers main instead, so the channel keeps its width, its scroll and anything typed. 1024px and wider are unchanged. This is enough to follow the story on a phone, not a phone layout: pinning the sidebar at 375px still leaves main 135px, and the proposed entry's table scrolls inside its card.
-- **The agent is "AI"**, in the sidebar, its profile and every message header, as `docs/agent-voice.md` rule 1 requires (chosen 2026-10-30, `docs/reviews/demo-first-pass-2026-10-30.md`).
+- **The four agents are role word + "AI"**: Cut-off AI, Payments AI, Approvals AI and Credit AI, in every message header, as `docs/agent-voice.md` rule 1 allows since 2026-11-03. The word was "AI" alone while there was one agent (`docs/reviews/demo-first-pass-2026-10-30.md`).
 - `DemoBanner`, in the top nav, says all of this in one line; see its README.
 
 ## Data
 
-`data/` holds small JSON files, only what the screens read: `pack.json`, `company.json`, `discovery.json` and `findings.json` for the onboarding journey, and `people.json`, `close.json` and `checks.json` for the close demo that replaces it (`kasane-close-demo-plan.md`). They are generated; never edit them by hand.
+`data/` holds small JSON files, only what the screens read: `pack.json`, `company.json`, `discovery.json` and `findings.json` from the onboarding journey, and `people.json`, `close.json`, `checks.json` and `sources.json` for the workspace. They are generated; never edit them by hand.
 
-The close demo's copy is authored in the dataset, in `onboarding/close-demo.json`: the channel's exceptions, replies, the hero question and the proposed entry's wording. Every figure in it is a `{token}` the export script fills from the data, and its people are employee ids, each of whom must attend an interview. The script stops on an unknown token, a person who isn't in the material, an unbalanced entry or an account missing from the chart of accounts. `apps/storybook/tests/close-data.spec.ts` checks the generated files against each other, since CI has no dataset.
+`sources.json` is the binder: the 18 files a finding, gap or question cites, or an agent reads, each with an exhibit ID in a fixed order (transcripts, then documents, then CSVs, each alphabetical) and a trimmed excerpt with an honest count. Full files stay out, for repo size.
+
+The copy is authored in the dataset, in `onboarding/close-demo.json`: the agents and their suggested answers, the channels, each finding's replies and the line range it rests on, the hero question and the proposed entry's wording. Each finding's `claim`, `evidence` and `sources` are written in `scripts/export-fixtures.mjs`. Every figure is a `{token}` the export script fills from the data, and its people are employee ids, each of whom must attend an interview. The script stops on an unknown token, a person who isn't in the material, an unbalanced entry, an account missing from the chart of accounts, or a line range that doesn't exist or no longer holds the words it's cited for. `apps/storybook/tests/close-data.spec.ts` checks the generated files against each other, since CI has no dataset.
 
 The full Kasane dataset is kept outside this repository. To rebuild the fixtures from it:
 
@@ -36,7 +40,7 @@ The full Kasane dataset is kept outside this repository. To rebuild the fixtures
 KASANE_DATA_DIR=/path/to/kasane pnpm --filter tabular-ui-demo export-fixtures
 ```
 
-`KASANE_DATA_DIR` is the dataset's root, the folder holding `01_master_data/` through `05_reporting/`, `docs/` and `onboarding/` (`transcripts/`, the org chart and `close-demo.json`). The script also rewrites the story fixtures in `packages/ui/src/fixtures/kasane.ts`, and stops if the data no longer supports a finding. On an unchanged dataset it produces no diff.
+`KASANE_DATA_DIR` is the dataset's root, the folder holding `01_master_data/` through `05_reporting/`, `docs/` and `onboarding/` (`transcripts/`, the org chart and `close-demo.json`). The script also rewrites the story fixtures in `packages/ui/src/fixtures/kasane.ts` and the site's `apps/site/data/kasane.json`, and stops if the data no longer supports a finding. On an unchanged dataset it produces no diff.
 
 ## Running it
 

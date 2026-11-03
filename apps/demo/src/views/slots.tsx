@@ -46,7 +46,7 @@ export function slotsFor(view: View): ViewSlots {
   }
   return {
     title,
-    actions: <ChannelPresence channel="sep-close" />,
+    actions: <ChannelPresence channel="revenue" />,
     body: <SepCloseChannel />,
     panel: {
       label: `${lastClosedMonth} close`,

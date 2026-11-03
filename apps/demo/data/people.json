@@ -1,17 +1,6 @@
 {
   "visitor": {
     "key": "visitor",
-    "id": "E0011",
-    "name": "Mei Tachibana",
-    "shortName": "Mei",
-    "title": "Head of FP&A",
-    "entity": "KJP",
-    "email": "mei.tachibana@kasane.example",
-    "initials": "MT",
-    "handle": "m.tachibana"
-  },
-  "controller": {
-    "key": "controller",
     "id": "E0010",
     "name": "Daisuke Onodera",
     "shortName": "Daisuke",
@@ -20,6 +9,17 @@
     "email": "daisuke.onodera@kasane.example",
     "initials": "DO",
     "handle": "d.onodera"
+  },
+  "fpaHead": {
+    "key": "fpaHead",
+    "id": "E0011",
+    "name": "Mei Tachibana",
+    "shortName": "Mei",
+    "title": "Head of FP&A",
+    "entity": "KJP",
+    "email": "mei.tachibana@kasane.example",
+    "initials": "MT",
+    "handle": "m.tachibana"
   },
   "apLead": {
     "key": "apLead",
@@ -75,5 +75,16 @@
     "email": "marcus.bell@kasane.example",
     "initials": "MB",
     "handle": "m.bell"
+  },
+  "treasury": {
+    "key": "treasury",
+    "id": "E0013",
+    "name": "Ren Fujisawa",
+    "shortName": "Ren",
+    "title": "Treasury Manager",
+    "entity": "KJP",
+    "email": "ren.fujisawa@kasane.example",
+    "initials": "RF",
+    "handle": "r.fujisawa"
   }
 }

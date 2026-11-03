@@ -24,7 +24,7 @@ const dateTime = (at: string) => `${close.scene.date}T${at}`;
 const SCRIPTED_NOTE = 'The people and the AI are scripted, so nobody will reply to your message.';
 
 /**
- * #sep-close: one message per exception with its replies inline, the decision
+ * #revenue: one message per exception with its replies inline, the decision
  * first so it opens above the fold, then whatever the visitor writes, and the
  * composer. The decision and the
  * timeline change it all through the close state.
@@ -38,18 +38,13 @@ export function SepCloseChannel() {
   const [heard, setHeard] = useState('');
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
-      <ChannelMessageList aria-label="Messages in sep-close">
-        {close.exceptions.map((e, i) => (
+      <ChannelMessageList aria-label="Messages in revenue">
+        {close.exceptions.map((e) => (
           <ExceptionCard
             key={e.id}
             awaitsYou={awaitsVisitor(state, e.id)}
             exception={e}
             state={state.exceptions[e.id]}
-            // A run: the agent posted every exception at once. Same author, same
-            // minute, so one header (ChannelMessage's `continued`). Except after
-            // the hero, whose thread opens with a person's reply: a headerless
-            // message under it would read as that person's.
-            continued={i > 0 && close.exceptions[i - 1].postedAt === e.postedAt && !isHero(close.exceptions[i - 1])}
             // The decision the visitor makes: open on arrival, so the reply is there.
             defaultRepliesOpen={isHero(e)}
             extraReplies={isHero(e) ? heroReplies : undefined}
@@ -99,8 +94,8 @@ export function SepCloseChannel() {
           {state.typing ? `${memberName(state.typing.who)} is replying on ${titleOf(state.typing.exception)}…` : null}
         </p>
         <ChatComposer
-          label="Message sep-close"
-          placeholder="Message #sep-close"
+          label="Message revenue"
+          placeholder="Message #revenue"
           onSend={(text) => {
             flushSync(() => dispatch({ type: 'say', text, at: sceneNow() }));
             // A post lands at the channel's foot, off screen from anywhere above it.
