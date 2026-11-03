@@ -9,6 +9,7 @@ import { NoMessages, Profile } from './parts';
 import { AgentProfile, AgentView } from './AgentView';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
 import { ChannelView } from './Channel';
+import { SearchView } from './Search';
 import { SourcesView } from './Sources';
 import { TaskPanel, TasksView } from './Tasks';
 
@@ -52,8 +53,9 @@ export function slotsFor(view: View): ViewSlots {
       contentWidth: 'full',
     };
   }
-  // Only these reach here until their steps are built (`BUILT_PLACES`).
-  if (view.kind !== 'channel' && view.kind !== 'dm') throw new Error(`No view for "${view.kind}" yet`);
+  if (view.kind === 'search') {
+    return { title: 'Search', body: <SearchView q={view.q} /> };
+  }
   if (view.kind === 'dm') {
     const m = member(view.member);
     if (m?.kind === 'agent') {
