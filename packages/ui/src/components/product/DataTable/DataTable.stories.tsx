@@ -277,8 +277,12 @@ export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-field)', height: 320 }}>
+        {/* Every state starts with the same letter, or the screenshot isn't
+            deterministic. An `O`'s subpixel fringe reaches 1px left of what a text
+            change repaints, so that pixel keeps the letter the first raster drew,
+            and whether that came before play's first click is timing. */}
         <p role="status" className="text-xs text-text-secondary">
-          {opened ? `Opened ${opened}` : 'No model open'}
+          {opened ? `Opened ${opened}` : 'Opened nothing yet'}
         </p>
         <div style={{ flex: 1, minHeight: 0 }}>
           <DataTable columns={cols} data={data} onRowClick={(row) => open(row.original.model)} />
