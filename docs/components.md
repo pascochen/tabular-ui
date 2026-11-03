@@ -30,7 +30,7 @@ foundational component without asking. Never re-implement one inline.**
 
 | Component | Status | Notes |
 |---|---|---|
-| Button | **built** | 32px via `--h-control`. Variants: default / outline / ghost / danger / inline (embedded in a header cell or tree row: no ground, padding or size; inherits type). Sizes: sm 24 / default 32 / lg 36. No icon-only size — that is `IconButton`. |
+| Button | **built** | 32px via `--h-control`. Variants: default / outline / ghost / danger / inline (embedded in a header cell or tree row: no ground, padding or size; inherits type; `select-auto`, so what it holds stays in a copy). Sizes: sm 24 / default 32 / lg 36. No icon-only size — that is `IconButton`. |
 | IconButton | **built** | Square 24/32/36 with 14/16/20px icons. `aria-label` required at the type level. Defaults to `ghost`. Weight injected per §11.2. Auto-wraps in `Tooltip` using its `aria-label`; `tooltip={false}` opts out. |
 | Input | **built** | `content` variants: text / numeric (tabular-nums, right-aligned) / mono. Sizes sm 24 / default 32 / lg 36. Transparent + border. Labels are the caller's job. |
 | Textarea | **built** | Added 2026-10-13 (approved), for `ChatComposer`. A native `<textarea>` (Base UI has no part; shadcn's is a `cn-*` class, so written, not added) styled as `Input`: same border, type and states. Grows with its text (`field-sizing: content`) between `minRows` (default 3) and `maxRows`, then scrolls; one line is exactly `--h-control`. `variant="borderless"` (approved the same day) drops border, padding, ring and disabled fade for a container that draws them, and fades hidden lines at the edge (§4 scroll cue, `data-overflow-y-*` as on Combobox). No `size` or `content` yet. |

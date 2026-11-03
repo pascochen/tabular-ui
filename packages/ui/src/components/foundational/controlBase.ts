@@ -89,9 +89,16 @@ export const controlGrounds = {
   // Case is inherited explicitly: browsers give <button> text-transform:none,
   // so without it every sortable DataTable header ignored its cell's
   // `uppercase` and rendered mixed case (found 2026-10-09).
+  // Selection comes from the context too. pressableBase's `select-none` suits a
+  // label, but this variant holds data: a table's identifier, a tree's node, an
+  // expandable log row. A selection passing over one left it out of the copy, so
+  // copied figures lost their row's name with no error (found 2026-11-02). A
+  // drag that starts on the button still selects nothing. A label that is not
+  // data passes `select-none`, and `auto` does not take that from a parent: in
+  // Chromium a sort header inside a `select-none` <th> copied until it said so.
   // Button and IconButton drop their size variant for it, so it adds no
   // height or padding either. Exists so those places use the real control,
   // with Base UI's behaviour and the system focus ring, instead of a
   // hand-styled <button> (CLAUDE.md, "Never re-implement a primitive inline").
-  inline: 'border-0 font-normal [text-transform:inherit] after:hidden',
+  inline: 'border-0 font-normal select-auto [text-transform:inherit] after:hidden',
 } as const;

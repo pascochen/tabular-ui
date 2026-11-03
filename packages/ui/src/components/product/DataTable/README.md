@@ -53,7 +53,7 @@ Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per
 
 ## Clickable rows
 
-`onRowClick` makes the whole row a pointer target. It is a shortcut for the mouse, not the way in: a `<tr>` is not a control, and it gets no `tabIndex`, because in a table of 50,000 rows that is 50,000 tab stops. **Whenever you pass `onRowClick`, render the row's identifier as a link or a `Button variant="inline"` that does the same thing.** That control is the keyboard path, the screen reader's path, and the thing a user can middle-click or copy.
+`onRowClick` makes the whole row a pointer target. It is a shortcut for the mouse, not the way in: a `<tr>` is not a control, and it gets no `tabIndex`, because in a table of 50,000 rows that is 50,000 tab stops. **Whenever you pass `onRowClick`, render the row's identifier as a link or a `Button variant="inline"` that does the same thing.** That control is the keyboard path and the screen reader's path. Use a link when the row has a URL, because only a link can be middle-clicked.
 
 ```tsx
 {
@@ -61,12 +61,20 @@ Hover uses the single `--color-bg-hover` overlay, composited (§4) — not a per
   header: 'Model',
   meta: { content: 'mono' },
   cell: ({ row }) => (
-    <Button variant="inline" onClick={() => open(row.original)}>
+    <Button variant="inline" className="inline-block max-w-full truncate" onClick={() => open(row.original)}>
       {row.original.model}
     </Button>
   ),
 }
 ```
+
+**A copied row keeps its identifier, on one line.** Its figures mean nothing without it, so a selection across rows has to arrive as one line of tab-separated cells per row. `apps/storybook/tests/identifier-copy.spec.ts` reads the clipboard.
+
+- **Give the button its text directly.** A child of `Button` is a flex item, so it lays out as a block, and Chromium writes a line break either side of a block. With a `<span className="truncate">` inside, every row copied as `dim_accounts_1\nfailed\t2,019,530…`, with a blank line after it. `inline-block truncate` keeps the ellipsis with no child. A `<div>` or a `flex` element directly in a cell breaks a row the same way.
+- **A link is a plain `<a>`**, with the focus ring `AttachmentRow`'s filename carries but not its `block`. `buttonVariants` brings `select-none`, whichever variant you pass, so a link styled with it drops out of the copy.
+- **Keep `columns` stable:** outside the component, or in `useMemo`. TanStack renders `cell` as a component, so a new function on every render remounts the identifier, and opening a row dropped focus to `<body>`.
+- **One name on its own is awkward.** A drag or a double-click that starts on the button clicks it and selects nothing, as on any button, so start the drag in the cell's padding or the cell beside it.
+- **Measured in Chromium only.** The rich-text flavour now holds a `<button>` for the identifier, and that hasn't been pasted into Excel or Docs.
 
 A click on any control inside a row stays with that control: the identifier's own button, a selection checkbox or a row action never also fires `onRowClick`, and neither does a click inside a popup opened from the row. So the identifier's handler and `onRowClick` can be the same function without opening the row twice. The `ClickableRows` story shows the pattern and tests all three paths.
 
