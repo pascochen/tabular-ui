@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { axePath, focusRingStyle, gotoStory, ringOverhang, tabTo } from './helpers';
+import { focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo } from './helpers';
 
 /**
  * AppShell's behaviour is a function of viewport width, so it is tested here
@@ -307,7 +307,7 @@ test.describe('docked — at and above the 1280px floor', () => {
     // landmark, and only an axe run on a full app page (the Kasane demo)
     // found it.
     await gotoStory(page, 'product-appshell--expanded');
-    await page.addScriptTag({ path: axePath });
+    await injectAxe(page);
     const targets = await page.evaluate(async () => {
       // Storybook's own hidden screens (preparing, no preview, error) carry
       // links to storybook.js.org ahead of the story. axe counts a link as a
