@@ -347,7 +347,7 @@ test.describe('a component page', () => {
     await expect(current).toHaveText('Agent plan');
     await expect(current).toHaveCSS('border-left-width', '2px');
     await expect(current).toHaveCSS('font-weight', '600');
-    await expect(list.getByRole('link', { name: 'All 15, by moment' })).toHaveAttribute('href', '/#components');
+    await expect(list.getByRole('link', { name: /by moment/ })).toHaveCount(0);
 
     // Beside the reading column, not above it.
     const box = async (l: typeof list) => (await l.boundingBox())!;

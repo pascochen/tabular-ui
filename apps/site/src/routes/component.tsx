@@ -4,7 +4,7 @@ import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabu
 import { BridgeTable } from '../components/bridge-table';
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
-import { componentGrid, componentPage, components, pages, principles, storybookDocs } from '../content';
+import { componentPage, components, pages, principles, storybookDocs } from '../content';
 import { cn } from '../lib/cn';
 import { focusRing, standaloneLink } from '../lib/styles';
 import { install, usage } from '../component-usage';
@@ -104,9 +104,6 @@ function ComponentList({ current }: { current: string }) {
           );
         })}
       </ul>
-      <a href={componentGrid} className={`${standaloneLink} self-start text-site-small text-text-body`}>
-        All {components.length}, by moment
-      </a>
     </nav>
   );
 }

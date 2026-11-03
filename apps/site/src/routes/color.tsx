@@ -165,7 +165,7 @@ export default function Color() {
       <FoundationsHeader
         current={pages.color}
         title="Color"
-        lead="Each color is named by what it marks: a state of the data, the run or your focus, never a level of importance. Five hues and a neutral, measured in both modes."
+        lead="Every color marks something: an error, a warning, a success, information, the AI’s work or something you can click. None is there to make something stand out. Five colors and a neutral, each checked for contrast in light and dark mode."
       />
 
       <Section labelledBy="roles-title">
