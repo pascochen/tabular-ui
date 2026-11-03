@@ -801,7 +801,7 @@
       "name": "data-table",
       "type": "registry:component",
       "title": "DataTable",
-      "description": "A sortable, filterable, virtualized table with 28px rows.",
+      "description": "A sortable, filterable, virtualized table with 28px rows, and a totals row that checks its sum.",
       "categories": ["product"],
       "author": "Pascal Chenier",
       "dependencies": [
@@ -819,6 +819,11 @@
           "path": "src/components/product/DataTable/index.tsx",
           "type": "registry:file",
           "target": "@components/tabular-ui/components/product/DataTable/index.tsx"
+        },
+        {
+          "path": "src/components/product/DataTable/totals.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/totals.ts"
         }
       ]
     },
