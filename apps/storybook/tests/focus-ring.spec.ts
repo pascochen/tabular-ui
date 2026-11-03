@@ -58,10 +58,15 @@ test.describe('focus rings survive scroll containers', () => {
   // A label sits on its column's edge, and an inset ring paints over the
   // button's outer 2px, so a ring can sit on top of the label's first or last
   // letter with nothing clipped. Checked at the table's first and last columns,
-  // which meet the scroll container, one aligned each way.
-  for (const name of ['Model', 'Duration']) {
+  // which meet the scroll container, one aligned each way, and on a `figure`
+  // column, which right-aligns without setting `align`.
+  for (const [story, name] of [
+    ['product-appbar--in-dashboard', 'Model'],
+    ['product-appbar--in-dashboard', 'Duration'],
+    ['product-datatable--total-with-cents', 'USD'],
+  ]) {
     test(`sort button at the table edge draws its ring clear of its label — ${name}`, async ({ page }) => {
-      await gotoStory(page, 'product-appbar--in-dashboard');
+      await gotoStory(page, story);
       const sortButton = page.getByRole('button', { name });
       await expect(sortButton).toBeVisible();
 

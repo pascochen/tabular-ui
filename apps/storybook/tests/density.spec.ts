@@ -69,11 +69,7 @@ test('numeric cells render tabular figures, and the column aligns', async ({ pag
  * caret, which lifted the label 1px above its neighbours with the edge correct.
  */
 const readHeaders = (page: Page) =>
-  page.evaluate(async () => {
-    // A label's width is final only once its face has loaded. Read before that,
-    // the fallback's width says a label moved when the font arrived.
-    await document.fonts.load('500 10px "Source Sans 3 Variable"', 'A');
-    await document.fonts.ready;
+  page.evaluate(() => {
     const table = document.querySelector('#storybook-root table')!;
     const rows = Array.from(table.querySelectorAll('tbody tr[data-row-id]'));
     const textBox = (node: Node) => {
@@ -156,6 +152,22 @@ for (const theme of ['dark', 'light'] as const) {
     expectNothingMoved(sorted, rest);
   });
 }
+
+/**
+ * `meta.figure` makes a figure column without setting `align`, so a header that
+ * read `align` alone would draw this caret on the label's outer side.
+ */
+test('a sortable `figure` column takes the same edge, with the caret on its inner side', async ({ page }) => {
+  await gotoStory(page, 'product-datatable--total-with-cents');
+  await page.mouse.move(0, 0);
+  const rest = await readHeaders(page);
+  expectLabelsOnTheirEdges(rest, ['USD']);
+  await page.getByRole('button', { name: 'USD' }).click();
+  await page.mouse.move(0, 0);
+  const sorted = await readHeaders(page);
+  expectLabelsOnTheirEdges(sorted, ['USD']);
+  expectNothingMoved(sorted, rest);
+});
 
 /**
  * Where the reservation earns its keep. Squeezed, a column is as wide as its
