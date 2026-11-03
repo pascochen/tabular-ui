@@ -13,6 +13,7 @@
 //
 // Thresholds (docs/design-system.md §3, §4, §6):
 // - text and on-colours 4.5:1 on every ground they sit on
+// - selected text 4.5:1 on --color-bg-selection, over every ground and role tint
 // - --color-text-tertiary 4.5:1 where it is a placeholder (canvas, surface, raised), and
 //   3:1 on row states, where it only marks icons (§3)
 // - the focus ring, solid fills and chart series 3:1
@@ -149,6 +150,20 @@ for (const [mode, decls] of Object.entries(MODES)) {
       0,
     );
     check(`fill-${role}`, fill.ref, 'canvas', wcagContrast(fill.hex, canvas.hex), 3);
+  }
+  // §4 Text selection: the text steps to primary on the highlight, over every ground, tints included.
+  const selection = L('bg-selection');
+  const primary = L('text-primary');
+  for (const [ground, layers] of Object.entries(GROUNDS)) {
+    check('selected text', primary.ref, ground, wcagContrast(primary.hex, composite([...layers, selection])), 4.5);
+    for (const role of ROLES)
+      check(
+        'selected text',
+        primary.ref,
+        `${ground} + ${role} tint`,
+        wcagContrast(primary.hex, composite([...layers, L(`bg-${role}`), selection])),
+        4.5,
+      );
   }
   const ring = L('ring');
   for (const ground of SURFACES) check('ring', ring.ref, ground, wcagContrast(ring.hex, composite(GROUNDS[ground])), 3);

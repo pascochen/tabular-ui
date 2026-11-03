@@ -472,6 +472,16 @@ test.describe('accessibility beyond axe', () => {
     expect(withEdge.equals(await run.screenshot()), 'the edge paints').toBe(false);
   });
 
+  // design-system §4: selected text steps to primary, which is the wrong pair
+  // on a solid fill, so text on one can't be selected.
+  test("Color's fill samples can't be selected", async ({ page }) => {
+    await open(page, '/foundations/color');
+    const fills = page.locator('p[class*="bg-fill-"]');
+    expect(await fills.count()).toBeGreaterThan(0);
+    for (const value of await fills.evaluateAll((els) => els.map((el) => getComputedStyle(el).userSelect)))
+      expect(value).toBe('none');
+  });
+
   // On the Foundations pages the colours are the content: the mode panels and
   // the ramps opt out of forced colours, so a sample still shows its colour.
   test('in forced colours, Color still paints its samples', async ({ page }) => {

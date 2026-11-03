@@ -34,4 +34,6 @@ The state lives in `lib/close-state.ts` (`hero.rounds`), and the agent's timed s
 | The rerun posts as "System" with a neutral badge | A deterministic check, not the agent (`docs/agent-voice.md`, rule 1) |
 | The rerun row has no timestamp | The reply's header already gives the time |
 | On a phone, #sep-close opens scrolled to the whole decision | At 375×812 the second answer lands under the composer, and testers missed these answers. It scrolls by the least that clears it, once on opening, and never a page already scrolled (`lib/decision-in-view.ts`). The cost: the top of the Revenue cut-off card is off screen on landing |
-| Fixed widths for the code and figure columns | The account names never truncate at the thread's width |
+| No decision scroll while a pinned sidebar squeezes main | At 135px the question runs thousands of pixels tall, and a scroll measured there left the page at the channel's foot when the sidebar collapsed. On that path the page stays at its top, as it did before the scroll |
+| The channel lands a link to an exception itself | The browser looks for the fragment before React has rendered the message, so a link opened fresh stayed at the top of the channel, at any width (`useExceptionLink`) |
+| Nothing in the entry's table truncates | A cut cell has no way to read the rest. The account name wraps, and each figure holds its width. Fixed widths for the code and figures give the name the rest of the row: 166px at 1280, with no name over two lines. At 375 the table scrolls inside its card, 306px in 213px |

@@ -59,6 +59,8 @@
    The radius comments moved the switch from --radius-full to --radius-md
    (track) and --radius-sm (thumb), from §7.7 (comment only, no value
    changed, 2026-10-23, user-approved after a side-by-side in Storybook).
+   --color-bg-selection and the ::selection base rule from §4 "Text
+   selection" (2026-11-02, user-approved after a side-by-side).
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -363,6 +365,8 @@
   --tui-bg-hover-inverse: --alpha(var(--color-ledger-50) / 6%);
   --tui-bg-active-inverse: --alpha(var(--color-ledger-50) / 10%);
   --tui-text-disabled: var(--color-ledger-400);   /* 2.22:1 — fails on purpose (WCAG 1.4.3 exempt) */
+  /* §4 — selected text, not a selected row. The text steps to primary on it. */
+  --tui-bg-selection: --alpha(var(--color-sage-500) / 30%);
 
   /* §6 — chart ramp, light: step 600 of each ramp, 4.59:1 or more on
      paper. Vermilion and sage, the polarity hues, come last (§6). */
@@ -445,6 +449,8 @@
   --tui-bg-hover-inverse: --alpha(var(--color-ledger-950) / 6%);
   --tui-bg-active-inverse: --alpha(var(--color-ledger-950) / 10%);
   --tui-text-disabled: var(--color-ledger-600);   /* 3.35:1 — exempt, dim on purpose */
+  /* §4 — selected text, as in light. */
+  --tui-bg-selection: --alpha(var(--color-sage-500) / 30%);
 
   /* §6 — chart ramp, dark: step 400 of each ramp. Same order as light. */
   --tui-chart-1: var(--color-federal-400);
@@ -518,6 +524,7 @@
   --color-bg-hover-inverse: var(--tui-bg-hover-inverse);
   --color-bg-active-inverse: var(--tui-bg-active-inverse);
   --color-text-disabled: var(--tui-text-disabled);
+  --color-bg-selection: var(--tui-bg-selection);
 
   /* §4 focus ring — outline color; geometry in section 2 */
   --color-ring: var(--tui-ring);
@@ -555,6 +562,13 @@
   html {
     font-optical-sizing: auto;
     font-variant-numeric: var(--font-numeric);
+  }
+
+  /* §4 — selected text. --tui-*, not --color-*: a nested [data-theme] rescopes
+     the --tui-* layer, and this must follow it (§9). */
+  ::selection {
+    background-color: var(--tui-bg-selection);
+    color: var(--tui-text-primary);
   }
 
   h1,

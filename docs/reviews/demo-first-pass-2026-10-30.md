@@ -9,6 +9,8 @@ Two methods from Ileana Marcut's UX + AI method library, run on the Kasane close
 
 **Status, 2026-11-02:** issues 6 and 7 are fixed, ahead of the second round of user tests: each option shows what it does beside its button, and the delegated outcome says the choice is the agent's own. Issue 7 took the review's first fix, so "Choose for me" stays.
 
+**Status, 2026-11-02, later that day:** issues 8, 9 and 10 are fixed, so all ten are now fixed or settled. The agent's profile lists what it does, what it never does and what it reads. The visitor's first post gets a one-line note from System, and the channel scrolls to show the post. Nothing in the proposed entry's table truncates, at 1280 or at 375. The note's wording is a draft until the owner approves it. Rendering `DataTable`'s truncating cells through `TruncatedText` is still open, as a library question.
+
 **User tests, reported by the owner on 2026-11-02.** Real sessions, so they outrank this document's hypotheses:
 
 - **The end strip:** testers missed it. Those who did see it expected Replay to start an animation. The card is removed, which settles issue 4, and the top nav's Replay is now "Start over", since it returns to landing and plays nothing. "Browse the AI components" now lives only in the About dialog.
