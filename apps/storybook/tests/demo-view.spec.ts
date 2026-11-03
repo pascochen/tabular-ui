@@ -63,6 +63,15 @@ test('Tasks opens by its URL, with or without a task', () => {
   expect(parseView('?view=tasks&task=credit-limit')).toEqual({ kind: 'tasks', task: 'credit-limit' });
 });
 
+test('the binder opens by its URL, on a source and a record', () => {
+  expect(parseView('?view=sources')).toEqual({ kind: 'sources' });
+  expect(parseView('?view=sources&source=S-17&record=INV-KJP-2609-00363')).toEqual({
+    kind: 'sources',
+    source: 'S-17',
+    record: 'INV-KJP-2609-00363',
+  });
+});
+
 test('a view’s link carries what it selects, and encodes it', () => {
   expect(hrefFor({ kind: 'tasks' })).toBe('?view=tasks');
   expect(hrefFor({ kind: 'tasks', task: 'revenue-cut-off' })).toBe('?view=tasks&task=revenue-cut-off');

@@ -22,13 +22,15 @@ Each figure names what it rests on, in the line where it appears.
 | `number` | `number` | Required. The source's position in the answer's `Sources`, from 1 |
 | `source` | `Source` | Required. The same object passed to `Sources` |
 | `locator` | `string` | Where in the source: rows, entries, lines. Optional, and worth giving |
+| `locatorHref` | `string` | Makes the locator a link to that record. `source.href` is one link per file, and the same `Source` is the row in `Sources`, so one citation's record can't live on it |
+| `locatorRender` | `ReactElement` | Swaps the locator's `<a>` for a router link. Needs `locator` |
 | `className` | `string` | |
 
 ## Geometry
 
 A `Chip` (`size="sm"`), 16px tall, at least 16px wide, with 2px each side: a one- or two-digit figure in a square or near-square box. 16px is a `--text-sm` line, so the mark never makes the line it sits in taller, at `--text-sm` or `--text-base`. No token names an inline mark's size, so `h-4 min-w-4 px-0.5` are primitive steps, used as §7.4's fallback.
 
-The popover is `Popover`'s own: `--pad-popover`, as wide as its content up to `--w-panel`. The figure, then the file name in mono `--text-xs` (§8.3), a link when the source has an `href`, then the locator.
+The popover is `Popover`'s own: `--pad-popover`, as wide as its content up to `--w-panel`. The figure, then the file name in mono `--text-xs` (§8.3), a link when the source has an `href`, then the locator, a link when it has a `locatorHref`.
 
 ## Mechanisms worth knowing
 

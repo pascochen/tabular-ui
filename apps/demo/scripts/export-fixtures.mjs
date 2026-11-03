@@ -1026,8 +1026,9 @@ const binderFiles = [
   .sort((a, b) => BINDER_GROUP[a.kind] - BINDER_GROUP[b.kind] || byCodeUnit(a.name, b.name));
 const exhibitOf = Object.fromEntries(binderFiles.map((f, i) => [f.name, `S-${i + 1}`]));
 
-// What each CSV excerpt shows. Only the columns a reader needs to follow the citation: the count above
-// the excerpt says how many were left out. Headers are the file's own names (docs/agent-voice.md).
+// What each CSV excerpt shows. Only the columns a reader needs to follow the citation, the evidence
+// first, so it's on screen before the table has to scroll: the count above the excerpt says how many
+// were left out. Headers are the file's own names (docs/agent-voice.md).
 const mono = (key) => ({ key, mono: true });
 const text = (key) => ({ key });
 const figure = (key) => ({ key, numeric: true });
@@ -1038,11 +1039,11 @@ const CSV_TABLES = {
     columns: [
       text('period'),
       mono('customer_id'),
+      figure('total_open'),
       text('currency'),
       figure('current'),
       figure('past_due_1_30'),
       figure('past_due_31_60'),
-      figure('total_open'),
       text('oldest_due_date'),
     ],
   },
@@ -1083,15 +1084,15 @@ const CSV_TABLES = {
     columns: [
       mono('je_id'),
       figure('line_no'),
-      text('entity_id'),
-      text('posting_date'),
-      mono('account_id'),
-      text('account_name'),
+      mono('created_by'),
+      mono('approved_by'),
       figure('debit'),
       figure('credit'),
       text('currency'),
-      mono('created_by'),
-      mono('approved_by'),
+      mono('account_id'),
+      text('account_name'),
+      text('posting_date'),
+      text('entity_id'),
     ],
   },
   [P.salesInvoices]: {
@@ -1099,12 +1100,12 @@ const CSV_TABLES = {
     all: Object.keys(salesInvoices[0]).length,
     columns: [
       mono('invoice_id'),
-      text('entity_id'),
-      mono('customer_id'),
       text('invoice_date'),
       text('delivery_date'),
       figure('net_amount'),
       text('currency'),
+      text('entity_id'),
+      mono('customer_id'),
     ],
   },
   [P.supplierInvoices]: {
@@ -1112,14 +1113,14 @@ const CSV_TABLES = {
     all: Object.keys(supplierInvoices[0]).length,
     columns: [
       mono('ap_invoice_id'),
-      text('entity_id'),
-      mono('supplier_id'),
       mono('supplier_invoice_number'),
       text('invoice_date'),
       text('description'),
       figure('gross_amount'),
       figure('amount_paid'),
       text('currency'),
+      text('entity_id'),
+      mono('supplier_id'),
     ],
   },
 };

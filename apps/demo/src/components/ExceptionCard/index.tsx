@@ -2,8 +2,10 @@ import { useId, useState, type ReactElement } from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
 import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn } from 'tabular-ui';
 
-import type { ExceptionState } from '../../lib/close-state';
-import { close, memberName, sourcesOf, type Exception } from '../../lib/kasane';
+import { notCheckedWith, type ExceptionState } from '../../lib/close-state';
+import { useClose } from '../../lib/close-context';
+import { close, memberName, type Exception } from '../../lib/kasane';
+import { citationOf, sourcesOf } from '../../lib/sources';
 import { CitedSentence } from '../CitedSentence';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
@@ -37,6 +39,7 @@ export function ExceptionCard({
   awaitsYou = false,
   extraReplies = [],
 }: ExceptionCardProps) {
+  const { state: closeState } = useClose();
   const [sourcesOpen, setSourcesOpen] = useState(false);
   // The thread opens by itself when a teammate replies in it after landing,
   // so the reply is read, not just counted. Once the visitor opens or closes
@@ -74,7 +77,7 @@ export function ExceptionCard({
         </div>
         <CitedSentence text={e.summary}>
           {sources.map((s, i) => (
-            <InlineCitation key={s.id} number={i + 1} source={s} />
+            <InlineCitation key={s.id} number={i + 1} source={s} {...citationOf(e, i)} />
           ))}
         </CitedSentence>
         {state.status === 'waiting' && 'waiting' in e && e.waiting ? (
@@ -100,7 +103,7 @@ export function ExceptionCard({
           </Button>
           {sourcesOpen ? (
             <div id={sourcesId} className="w-full">
-              <Sources sources={sources} notChecked={e.notChecked} />
+              <Sources sources={sources} notChecked={notCheckedWith(closeState, e.sources, e.notChecked)} />
             </div>
           ) : null}
         </div>

@@ -38,7 +38,7 @@ export const BUILT_CHANNELS: readonly ChannelId[] = [
 ];
 
 /** The places above the channels that are built, in sidebar order. */
-export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['tasks'];
+export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['tasks', 'sources'];
 
 const DEFAULT_CHANNEL: ChannelId = 'revenue';
 export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };

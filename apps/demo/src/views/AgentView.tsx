@@ -18,8 +18,10 @@ import { CitedSentence } from '../components/CitedSentence';
 import { Section } from '../components/ClosePanel';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
-import { close, exceptions, sourcesOf, sourcesOfNames, visitor, type Agent } from '../lib/kasane';
+import { isSourceOn, notCheckedWith } from '../lib/close-state';
+import { close, exceptions, exhibitOf, visitor, type Agent } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
+import { citationOf, exhibitView, sourcesOf, sourcesOfNames } from '../lib/sources';
 import { SCRIPTED_NOTE } from '../lib/scripted-note';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 import { MemberAvatar } from '../shell/members';
@@ -62,7 +64,7 @@ function AgentRun({ agent }: { agent: Agent }) {
         />
         <CitedSentence text={finding.summary}>
           {sources.map((s, i) => (
-            <InlineCitation key={s.id} number={i + 1} source={s} locator={finding.citations[i].locator} />
+            <InlineCitation key={s.id} number={i + 1} source={s} {...citationOf(finding, i)} />
           ))}
         </CitedSentence>
         <a href={hrefFor(task)} onClick={onViewLinkClick(task)} className={cn(linkClassName, 'w-fit text-sm')}>
@@ -111,7 +113,7 @@ export function AgentView({ agent }: { agent: Agent }) {
                 <InlineCitation key={s.id} number={n + 1} source={s} />
               ))}
             </CitedSentence>
-            <Sources sources={sources} notChecked={starter.notChecked} />
+            <Sources sources={sources} notChecked={notCheckedWith(state, starter.sources, starter.notChecked)} />
           </div>
         ),
       },
@@ -158,6 +160,7 @@ export function AgentView({ agent }: { agent: Agent }) {
  * state, so nothing takes a hue (§0 rule 1).
  */
 export function AgentProfile({ agent }: { agent: Agent }) {
+  const { state } = useClose();
   return (
     <AppShellPanelBody className="flex flex-col gap-[var(--gap-section)]">
       <div className="flex items-center gap-[var(--gap-control-icon)]">
@@ -169,11 +172,27 @@ export function AgentProfile({ agent }: { agent: Agent }) {
       </Section>
       <Section title="Reads">
         <ul role="list" className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
-          {agent.reads.map((name) => (
-            <li key={name}>
-              <FileName>{name}</FileName>
-            </li>
-          ))}
+          {agent.reads.map((name) => {
+            const id = exhibitOf(name);
+            const view = exhibitView(id);
+            return (
+              <li key={name} className="flex min-w-0 flex-col gap-[var(--gap-bonded)]">
+                <span className="flex min-w-0 gap-[var(--gap-inline)]">
+                  <span className="w-[5ch] shrink-0 font-mono text-xs">{id}</span>
+                  <a
+                    href={hrefFor(view)}
+                    onClick={onViewLinkClick(view)}
+                    className={cn(linkClassName, 'min-w-0 break-all font-mono text-xs')}
+                  >
+                    {name}
+                  </a>
+                </span>
+                {isSourceOn(state, id) ? null : (
+                  <span className="text-xs text-text-secondary">Not read: turned off in Sources</span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </Section>
       <Section title="Never">
