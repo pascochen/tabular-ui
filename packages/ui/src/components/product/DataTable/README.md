@@ -76,6 +76,17 @@ A click on any control inside a row stays with that control: the identifier's ow
 
 `AttachmentRow` follows the same split outside a table: the filename is the link, and whole-row activation is left to `DataTable`.
 
+## Copying
+
+A negative takes U+2212 on screen and a hyphen on the clipboard (§8.6). Excel is reported to read `−1,234` as text, and a `1,234` beside it stays a number, so a sum skips only the negatives with no error.
+
+- **A selection holding a minus** is written as tab-separated plain text, with a hyphen in place of each minus. The screen, the DOM and the selection don't change. It pastes into a document as tabs, not as a table, and a `StatusBadge` copies as it reads, `PASSED`.
+- **A selection with no minus** keeps the browser's own copy.
+- **A double-click in a `numeric` column** takes the whole figure. A browser's double-click would select only a word, so `−¥41,415,809` would copy as `41,415,809`, a positive figure. A figure inside a control stays with that control.
+- **A field in a cell** keeps what was typed.
+
+The limits are in §8.6: `¥` and comma-decimal locales, rendered rows only in a virtualized table, no header row, no single column, and a selection that starts outside the table keeps U+2212. `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard, and the `SignedFigures` story has the figures.
+
 ## Columns with no visible header
 
 A selection or row-action column still needs a header name. Pass one that is visually hidden, never `''`:

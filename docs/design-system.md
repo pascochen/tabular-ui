@@ -314,6 +314,30 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 
 **Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (sage), 4.42:1 (federal), 4.76:1 (orchid) and 4.86:1 (vermilion), so sage and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.47:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
 
+### Text selection — added 2026-11-02 (owner, after a side-by-side)
+
+```
+                              Dark                 Light
+--color-bg-selection          sage-500 / 30%       sage-500 / 30%
+```
+
+```css
+::selection {
+  background-color: var(--tui-bg-selection);
+  color: var(--tui-text-primary);
+}
+```
+
+Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selection is already `sage` (§1). Until now the browser painted its own blue, off-palette.
+
+**Not `--color-bg-interactive`.** That tint is for a selected row, at 8% and 10%. Selecting text inside a row has to show on top of it, so this token is a separate one, not a duplicate of it: against a selected row it measures 1.27:1 in light and 1.37:1 in dark, and against the canvas 1.39:1 and 1.56:1.
+
+**The text steps to `--color-text-primary`.** Text that kept its own colour on this tint would fall to 3.63:1 in light and 3.22:1 in dark for role text, under AA. Primary measures 9.39:1 or more in light and 7.35:1 or more in dark, on every ground in this section, every role's tint included. So a status colour steps back while its text is selected and returns when the selection clears. The word beside it still says what it is (§11.1).
+
+**Text on a solid fill isn't selectable.** Primary on a fill is the wrong pair: in dark mode it's paper on the paper button. Every filled control is already `select-none` through `controlBase` and `tabVariants`. Anything else with text on a `--color-fill-*` takes `select-none` as well, as the samples on the site's Color page do.
+
+**A nested `[data-theme]` rescopes it,** as it does every token, so selected text in a dark band on a light page takes the dark values. The rule reads the `--tui-*` layer for that reason. `apps/storybook/tests/selection.spec.ts` measures the colours painted in both modes and in a nested band. `packages/ui/scripts/check-contrast.mjs` gates primary on the highlight over every ground.
+
 ### Focus ring
 
 ```css
@@ -889,6 +913,33 @@ Apply `font-variant-numeric: tabular-nums lining-nums` to **every** element rend
 
 The rule covers every figure the system renders: a formatter's output, a table cell, a delta, a figure in a sentence, agent replies included. It does not cover identifiers, date ranges or code, what a person typed into an `Input`, or data. The sign goes on at the display step and stays there, because `Number('−41')` is `NaN`, with no error. Never parse a formatted figure back into a number: keep the number and pass it beside the text, as `MetricTile`'s `deltaValue` does.
 
+**A figure copied from `DataTable` carries a hyphen.** Decided 2026-11-02 (owner), on the evidence below. U+2212 is for the screen, and a copy is data leaving it. When a selection inside a `DataTable` holds U+2212, the table's copy handler writes it as tab-separated plain text with a hyphen in place of each minus. The screen, the DOM and the selection don't change. A selection with no minus keeps the browser's own copy, because setting one clipboard flavour drops the others, including the HTML a rich-text paste needs. So a selection holding a negative pastes into a document as tabs, not as a table, and a `StatusBadge` in it copies as it reads, `PASSED`, because `Selection.toString()` applies `text-transform`.
+
+**A double-click in a numeric cell takes the whole figure.** A browser's double-click selects a word, and neither the sign nor the currency symbol is part of it. `−¥41,415,809` copied as `41,415,809`, a positive figure that pastes as a number and raises nothing. `-1,234` and `(1,234)` lost their signs the same way, so this predates the minus. A figure inside a control stays with that control.
+
+Why the hyphen, as measured on 2026-11-02. Numbers was driven through its parser in five locales (AppleScript, `-AppleLocale`), not by a real paste. Excel and Google Sheets are **not tested**: Excel isn't on the machine this was checked on, its anonymous web viewer is read-only, and no account was signed in to.
+
+| Figure | Numbers 15.1, observed | Excel, read only | Google Sheets |
+|---|---|---|---|
+| `-1,234` | Negative number | Not checked | No source found |
+| `−1,234` | Negative number in all five locales | Text, per a [2018 Microsoft MVP answer](https://learn.microsoft.com/en-us/answers/questions/4944929/numeric-cells-with-negative-value-are-not-taken-in) | No source found |
+| `(1,234)` | Negative number in all five locales | Negative, per third-party tutorials | No source found |
+| `-¥41,415,809` | Number in en_US and ja_JP, text in en_CA, fr_CA and sv_SE | No source found | No source found |
+| `−¥41,415,809` | Same as the hyphen | No source found | No source found |
+
+The Excel report is the case that decided it. In that thread only the negatives became text, so the sum left them out with no error. A hyphen is never read worse than U+2212 in Numbers, so the choice holds whatever Excel does.
+
+**What a copy still does not do.** These need raw values or an explicit "Copy table" action, which were compared and left until a product table needs them:
+
+- **`¥` is locale-dependent, with either sign.** Numbers keeps it as text in en_CA, fr_CA and sv_SE.
+- **Grouped figures change value in comma-decimal locales.** In fr_CA and sv_SE, Numbers reads `1,234` as 1.234, and in fr_CA `$1,234` becomes `1,23 $`. [Excel uses the system's separators too](https://support.microsoft.com/en-us/office/change-the-character-used-to-separate-thousands-or-decimals-c093b545-71cb-4903-b205-aebb9837bd1e), so it may do the same.
+- **Compact figures are text.** `¥34.4bn` and `−¥41m` stay text in Numbers in en_CA, whichever sign they carry.
+- **A virtualized table copies only its rendered rows.** Select-all gave 30 of 50,000 rows with no warning, and a selection cannot be carried across a long scroll.
+- **No header, no single column.** The header row is `select-none`, so it is never copied. Dragging down a column selects whole rows, with partial first and last rows, so a paste misaligns.
+- **Only `DataTable` does this.** A selection that starts outside the table keeps U+2212, as does a copy from `MetricTile`, a sentence, or a list on the site, and a double-click on those still drops the sign.
+
+All clipboard measurements are Chromium's, read in the browser. Safari and Firefox are unmeasured. `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard.
+
 ### 8.7 OpenType features
 
 ```css
@@ -1080,12 +1131,15 @@ Before the token set is considered done:
 - [x] Chart tokens resolve and clear 3:1, and `--color-chart-8` must not exist — asserted in `apps/storybook/tests/contrast.spec.ts`. *(Literal OKLCH until 2026-10-16; they reference the Riso ramps since, §6.)*
 - [x] Hover and press use the `--color-bg-hover` / `--color-bg-active` overlay; the primary button, whose fill is the overlay's own colour, uses the `-inverse` pair (2026-10-16). No per-role hover token exists. The 6% overlay was verified visible on 28px rows over canvas, over `--color-surface`, and over a solid fill (2026-08-02).
 - [x] Selection uses `--color-bg-interactive`; no `--color-bg-selected` is declared or used. All four selection sites (Chip, Select, Combobox, LineageTree) use it.
+- [x] Selected text uses `--color-bg-selection` with `--color-text-primary`, in both modes and inside a nested `[data-theme]`. Asserted by painting it in Chromium, in `apps/storybook/tests/selection.spec.ts`. Safari and Firefox are not in the test run: check them by hand when the rule changes (§4).
 - [x] Every `--text-*` size has its `--line-height` partner — 9 sizes, 9 partners, none missing.
 - [x] `--radius-*` declared in px — 0px for `xs` through `lg` plus `9999px` for `full` (2/4/6/8px until 2026-10-16, §7.7); `xl` through `4xl` are stripped to `initial` so the 8px ceiling is structural.
 - [x] No chromatic 900/950 background — zero occurrences in `packages/ui/src/`, and `tui/no-deep-chromatic-background` rejects them in CSS including `theme.css` itself.
 - [x] Focus rings use `outline` and survive inside `overflow: hidden` — **verified 2026-08-03** by keyboard on three surfaces that put a control against a scroll boundary: `DataTable` (checkbox first column, icon button last), `Chip`/`FilterChip`, and a scrollable `TabsList`. See §4 on why padding and inset offsets — not `outline` itself — are what prevent clipping.
 - [x] Numeric cells carry `tabular-nums` and share a right edge — asserted in `apps/storybook/tests/density.spec.ts` on a `DataTable` variance column with mixed-width figures. The column's header label shares that edge too, at rest, hovered and sorted (same file).
 - [x] Negatives render U+2212, not a hyphen (§8.6) — asserted in `apps/storybook/tests/density.spec.ts` on that same column, in `apps/site/tests/data.spec.ts` on the formatters, and on every page in `apps/site/tests/pages.spec.ts`.
+- [x] A figure copied from `DataTable` carries a hyphen, and a double-click in a numeric cell takes the whole figure (§8.6) — asserted by reading the clipboard in `apps/storybook/tests/data-table-copy.spec.ts`.
+- [ ] **Paste into Excel, Google Sheets and Numbers (§8.6).** Not tested: Excel isn't on the machine this was checked on, no account was signed in to, and Numbers was driven through its parser, not by a real paste. Paste `-1,234`, `−1,234`, `(1,234)`, `-¥41,415,809` and `−¥41,415,809` into a column and check each with `=ISNUMBER()`. Record the result in §8.6's table.
 - [x] **Source Serif 4 and Source Sans 3 ship `tnum`** — verified 2026-10-16 by glyph-width diff: with `tabular-nums`, `111111` and `000000` both measure 97.96px in the serif and 98.46px in the sans at 32px/600. (Archivo measured 111.17px for both, 2026-10-08, and Inter Tight 121.47px, 2026-08-02.)
 - [x] Source Serif 4 is loaded *with* its `opsz` axis, and the metric tier renders in the display cut — verified 2026-10-16: `Hamburgefonstiv` at 32px/600 measures 288.35px at `'opsz' 8` and 232.13px at `'opsz' 60`, and `$847.2M` measures 118.75px with `font-optical-sizing: auto` against 127.78px at the text cut. Asserted in `apps/storybook/tests/density.spec.ts`. **Import `@fontsource-variable/source-serif-4/opsz.css`, not the package default:** the default entry point ships wght-only files and silently turns optical sizing off, the same trap the Google Fonts URL sets in §9. (Until 2026-10-16 this row checked Archivo's `"wdth" 90`, removed with the family, §8.3.)
 - [x] No `--tracking-tight` on the metric tier — `MetricTile` uses `--tracking-display` (0); measured `letter-spacing: normal` at 32px.

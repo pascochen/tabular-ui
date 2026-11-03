@@ -7,6 +7,7 @@ import { Button } from '../../foundational/Button';
 import { Checkbox } from '../../foundational/Checkbox';
 import { IconButton } from '../../foundational/IconButton';
 import { Input } from '../../foundational/Input';
+import { operatingBridge } from '../../../fixtures/kasane';
 import { StatusBadge } from '../StatusBadge';
 import { runStatusRowTreatment, type RunStatus } from '../StatusBadge/statuses';
 import { DataTable } from './index';
@@ -142,6 +143,32 @@ export const Virtualized: Story = {
       </div>
     );
   },
+};
+
+const bridgeColumns: ColumnDef<(typeof operatingBridge.steps)[number], unknown>[] = [
+  { accessorKey: 'label', header: 'Step', size: 400 },
+  {
+    accessorKey: 'value',
+    header: 'Against budget',
+    meta: { align: 'numeric' },
+    size: 140,
+    cell: ({ getValue }) => {
+      const v = getValue() as number;
+      return `${v < 0 ? '−' : ''}¥${Math.abs(v).toLocaleString('en-US')}`;
+    },
+  },
+];
+
+/**
+ * Exact, signed figures. A negative takes U+2212 on screen and a hyphen on the
+ * clipboard, and a double-click takes the whole figure, sign included (§8.6).
+ */
+export const SignedFigures: Story = {
+  render: () => (
+    <div style={{ height: 198 }}>
+      <DataTable columns={bridgeColumns} data={operatingBridge.steps} />
+    </div>
+  ),
 };
 
 /** Filtering, selection and a row action — the full dense surface. */
