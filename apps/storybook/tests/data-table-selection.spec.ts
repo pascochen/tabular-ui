@@ -22,7 +22,7 @@ declare global {
  * holds a table of its own.
  */
 const ROOT = '#storybook-root';
-const COLUMN = { model: 0, status: 1, rows: 2, owner: 5 };
+const COLUMN = { model: 0, status: 1, rows: 2, variance: 4, owner: 5 };
 /** The story's play function opens three rows before a test starts. */
 const OPENS_IN_PLAY = 3;
 
@@ -214,6 +214,13 @@ test.describe('a double or triple click selects text and opens the row only on i
       expect(await opens(page)).toBe(1);
     });
   }
+
+  test('in a numeric cell, where it takes the whole figure', async ({ page }) => {
+    const variance = await cell(page, 2, COLUMN.variance);
+    await page.mouse.dblclick(variance.middle, variance.y);
+    expect(await page.evaluate(() => getSelection()!.toString())).toBe('−4.7%');
+    expect(await opens(page)).toBe(1);
+  });
 });
 
 test.describe('the keyboard path through the identifier', () => {

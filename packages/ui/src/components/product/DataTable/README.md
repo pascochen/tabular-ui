@@ -72,12 +72,23 @@ A click on any control inside a row stays with that control: the identifier's ow
 
 **Selecting text doesn't open the row.** Filenames, GL references and model names are copied constantly, and a row that navigates would take the page away first. A drag that leaves a selection, a Shift-click that extends one, and the later clicks of a double or triple click don't fire `onRowClick`. `tests/data-table-selection.spec.ts` drives each with real pointer events, in Chromium only.
 
-- **A double-click still opens the row, on its first click.** That click can't know a second is coming, and waiting to find out would delay every open. In a table whose rows navigate, drag to select.
+- **A double-click still opens the row, on its first click.** That click can't know a second is coming, and waiting to find out would delay every open. In a table whose rows navigate, drag to select: the whole figure a double-click takes in a `numeric` column (see Copying) never arrives there.
 - **A selection alone doesn't decide it.** Chromium clears a selection on release, after the click, so a click on selected text, or anywhere after select-all, still finds one, and a click on `user-select: none` content never clears it. Those are plain clicks, and they open the row. So a press that leaves a selection also has to travel 4px. 1px of wobble selected a character in 3 presses of 16, and 3px in 8, and those are clicks too.
 - **A drag that selects nothing is still a click**, across a cell's padding, say.
 - **A drag ending on the identifier is the same case as any other.** The browser sends the click to the `<tr>`, the control never gets it, and the row stays closed. A press that starts and ends on the identifier is the control's own click: `Button` is `select-none`, so it selects nothing, and it opens the row. The row can't see that click, so if an identifier ever became selectable, its own handler would need the same guard.
 
 `AttachmentRow` follows the same split outside a table: the filename is the link, and whole-row activation is left to `DataTable`.
+
+## Copying
+
+A negative takes U+2212 on screen and a hyphen on the clipboard (§8.6). Excel is reported to read `−1,234` as text, and a `1,234` beside it stays a number, so a sum skips only the negatives with no error.
+
+- **A selection holding a minus** is written as tab-separated plain text, with a hyphen in place of each minus. The screen, the DOM and the selection don't change. It pastes into a document as tabs, not as a table, and a `StatusBadge` copies as it reads, `PASSED`.
+- **A selection with no minus** keeps the browser's own copy.
+- **A double-click in a `numeric` column** takes the whole figure. A browser's double-click would select only a word, so `−¥41,415,809` would copy as `41,415,809`, a positive figure. A figure inside a control stays with that control.
+- **A field in a cell** keeps what was typed.
+
+The limits are in §8.6: `¥` and comma-decimal locales, rendered rows only in a virtualized table, no header row, no single column, and a selection that starts outside the table keeps U+2212. `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard, and the `SignedFigures` story has the figures.
 
 ## Columns with no visible header
 

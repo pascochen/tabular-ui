@@ -62,7 +62,7 @@ variant.
 | Component | Status | Notes |
 |---|---|---|
 | CountBadge | **built** | Static summary marker — a category and its count. Composes `Badge`; tint ground, no border, because §7.7 makes border the *interactive* signal. Neutral even when counting failures. `99+` truncation is visual only; the true figure stays in the accessible name. Becomes a `Chip` if it ever filters. |
-| DataTable | **built** | TanStack Table + Virtual (headless). 28px rows, sticky neutral header, virtualizes past 100 rows. `meta.align: 'numeric'` drives tabular-nums; `meta.content: 'mono'` for identifiers. |
+| DataTable | **built** | TanStack Table + Virtual (headless). 28px rows, sticky neutral header, virtualizes past 100 rows. `meta.align: 'numeric'` drives tabular-nums; `meta.content: 'mono'` for identifiers. A copied negative carries a hyphen, and a double-click takes the whole figure (§8.6). |
 | MetricTile | **built** | The only user of `--font-display`. 32px hero / 24px grid tier, tracking 0. `higherIsBetter` decides delta polarity — direction is not goodness. |
 | RunLogRow | **built** | 24px via `--h-row-xs`. Composes `StatusBadge` + `runStatusRowTreatment`. Expands to show error detail when given `detail`. |
 | LineageTree | **built** | 24px rows, 12px indent per level via `--gap-tree-indent`. Nested lists with disclosure carets, so depth is announced, not only drawn. Not `role="tree"`, whose keyboard pattern it does not implement (2026-10-28). |
