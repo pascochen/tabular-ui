@@ -889,6 +889,33 @@ Apply `font-variant-numeric: tabular-nums lining-nums` to **every** element rend
 
 The rule covers every figure the system renders: a formatter's output, a table cell, a delta, a figure in a sentence, agent replies included. It does not cover identifiers, date ranges or code, what a person typed into an `Input`, or data. The sign goes on at the display step and stays there, because `Number('−41')` is `NaN`, with no error. Never parse a formatted figure back into a number: keep the number and pass it beside the text, as `MetricTile`'s `deltaValue` does.
 
+**A figure copied from `DataTable` carries a hyphen.** Decided 2026-11-02 (owner), on the evidence below. U+2212 is for the screen, and a copy is data leaving it. When a selection inside a `DataTable` holds U+2212, the table's copy handler writes it as tab-separated plain text with a hyphen in place of each minus. The screen, the DOM and the selection don't change. A selection with no minus keeps the browser's own copy, because setting one clipboard flavour drops the others, including the HTML a rich-text paste needs. So a selection holding a negative pastes into a document as tabs, not as a table, and a `StatusBadge` in it copies as it reads, `PASSED`, because `Selection.toString()` applies `text-transform`.
+
+**A double-click in a numeric cell takes the whole figure.** A browser's double-click selects a word, and neither the sign nor the currency symbol is part of it. `−¥41,415,809` copied as `41,415,809`, a positive figure that pastes as a number and raises nothing. `-1,234` and `(1,234)` lost their signs the same way, so this predates the minus. A figure inside a control stays with that control.
+
+Why the hyphen, as measured on 2026-11-02. Numbers was driven through its parser in five locales (AppleScript, `-AppleLocale`), not by a real paste. Excel and Google Sheets are **not tested**: Excel isn't on the machine this was checked on, its anonymous web viewer is read-only, and no account was signed in to.
+
+| Figure | Numbers 15.1, observed | Excel, read only | Google Sheets |
+|---|---|---|---|
+| `-1,234` | Negative number | Not checked | No source found |
+| `−1,234` | Negative number in all five locales | Text, per a [2018 Microsoft MVP answer](https://learn.microsoft.com/en-us/answers/questions/4944929/numeric-cells-with-negative-value-are-not-taken-in) | No source found |
+| `(1,234)` | Negative number in all five locales | Negative, per third-party tutorials | No source found |
+| `-¥41,415,809` | Number in en_US and ja_JP, text in en_CA, fr_CA and sv_SE | No source found | No source found |
+| `−¥41,415,809` | Same as the hyphen | No source found | No source found |
+
+The Excel report is the case that decided it. In that thread only the negatives became text, so the sum left them out with no error. A hyphen is never read worse than U+2212 in Numbers, so the choice holds whatever Excel does.
+
+**What a copy still does not do.** These need raw values or an explicit "Copy table" action, which were compared and left until a product table needs them:
+
+- **`¥` is locale-dependent, with either sign.** Numbers keeps it as text in en_CA, fr_CA and sv_SE.
+- **Grouped figures change value in comma-decimal locales.** In fr_CA and sv_SE, Numbers reads `1,234` as 1.234, and in fr_CA `$1,234` becomes `1,23 $`. [Excel uses the system's separators too](https://support.microsoft.com/en-us/office/change-the-character-used-to-separate-thousands-or-decimals-c093b545-71cb-4903-b205-aebb9837bd1e), so it may do the same.
+- **Compact figures are text.** `¥34.4bn` and `−¥41m` stay text in Numbers in en_CA, whichever sign they carry.
+- **A virtualized table copies only its rendered rows.** Select-all gave 30 of 50,000 rows with no warning, and a selection cannot be carried across a long scroll.
+- **No header, no single column.** The header row is `select-none`, so it is never copied. Dragging down a column selects whole rows, with partial first and last rows, so a paste misaligns.
+- **Only `DataTable` does this.** A selection that starts outside the table keeps U+2212, as does a copy from `MetricTile`, a sentence, or a list on the site, and a double-click on those still drops the sign.
+
+All clipboard measurements are Chromium's, read in the browser. Safari and Firefox are unmeasured. `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard.
+
 ### 8.7 OpenType features
 
 ```css
@@ -1086,6 +1113,8 @@ Before the token set is considered done:
 - [x] Focus rings use `outline` and survive inside `overflow: hidden` — **verified 2026-08-03** by keyboard on three surfaces that put a control against a scroll boundary: `DataTable` (checkbox first column, icon button last), `Chip`/`FilterChip`, and a scrollable `TabsList`. See §4 on why padding and inset offsets — not `outline` itself — are what prevent clipping.
 - [x] Numeric cells carry `tabular-nums` and share a right edge — asserted in `apps/storybook/tests/density.spec.ts` on a `DataTable` variance column with mixed-width figures.
 - [x] Negatives render U+2212, not a hyphen (§8.6) — asserted in `apps/storybook/tests/density.spec.ts` on that same column, in `apps/site/tests/data.spec.ts` on the formatters, and on every page in `apps/site/tests/pages.spec.ts`.
+- [x] A figure copied from `DataTable` carries a hyphen, and a double-click in a numeric cell takes the whole figure (§8.6) — asserted by reading the clipboard in `apps/storybook/tests/data-table-copy.spec.ts`.
+- [ ] **Paste into Excel, Google Sheets and Numbers (§8.6).** Not tested: Excel isn't on the machine this was checked on, no account was signed in to, and Numbers was driven through its parser, not by a real paste. Paste `-1,234`, `−1,234`, `(1,234)`, `-¥41,415,809` and `−¥41,415,809` into a column and check each with `=ISNUMBER()`. Record the result in §8.6's table.
 - [x] **Source Serif 4 and Source Sans 3 ship `tnum`** — verified 2026-10-16 by glyph-width diff: with `tabular-nums`, `111111` and `000000` both measure 97.96px in the serif and 98.46px in the sans at 32px/600. (Archivo measured 111.17px for both, 2026-10-08, and Inter Tight 121.47px, 2026-08-02.)
 - [x] Source Serif 4 is loaded *with* its `opsz` axis, and the metric tier renders in the display cut — verified 2026-10-16: `Hamburgefonstiv` at 32px/600 measures 288.35px at `'opsz' 8` and 232.13px at `'opsz' 60`, and `$847.2M` measures 118.75px with `font-optical-sizing: auto` against 127.78px at the text cut. Asserted in `apps/storybook/tests/density.spec.ts`. **Import `@fontsource-variable/source-serif-4/opsz.css`, not the package default:** the default entry point ships wght-only files and silently turns optical sizing off, the same trap the Google Fonts URL sets in §9. (Until 2026-10-16 this row checked Archivo's `"wdth" 90`, removed with the family, §8.3.)
 - [x] No `--tracking-tight` on the metric tier — `MetricTile` uses `--tracking-display` (0); measured `letter-spacing: normal` at 32px.

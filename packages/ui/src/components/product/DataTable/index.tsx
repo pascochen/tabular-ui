@@ -80,11 +80,42 @@ const ROW_CONTROLS =
  * bubbles through the `<tr>`. Without this, clicking a cell's link would
  * activate the row as well, and selecting a row would open it.
  */
-function isClickForControl(event: React.MouseEvent<HTMLTableRowElement>) {
+function isClickForControl(event: React.MouseEvent<HTMLElement>) {
   const target = event.target as Element;
   if (!event.currentTarget.contains(target)) return true;
   const control = target.closest(ROW_CONTROLS);
   return control !== null && event.currentTarget.contains(control);
+}
+
+/**
+ * A copy leaves the screen, so it leaves U+2212 behind (§8.6). Excel is reported
+ * to read `−1,234` as text. A `1,234` beside it stays a number, so SUM skips only
+ * the negatives, with no error. Numbers reads either sign, so a hyphen is never
+ * the worse choice.
+ *
+ * Only a selection holding the minus is rewritten: setting one clipboard flavour
+ * drops the browser's others, including the HTML a rich-text paste needs. The
+ * swap runs on the selection's joined text because a cell can render its sign and
+ * its figure as separate text nodes. `toString()` applies `text-transform`, so a
+ * `StatusBadge` copies as it reads on screen. What someone typed into a field in
+ * a cell is theirs, and §8.6 leaves it alone.
+ */
+function copyWithPlainSign(event: React.ClipboardEvent<HTMLTableElement>) {
+  if ((event.target as Element).closest('input, textarea, [contenteditable="true"]')) return;
+  const text = document.getSelection()?.toString() ?? '';
+  if (!text.includes('−')) return;
+  event.clipboardData.setData('text/plain', text.replaceAll('−', '-'));
+  event.preventDefault();
+}
+
+/**
+ * A browser's double-click selects a word, and neither the sign nor the currency
+ * symbol is part of it: `−¥41,415,809` copies as `41,415,809`, a positive figure
+ * that pastes as a number and raises nothing. In a numeric cell it takes the
+ * whole figure.
+ */
+function selectWholeFigure(event: React.MouseEvent<HTMLTableCellElement>) {
+  if (!isClickForControl(event)) document.getSelection()?.selectAllChildren(event.currentTarget);
 }
 
 /**
@@ -170,7 +201,7 @@ function DataTable<TData>({
       )}
     >
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
-        <table className="w-full border-separate border-spacing-0 text-sm">
+        <table className="w-full border-separate border-spacing-0 text-sm" onCopy={copyWithPlainSign}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
@@ -275,6 +306,7 @@ function DataTable<TData>({
                   return (
                     <td
                       key={cell.id}
+                      onDoubleClick={meta?.align === 'numeric' ? selectWholeFigure : undefined}
                       className={cn(
                         // Height on the CELL, not padding. A fixed --pad-cell-y
                         // plus an 18px StatusBadge renders a 31px row while the
