@@ -92,8 +92,8 @@ const columns: ColumnDef<Model, unknown>[] = [
       const cls = v > 0.05 ? 'text-text-success' : v < -0.05 ? 'text-text-danger' : 'text-text-secondary';
       return (
         <span className={cls}>
-          {v > 0 ? '+' : ''}
-          {v.toFixed(1)}%
+          {v > 0 ? '+' : v < 0 ? '−' : ''}
+          {Math.abs(v).toFixed(1)}%
         </span>
       );
     },

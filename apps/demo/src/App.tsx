@@ -11,6 +11,8 @@ import { useHeroScript } from './lib/hero-script';
 import { useTimeline } from './lib/timeline-script';
 import { parseAtEnd } from './lib/view';
 import { useView } from './lib/view';
+import { useNoRoomForPanel } from './lib/viewport';
+import { PanelSheet } from './shell/PanelSheet';
 import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
 import { slotsFor } from './views/slots';
 
@@ -32,6 +34,7 @@ export function App() {
   // The scripted steps run here, not in the channel, so they land from any view.
   useHeroScript(state, dispatch);
   useTimeline(state, dispatch);
+  const panelAsSheet = useNoRoomForPanel() && slots.panel != null;
 
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
@@ -48,9 +51,26 @@ export function App() {
         sidebarHeader={<SidebarHeader />}
         sidebar={<Sidebar />}
         sidebarFooter={<SidebarFooter />}
-        pageHeader={<AppShellPageHeader title={slots.title} actions={slots.actions} />}
-        panel={slots.panel?.content}
-        panelLabel={slots.panel?.label}
+        pageHeader={
+          <AppShellPageHeader
+            title={slots.title}
+            actions={
+              panelAsSheet ? (
+                <>
+                  {slots.actions}
+                  {/* Keyed so a view's sheet doesn't stay open over the next view. */}
+                  <PanelSheet key={slots.panel!.label} label={slots.panel!.label}>
+                    {slots.panel!.content}
+                  </PanelSheet>
+                </>
+              ) : (
+                slots.actions
+              )
+            }
+          />
+        }
+        panel={panelAsSheet ? undefined : slots.panel?.content}
+        panelLabel={panelAsSheet ? undefined : slots.panel?.label}
         contentWidth={slots.contentWidth}
       >
         {slots.body}
