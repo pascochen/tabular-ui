@@ -25,8 +25,7 @@ export const story = (id: string, theme: 'dark' | 'light' = 'dark') => `/iframe.
 
 /**
  * Navigates and waits for the theme to actually be applied, but not the fonts.
- * Reach for `gotoStory` unless real time matters from the moment the story
- * mounts, as it does for elapsed.spec.ts's running clock.
+ * Reach for `gotoStory` unless the test reads only text, as elapsed.spec.ts does.
  *
  * `page.goto` resolves on `load`, but Storybook's decorator sets
  * `data-theme` when the story renders — later. Reading tokens in that gap

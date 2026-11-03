@@ -4,8 +4,8 @@ import {
   ClockIcon,
   EyeIcon,
   MinusCircleIcon,
+  PencilSimpleLineIcon,
   RobotIcon,
-  SparkleIcon,
   WarningIcon,
   XCircleIcon,
 } from '@phosphor-icons/react';
@@ -59,7 +59,8 @@ const entries: Record<RunStatus, Omit<RunStatusEntry, 'role' | 'spin'>> = {
   // Spinner, as running (§11.5, 2026-10-20). The robot spun here until then and tumbled.
   // "AI", agent-voice's word for the role: with the mark shared, the label is the badge's authorship signal (2026-10-25).
   'agent-working': { label: 'AI working', tone: 'agent', icon: RobotIcon, working: true },
-  'agent-proposed': { label: 'proposed', tone: 'agent', icon: SparkleIcon },
+  // Pencilled in: on the line, not yet in ink (owner, 2026-11-03). Sparkle until then, which said "AI", not "not done".
+  'agent-proposed': { label: 'proposed', tone: 'agent', icon: PencilSimpleLineIcon },
   skipped: { label: 'skipped', tone: 'neutral', icon: MinusCircleIcon },
 };
 
