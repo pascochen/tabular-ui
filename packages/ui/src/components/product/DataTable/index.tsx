@@ -442,7 +442,7 @@ function DataTable<TData>({
                           variant="inline"
                           onClick={header.column.getToggleSortingHandler()}
                           className={cn(
-                            'w-full gap-[var(--gap-icon-label)] rounded-xs font-medium hover:text-text-body',
+                            'justify-start gap-[var(--gap-icon-label)] rounded-xs font-medium hover:text-text-body',
                             // Stays out of a copy. `inline` is `select-auto`,
                             // which does not take the <th>'s `select-none` in
                             // Chromium: the labels ran together on one line.
@@ -451,7 +451,17 @@ function DataTable<TData>({
                             // cell: an outset ring on a sticky header inside
                             // overflow:hidden gets clipped (§4).
                             'focus-visible:outline-offset-[-2px]',
-                            numeric ? 'justify-end' : 'justify-start',
+                            // That ring paints over the button's outer 2px, and
+                            // a label sits on the button's edge. So the button
+                            // reaches a ring's width into the cell's padding and
+                            // pads it back: the label stays put, clear of the ring.
+                            'flex w-[calc(100%+2*var(--ring-width))] -mx-[var(--ring-width)] px-[var(--ring-width)]',
+                            // The label stays on the column's edge, over its
+                            // figures, and the caret takes the inner side. `flex`
+                            // above matters here too: `row-reverse` on an
+                            // inline-flex takes the button's baseline from the
+                            // caret, which lifts the label 1px above its neighbours.
+                            numeric && 'flex-row-reverse',
                           )}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
@@ -464,10 +474,13 @@ function DataTable<TData>({
                               className="size-2.5 text-text-interactive"
                             />
                           ) : (
+                            // In the layout at rest, to hold its space: a sort
+                            // moves no label, and a squeezed column keeps its
+                            // width. `group/button` is Button's own group.
                             <CaretUpDownIcon
                               weight="bold"
                               aria-hidden="true"
-                              className="size-2.5 opacity-0 group-hover:opacity-100"
+                              className="size-2.5 opacity-0 group-hover/button:opacity-100"
                             />
                           )}
                         </Button>

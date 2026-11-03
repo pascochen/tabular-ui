@@ -55,6 +55,51 @@ test.describe('focus rings survive scroll containers', () => {
     }
   });
 
+  // A label sits on its column's edge, and an inset ring paints over the
+  // button's outer 2px, so a ring can sit on top of the label's first or last
+  // letter with nothing clipped. Checked at the table's first and last columns,
+  // which meet the scroll container, one aligned each way, and on a `figure`
+  // column, which right-aligns without setting `align`.
+  for (const [story, name] of [
+    ['product-appbar--in-dashboard', 'Model'],
+    ['product-appbar--in-dashboard', 'Duration'],
+    ['product-datatable--total-with-cents', 'USD'],
+  ]) {
+    test(`sort button at the table edge draws its ring clear of its label — ${name}`, async ({ page }) => {
+      await gotoStory(page, story);
+      const sortButton = page.getByRole('button', { name });
+      await expect(sortButton).toBeVisible();
+
+      expect(await tabTo(page, sortButton)).toBe(true);
+
+      const ring = await focusRingStyle(page);
+      expect(ring?.outlineStyle).toBe('solid');
+      expect(ring?.boxShadow).toBe('none');
+      expect(parseFloat(ring?.outlineOffset ?? '0')).toBeLessThan(0);
+
+      for (const c of await ringOverhang(page)) {
+        expect(Math.max(c.left, c.right, c.top, c.bottom), `clipped by ${c.el}`).toBeLessThanOrEqual(0);
+      }
+
+      const g = await sortButton.evaluate((button) => {
+        const box = button.getBoundingClientRect();
+        const offset = Math.abs(parseFloat(getComputedStyle(button).outlineOffset));
+        const range = document.createRange();
+        range.selectNodeContents(Array.from(button.childNodes).find((n) => n.nodeType === Node.TEXT_NODE)!);
+        const label = range.getBoundingClientRect();
+        const caret = button.querySelector('svg')!.getBoundingClientRect();
+        return {
+          ringLeft: box.left + offset,
+          ringRight: box.right - offset,
+          left: Math.min(label.left, caret.left),
+          right: Math.max(label.right, caret.right),
+        };
+      });
+      expect(g.left, 'under the ring on the left').toBeGreaterThanOrEqual(g.ringLeft);
+      expect(g.right, 'under the ring on the right').toBeLessThanOrEqual(g.ringRight);
+    });
+  }
+
   test('chip in a horizontally scrolling row', async ({ page }) => {
     await gotoStory(page, 'foundational-chip--filter-bar');
     // Force the container to scroll, which is when a chip meets an edge.
