@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { gotoStoryBeforeFonts } from './helpers';
 
 /**
  * §11.5's elapsed figure: "Working…" for three seconds, then "Working · 0:03",
@@ -10,7 +10,10 @@ import { gotoStory } from './helpers';
  *
  * The clock is paused straight after load, at the page's own "now", so the
  * only real time counted is mount to pause, well under a second, plus
- * 200ms of margin.
+ * 200ms of margin. That is why these tests don't wait for the fonts: the clock
+ * runs through that wait, and with the fonts 800ms late every figure here read
+ * a second or more ahead. They read text, not boxes, so a swap moves nothing
+ * they check.
  */
 
 async function freeze(page: import('@playwright/test').Page) {
@@ -21,7 +24,7 @@ async function freeze(page: import('@playwright/test').Page) {
 
 test('the waiting turn gains its elapsed figure after 3 seconds', async ({ page }) => {
   await page.clock.install();
-  await gotoStory(page, 'product-chatthread--awaiting-response');
+  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
   await freeze(page);
 
   const visible = page.locator('[aria-hidden="true"]', { hasText: /^Working/ });
@@ -36,7 +39,7 @@ test('the waiting turn gains its elapsed figure after 3 seconds', async ({ page 
 
 test('assistive technology reads the bare label, which never ticks', async ({ page }) => {
   await page.clock.install();
-  await gotoStory(page, 'product-chatthread--awaiting-response');
+  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
   await freeze(page);
   await page.clock.runFor(10_000);
 
@@ -50,7 +53,7 @@ test('assistive technology reads the bare label, which never ticks', async ({ pa
 test('the figure keeps counting under reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.clock.install();
-  await gotoStory(page, 'product-chatthread--awaiting-response');
+  await gotoStoryBeforeFonts(page, 'product-chatthread--awaiting-response');
   await freeze(page);
   expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
 
@@ -61,7 +64,7 @@ test('the figure keeps counting under reduced motion', async ({ page }) => {
 
 test('the drafting step gains its elapsed figure', async ({ page }) => {
   await page.clock.install();
-  await gotoStory(page, 'product-agentplan--streaming');
+  await gotoStoryBeforeFonts(page, 'product-agentplan--streaming');
   await freeze(page);
   await page.clock.runFor(4_000);
   await expect(page.locator('[aria-hidden="true"]', { hasText: /^Drafting step/ })).toHaveText(/ · 0:04$/);
