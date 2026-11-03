@@ -32,4 +32,14 @@ The links on Color changed from an underline to the bordered look, and they must
 | 15 | Tab back to Typography and press VO-Space. | A new page loads and its title is announced. Then, as in step 12, "Typography, current page, link". Color is now just "Color, link". |
 | 16 | In Safari's Develop menu, choose Disable JavaScript, and reload `/foundations/color`. Press VO-Space on Density. Then turn JavaScript back on. | Steps 11 and 12 sound the same with JavaScript off, and Density loads. This is the case tabs would have broken. |
 
+## The double rule (D11, 2026-11-02)
+
+Lineage tree's page gained a table that closes on its total, and the double rule under that total has to be heard, since a rule can't be. Run this on the PR's preview until it merges, then on `https://tabularui.com`.
+
+| # | Do | Expect to hear |
+|---|---|---|
+| 17 | Open `/components/lineage-tree`. Press VO-U, Headings list, and choose "The same figures, in a Data table". Press Escape. | "The same figures, in a Data table, heading level 2". |
+| 18 | Move with VO-Right Arrow through the sentence and into the table. | The sentence, then a table with 2 columns. Its column headers are "H1 operating profit" and "Yen", read as headers. A negative figure is read as minus, not as a dash or a hyphen. |
+| 19 | Keep moving to the last row. | "Actual", as the row's header. Then "2,192,778,193 adds up". No word about a difference. |
+
 **When you're done,** turn VoiceOver off with Command-F5, and send the step numbers that differed, with what you heard.
