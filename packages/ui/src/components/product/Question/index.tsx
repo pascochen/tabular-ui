@@ -11,6 +11,11 @@ export type QuestionOption = {
   id: string;
   /** One word or a few: "KJP only". It is the button's whole label. */
   label: string;
+  /**
+   * What this answer does, beside its button, when the label alone can't say
+   * it. Buttons only: a `Select`'s row holds its label and nothing else.
+   */
+  description?: string;
 };
 
 /** What the person did. One of four, so the agent knows which it got. */
@@ -55,7 +60,10 @@ const MAX_BUTTONS = 4;
  * is an answer that stands on its own (§4, *Button groups*), and pressing it
  * is the answer, with no selected state and no submit. That is why this is
  * not a radio group, which CLAUDE.md rules out. Five or more go in a
- * `Select`, which costs one row however long the list (Select's README).
+ * `Select`, which costs one row however long the list (Select's README). An
+ * option with a `description` takes a row of its own, its button beside what
+ * the answer does, so nobody has to press to find out. Under 320px the line
+ * goes under its button, where it has the width to be read.
  *
  * Skip and Choose for me are always there (Vocabulary: "Answer, skip, or let
  * the agent decide"). They step back from answering, so they are `ghost`, at
@@ -73,6 +81,7 @@ function Question({ title, options = [], text, onAnswer, outcome, className }: Q
   const outcomeRef = useRef<HTMLParagraphElement>(null);
   const decided = outcome != null;
   const asSelect = options.length > MAX_BUTTONS;
+  const described = options.some((option) => option.description);
 
   // Focus follows the answer: the control that had it is about to unmount.
   useEffect(() => {
@@ -121,19 +130,52 @@ function Question({ title, options = [], text, onAnswer, outcome, className }: Q
         >
           {options.length > 0 && !asSelect ? (
             // A group named by the question, so each button is heard as one of its answers.
-            <div role="group" aria-labelledby={titleId} className="flex flex-wrap gap-[var(--gap-inline)]">
-              {options.map((option) => (
-                <Button
-                  key={option.id}
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  {...lock}
-                  onClick={() => answer({ kind: 'option', id: option.id })}
-                >
-                  {option.label}
-                </Button>
-              ))}
+            <div
+              role="group"
+              aria-labelledby={titleId}
+              className={described ? '@container' : 'flex flex-wrap gap-[var(--gap-inline)]'}
+            >
+              {described ? (
+                // Keyed to the space the question has, not the screen: it sits in a panel or a thread.
+                <div className="flex flex-col gap-[var(--gap-field)] @xs:grid @xs:grid-cols-[max-content_minmax(0,1fr)] @xs:items-baseline @xs:gap-x-[var(--gap-inline)]">
+                  {options.map((option) => {
+                    const descriptionId = option.description ? `${titleId}-${option.id}` : undefined;
+                    return (
+                      <div key={option.id} className="flex flex-col gap-[var(--gap-bonded)] @xs:contents">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          {...lock}
+                          aria-describedby={descriptionId}
+                          className="w-full @xs:col-start-1"
+                          onClick={() => answer({ kind: 'option', id: option.id })}
+                        >
+                          {option.label}
+                        </Button>
+                        {option.description ? (
+                          <p id={descriptionId} className="text-sm text-text-secondary">
+                            {option.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                options.map((option) => (
+                  <Button
+                    key={option.id}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    {...lock}
+                    onClick={() => answer({ kind: 'option', id: option.id })}
+                  >
+                    {option.label}
+                  </Button>
+                ))
+              )}
             </div>
           ) : null}
 

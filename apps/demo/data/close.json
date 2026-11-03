@@ -194,7 +194,7 @@
       {
         "id": "keep-locked",
         "label": "Keep September locked",
-        "description": "Post nothing. List the ¥42.7m for the auditors' interim review, and the year to date is right from October."
+        "description": "Post nothing. List the ¥42.7m for the auditors’ interim review, and the year to date is right from October."
       }
     ],
     "tool": {
@@ -238,7 +238,7 @@
     "authorship": { "asked": "AI · Awaiting your answer", "proposed": "AI · Awaiting confirmation", "done": "AI" },
     "delegate": {
       "option": "reopen",
-      "reason": "The policy puts revenue in the month of delivery, and H1 is published on 6 Nov."
+      "reason": "The policy doesn’t decide this. I chose it so H1 is right for the 6 Nov earnings release."
     },
     "skipped": "Skipped. INV-KJP-2609-00363 stays open until someone decides."
   }

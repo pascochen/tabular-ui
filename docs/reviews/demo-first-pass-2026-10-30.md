@@ -7,6 +7,8 @@ Two methods from Ileana Marcut's UX + AI method library, run on the Kasane close
 
 **Status, 2026-10-30:** the name (variant 1, "AI") and the three severity-3 issues are fixed in #67, carried to `main` by #68. The rest are open.
 
+**Status, 2026-11-02:** issues 6 and 7 are fixed, ahead of the second round of user tests: each option shows what it does beside its button, and the delegated outcome says the choice is the agent's own. Issue 7 took the review's first fix, so "Choose for me" stays.
+
 **User tests, reported by the owner on 2026-11-02.** Real sessions, so they outrank this document's hypotheses:
 
 - **The end strip:** testers missed it. Those who did see it expected Replay to start an animation. The card is removed, which settles issue 4, and the top nav's Replay is now "Start over", since it returns to landing and plays nothing. "Browse the AI components" now lives only in the About dialog.

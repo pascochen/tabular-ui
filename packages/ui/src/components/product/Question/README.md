@@ -44,6 +44,16 @@ The agent is the one asking, so the question is agent output, and CLAUDE.md is e
 
 The options are named by the question (`role="group"` with `aria-labelledby`, or the `Select`'s own label), so each is heard as one of its answers.
 
+## `description`: what an answer does
+
+When a label can't say what the answer does, an option takes a `description`. Each option then gets a row of its own: its button, then the line, with the buttons at one width so the lines start together. Where the question has under 320px, as in a thread on a phone, the line goes under its button instead.
+
+- **Why under 320px, and why the question's width.** Beside a 138px button, a line at 215px gets 69px and runs to ten lines. The test is a container query on the options, not the screen's width, because the same question sits in a 440px panel and in a thread.
+
+- **Why beside the button, not in a tooltip.** People choose from this, and a `Tooltip` is visual only, so a line in one would exist nowhere else (`Tooltip` README). The line is the button's `aria-describedby`, so a screen reader hears both.
+- **Why not in the title or a paragraph above.** The consequence belongs to the answer it follows from. In a paragraph, the reader has to match each sentence to a button.
+- **Buttons only.** A `Select`'s row holds its label. A list long enough for a `Select` is not one where each answer needs explaining; if it is, it's more than one question.
+
 ## Skip and Choose for me
 
 Both are always there: the person can "Answer, skip, or let the agent decide" (tabularui.com's Vocabulary, signed off 2026-10-28). They step back from answering, so they are `ghost` at the trailing edge. When there is a field, Answer is the filled action after them (§4, *Button groups*).
@@ -70,6 +80,7 @@ type QuestionAnswer =
 |---|---|
 | Title | `<h3>`, `--text-md`, 600, `--color-text-primary`, and the section's name. As in `Confirmation` and `AgentPlan`. |
 | Options | `Button size="sm" variant="outline"`, `--gap-inline` apart, wrapping. Or a full-width `Select`. |
+| Described options | One row each, `--gap-field` apart: the button at the widest label's width, `--gap-inline`, then the line in `--text-sm`, `--color-text-secondary`, on the button's baseline. Under 320px, the button at full width with the line `--gap-bonded` under it. |
 | Text | `Field` with `Input`. |
 | Ways out | Right-aligned, `size="sm"`: Skip and Choose for me `ghost`, then Answer `default` when there is a field. |
 | Outcome | `--text-base`, `--color-text-secondary`, where the controls were. A focus target with `tabIndex={-1}` and no ring. |
@@ -81,7 +92,8 @@ Groups are `--gap-group` (12px) apart.
 - **Title:** one question, sentence case, with its question mark. It names the options: "all of them, or KJP only?" (`docs/agent-voice.md`).
 - **Options:** a word or a few, each the whole answer: "All entities", "KJP only". Never "Yes" and "No" to a question that names two things.
 - **Fixed strings:** "Skip", "Choose for me", "Answer", and the `Select`'s placeholder, "Choose an answer".
-- **Outcome:** what was answered, by whom. "Answered by you: KJP only." For Skip, what the agent does instead: "Skipped by you. I'll cover all entities, and say so in the summary." For Choose for me, what it chose and why: "I chose all entities: KJP alone leaves out the KUS invoices."
+- **Descriptions:** what the answer does, not why to pick it: "Post nothing. List the amount for the auditors' interim review." Each stands on its own, and neither argues against the other.
+- **Outcome:** what was answered, by whom. "Answered by you: KJP only." For Skip, what the agent does instead: "Skipped by you. I'll cover all entities, and say so in the summary." For Choose for me, what it chose and why: "I chose all entities: KJP alone leaves out the KUS invoices." When the rules don't settle the question, the outcome says the choice is the agent's own, so its reason isn't read as the rule: "The policy doesn't decide this. I chose it so H1 is right for the 6 Nov earnings release."
 - **The block's label** says the state: "AI · Awaiting your answer", then "AI · Answered" or "AI · Skipped".
 
 ## Not here
