@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   awaitsVisitor,
   closeReducer,
+  isReopened,
   landingState,
   progress,
   type CloseAction,
@@ -57,6 +58,21 @@ test('keep September locked: resolved on posting, no rerun, the figure unchanged
   expect(hero(done).status).toBe('resolved');
   expect(done.checks['revenue-cut-off']).toBe(42720000);
   expect(done.log.at(-1)?.text).toMatch(/listed for the auditors/);
+});
+
+test('September reads as reopened only once the reversal is posted, and Start over locks it again', () => {
+  const proposed = run({ type: 'answer', answer: 'reopen', at: '14:00' }, { type: 'read' });
+  expect(isReopened(proposed)).toBe(false);
+  const posted = closeReducer(proposed, { type: 'post', at: '14:01' });
+  expect(isReopened(posted)).toBe(true);
+  expect(isReopened(closeReducer(posted, { type: 'reset' }))).toBe(false);
+  // Keeping it locked never reads as reopened, nor does stopping at the confirmation.
+  expect(
+    isReopened(
+      run({ type: 'answer', answer: 'keep-locked', at: '14:00' }, { type: 'read' }, { type: 'post', at: '14:01' }),
+    ),
+  ).toBe(false);
+  expect(isReopened(closeReducer(proposed, { type: 'stop', at: '14:01' }))).toBe(false);
 });
 
 test("don't post: the round stops and the question is asked again", () => {

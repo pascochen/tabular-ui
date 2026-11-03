@@ -9,8 +9,7 @@ import { sceneNow } from './lib/clock';
 import { closeReducer, endState, landingState } from './lib/close-state';
 import { useHeroScript } from './lib/hero-script';
 import { useTimeline } from './lib/timeline-script';
-import { parseAtEnd } from './lib/view';
-import { useView } from './lib/view';
+import { parseAtEnd, placeOf, useView } from './lib/view';
 import { useNoRoomForPanel } from './lib/viewport';
 import { PanelSheet } from './shell/PanelSheet';
 import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
@@ -59,7 +58,7 @@ export function App() {
                 <>
                   {slots.actions}
                   {/* Keyed so a view's sheet doesn't stay open over the next view. */}
-                  <PanelSheet key={slots.panel!.label} label={slots.panel!.label}>
+                  <PanelSheet key={placeOf(view)} label={slots.panel!.label}>
                     {slots.panel!.content}
                   </PanelSheet>
                 </>

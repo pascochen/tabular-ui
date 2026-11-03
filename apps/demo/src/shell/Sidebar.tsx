@@ -1,9 +1,9 @@
 import type { ReactElement, ReactNode } from 'react';
-import { HashIcon } from '@phosphor-icons/react';
+import { BooksIcon, HashIcon, MagnifyingGlassIcon, TrayIcon } from '@phosphor-icons/react';
 import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, TruncatedText } from 'tabular-ui';
 
-import { channels, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
-import { BUILT_CHANNELS, hrefFor, onViewLinkClick, sameView, useView, type View } from '../lib/view';
+import { agents, channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
+import { BUILT_CHANNELS, BUILT_PLACES, hrefFor, onViewLinkClick, placeOf, useView, type View } from '../lib/view';
 import { useClose } from '../lib/close-context';
 import { progress } from '../lib/close-state';
 import { MemberAvatar } from './members';
@@ -26,7 +26,7 @@ function NavLink({
     <AppShellNavItem
       href={hrefFor(view)}
       onClick={onViewLinkClick(view)}
-      active={sameView(current, view)}
+      active={placeOf(current) === placeOf(view)}
       icon={icon}
       avatar={avatar}
       trailing={trailing}
@@ -36,16 +36,33 @@ function NavLink({
   );
 }
 
+const PLACES = {
+  search: { label: 'Search', icon: <MagnifyingGlassIcon />, view: { kind: 'search' } },
+  tasks: { label: 'Tasks', icon: <TrayIcon />, view: { kind: 'tasks' } },
+  sources: { label: 'Sources', icon: <BooksIcon />, view: { kind: 'sources' } },
+} satisfies Record<(typeof BUILT_PLACES)[number], { label: string; icon: ReactElement; view: View }>;
+
 /**
- * The sidebar: the channels and the direct messages. Every item
- * opens a view (`lib/view.ts`), because a dead link is where a three-minute
- * visitor leaves.
+ * The sidebar: one home for everything. The places, the channels, the agents
+ * and the direct messages, in that order. Every item opens a built view
+ * (`lib/view.ts`), because a dead link is where a three-minute visitor leaves,
+ * so a section with nothing built isn't drawn.
  */
 export function Sidebar() {
   const { resolved, total } = progress(useClose().state);
   const open = total - resolved;
+  const builtAgents: typeof agents = [];
   return (
     <AppShellNav aria-label="Workspace">
+      {BUILT_PLACES.length ? (
+        <AppShellNavGroup>
+          {BUILT_PLACES.map((place) => (
+            <NavLink key={place} view={PLACES[place].view} icon={PLACES[place].icon}>
+              {PLACES[place].label}
+            </NavLink>
+          ))}
+        </AppShellNavGroup>
+      ) : null}
       <AppShellNavGroup label="Channels">
         {BUILT_CHANNELS.map((id) => channels.find((c) => c.id === id)!).map((c) => (
           <NavLink
@@ -65,6 +82,15 @@ export function Sidebar() {
           </NavLink>
         ))}
       </AppShellNavGroup>
+      {builtAgents.length ? (
+        <AppShellNavGroup label="Agents">
+          {builtAgents.map((a) => (
+            <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} avatar={<MemberAvatar memberKey={a.key} />}>
+              {a.name}
+            </NavLink>
+          ))}
+        </AppShellNavGroup>
+      ) : null}
       <AppShellNavGroup label="Direct messages">
         {directMessages.map((key) => (
           <NavLink key={key} view={{ kind: 'dm', member: key }} avatar={<MemberAvatar memberKey={key} />}>
@@ -82,21 +108,29 @@ export function Sidebar() {
  */
 const itemInset = 'border-x border-transparent px-[var(--pad-sidebar-item)]';
 
-/** The workspace. Static: Kasane is the only company, so a switcher would offer nothing. */
+/**
+ * The company and the period, on two lines. Static: Kasane is the only company,
+ * and nothing in the demo is filtered by period, so a switcher would change
+ * nothing visible (pages spec, D7).
+ */
 export function SidebarHeader() {
   return (
-    <TruncatedText className={`${itemInset} text-sm font-semibold text-text-primary`}>
-      {kasaneCompany.legalName}
-    </TruncatedText>
+    <div className={`${itemInset} flex min-h-[var(--h-control)] min-w-0 flex-col justify-center`}>
+      <TruncatedText className="text-sm font-semibold text-text-primary">{kasaneCompany.legalName}</TruncatedText>
+      <TruncatedText className="text-xs text-text-secondary">{close.period.open}</TruncatedText>
+    </div>
   );
 }
 
-/** Who the visitor is playing. Not a control: the demo has no account to manage. */
+/** Who the visitor is playing, on two lines. Not a control: the demo has no account to manage. */
 export function SidebarFooter() {
   return (
     <div className={`${itemInset} flex h-[var(--h-control)] min-w-0 items-center gap-[var(--gap-control-icon)]`}>
       <MemberAvatar memberKey="visitor" />
-      <TruncatedText className="text-sm text-text-body">{`${visitor.name} · ${visitor.title}`}</TruncatedText>
+      <div className="flex min-w-0 flex-col">
+        <TruncatedText className="text-sm text-text-body">{visitor.name}</TruncatedText>
+        <TruncatedText className="text-xs text-text-secondary">{visitor.title}</TruncatedText>
+      </div>
     </div>
   );
 }

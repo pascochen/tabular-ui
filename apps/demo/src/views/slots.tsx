@@ -24,6 +24,8 @@ export type ViewSlots = {
 };
 
 export function slotsFor(view: View): ViewSlots {
+  // Only channels and direct messages reach here until their steps are built (`BUILT_PLACES`).
+  if (view.kind !== 'channel' && view.kind !== 'dm') throw new Error(`No view for "${view.kind}" yet`);
   if (view.kind === 'dm') {
     return {
       title: memberName(view.member),

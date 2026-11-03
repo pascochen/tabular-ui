@@ -9,6 +9,7 @@ App-local (`kasane-close-demo-plan.md` §3).
 | Decision | Why |
 |---|---|
 | Stores nothing | Every line is derived from the close state (`lib/close-state.ts`), so the panel can't disagree with the channel |
+| A status line above the progress, "Locked 8 Oct 2026, business day 6", then "Reopened 16 Oct 2026" | There's no period switcher (pages spec, D7), so this is where the lock and the reopen show. It reads "Reopened" only once the reversal is posted: proposing one reopens nothing (`docs/agent-voice.md`, principle 3) |
 | `ProgressBar` in `info` | The close is work in progress. A hue must be true of the run (ProgressBar README) |
 | Checks are `MetricTile size="sm"`, two to a row, with the check's meaning as the caption | Readable without accounting knowledge: the figure, then what it counts. The figure takes no hue (§5: polarity is for deltas) |
 | Each exception is a link to its message | A list that only shows status is a dead end; this one takes you to the evidence. Under 1024px, where the panel is a dialog over the channel (`shell/PanelSheet.tsx`), following one closes the dialog |
