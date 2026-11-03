@@ -27,7 +27,9 @@ node apps/site/tests/serve.mjs apps/site/build/client 8199
 pnpm dlx lighthouse@12 http://localhost:8199/ --only-categories=performance,accessibility --chrome-flags="--headless=new" --view
 ```
 
-Run each page several times and take the median: a single run varies by a point or two. The bar is 95 for Performance and Accessibility on Home and a component page (§12). Request every file once before the first run (the server compresses each file on its first request, and that run once scored a false 100), and write the Chrome and Lighthouse versions next to the scores: they're in the report's `environment.hostUserAgent` and `lighthouseVersion`. The same build scored 95 on 2026-10-27 and 86 on 2026-10-29, and without the versions nobody could say why.
+Take the median of at least 12 runs per page. A single local run can swing by 14 points, even on a quiet machine: on 2026-11-03 (Chrome 156, Lighthouse 12.8.2, mobile settings, load average about 2.5), one unchanged page scored between 86 and 100 under `tests/serve.mjs`. Five runs aren't enough: they gave Lineage tree a median of 94 and Agent block 86, where 12 gave 99 and 100. Before suspecting the code, measure `https://tabularui.com` too: all 36 runs there scored 100 the same day. The cause of the local swing isn't known. The number of connections Chrome opened doesn't predict it (r = -0.09 over 72 runs).
+
+The bar is 95 for Performance and Accessibility on Home and a component page (§12). Request every file once before the first run (the server compresses each file on its first request, and that run once scored a false 100), and write the Chrome and Lighthouse versions next to the scores: they're in the report's `environment.hostUserAgent` and `lighthouseVersion`. The same build scored 95 on 2026-10-27 and 86 on 2026-10-29, and without the versions nobody could say why.
 
 The **VoiceOver** pass is manual, by the owner: [`docs/site-voiceover.md`](../../docs/site-voiceover.md).
 
