@@ -26,7 +26,7 @@ export type AppBarProps = React.ComponentProps<'header'> & {
  *
  * Neutral throughout: §0 rule 1 puts structure in neutral, and a navbar is
  * structure. §1 does list "active nav item" under the interactive role, so a
- * coloured (sage) active treatment would be legal — see README for why the default is
+ * coloured (ivy) active treatment would be legal — see README for why the default is
  * neutral and how to change it.
  *
  * Three regions, laid out brand / nav / actions. The nav region takes the

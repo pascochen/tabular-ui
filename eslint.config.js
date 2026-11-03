@@ -22,12 +22,12 @@ const designGate = [
   {
     selector: `Literal[value=/\\b(${SCALES})-(${SCALE_STEPS})\\b/]`,
     message:
-      'Raw colour scale name (a Tailwind scale or a Riso ramp such as sage-700) in component code breaks mode switching and any future hue change, silently. Use the semantic token utilities (text-text-danger, bg-bg-danger, border-border-agent). Ramp names are legal only in src/styles/theme.css and the generated palette.css. See docs/design-system.md §9 "Naming" and CLAUDE.md rule 10.',
+      'Raw colour scale name (a Tailwind scale or a Riso ramp such as ivy-700) in component code breaks mode switching and any future hue change, silently. Use the semantic token utilities (text-text-danger, bg-bg-danger, border-border-agent). Ramp names are legal only in src/styles/theme.css and the generated palette.css. See docs/design-system.md §9 "Naming" and CLAUDE.md rule 10.',
   },
   {
     selector: `TemplateElement[value.raw=/\\b(${SCALES})-(${SCALE_STEPS})\\b/]`,
     message:
-      'Raw colour scale name (a Tailwind scale or a Riso ramp such as sage-700) in component code breaks mode switching and any future hue change, silently. Use the semantic token utilities (text-text-danger, bg-bg-danger, border-border-agent). Ramp names are legal only in src/styles/theme.css and the generated palette.css. See docs/design-system.md §9 "Naming" and CLAUDE.md rule 10.',
+      'Raw colour scale name (a Tailwind scale or a Riso ramp such as ivy-700) in component code breaks mode switching and any future hue change, silently. Use the semantic token utilities (text-text-danger, bg-bg-danger, border-border-agent). Ramp names are legal only in src/styles/theme.css and the generated palette.css. See docs/design-system.md §9 "Naming" and CLAUDE.md rule 10.',
   },
   {
     selector: 'Literal[value=/#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]',

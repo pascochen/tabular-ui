@@ -32,10 +32,10 @@ Then grep for what lint may not yet cover. **Keep the `--include` globs quoted.*
 
 ```bash
 # raw scale names (Tailwind's and the Riso ramps) outside theme.css and palette.css
-grep -rnE '\b(blue|red|amber|emerald|violet|teal|pink|lime|cyan|fuchsia|sky|indigo|orange|yellow|green|purple|rose|olive|neutral|slate|gray|zinc|stone|mauve|mist|taupe|ledger|sage|vermilion|ochre|federal|orchid)-[0-9]{2,3}\b' packages/ui/src --include='*.tsx' | grep -v 'styles/theme.css'
+grep -rnE '\b(blue|red|amber|emerald|violet|teal|pink|lime|cyan|fuchsia|sky|indigo|orange|yellow|green|purple|rose|olive|neutral|slate|gray|zinc|stone|mauve|mist|taupe|ledger|ivy|sage|vermilion|ochre|federal|orchid)-[0-9]{2,3}\b' packages/ui/src --include='*.tsx' | grep -v 'styles/theme.css'
 
 # chromatic 900/950 used as background
-grep -rnE 'bg-(sage|vermilion|ochre|federal|orchid|teal)-(900|925|950)' packages/ui/src
+grep -rnE 'bg-(ivy|sage|vermilion|ochre|federal|orchid|teal)-(900|925|950)' packages/ui/src
 
 # font weights above 600
 grep -rnE 'font-(bold|extrabold|black)|font-\[?[7-9]00' packages/ui/src

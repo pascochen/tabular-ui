@@ -79,7 +79,7 @@ for (const mode of ['dark', 'light'] as const) {
  * §10's explicit trap. Light-mode figures must be measured against the
  * ledger-50 paper canvas, not #fff — measuring against white overstates every
  * light ratio by roughly 8%. The tightest role fails first, so it is the
- * canary: interactive (sage-700) since the Riso Ledger palette (2026-10-16).
+ * canary: interactive (ivy-700) since the Riso Ledger palette (2026-10-16).
  * Before that it was danger (red-700), and interactive, warning and danger
  * again before the lightness bands.
  */
@@ -174,7 +174,7 @@ for (const mode of ['light', 'dark'] as const) {
 /**
  * §4 — every solid fill must carry its on-colour at 4.5:1, in both modes:
  * fills differ by mode since the Riso Ledger palette (700 light, 600 dark;
- * the interactive fill is ink, inverted in dark). Dark sage-600 (success)
+ * the interactive fill is ink, inverted in dark). Dark ivy-600 (success)
  * under paper is the tightest pair, 4.59:1, and warning takes ink, not
  * paper, in both modes.
  */

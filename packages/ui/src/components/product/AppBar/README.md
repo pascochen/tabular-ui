@@ -79,7 +79,7 @@ indicator — and a navbar is not a tab list. Keeping the underline out also kee
 things: tabs switch a view, a navbar changes the page.
 
 **The active treatment is neutral, and that is a choice, not the only legal one.**
-§1 lists "active nav item" under the interactive role, so a sage treatment would pass
+§1 lists "active nav item" under the interactive role, so an ivy treatment would pass
 review. Neutral is the default here because the active item is already redundantly
 communicated by the page content itself, and §0 rule 1's reasoning applies — a
 coloured pixel that is not carrying state is stealing attention from one that is. To

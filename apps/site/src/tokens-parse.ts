@@ -58,7 +58,7 @@ export function makeTokens(themeCss: string, palette: Palette) {
 
   const ramps = palette.ramps;
 
-  /** `var(--color-sage-700)` or `--alpha(var(--color-sage-500) / 8%)` → the step it names. */
+  /** `var(--color-ivy-700)` or `--alpha(var(--color-ivy-500) / 8%)` → the step it names. */
   function resolve(value: string): RampStep {
     const m = value.match(/var\(--color-([a-z]+)-(\d+)\)(?:\s*\/\s*(\d+%))?/);
     if (!m) throw new Error(`Not a palette reference: ${value}`);
@@ -74,7 +74,7 @@ export function makeTokens(themeCss: string, palette: Palette) {
     return resolve(decl.value);
   }
 
-  /** The step's name as the spec writes it: `sage-700`, or `sage-500 / 8%` for a tint. */
+  /** The step's name as the spec writes it: `ivy-700`, or `ivy-500 / 8%` for a tint. */
   function stepLabel(s: RampStep): string {
     return `${s.ramp}-${s.step}${s.alpha ? ` / ${s.alpha}` : ''}`;
   }

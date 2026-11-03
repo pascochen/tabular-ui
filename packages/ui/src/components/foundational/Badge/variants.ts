@@ -48,7 +48,7 @@ const badgeCva = cva(
         success: 'bg-bg-success text-text-success',
         agent: 'bg-bg-agent text-text-agent',
         // §5 — running and in-progress work. Not `interactive`: that is
-        // sage, and a running badge would read as passed (§1).
+        // ivy, and a running badge would read as passed (§1).
         info: 'bg-bg-info text-text-info',
       },
       shape: {

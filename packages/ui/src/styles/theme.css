@@ -61,6 +61,8 @@
    changed, 2026-10-23, user-approved after a side-by-side in Storybook).
    --color-bg-selection and the ::selection base rule from §4 "Text
    selection" (2026-11-02, user-approved after a side-by-side).
+   The sage ramp renamed ivy from §1, with --color-sage-* kept as deprecated
+   aliases from §9 (names only, no value changed, 2026-11-03, user-approved).
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -76,7 +78,7 @@
 /* --------------------------------------------------------------------------
    1. Strip Tailwind's colour scales (§9). All of them, since the Riso Ledger
    palette (2026-10-16): colour comes only from the seven generated ramps in
-   palette.css — ledger (neutral), sage, vermilion, ochre, federal, orchid and
+   palette.css — ledger (neutral), ivy, vermilion, ochre, federal, orchid and
    teal (charts only). palette.css is imported AFTER this file, so the teal
    strip below removes Tailwind's teal and not the Riso one.
    -------------------------------------------------------------------------- */
@@ -116,6 +118,23 @@
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
   --text-shadow-*: initial;
+}
+
+/* §9 — deprecated ramp names. sage became ivy on 2026-11-03 (§1). `static`, so
+   a copy installed from the registry that names the old ramp keeps resolving.
+   New code uses ivy, and lint rejects both. */
+@theme static {
+  --color-sage-50: var(--color-ivy-50);
+  --color-sage-100: var(--color-ivy-100);
+  --color-sage-200: var(--color-ivy-200);
+  --color-sage-300: var(--color-ivy-300);
+  --color-sage-400: var(--color-ivy-400);
+  --color-sage-500: var(--color-ivy-500);
+  --color-sage-600: var(--color-ivy-600);
+  --color-sage-700: var(--color-ivy-700);
+  --color-sage-800: var(--color-ivy-800);
+  --color-sage-900: var(--color-ivy-900);
+  --color-sage-950: var(--color-ivy-950);
 }
 
 /* --------------------------------------------------------------------------
@@ -314,23 +333,23 @@
   /* §4 — accent map, light. Step 700 for every role's text (§0 rule 4):
      5.06:1 or more on every ground §4 lists, its own tint included. On
      canvas: interactive and success 6.23, danger 7.15, warning 6.74, agent
-     7.13, info 6.75. Interactive and success share sage by decision (§1). */
-  --tui-text-interactive: var(--color-sage-700);
+     7.13, info 6.75. Interactive and success share ivy by decision (§1). */
+  --tui-text-interactive: var(--color-ivy-700);
   --tui-text-danger: var(--color-vermilion-700);
   --tui-text-warning: var(--color-ochre-700);
-  --tui-text-success: var(--color-sage-700);
+  --tui-text-success: var(--color-ivy-700);
   --tui-text-agent: var(--color-orchid-700);
   --tui-text-info: var(--color-federal-700);
 
   /* §1 — the accent is ink: the primary fill is ledger-950, 16.39:1 on
      paper. The focus ring is a step softer, ledger-800, 9.10:1 (§4,
      2026-10-22). Links and selection (text, bg, border above and below)
-     stay sage. */
+     stay ivy. */
   --tui-fill-interactive: var(--color-ledger-950);
   --tui-ring: var(--color-ledger-800);
   --tui-fill-danger: var(--color-vermilion-700);
   --tui-fill-warning: var(--color-ochre-500);     /* not -400: 2.26:1 on paper, under 3:1 (§4) */
-  --tui-fill-success: var(--color-sage-700);
+  --tui-fill-success: var(--color-ivy-700);
   --tui-fill-agent: var(--color-orchid-700);
   --tui-fill-info: var(--color-federal-700);
 
@@ -342,17 +361,17 @@
   --tui-on-agent: var(--color-ledger-50);         /* 7.13:1 */
   --tui-on-info: var(--color-ledger-50);          /* 6.75:1 */
 
-  --tui-bg-interactive: --alpha(var(--color-sage-500) / 8%);
+  --tui-bg-interactive: --alpha(var(--color-ivy-500) / 8%);
   --tui-bg-danger: --alpha(var(--color-vermilion-500) / 8%);
   --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
-  --tui-bg-success: --alpha(var(--color-sage-500) / 8%);
+  --tui-bg-success: --alpha(var(--color-ivy-500) / 8%);
   --tui-bg-agent: --alpha(var(--color-orchid-500) / 8%);
   --tui-bg-info: --alpha(var(--color-federal-500) / 8%);
 
-  --tui-border-interactive: --alpha(var(--color-sage-500) / 20%);
+  --tui-border-interactive: --alpha(var(--color-ivy-500) / 20%);
   --tui-border-danger: --alpha(var(--color-vermilion-500) / 20%);
   --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
-  --tui-border-success: --alpha(var(--color-sage-500) / 20%);
+  --tui-border-success: --alpha(var(--color-ivy-500) / 20%);
   --tui-border-agent: --alpha(var(--color-orchid-500) / 20%);
   --tui-border-info: --alpha(var(--color-federal-500) / 20%);
 
@@ -366,17 +385,17 @@
   --tui-bg-active-inverse: --alpha(var(--color-ledger-50) / 10%);
   --tui-text-disabled: var(--color-ledger-400);   /* 2.22:1 — fails on purpose (WCAG 1.4.3 exempt) */
   /* §4 — selected text, not a selected row. The text steps to primary on it. */
-  --tui-bg-selection: --alpha(var(--color-sage-500) / 30%);
+  --tui-bg-selection: --alpha(var(--color-ivy-500) / 30%);
 
   /* §6 — chart ramp, light: step 600 of each ramp, 4.59:1 or more on
-     paper. Vermilion and sage, the polarity hues, come last (§6). */
+     paper. Vermilion and ivy, the polarity hues, come last (§6). */
   --tui-chart-1: var(--color-federal-600);
   --tui-chart-2: var(--color-ochre-600);
   --tui-chart-3: var(--color-teal-600);
   --tui-chart-4: var(--color-orchid-600);
   --tui-chart-5: var(--color-ledger-600);
   --tui-chart-6: var(--color-vermilion-600);
-  --tui-chart-7: var(--color-sage-600);
+  --tui-chart-7: var(--color-ivy-600);
 }
 
 [data-theme='dark'] {
@@ -400,10 +419,10 @@
      canvas: interactive and success 7.84, danger 6.95, warning 7.24, agent
      6.96, info 7.31. Lowest anywhere: agent on its own tint over a
      highlighted menu row, 4.66:1 — why raised is ledger-925 (§3). */
-  --tui-text-interactive: var(--color-sage-400);
+  --tui-text-interactive: var(--color-ivy-400);
   --tui-text-danger: var(--color-vermilion-400);
   --tui-text-warning: var(--color-ochre-400);
-  --tui-text-success: var(--color-sage-400);
+  --tui-text-success: var(--color-ivy-400);
   --tui-text-agent: var(--color-orchid-400);
   --tui-text-info: var(--color-federal-400);
   /* §4 — the ring is a step softer than the paper accent: ledger-200,
@@ -416,7 +435,7 @@
      (§4); no control hovers on one today. */
   --tui-fill-danger: var(--color-vermilion-600);
   --tui-fill-warning: var(--color-ochre-400);
-  --tui-fill-success: var(--color-sage-600);
+  --tui-fill-success: var(--color-ivy-600);
   --tui-fill-agent: var(--color-orchid-600);
   --tui-fill-info: var(--color-federal-600);
 
@@ -427,17 +446,17 @@
   --tui-on-agent: var(--color-ledger-50);         /* 5.30:1 */
   --tui-on-info: var(--color-ledger-50);          /* 4.97:1 */
 
-  --tui-bg-interactive: --alpha(var(--color-sage-500) / 10%);
+  --tui-bg-interactive: --alpha(var(--color-ivy-500) / 10%);
   --tui-bg-danger: --alpha(var(--color-vermilion-500) / 10%);
   --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
-  --tui-bg-success: --alpha(var(--color-sage-500) / 10%);
+  --tui-bg-success: --alpha(var(--color-ivy-500) / 10%);
   --tui-bg-agent: --alpha(var(--color-orchid-500) / 10%);
   --tui-bg-info: --alpha(var(--color-federal-500) / 10%);
 
-  --tui-border-interactive: --alpha(var(--color-sage-500) / 25%);
+  --tui-border-interactive: --alpha(var(--color-ivy-500) / 25%);
   --tui-border-danger: --alpha(var(--color-vermilion-500) / 25%);
   --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
-  --tui-border-success: --alpha(var(--color-sage-500) / 25%);
+  --tui-border-success: --alpha(var(--color-ivy-500) / 25%);
   --tui-border-agent: --alpha(var(--color-orchid-500) / 25%);
   --tui-border-info: --alpha(var(--color-federal-500) / 25%);
 
@@ -450,7 +469,7 @@
   --tui-bg-active-inverse: --alpha(var(--color-ledger-950) / 10%);
   --tui-text-disabled: var(--color-ledger-600);   /* 3.35:1 — exempt, dim on purpose */
   /* §4 — selected text, as in light. */
-  --tui-bg-selection: --alpha(var(--color-sage-500) / 30%);
+  --tui-bg-selection: --alpha(var(--color-ivy-500) / 30%);
 
   /* §6 — chart ramp, dark: step 400 of each ramp. Same order as light. */
   --tui-chart-1: var(--color-federal-400);
@@ -459,7 +478,7 @@
   --tui-chart-4: var(--color-orchid-400);
   --tui-chart-5: var(--color-ledger-400);
   --tui-chart-6: var(--color-vermilion-400);
-  --tui-chart-7: var(--color-sage-400);
+  --tui-chart-7: var(--color-ivy-400);
 }
 
 /* --------------------------------------------------------------------------

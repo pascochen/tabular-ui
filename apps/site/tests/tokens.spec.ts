@@ -22,7 +22,7 @@ test('role tokens resolve to the spec’s steps, both modes (§4)', () => {
   for (const role of roles) {
     expect(tokenStep(`text-${role}`, 'dark').step).toBe('400');
   }
-  expect(stepLabel(tokenStep('text-success', 'light'))).toBe('sage-700');
+  expect(stepLabel(tokenStep('text-success', 'light'))).toBe('ivy-700');
   expect(stepLabel(tokenStep('bg-warning', 'light'))).toBe('ochre-500 / 10%');
   expect(stepLabel(tokenStep('fill-warning', 'light'))).toBe('ochre-500');
   expect(stepLabel(tokenStep('surface-raised', 'dark'))).toBe('ledger-925');
