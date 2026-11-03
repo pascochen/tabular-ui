@@ -236,10 +236,12 @@ export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
   args: { onOpen: fn() },
   render: function ClickableStory({ onOpen }) {
     const [opened, setOpened] = useState<string | null>(null);
+    const [opens, setOpens] = useState(0);
     const data = useMemo(() => makeRows(8), []);
     const open = useCallback(
       (model: string) => {
         setOpened(model);
+        setOpens((count) => count + 1);
         onOpen(model);
       },
       [onOpen],
@@ -273,7 +275,9 @@ export const ClickableRows: StoryObj<{ onOpen: (model: string) => void }> = {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-field)', height: 320 }}>
-        <p role="status" className="text-xs text-text-secondary">
+        {/* `data-opens` is what data-table-selection.spec.ts counts: the text reads
+            the same when one row opens twice. */}
+        <p role="status" data-opens={opens} className="text-xs text-text-secondary">
           {opened ? `Opened ${opened}` : 'No model open'}
         </p>
         <div style={{ flex: 1, minHeight: 0 }}>
