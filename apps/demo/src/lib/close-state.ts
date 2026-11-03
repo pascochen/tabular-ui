@@ -50,7 +50,7 @@ export type CloseState = {
   checks: Record<string, number>;
   /** How many of `timeline`'s events have applied. The next one to play is this index. */
   applied: number;
-  /** A person typing now, and on which exception's thread, or null. People only: the agent never types. */
+  /** A person typing now, and on which exception's thread, or null. People only: an agent never types. */
   typing: { who: string; exception: ExceptionId } | null;
   /** The scripted run is over: Skip has nothing left to do. */
   ended: boolean;
@@ -61,25 +61,20 @@ export type CloseState = {
 const HERO = close.hero.exception as ExceptionId;
 
 /**
- * The state a visitor lands on: what had happened before 14:00. A reply or
- * resolution with a clock time (`at`) is already in the channel; one with a
+ * The state a visitor lands on: what had happened before 14:00. Every exception
+ * is open. A reply with a clock time (`at`) is already in its thread; one with a
  * delay is scripted to arrive later.
  */
 export function landingState(): CloseState {
   const exceptions = {} as CloseState['exceptions'];
-  const log: LogEntry[] = [];
   for (const e of close.exceptions) {
     const replies = e.replies.flatMap((r) => ('at' in r && r.at ? [{ author: r.author, text: r.text, at: r.at }] : []));
-    exceptions[e.id] = { status: e.atLanding === 'resolved' ? 'resolved' : 'open', replies };
-    if (e.atLanding === 'resolved' && e.resolution && 'at' in e.resolution && e.resolution.at) {
-      log.push({ at: e.resolution.at, exception: e.id, text: e.resolution.log, by: e.resolution.by });
-    }
+    exceptions[e.id] = { status: 'open', replies };
   }
-  log.sort((a, b) => a.at.localeCompare(b.at));
   return {
     exceptions,
     hero: { rounds: [{ askedAt: close.hero.askedAt }] },
-    log,
+    log: [],
     checks: Object.fromEntries(checks.map((c) => [c.id, c.before])),
     applied: 0,
     typing: null,

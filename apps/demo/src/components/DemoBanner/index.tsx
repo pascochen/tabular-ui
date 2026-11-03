@@ -20,11 +20,11 @@ import { AI_COMPONENTS_URL, STORYBOOK_URL } from '../../lib/links';
 import { useStartOver } from '../../lib/start-over';
 import { useCompactBar } from '../../lib/viewport';
 
-const whoYouAre = `You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agent are scripted.`;
+const whoYouAre = `You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agents are scripted.`;
 
 /**
  * The line that tells a visitor where they are: a demo, played as Kasane's
- * Head of FP&A, in a channel whose people and agent are scripted. It sits in
+ * Group Controller, in a workspace whose people and agents are scripted. It sits in
  * the top nav, between the sidebar toggle and the trailing edge, so the shell
  * keeps its full height. Neutral throughout: being a demo is context, not a
  * state of the data (§0 rule 1). App-local: only the public demo needs it.
@@ -94,8 +94,9 @@ export function DemoBanner() {
               the UK and China. Its people, customers and numbers were generated, and its books balance to the yen.
             </p>
             <p>
-              <span className="font-medium text-text-primary">The people and the agent are scripted.</span> Every figure
-              they quote is computed from Kasane&rsquo;s books. You make one decision, and only what it touches changes.
+              <span className="font-medium text-text-primary">The people and the agents are scripted.</span> Every
+              figure they quote is computed from Kasane&rsquo;s books. You make one decision, and only what it touches
+              changes.
             </p>
             <p>
               <span className="font-medium text-text-primary">The interface is real.</span> Every control, colour and

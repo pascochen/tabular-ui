@@ -24,7 +24,7 @@ export function useExceptionLink() {
 }
 
 /**
- * On a phone, #sep-close opens scrolled just far enough that the whole decision
+ * On a phone, the channel opens scrolled just far enough that the whole decision
  * clears the composer: at 375×812 its second answer lands under it. By the least
  * that does it, so the thread above stays. It never moves a page the visitor
  * has already scrolled or a link has placed, and it does nothing once the

@@ -1,8 +1,9 @@
 import { useClose } from '../../lib/close-context';
-import { checks, close } from '../../lib/kasane';
+import { checks, close, memberName } from '../../lib/kasane';
 
 const hero = close.hero;
 const cutOff = checks.find((c) => c.id === hero.exception)!;
+const heroAgent = close.exceptions.find((e) => e.id === hero.exception)!.agent;
 
 /**
  * What changed in the hero decision, said once for assistive technology (§5:
@@ -20,7 +21,7 @@ export function HeroAnnouncer() {
   const copy = round.answer === 'reopen' ? hero.entry : hero.record;
   const message =
     round.stage === 'proposed'
-      ? `${close.agent.name} proposes: ${copy.title}`
+      ? `${memberName(heroAgent)} proposes: ${copy.title}`
       : round.stage === 'rerunning'
         ? `${copy.outcome} The ${cutOff.label.toLowerCase()} check is rerunning.`
         : round.stage === 'done'

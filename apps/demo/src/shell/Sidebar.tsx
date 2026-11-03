@@ -53,7 +53,7 @@ export function Sidebar() {
             view={{ kind: 'channel', channel: c.id }}
             icon={<HashIcon />}
             trailing={
-              c.id === 'sep-close' ? (
+              c.id === 'revenue' ? (
                 <Badge shape="count" aria-hidden="true">
                   {open}
                 </Badge>
@@ -61,7 +61,7 @@ export function Sidebar() {
             }
           >
             {c.name}
-            {c.id === 'sep-close' ? <span className="sr-only">, {open} open</span> : null}
+            {c.id === 'revenue' ? <span className="sr-only">, {open} open</span> : null}
           </NavLink>
         ))}
       </AppShellNavGroup>

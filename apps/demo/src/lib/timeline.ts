@@ -23,7 +23,7 @@ function build(): TimelineEvent[] {
   for (const e of close.exceptions) {
     for (const r of e.replies) {
       if (!('delayMs' in r) || r.delayMs === undefined) continue;
-      // A person types before they post; the agent never "types" (docs/agent-voice.md).
+      // A person types before they post; an agent never "types" (docs/agent-voice.md).
       timed.push({
         at: Math.max(0, r.delayMs - close.typingMs),
         effect: { kind: 'typing', who: r.author, exception: e.id },

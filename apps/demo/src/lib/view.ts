@@ -6,24 +6,23 @@ import { directMessages, type ChannelId } from './kasane';
  * What the main area shows. Views live in the URL with no router, as Part 1's
  * steps did:
  *
- *   ?view=sep-close (default) · ?view=open-items
- *   ?dm=agent · ?dm=controller · ?dm=apLead
+ *   ?view=revenue (default) · ?view=open-items
+ *   ?dm=fpaHead · ?dm=apLead
  *   ?at=end, with any of them: the end state, for screenshots and sharing
  *
  * Every view is a real URL, so a sidebar item is a link: it opens in a new tab,
  * copies, and reads as navigation to a screen reader.
  *
- * Only built views are reachable. Home and #rev-check (the plan's phases 9 and
- * 10) are in the data but not here: a view that only says it isn't built yet
- * is a dead end (docs/reviews/demo-first-pass-2026-10-30.md, issue 1). Their
- * old URLs open the default.
+ * Only built views are reachable: a view that only says it isn't built yet is
+ * a dead end (docs/reviews/demo-first-pass-2026-10-30.md, issue 1). Old URLs
+ * (?view=sep-close, ?view=rev-check) open the default.
  */
 export type View = { kind: 'channel'; channel: ChannelId } | { kind: 'dm'; member: string };
 
 /** The channels a visitor can open, in sidebar order. */
-export const BUILT_CHANNELS: readonly ChannelId[] = ['sep-close', 'open-items'];
+export const BUILT_CHANNELS: readonly ChannelId[] = ['revenue', 'open-items'];
 
-const DEFAULT_CHANNEL: ChannelId = 'sep-close';
+const DEFAULT_CHANNEL: ChannelId = 'revenue';
 export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };
 
 export function parseView(search: string): View {

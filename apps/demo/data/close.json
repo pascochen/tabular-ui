@@ -1,58 +1,178 @@
 {
-  "scene": { "date": "2026-10-16", "landingTime": "14:00", "channel": "sep-close" },
-  "agent": {
-    "name": "AI",
-    "authorship": "AI",
-    "reads": [
-      "sales_invoices_2026-09.csv",
-      "supplier_invoices_fy2026_h1.csv",
-      "manual_journal_entries_fy2026_h1.csv",
-      "ar_aging_monthly.csv",
-      "trial_balance_monthly.csv",
-      "close_calendar.md",
-      "accounting_policies.md"
-    ],
-    "does": [
-      "Compares what people say about the close with the ledger and subledgers",
-      "Reruns a check when a decision changes its input",
-      "Drafts journal entries for a person to post"
-    ],
-    "never": ["Posts an entry", "Changes a locked period", "Messages anyone outside the channel"],
-    "setUpBy": "controller"
+  "scene": { "date": "2026-10-16", "landingTime": "14:00", "channel": "revenue" },
+  "period": {
+    "open": "October 2026, open",
+    "locked": "Locked 8 Oct 2026, business day 6",
+    "reopened": "Reopened 16 Oct 2026"
   },
-  "channels": [
+  "agentRules": {
+    "never": ["Posts an entry", "Changes a locked period", "Messages anyone outside the channel"],
+    "setUpBy": "visitor"
+  },
+  "agents": [
     {
-      "id": "sep-close",
-      "name": "sep-close",
-      "topic": "September close exceptions",
-      "members": ["visitor", "controller", "apLead", "glAccountant", "fpaAnalyst", "usCredit", "agent"]
+      "key": "cutoff-ai",
+      "name": "Cut-off AI",
+      "checks": "Revenue lands in the month of delivery.",
+      "finding": "revenue-cut-off",
+      "reads": [
+        "sales_invoices_2026-09.csv",
+        "close_calendar.md",
+        "accounting_policies.md",
+        "03_interview_controller_2026-10-13.txt"
+      ],
+      "ask": "Ask about the September cut-off.",
+      "starters": [
+        {
+          "question": "Which other September invoices were delivered in October?",
+          "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+          "sources": ["sales_invoices_2026-09.csv"],
+          "notChecked": [
+            "Delivery dates against logistics: the material has no delivery confirmations, only each invoice’s delivery date."
+          ]
+        },
+        {
+          "question": "What does the policy say about the delivery date?",
+          "answer": "Revenue belongs to the period in which delivery occurs. The delivery date on each invoice is the control field.",
+          "sources": ["accounting_policies.md"],
+          "notChecked": ["Whether a locked month is reopened: the policy doesn’t say."]
+        }
+      ]
     },
     {
-      "id": "open-items",
-      "name": "open-items",
-      "topic": "Gaps and follow-ups from onboarding",
-      "members": ["visitor", "controller", "agent"]
+      "key": "payments-ai",
+      "name": "Payments AI",
+      "checks": "Nothing is paid twice.",
+      "finding": "duplicate-payment",
+      "reads": ["supplier_invoices_fy2026_h1.csv", "05_interview_ar_ap_2026-10-14.txt"],
+      "ask": "Ask about supplier invoices in FY2026 H1.",
+      "starters": [
+        {
+          "question": "Is any other supplier invoice number entered twice?",
+          "answer": "No. MFL-58821 is the only number one supplier has twice, across the 559 supplier invoices in FY2026 H1.",
+          "sources": ["supplier_invoices_fy2026_h1.csv"],
+          "notChecked": ["Invoices with different numbers for the same amount: I compared numbers, not amounts."]
+        },
+        {
+          "question": "How do the two entries differ?",
+          "answer": "In the date and the description. API-KUS-2607-00007 is dated 14 Jul 2026 and reads \"Outbound freight - June 2026 linehaul surcharge\". API-KUS-2607-00011 is dated 21 Jul 2026 and reads \"Outbound freight - Jun 2026 linehaul surcharge\". The supplier, the invoice number and the amount match.",
+          "sources": ["supplier_invoices_fy2026_h1.csv"],
+          "notChecked": [
+            "Why the system let the second entry through: the file records the entries, not the ERP’s rule."
+          ]
+        }
+      ]
     },
     {
-      "id": "rev-check",
-      "name": "rev-check",
-      "topic": "How the revenue check is built",
-      "members": ["visitor", "glAccountant", "agent"]
+      "key": "approvals-ai",
+      "name": "Approvals AI",
+      "checks": "Every manual entry has a different approver.",
+      "finding": "self-approved-entry",
+      "reads": ["manual_journal_entries_fy2026_h1.csv", "03_interview_controller_2026-10-13.txt"],
+      "ask": "Ask about manual entries in FY2026 H1.",
+      "starters": [
+        {
+          "question": "Is any other manual entry self-approved?",
+          "answer": "No. JE-KUK-2608-00055 is the only one of the 10 manual entries in FY2026 H1 with the same person as creator and approver.",
+          "sources": ["manual_journal_entries_fy2026_h1.csv"],
+          "notChecked": ["Entries outside FY2026 H1: the file covers those six months."]
+        },
+        {
+          "question": "Who created and approved it?",
+          "answer": "E3003 did both, on 31 Aug 2026. The entry moves £18,400 from advertising (6100) to prepaid expenses (1300).",
+          "sources": ["manual_journal_entries_fy2026_h1.csv"],
+          "notChecked": ["The approver’s limit: the employee master isn’t in this material."]
+        }
+      ]
+    },
+    {
+      "key": "credit-ai",
+      "name": "Credit AI",
+      "checks": "Customers stay within their credit limit.",
+      "finding": "credit-limit",
+      "reads": ["ar_aging_monthly.csv", "05_interview_ar_ap_2026-10-14.txt"],
+      "ask": "Ask about Great Lakes Duplicating Supply’s balance.",
+      "starters": [
+        {
+          "question": "Which months before August were over the limit?",
+          "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026, 7 months in all. The limit is $600,000.",
+          "sources": ["ar_aging_monthly.csv"],
+          "notChecked": ["Months before Apr 2025: the aging file starts there."]
+        },
+        {
+          "question": "How much does Great Lakes owe now?",
+          "answer": "$1.42m at the end of Sep 2026, against a limit of $600,000.",
+          "sources": ["ar_aging_monthly.csv"],
+          "notChecked": ["Receipts after Sep 2026: the aging file stops at that month."]
+        }
+      ]
     }
   ],
-  "directMessages": ["agent", "controller", "apLead"],
+  "channels": [
+    {
+      "id": "close",
+      "name": "close",
+      "topic": "The close and controls",
+      "owner": "visitor",
+      "members": ["visitor", "glAccountant", "fpaHead", "approvals-ai"],
+      "gaps": []
+    },
+    {
+      "id": "cash",
+      "name": "cash",
+      "topic": "Cash, FX and debt",
+      "owner": "treasury",
+      "members": ["visitor", "fpaHead"],
+      "gaps": ["cash-forecast"]
+    },
+    {
+      "id": "receivables",
+      "name": "receivables",
+      "topic": "Receivables, credit and aging",
+      "owner": "arLead",
+      "members": ["visitor", "arLead", "usCredit", "credit-ai"],
+      "gaps": []
+    },
+    {
+      "id": "payables",
+      "name": "payables",
+      "topic": "Payables and supplier spend",
+      "owner": "apLead",
+      "members": ["visitor", "apLead", "payments-ai"],
+      "gaps": []
+    },
+    {
+      "id": "revenue",
+      "name": "revenue",
+      "topic": "Sales and margin by product, region and customer",
+      "owner": "fpaAnalyst",
+      "members": ["visitor", "glAccountant", "fpaAnalyst", "fpaHead", "cutoff-ai"],
+      "gaps": []
+    },
+    {
+      "id": "intercompany",
+      "name": "intercompany",
+      "topic": "Intercompany sales and transfer prices",
+      "owner": "visitor",
+      "members": ["visitor", "fpaHead"],
+      "gaps": ["transfer-price-policy"]
+    }
+  ],
+  "directMessages": ["fpaHead", "apLead"],
   "typingMs": 1500,
+  "searchSuggestions": ["MFL-58821", "Great Lakes", "cut-off"],
   "exceptions": [
     {
       "id": "revenue-cut-off",
       "title": "Revenue cut-off",
+      "agent": "cutoff-ai",
+      "channel": "revenue",
       "summary": "Invoice INV-KJP-2609-00363 is dated 30 Sep but was delivered 2 Oct, so ¥42.7m of revenue is in the wrong month.",
       "postedAt": "09:04",
-      "atLanding": "open",
       "hero": true,
       "replies": [
         {
-          "author": "controller",
+          "author": "glAccountant",
           "at": "13:48",
           "text": "Logistics confirms it left Tsukuba on 1 Oct. The cut-off review missed it."
         }
@@ -64,16 +184,32 @@
       "notChecked": [
         "The delivery note: the material has no delivery confirmations, only the invoice’s delivery date."
       ],
-      "claim": "The controller says the Sep 2026 cut-off was clean.",
+      "scope": "KJP, Sep 2026",
+      "claim": "You said the September 2026 cut-off was clean, in the controller interview on 13 Oct.",
       "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
-      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"]
+      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"],
+      "citations": [
+        {
+          "source": "03_interview_controller_2026-10-13.txt",
+          "exhibit": "S-3",
+          "record": "L39-43",
+          "locator": "S-3, lines 39 to 43"
+        },
+        {
+          "source": "sales_invoices_2026-09.csv",
+          "exhibit": "S-17",
+          "record": "INV-KJP-2609-00363",
+          "locator": "S-17, INV-KJP-2609-00363"
+        }
+      ]
     },
     {
       "id": "duplicate-payment",
       "title": "Duplicate payment",
+      "agent": "payments-ai",
+      "channel": "payables",
       "summary": "KUS entered supplier invoice MFL-58821 twice and paid $48,216.40 both times.",
       "postedAt": "09:04",
-      "atLanding": "open",
       "replies": [
         {
           "author": "apLead",
@@ -92,39 +228,71 @@
         "log": "Duplicate payment: $48,216.40 to be credited by the supplier."
       },
       "notChecked": [],
+      "scope": "KUS, Jul 2026",
       "claim": "AP says the system blocks a duplicate supplier invoice number, in every entity.",
       "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
-      "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"]
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"],
+      "citations": [
+        {
+          "source": "05_interview_ar_ap_2026-10-14.txt",
+          "exhibit": "S-5",
+          "record": "L45-49",
+          "locator": "S-5, lines 45 to 49"
+        },
+        {
+          "source": "supplier_invoices_fy2026_h1.csv",
+          "exhibit": "S-18",
+          "record": "API-KUS-2607-00007",
+          "locator": "S-18, API-KUS-2607-00007 and API-KUS-2607-00011"
+        }
+      ]
     },
     {
       "id": "self-approved-entry",
       "title": "Self-approved entry",
+      "agent": "approvals-ai",
+      "channel": "close",
       "summary": "JE-KUK-2608-00055 moved £18,400 from advertising to prepaid expenses. The same person created and approved it.",
       "postedAt": "09:04",
-      "atLanding": "open",
       "replies": [
         {
-          "author": "controller",
+          "author": "glAccountant",
           "delayMs": 6000,
           "text": "Fiona has reversed it in October, and the UK approval rule now blocks self-approval."
         }
       ],
       "resolution": {
-        "by": "controller",
+        "by": "glAccountant",
         "delayMs": 8000,
         "log": "Self-approved entry: JE-KUK-2608-00055 reversed; self-approval now blocked in KUK."
       },
       "notChecked": ["The approver’s limit: the employee master isn’t in this material."],
-      "claim": "The controller says every manual journal has a different approver, enforced group-wide.",
+      "scope": "KUK, Aug 2026",
+      "claim": "You said every manual journal has a different approver, enforced group-wide.",
       "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in this material.",
-      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"]
+      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"],
+      "citations": [
+        {
+          "source": "03_interview_controller_2026-10-13.txt",
+          "exhibit": "S-3",
+          "record": "L23-27",
+          "locator": "S-3, lines 23 to 27"
+        },
+        {
+          "source": "manual_journal_entries_fy2026_h1.csv",
+          "exhibit": "S-16",
+          "record": "JE-KUK-2608-00055",
+          "locator": "S-16, JE-KUK-2608-00055"
+        }
+      ]
     },
     {
       "id": "credit-limit",
       "title": "Credit limit",
+      "agent": "credit-ai",
+      "channel": "receivables",
       "summary": "US credit says Great Lakes Duplicating Supply was within its limit until August. It was over $600,000 in 7 earlier months.",
       "postedAt": "09:04",
-      "atLanding": "open",
       "replies": [
         {
           "author": "usCredit",
@@ -134,51 +302,14 @@
       ],
       "waiting": { "on": "Legal decision by 30 Oct", "followUp": "great-lakes-decision" },
       "notChecked": ["Whether legal will pursue recovery: the decision is due 30 Oct."],
+      "scope": "KUS, up to Sep 2026",
       "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
       "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
-      "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"]
-    },
-    {
-      "id": "close-length",
-      "title": "Close length",
-      "summary": "The CFO says the group closes in five working days. September locked on business day 6.",
-      "postedAt": "09:04",
-      "atLanding": "resolved",
-      "replies": [
-        {
-          "author": "controller",
-          "at": "09:31",
-          "text": "Five is Japan. The group needs a sixth day for consolidation."
-        }
-      ],
-      "resolution": { "by": "controller", "at": "09:33", "log": "Group close is business day 6; Japan’s is 5." },
-      "notChecked": [],
-      "claim": "The CFO says the group closes in five working days.",
-      "evidence": "Sep 2026 was locked on 8 Oct 2026, business day 6, not 5.",
-      "sources": ["01_kickoff_cfo_2026-10-12.txt", "close_calendar.md"]
-    },
-    {
-      "id": "europe-on-plan",
-      "title": "Europe on plan",
-      "summary": "FP&A says Europe is on plan in euros. H1 sales were 5.7% under budget; profit was above it.",
-      "postedAt": "09:04",
-      "atLanding": "resolved",
-      "replies": [
-        {
-          "author": "fpaAnalyst",
-          "at": "11:12",
-          "text": "Agreed. The board pack now says sales are under plan and profit is above it."
-        }
-      ],
-      "resolution": {
-        "by": "fpaAnalyst",
-        "at": "11:14",
-        "log": "Europe: sales 5.7% under plan, profit above. Board pack wording corrected."
-      },
-      "notChecked": [],
-      "claim": "FP&A says Europe is on plan in euros.",
-      "evidence": "Kasane Europe’s H1 external sales were €22.55m against a budget of €23.92m (5.7% under). Equipment was 18.2% under. Profit is above plan; sales are not.",
-      "sources": ["02_interview_fpa_2026-10-13.txt", "trial_balance_monthly.csv", "budget_forecast_monthly.csv"]
+      "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"],
+      "citations": [
+        { "source": "05_interview_ar_ap_2026-10-14.txt", "exhibit": "S-5", "record": "L21", "locator": "S-5, line 21" },
+        { "source": "ar_aging_monthly.csv", "exhibit": "S-12", "record": "C-KUS-0001", "locator": "S-12, C-KUS-0001" }
+      ]
     }
   ],
   "hero": {
@@ -235,7 +366,11 @@
     },
     "rerun": "Revenue cut-off check reran in 2s",
     "askedAt": "13:49",
-    "authorship": { "asked": "AI · Awaiting your answer", "proposed": "AI · Awaiting confirmation", "done": "AI" },
+    "authorship": {
+      "asked": "Cut-off AI · Awaiting your answer",
+      "proposed": "Cut-off AI · Awaiting confirmation",
+      "done": "Cut-off AI"
+    },
     "delegate": {
       "option": "reopen",
       "reason": "The policy doesn’t decide this. I chose it so H1 is right for the 6 Nov earnings release."
