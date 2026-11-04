@@ -49,10 +49,7 @@ A cell cuts only what an ellipsis can stand in for (owner, 2026-11-03).
 
 Figures and badges stay on one line, so a row stays 28px and the virtualizer's estimate holds.
 
-**In a virtualized table, a `figure` column holds still and an `align: 'numeric'` column may not.** The table measures only the rows it renders. It prints a `figure` column itself, so it can reserve room for that column's widest figure across every row. An `align: 'numeric'` column's `cell` is yours, so the table can't know what a row further down will print, and the column's width can follow the rows on screen. So use `figure` where a column needs no custom `cell`, and give any other figure column a `size`.
-
-- **With a `size`** wide enough for its figures, an `align: 'numeric'` column moves only when the table is squeezed. Sorted by its figures and scrolled end to end, the `Virtualized` story's Rows column moves 8.4px at a 420px viewport, and not at all at 1280. A status column does the same when sorted by status: 40px at 420.
-- **With no `size`,** it moves at any width, because those columns share out spare width by their content. In a table with figures from 37 to 925,000,000, scrolling moved the column by 125px at 1280. Filtering can move a column in a table that isn't virtualized, too.
+**In a virtualized table, a `figure` column holds still and an `align: 'numeric'` column may not.** The table measures only the rows it renders. It prints a `figure` column itself, so it can reserve room for that column's widest figure across every row. An `align: 'numeric'` column's `cell` is yours, so the table can't know what a row further down will print, and the column's width can follow the rows on screen. So use `figure` where a column needs no custom `cell`, and give any other figure column a `size`, which holds it still unless the table is squeezed. A status column sorted by status moves the same way, and with no `size`, filtering can move a column in any table.
 
 `apps/storybook/tests/density.spec.ts` measures every figure and badge against its cell, and the `Squeezed` story shows the result.
 
