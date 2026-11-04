@@ -18,6 +18,8 @@ import { useMemo, useRef, useState } from 'react';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
+import { longestText, useCutTextStop } from './cutText';
+import { CutTextTooltip, TextCell } from './CutTextTooltip';
 import {
   printFigure,
   totalsRow,
@@ -342,6 +344,8 @@ function DataTable<TData>({
     }
   }
 
+  const onCutTextKeys = useCutTextStop(scrollRef, ROW_CONTROLS);
+
   const rows = table.getRowModel().rows;
   const shouldVirtualize = rows.length > virtualizeAfter;
 
@@ -383,6 +387,14 @@ function DataTable<TData>({
     () => (shouldVirtualize ? widestFigures(rows, leafColumns) : null),
     [shouldVirtualize, rows, leafColumns],
   );
+  // Text counts toward its column up to the floor, so the same goes for it. The
+  // filtered rows, not the sorted ones: a sort changes no length, and at 50,000 rows
+  // re-reading them added about 30ms to every sort.
+  const filteredRows = table.getFilteredRowModel().rows;
+  const textLengths = useMemo(
+    () => (shouldVirtualize ? longestText(filteredRows, leafColumns) : null),
+    [shouldVirtualize, filteredRows, leafColumns],
+  );
   const footRows = totalsFoot ? ([...totalsFoot.cells.values()].some((total) => total.difference !== null) ? 2 : 1) : 0;
 
   return (
@@ -401,6 +413,8 @@ function DataTable<TData>({
         ref={scrollRef}
         className={cn(
           'min-h-0 flex-1 overflow-auto',
+          // Nor a cut cell arrowed up to under the sticky header.
+          'scroll-pt-[var(--h-row-sm)]',
           // A control tabbed to in a row must not land under the sticky foot.
           footRows === 1 && 'scroll-pb-[var(--h-row-sm)]',
           footRows === 2 && 'scroll-pb-[calc(var(--h-row-sm)*2)]',
@@ -414,6 +428,7 @@ function DataTable<TData>({
                   const headerMeta = header.column.columnDef.meta;
                   const numeric = isNumeric(headerMeta);
                   const reserved = figureLengths?.get(header.column.id);
+                  const textReserved = textLengths?.get(header.column.id);
                   const sortable = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
                   return (
@@ -502,6 +517,20 @@ function DataTable<TData>({
                           style={{ width: `${reserved}ch` }}
                         />
                       ) : null}
+                      {textReserved ? (
+                        // The floor, as the cells' cap sets it elsewhere: `28ch` holds
+                        // the padding there and not here. A letter is at most about
+                        // a digit's width, so this errs wide, and only up to the floor.
+                        // The cells' weight too: a sans digit is wider at the header's.
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'block h-0 max-w-[calc(28ch-2*var(--pad-cell-x))] font-normal',
+                            headerMeta?.content === 'mono' ? 'font-mono text-xs' : 'text-sm',
+                          )}
+                          style={{ width: `${textReserved}ch` }}
+                        />
+                      ) : null}
                     </th>
                   );
                 })}
@@ -509,88 +538,105 @@ function DataTable<TData>({
             ))}
           </thead>
 
-          <tbody>
-            {paddingTop > 0 ? (
-              <tr aria-hidden="true">
-                <td colSpan={table.getAllLeafColumns().length} style={{ height: paddingTop }} />
-              </tr>
-            ) : null}
+          <CutTextTooltip>
+            <tbody onKeyDown={onCutTextKeys}>
+              {paddingTop > 0 ? (
+                <tr aria-hidden="true">
+                  <td colSpan={table.getAllLeafColumns().length} style={{ height: paddingTop }} />
+                </tr>
+              ) : null}
 
-            {renderedRows.map((row) => (
-              <tr
-                key={row.id}
-                data-row-id={row.id}
-                onPointerDown={
-                  onRowClick
-                    ? (event) => {
-                        pressedAt.current = { x: event.clientX, y: event.clientY };
-                      }
-                    : undefined
-                }
-                onClick={
-                  onRowClick
-                    ? (event) => {
-                        if (!isClickForControl(event) && !isClickForSelection(event, pressedAt.current)) {
-                          onRowClick(row);
+              {renderedRows.map((row) => (
+                <tr
+                  key={row.id}
+                  data-row-id={row.id}
+                  onPointerDown={
+                    onRowClick
+                      ? (event) => {
+                          pressedAt.current = { x: event.clientX, y: event.clientY };
                         }
-                      }
-                    : undefined
-                }
-                className={cn(
-                  // §4 — one neutral overlay, composited. Not a per-state
-                  // background swap.
-                  'hover:bg-bg-hover',
-                  onRowClick && 'cursor-pointer',
-                  rowClassName?.(row),
-                )}
-              >
-                {row.getVisibleCells().map((cell) => {
-                  const meta = cell.column.columnDef.meta;
-                  return (
-                    <td
-                      key={cell.id}
-                      onDoubleClick={isNumeric(meta) ? selectWholeFigure : undefined}
-                      className={cn(
-                        // Height on the CELL, not padding. A fixed --pad-cell-y
-                        // plus an 18px StatusBadge renders a 31px row while the
-                        // virtualizer estimates 28 — scroll position then drifts
-                        // over 50k rows. With the height fixed and content
-                        // centred, text lands at 6px of breathing room (which is
-                        // --pad-cell-y) and a badge at 5px, which is exactly
-                        // §7.3's "18px badge sits comfortably in a 28px row".
-                        'h-[var(--h-row-sm)] border-b border-border px-[var(--pad-cell-x)] align-middle',
-                        // §0 rule 6 — every figure column is tabular. Mono
-                        // runs one step below adjacent sans (§8.3).
-                        isNumeric(meta) && 'text-right tabular-nums',
-                        meta?.content === 'mono' && 'font-mono text-xs',
-                        // A cell cuts only what an ellipsis can stand in for.
-                        // `max-w-0` takes a cell's content out of its column's
-                        // width, so anything in it can be cut. A figure stays out
-                        // of that: `2,019…` hides a magnitude, so the widest figure
-                        // sets the column's minimum, and the table scrolls sideways
-                        // first. So does a badge: an atomic box can't end in an
-                        // ellipsis, so its letters are simply cut (`PROPOS`). Both
-                        // stay on one line, which holds the row at --h-row-sm.
-                        isNumeric(meta)
-                          ? 'whitespace-nowrap'
-                          : meta?.truncate !== false && 'max-w-0 truncate has-[>[data-slot=badge]]:max-w-none',
-                      )}
-                    >
-                      {meta?.figure
-                        ? printFigure(cell.getValue(), meta.figure.decimals)
-                        : flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                      : undefined
+                  }
+                  onClick={
+                    onRowClick
+                      ? (event) => {
+                          if (!isClickForControl(event) && !isClickForSelection(event, pressedAt.current)) {
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    // §4 — one neutral overlay, composited. Not a per-state
+                    // background swap.
+                    'hover:bg-bg-hover',
+                    onRowClick && 'cursor-pointer',
+                    rowClassName?.(row),
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta;
+                    const Cell = !isNumeric(meta) && meta?.truncate !== false ? TextCell : 'td';
+                    return (
+                      <Cell
+                        key={cell.id}
+                        onDoubleClick={isNumeric(meta) ? selectWholeFigure : undefined}
+                        className={cn(
+                          // Height on the CELL, not padding. A fixed --pad-cell-y
+                          // plus an 18px StatusBadge renders a 31px row while the
+                          // virtualizer estimates 28 — scroll position then drifts
+                          // over 50k rows. With the height fixed and content
+                          // centred, text lands at 6px of breathing room (which is
+                          // --pad-cell-y) and a badge at 5px, which is exactly
+                          // §7.3's "18px badge sits comfortably in a 28px row".
+                          'h-[var(--h-row-sm)] border-b border-border px-[var(--pad-cell-x)] align-middle',
+                          // §0 rule 6 — every figure column is tabular. Mono
+                          // runs one step below adjacent sans (§8.3).
+                          isNumeric(meta) && 'text-right tabular-nums',
+                          meta?.content === 'mono' && 'font-mono text-xs',
+                          // A cell cuts only what an ellipsis can stand in for.
+                          // `max-w-0` takes a cell's content out of its column's
+                          // width, so anything in it can be cut. A figure stays out
+                          // of that: `2,019…` hides a magnitude, so the widest figure
+                          // sets the column's minimum, and the table scrolls sideways
+                          // first. So does a badge: an atomic box can't end in an
+                          // ellipsis, so its letters are simply cut (`PROPOS`). Both
+                          // stay on one line, which holds the row at --h-row-sm.
+                          //
+                          // Text gives way, but only so far. `max-w-0` fell to the
+                          // header's width, and every row read `fct_g…`. With a cap,
+                          // text counts toward its column up to about 25 mono
+                          // characters, so a short column keeps its own width and an
+                          // identifier stays readable. A `size` still wins where
+                          // there's room, because a cell fills its column whatever
+                          // its max-width says. A windowed table can't follow its
+                          // cells, so they count for nothing and the header holds
+                          // the floor, read from every row.
+                          isNumeric(meta)
+                            ? 'whitespace-nowrap'
+                            : meta?.truncate !== false &&
+                                cn(
+                                  'truncate has-[>[data-slot=badge]]:max-w-none',
+                                  shouldVirtualize ? 'max-w-0' : 'max-w-[28ch]',
+                                ),
+                        )}
+                      >
+                        {meta?.figure
+                          ? printFigure(cell.getValue(), meta.figure.decimals)
+                          : flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </Cell>
+                    );
+                  })}
+                </tr>
+              ))}
 
-            {paddingBottom > 0 ? (
-              <tr aria-hidden="true">
-                <td colSpan={table.getAllLeafColumns().length} style={{ height: paddingBottom }} />
-              </tr>
-            ) : null}
-          </tbody>
+              {paddingBottom > 0 ? (
+                <tr aria-hidden="true">
+                  <td colSpan={table.getAllLeafColumns().length} style={{ height: paddingBottom }} />
+                </tr>
+              ) : null}
+            </tbody>
+          </CutTextTooltip>
 
           {/* Outside the virtualized rows: the virtualizer never counts or measures it. */}
           {totalsFoot ? <TotalsFoot row={totalsFoot} columns={leafColumns} /> : null}

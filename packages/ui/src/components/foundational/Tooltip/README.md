@@ -56,11 +56,11 @@ The consequence is a hard rule:
 A tooltip is a convenience for sighted users. The accessible name or description has to come from somewhere else — and in every case the system currently has, it does:
 
 - **`IconButton`** — `aria-label` is mandatory and supplies the name independently. The tooltip merely shows sighted users what screen-reader users already get. This is the correct pattern, not a workaround.
-- **Truncated table cells** — the full text is in the DOM and only visually clipped by `text-overflow`, so assistive technology reads it in full.
+- **Truncated table cells** — the full text is in the DOM and only visually clipped by `text-overflow`, so assistive technology reads it in full. `DataTable` opens one tooltip for the table from whichever cell has cut something; see its README.
 
 If a case ever genuinely needs tooltip-only content announced, wire `aria-describedby` explicitly at that call site, or reach for `Popover` instead. Do not assume this component does it.
 
-Tooltips **do** open on keyboard focus, so the affordance is reachable without a pointer — verified by tabbing to a trigger.
+Tooltips **do** open on keyboard focus, so the affordance is reachable without a pointer — verified by tabbing to a trigger. They don't open on touch: Base UI's trigger hovers for a mouse-like pointer only (verified 2026-11-03, tapped in a touch context).
 
 ## Related
 

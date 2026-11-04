@@ -812,9 +812,20 @@
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/tooltip.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [
+        {
+          "path": "src/components/product/DataTable/CutTextTooltip.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/CutTextTooltip.tsx"
+        },
+        {
+          "path": "src/components/product/DataTable/cutText.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/cutText.ts"
+        },
         {
           "path": "src/components/product/DataTable/index.tsx",
           "type": "registry:file",
