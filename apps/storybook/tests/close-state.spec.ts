@@ -6,6 +6,8 @@ import {
   holdsOpen,
   isUnread,
   isReopened,
+  isSourceOn,
+  notCheckedWith,
   openCount,
   landingState,
   progress,
@@ -113,6 +115,23 @@ test('a post stays in the place it was written, and Start over clears it', () =>
   expect(s.posts).toEqual([{ where: 'cash', text: 'A note', at: '14:00' }]);
   expect(closeReducer(s, { type: 'say', where: 'cash', text: '   ', at: '14:00' }).posts).toHaveLength(1);
   expect(closeReducer(s, { type: 'reset' }).posts).toEqual([]);
+});
+
+test('turning a source off adds a line to what wasn’t checked, changes no figure, and Start over turns it back on', () => {
+  const landing = landingState();
+  expect(isSourceOn(landing, 'S-17')).toBe(true);
+  const off = closeReducer(landing, { type: 'source', id: 'S-17', on: false });
+  expect(isSourceOn(off, 'S-17')).toBe(false);
+  expect(notCheckedWith(off, ['sales_invoices_2026-09.csv'], ['A line.'])).toEqual([
+    'A line.',
+    'S-17 is turned off, so this can’t be rechecked.',
+  ]);
+  // Only a finding that cites it gains the line.
+  expect(notCheckedWith(off, ['ar_aging_monthly.csv'], [])).toEqual([]);
+  expect(off.checks).toEqual(landing.checks);
+  expect(off.exceptions).toEqual(landing.exceptions);
+  expect(isSourceOn(closeReducer(off, { type: 'source', id: 'S-17', on: true }), 'S-17')).toBe(true);
+  expect(closeReducer(off, { type: 'reset' }).sourcesOff).toEqual([]);
 });
 
 test('September reads as reopened only once the reversal is posted, and Start over locks it again', () => {

@@ -3,7 +3,7 @@
 // close panel, the tiles and the counts are derived from it, never stored
 // (kasane-close-demo-plan.md §5).
 
-import { checks, close, exceptions, type ChannelId } from './kasane';
+import { checks, close, exceptions, exhibitOf, type ChannelId } from './kasane';
 import { timeline } from './timeline';
 
 export type ExceptionId = (typeof close.exceptions)[number]['id'];
@@ -56,6 +56,8 @@ export type CloseState = {
   ended: boolean;
   /** What the visitor wrote in a composer, and where. Nobody replies to it. */
   posts: { where: string; text: string; at: string }[];
+  /** The exhibits switched off in Sources. Every source is on at landing. */
+  sourcesOff: string[];
   /** How many replies the visitor has seen in each channel. Fewer than it holds: the sidebar marks it unread. */
   seen: Partial<Record<ChannelId, number>>;
 };
@@ -85,6 +87,7 @@ export function landingState(): CloseState {
     typing: null,
     ended: false,
     posts: [],
+    sourcesOff: [],
     seen,
   };
 }
@@ -112,6 +115,8 @@ export type CloseAction =
   | { type: 'skip'; at: string }
   /** The visitor posted in a composer. */
   | { type: 'say'; where: string; text: string; at: string }
+  /** The visitor flipped an exhibit's "Agents read this" switch. */
+  | { type: 'source'; id: string; on: boolean }
   /** The visitor has a channel open, so every reply in it is seen. */
   | { type: 'seen'; channel: ChannelId };
 
@@ -196,6 +201,13 @@ export function closeReducer(state: CloseState, action: CloseAction): CloseState
       return action.text.trim()
         ? { ...state, posts: [...state.posts, { where: action.where, text: action.text.trim(), at: action.at }] }
         : state;
+    case 'source':
+      return {
+        ...state,
+        sourcesOff: action.on
+          ? state.sourcesOff.filter((id) => id !== action.id)
+          : [...new Set([...state.sourcesOff, action.id])],
+      };
     case 'seen': {
       const count = repliesIn(state, action.channel);
       return state.seen[action.channel] === count
@@ -239,6 +251,20 @@ export function closeReducer(state: CloseState, action: CloseAction): CloseState
 export function progress(state: CloseState) {
   const all = Object.values(state.exceptions);
   return { resolved: all.filter((e) => e.status === 'resolved').length, total: all.length };
+}
+
+export function isSourceOn(state: CloseState, id: string): boolean {
+  return !state.sourcesOff.includes(id);
+}
+
+/**
+ * A finding's "not checked" list, with a line for each file it cites that's been
+ * turned off. No figure changes, because the findings are already made: only
+ * what can be rechecked does.
+ */
+export function notCheckedWith(state: CloseState, sources: readonly string[], lines: readonly string[]): string[] {
+  const off = sources.map(exhibitOf).filter((id) => !isSourceOn(state, id));
+  return [...lines, ...off.map((id) => `${id} is turned off, so this can’t be rechecked.`)];
 }
 
 /** How many replies a channel holds, across the findings in it. */

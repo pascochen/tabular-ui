@@ -2,8 +2,6 @@
 // The data is in apps/demo/data/, written by scripts/export-fixtures.mjs from the full Kasane
 // dataset, which is not in this repository. Kasane Corporation is fictional.
 
-import type { Source } from 'tabular-ui';
-
 import checksData from '../../data/checks.json' with { type: 'json' };
 import closeData from '../../data/close.json' with { type: 'json' };
 import company from '../../data/company.json' with { type: 'json' };
@@ -77,23 +75,26 @@ export function packFile(name: string): { name: string; bytes: number } | undefi
   return pack.find((f) => f.name === name);
 }
 
-const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
-
-/** A finding's files as `Sources` rows, numbered in the order the finding cites them. */
-export function sourcesOf(e: Exception): Source[] {
-  return sourcesOfNames(e.sources);
-}
-
-/** Files by name as `Sources` rows, for an answer that cites them. */
-export function sourcesOfNames(names: readonly string[]): Source[] {
-  return names.map((name) => {
-    const f = packFile(name);
-    return { id: name, name, size: f ? kb(f.bytes) : undefined };
-  });
-}
+export type TableExcerpt = {
+  type: 'table';
+  count: string;
+  columns: { key: string; mono?: boolean; numeric?: boolean }[];
+  rows: Record<string, string>[];
+  citedRows: number[];
+};
+export type TextExcerpt = { type: 'text'; count: string; lines: { n: number; text: string; cited?: boolean }[] };
+export type BinderSource = {
+  id: string;
+  name: string;
+  kind: string;
+  covers: string;
+  total: { count: number; unit: string } | null;
+  records: string[];
+  excerpt: TableExcerpt | TextExcerpt | null;
+};
 
 /** The binder: every file a finding, gap or question cites, or an agent reads (`sources.json`). */
-export const binder = sourcesData;
+export const binder = sourcesData as BinderSource[];
 
 /** A file's exhibit ID: "S-17". The export puts every cited file in the binder, so one that isn't is a bug. */
 export function exhibitOf(name: string): string {

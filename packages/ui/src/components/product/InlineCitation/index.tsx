@@ -12,6 +12,14 @@ export type InlineCitationProps = {
   source: Source;
   /** Where in the source, e.g. "Rows 412 and 419". Says what the figure rests on, not just which file. */
   locator?: string;
+  /**
+   * Makes the locator a link to that record. `source.href` is one link per file,
+   * and the same `Source` is `Sources`' row, so one citation's record can't live
+   * on it.
+   */
+  locatorHref?: string;
+  /** Swap the locator's `<a>` for a router link: `locatorRender={<Link to="/f/1#r412" />}`. Needs `locator`. */
+  locatorRender?: React.ReactElement<{ className?: string }>;
   className?: string;
 };
 
@@ -20,7 +28,8 @@ export type InlineCitationProps = {
  *
  * Each figure names what it rests on, in the line where it appears. The mark
  * is the source's number in `Sources`; pressing it opens the source's name
- * (a link when it has an `href`) and where in it the figure comes from.
+ * (a link when it has an `href`) and where in it the figure comes from (a link
+ * to that record when it has a `locatorHref`).
  *
  * **A Popover, never a Tooltip.** Base UI's tooltip is visual only, so a
  * source shown there would reach no screen reader (CLAUDE.md, failure log).
@@ -31,7 +40,7 @@ export type InlineCitationProps = {
  * in a line of text, so the chip loses its vertical padding to stay inside a
  * `--text-sm` or `--text-base` line box.
  */
-function InlineCitation({ number, source, locator, className }: InlineCitationProps) {
+function InlineCitation({ number, source, locator, locatorHref, locatorRender, className }: InlineCitationProps) {
   const nameClassName = 'font-mono text-xs';
   return (
     <>
@@ -79,7 +88,19 @@ function InlineCitation({ number, source, locator, className }: InlineCitationPr
               <span className={cn(nameClassName, 'min-w-0 break-all text-text-body')}>{source.name}</span>
             )}
           </PopoverTitle>
-          {locator ? <PopoverDescription className="tabular-nums">{locator}</PopoverDescription> : null}
+          {locator ? (
+            <PopoverDescription className="tabular-nums">
+              {isValidElement(locatorRender) ? (
+                cloneElement(locatorRender, { className: cn(linkClassName, locatorRender.props.className) }, locator)
+              ) : locatorHref ? (
+                <a href={locatorHref} className={linkClassName}>
+                  {locator}
+                </a>
+              ) : (
+                locator
+              )}
+            </PopoverDescription>
+          ) : null}
         </PopoverContent>
       </Popover>
     </>
