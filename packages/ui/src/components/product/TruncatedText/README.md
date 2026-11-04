@@ -9,7 +9,7 @@ One line of text that truncates with an ellipsis and shows the full text in a to
 <TruncatedText side="inline-end" className="font-mono text-xs">{model}</TruncatedText>
 ```
 
-Used by `ContextSwitcher` (trigger and menu rows) and `AppShellPageHeader` (the page title).
+Used by `ContextSwitcher` (trigger and menu rows) and `AppShellPageHeader` (the page title). Not in a `DataTable` cell: the table does this itself, without adding an element to the row. See its README.
 
 ## Props
 

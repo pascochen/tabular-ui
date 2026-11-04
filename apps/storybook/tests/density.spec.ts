@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { gotoStory } from './helpers';
+import { gotoStory, injectAxe } from './helpers';
 
 /**
  * §10 items that a grep cannot settle, because they are about what the
@@ -183,6 +183,10 @@ test('in a squeezed table, labels sit on their figures and a sort resizes no col
   expectLabelsOnTheirEdges(rest, ['Rows', 'Duration', 'Variance']);
   await page.getByRole('button', { name: 'Variance' }).click();
   await page.mouse.move(0, 0);
+  // This table scrolls sideways at this width, and the click brought Variance into view.
+  await page.locator('#storybook-root table').evaluate((table) => {
+    table.parentElement!.scrollLeft = 0;
+  });
   expectNothingMoved(await readHeaders(page), rest);
 });
 
@@ -250,10 +254,314 @@ for (const [story, width] of squeezedTables) {
 
 test('text gives way first, and past that the table scrolls sideways', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await gotoStory(page, 'product-datatable--default');
+  await gotoStory(page, 'product-datatable--long-text');
   const cells = await readCells(page);
   expect(cells.textCut, 'a text cell stopped truncating').toBe(true);
   expect(cells.sideways, 'the table should scroll sideways').toBeGreaterThan(0);
+  expect(cells.rowHeights, 'every row at --h-row-sm').toEqual([cells.rowHeight]);
+});
+
+/**
+ * A text column's floor (owner, 2026-11-03). `max-w-0` let a column fall to its
+ * header's width, so at 420 every row read `fct_g…` and scrolling sideways didn't
+ * help. A cap lets text count toward its column up to 28ch: it follows the text
+ * below that, and stops there. The figures must stay in the first view, which is
+ * what a floor taken from `size` gave up: at 375 it showed no figure at all.
+ */
+const readTextColumns = (page: Page) =>
+  page.evaluate(async () => {
+    await document.fonts.load('400 11px "Source Code Pro Variable"', '0');
+    await document.fonts.load('400 13px "Source Sans 3 Variable"', '0');
+    await document.fonts.ready;
+    const table = document.querySelector('#storybook-root table')!;
+    const scroller = table.parentElement!;
+    const rows = Array.from(table.querySelectorAll('tbody tr[data-row-id]'));
+    const ths = Array.from(table.querySelectorAll('thead th'));
+    return {
+      view: scroller.getBoundingClientRect().right,
+      sideways: scroller.scrollWidth - scroller.clientWidth,
+      columns: ths.map((th, i) => {
+        const cells = rows.map((row) => row.children[i]);
+        const style = getComputedStyle(cells[0]);
+        const zero = document.createElement('canvas').getContext('2d')!;
+        zero.font = `${style.fontSize} ${style.fontFamily}`;
+        const widest = Math.max(
+          ...cells.map((td) => {
+            const range = document.createRange();
+            range.selectNodeContents(td);
+            return range.getBoundingClientRect().width;
+          }),
+        );
+        return {
+          name: th.textContent ?? '',
+          width: th.getBoundingClientRect().width,
+          right: th.getBoundingClientRect().right,
+          floor: 28 * zero.measureText('0').width,
+          padding: parseFloat(style.paddingLeft) + parseFloat(style.paddingRight),
+          widest,
+          cut: cells.filter((td) => td.scrollWidth > td.clientWidth).length,
+          text: cells.map((td) => td.textContent ?? ''),
+        };
+      }),
+    };
+  });
+
+for (const width of [375, 420]) {
+  test(`a squeezed text column keeps its text, and the first figures stay in view — ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await gotoStory(page, 'product-datatable--default');
+    const { columns, sideways, view } = await readTextColumns(page);
+    const [model, , rows, , , owner] = columns;
+
+    expect(model.cut, 'no identifier is cut').toBe(0);
+    expect(new Set(model.text).size, 'every row can be told apart').toBe(model.text.length);
+    expect(owner.cut, 'no owner is cut').toBe(0);
+    // Each column follows its own text, so a short one doesn't pay for the floor.
+    expect(model.width).toBeCloseTo(model.widest + model.padding, 0);
+    expect(owner.width).toBeLessThan(model.width);
+    expect(rows.right, 'the first figure column is in the first view').toBeLessThanOrEqual(view);
+    expect(sideways, 'and the rest scroll sideways').toBeGreaterThan(0);
+  });
+}
+
+test('a text column stops at 28ch when squeezed, and a size wins where there is room', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text');
+  const squeezed = await readTextColumns(page);
+  const [model, note] = squeezed.columns;
+  expect(model.width, 'Model at its floor').toBeCloseTo(model.floor, 0);
+  expect(note.width, 'Note at its floor').toBeCloseTo(note.floor, 0);
+  expect(model.cut, 'long names are cut there').toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const wide = await readTextColumns(page);
+  // At least: a sized column takes a share of spare width too.
+  expect(wide.columns[0].width, 'the cap does not hold a sized column down').toBeGreaterThanOrEqual(260);
+  expect(wide.sideways).toBe(0);
+});
+
+/**
+ * A windowed table renders only some rows, so its text can't set the floor from the
+ * cells: a column would move as rows scroll in, and the columns beside it would too.
+ * The header reserves it from every row, and it has to land where the cells' cap does.
+ */
+test('a windowed table holds the same floor, and no text column moves as it scrolls', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text');
+  const rendered = (await readTextColumns(page)).columns.map((column) => column.width);
+
+  await gotoStory(page, 'product-datatable--long-text-virtualized');
+  const windowed = (await readTextColumns(page)).columns.map((column) => column.width);
+  expect(windowed[0], 'Model').toBeCloseTo(rendered[0], 0);
+  expect(windowed[1], 'Note').toBeCloseTo(rendered[1], 0);
+  // The reservation errs wide, so no story's text reaches past it. A `cell` that
+  // shows more than its value would, so what stops that has to be asserted itself.
+  const cellCap = await longCell(page, 0, 0).evaluate((td) => getComputedStyle(td).maxWidth);
+  expect(cellCap, 'its cells count for nothing').toBe('0px');
+
+  for (const width of [420, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    const before = (await readTextColumns(page)).columns.map((column) => column.width);
+    for (const row of [25000, 49990]) {
+      await page.locator('#storybook-root table').evaluate((table, top) => {
+        table.parentElement!.scrollTop = top;
+      }, row * 28);
+      await expect(page.locator(`#storybook-root tbody tr[data-row-id="${row}"]`)).toBeVisible();
+      expect((await readTextColumns(page)).columns.map((column) => column.width)).toEqual(before);
+    }
+    await page.locator('#storybook-root table').evaluate((table) => {
+      table.parentElement!.scrollTop = 0;
+    });
+    await expect(page.locator('#storybook-root tbody tr[data-row-id="0"]')).toBeVisible();
+  }
+});
+
+/**
+ * What a cell cut can be read. The tooltip repeats text from the DOM, and it opens
+ * only on a cell that has cut something: Base UI's hover, delay and grouping, with
+ * the table cancelling it. Nothing joins the cell, because an element there is what
+ * breaks a copied row into lines.
+ */
+const tooltip = (page: Page) => page.locator('[data-slot="tooltip-content"]');
+const longCell = (page: Page, row: number, column: number) =>
+  page.locator(`#storybook-root tbody tr[data-row-id="${row}"] td`).nth(column);
+
+test('a pointer resting on a cut cell reads all of it, and adds nothing to the cell', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text');
+  const cut = longCell(page, 0, 0);
+  await expect(cut.evaluate((td) => td.childElementCount)).resolves.toBe(0);
+
+  await cut.hover();
+  await expect(tooltip(page)).toHaveText('int_finance__gl_entries_by_cost_center_and_period_0');
+  const [cell, tip] = await Promise.all([cut.boundingBox(), tooltip(page).boundingBox()]);
+  expect(tip!.x, 'starts at the cell').toBeCloseTo(cell!.x, 0);
+
+  // A cell beside it fits: the open tooltip goes, and none takes its place.
+  await longCell(page, 1, 0).hover();
+  await expect(tooltip(page)).toBeHidden();
+  await longCell(page, 2, 0).hover();
+  await expect(tooltip(page)).toHaveText('int_finance__fx_rates_daily_by_currency_pair_2');
+  // A figure is never cut, and isn't a trigger at all.
+  await longCell(page, 2, 2).hover();
+  await expect(tooltip(page)).toBeHidden();
+});
+
+test('a table that cuts nothing shows no tooltip and takes no stop', async ({ page }) => {
+  await gotoStory(page, 'product-datatable--default');
+  await longCell(page, 1, 0).hover();
+  // Longer than the delay: the assertion is about something that must not open.
+  await page.waitForTimeout(500);
+  await expect(tooltip(page)).toBeHidden();
+  await expect(page.locator('#storybook-root td[tabindex]')).toHaveCount(0);
+});
+
+/**
+ * The keyboard's way in, since a `<td>` is not a control. One stop, not one per cut
+ * cell: that would never end in a windowed table, where 400 presses of Tab reached
+ * row 224. Presses are counted, and both stories have to give the same count.
+ */
+const focused = (page: Page) =>
+  page.evaluate(() => {
+    const el = document.activeElement!;
+    return { tag: el.tagName, text: el.textContent ?? '', row: el.closest('tr')?.dataset.rowId ?? null };
+  });
+
+for (const story of ['long-text', 'long-text-virtualized']) {
+  test(`a table takes one stop for what it cut, and the arrows move it — ${story}`, async ({ page }) => {
+    await page.setViewportSize({ width: 420, height: 800 });
+    await gotoStory(page, `product-datatable--${story}`);
+    await expect(page.locator('#storybook-root td[tabindex]')).toHaveCount(1);
+
+    const stops: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press('Tab');
+      const { tag } = await focused(page);
+      if (tag === 'BODY') break;
+      stops.push(tag);
+    }
+    expect(stops, 'three sort buttons and one cell').toEqual(['BUTTON', 'BUTTON', 'BUTTON', 'TD']);
+
+    await page.keyboard.press('Shift+Tab');
+    expect((await focused(page)).tag, 'Shift+Tab finds it again').toBe('TD');
+    await expect(tooltip(page)).toHaveText('int_finance__gl_entries_by_cost_center_and_period_0');
+
+    // Down skips a cell that fits; right moves to the next cut cell in the row.
+    await page.keyboard.press('ArrowDown');
+    expect((await focused(page)).row).toBe('2');
+    await expect(tooltip(page)).toHaveText('int_finance__fx_rates_daily_by_currency_pair_2');
+    await page.keyboard.press('ArrowRight');
+    expect((await focused(page)).text).toContain('Waiting on the controller');
+    await page.keyboard.press('ArrowLeft');
+    expect((await focused(page)).row).toBe('2');
+
+    // Escape closes the tooltip and keeps your place. Tab leaves the table.
+    await page.keyboard.press('Escape');
+    await expect(tooltip(page)).toBeHidden();
+    expect((await focused(page)).row).toBe('2');
+    await page.keyboard.press('Tab');
+    expect((await focused(page)).tag).toBe('BODY');
+    await expect(page.locator('#storybook-root td[tabindex]')).toHaveCount(1);
+  });
+}
+
+test('the arrows carry on past what is rendered, and a cell never lands under the header', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text-virtualized');
+  await longCell(page, 0, 0).evaluate((td: HTMLElement) => td.focus({ focusVisible: true } as FocusOptions));
+  for (let i = 0; i < 40; i++) await page.keyboard.press('ArrowDown');
+  const far = await focused(page);
+  expect(far.tag).toBe('TD');
+  expect(Number(far.row), 'past the first window').toBeGreaterThan(40);
+  await expect(page.locator('#storybook-root td[tabindex]')).toHaveCount(1);
+  await expect(tooltip(page)).toHaveText(far.text);
+
+  for (let i = 0; i < 12; i++) await page.keyboard.press('ArrowUp');
+  const { cellTop, headerBottom, height } = await page.evaluate(() => ({
+    cellTop: document.activeElement!.getBoundingClientRect().top,
+    headerBottom: document.querySelector('#storybook-root thead')!.getBoundingClientRect().bottom,
+    height: document.querySelector<HTMLElement>('#storybook-root table')!.parentElement!.scrollHeight,
+  }));
+  expect(cellTop, 'the sticky header covers no part of it').toBeGreaterThanOrEqual(headerBottom - 0.5);
+  expect(height, 'and the row height held').toBe(50_000 * 28 + 28);
+});
+
+test('the stop follows the scroll, so Tab does not jump back to a row out of view', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text');
+  await page.locator('#storybook-root table').evaluate((table) => {
+    table.parentElement!.scrollTop = 280;
+  });
+  await page.getByRole('button', { name: 'Rows' }).focus();
+  // It moves on `scrollend`, which a loaded machine can take a while to fire.
+  await expect
+    .poll(() => page.locator('#storybook-root td[tabindex]').evaluate((td) => Number(td.closest('tr')!.dataset.rowId)))
+    .toBeGreaterThan(5);
+  await page.keyboard.press('Tab');
+  const { row, top, viewTop } = await page.evaluate(() => ({
+    row: document.activeElement!.closest('tr')?.dataset.rowId,
+    top: document.activeElement!.getBoundingClientRect().top,
+    viewTop: document.querySelector('#storybook-root table')!.parentElement!.getBoundingClientRect().top,
+  }));
+  expect(Number(row), 'a row on screen, not the first').toBeGreaterThan(5);
+  expect(top).toBeGreaterThan(viewTop);
+});
+
+for (const theme of ['dark', 'light'] as const) {
+  test(`the stop's ring paints inside the cell, and its text is still all there — ${theme}`, async ({ page }) => {
+    await page.setViewportSize({ width: 420, height: 800 });
+    await gotoStory(page, 'product-datatable--long-text', theme);
+    for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+    const ring = await page.evaluate(() => {
+      const s = getComputedStyle(document.activeElement!);
+      const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return {
+        style: s.outlineStyle,
+        width: s.outlineWidth,
+        offset: s.outlineOffset,
+        ringWidth: token('--ring-width'),
+      };
+    });
+    expect(ring.style, 'outline-none would leave this "none"').toBe('solid');
+    expect(ring.width).toBe(ring.ringWidth);
+    expect(ring.offset, 'inset, since the cell clips').toBe(`-${ring.ringWidth}`);
+    await expect(page.locator('#storybook-root td[tabindex]')).toHaveText(
+      'int_finance__gl_entries_by_cost_center_and_period_0',
+    );
+  });
+}
+
+test('a focused cut cell passes the rules axe skips unless asked', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--long-text');
+  for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+  await injectAxe(page);
+  const violations = await page.evaluate(async () => {
+    const result = await window.axe.run(document, {
+      runOnly: { type: 'rule', values: ['focus-order-semantics', 'scrollable-region-focusable', 'tabindex'] },
+    });
+    return result.violations.flatMap((v) => v.nodes.map((n) => n.target.join(' ')));
+  });
+  expect(violations).toEqual([]);
+});
+
+/**
+ * A cell with a control takes no stop: its control is already the way in, and the
+ * cut lives on the control. Seeded, because at 28ch nothing in the story is cut.
+ */
+test('a control in a cell opens the tooltip when focused, and adds no stop', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--clickable-rows');
+  const long = 'int_finance__gl_entries_by_cost_center_and_period_1';
+  const button = page.getByRole('button', { name: 'dim_accounts_1' });
+  await button.evaluate((el, text) => {
+    el.textContent = text;
+  }, long);
+  await page.getByRole('button', { name: long }).focus();
+  await expect(page.locator('#storybook-root td[tabindex]')).toHaveCount(0);
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Tab');
+  await expect(tooltip(page)).toHaveText(long);
 });
 
 /**

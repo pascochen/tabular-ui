@@ -203,7 +203,12 @@ test.describe('an identifier in a copied row', () => {
   test('a name cut off on screen copies whole, and still draws its ellipsis', async ({ page }) => {
     await page.setViewportSize({ width: 420, height: 800 });
     await gotoClickableRows(page);
-    const box = await identifier(page, 'int_fx_rates_daily_3').evaluate((el) => ({
+    // Longer than the story's names, which the floor now keeps whole at this width.
+    const long = 'int_finance__fx_rates_daily_by_currency_pair_3';
+    await identifier(page, 'int_fx_rates_daily_3').evaluate((el, text) => {
+      el.textContent = text;
+    }, long);
+    const box = await identifier(page, long).evaluate((el) => ({
       overflows: el.scrollWidth > el.clientWidth,
       textOverflow: getComputedStyle(el).textOverflow,
     }));
@@ -211,7 +216,19 @@ test.describe('an identifier in a copied row', () => {
 
     const rows = await cellText(page);
     await selectRows(page, 0, rows.length - 1);
-    expect((await copy(page))['text/plain']).toContain('int_fx_rates_daily_3\t');
+    expect((await copy(page))['text/plain']).toContain(`${long}\t`);
+  });
+
+  test('a text cell cut on screen copies whole, on its row’s line', async ({ page }) => {
+    await page.setViewportSize({ width: 420, height: 800 });
+    await gotoStory(page, 'product-datatable--long-text');
+    await selectRows(page, 0, 1);
+    const { 'text/plain': text } = await copy(page);
+    const [first, second] = text.split('\n');
+    expect(first.split('\t')[0]).toBe('int_finance__gl_entries_by_cost_center_and_period_0');
+    expect(first.split('\t')[1]).toContain('then re-run against the corrected FX rates');
+    expect(second.split('\t')[0]).toBe('dim_accounts_1');
+    expect(text.trim().split('\n')).toHaveLength(2);
   });
 
   test('sort headers stay out of a copy', async ({ page }) => {

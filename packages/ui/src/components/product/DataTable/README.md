@@ -33,7 +33,7 @@ Rows virtualize past `virtualizeAfter` (default 100). Below that every row rende
 |---|---|
 | `align: 'numeric'` | Right-aligns and applies `tabular-nums`. The cell never truncates or wraps |
 | `content: 'mono'` | `--font-mono` one step down (§8.3) — model names, IDs, account codes |
-| `truncate: false` | Opts a text cell out of truncation, so it wraps. A `numeric` or `figure` column ignores it |
+| `truncate: false` | Opts a text cell out of truncation, the floor and the tooltip, so it wraps. A `numeric` or `figure` column ignores it |
 | `figure: { decimals, unit }` | The table prints the column itself: right-aligned, tabular, never truncated. Needed for a [totals row](#totals-row) |
 
 **Every figure column needs `align: 'numeric'` or `figure`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
@@ -44,14 +44,42 @@ A cell cuts only what an ellipsis can stand in for (owner, 2026-11-03).
 
 - **A figure is never cut.** A `numeric` or `figure` cell stays on one line, and its widest figure sets the column's minimum width. `2,019,530` used to read `2,019…`, which hides the magnitude.
 - **A badge is never cut.** A cell whose direct child is a `Badge` or `StatusBadge` keeps its width as well. A badge is an atomic box, so it can't end in an ellipsis, and its letters were simply cut: `PROPOS`. Put it straight in the cell: wrapped in another element, the table can't see it and it is cut as before.
-- **Text gives way.** A text cell truncates, as far down as its header's width. Scrolling doesn't reveal what it cut.
-- **Past that, the table scrolls sideways.**
+- **Text gives way, down to a floor.** A text column shrinks to its widest text, up to `28ch`: about 25 mono characters at `--text-xs`, or 31 letters of sans at `--text-sm`. Past that the cell truncates. So a short column keeps its own width, and an identifier stays readable: `fct_gl_entries_0`, not `fct_g…`. A `size` wins where there's room, because a cell fills its column whatever the cap says.
+- **Past that, the table scrolls sideways.** In the `Default` story that starts at a 580px viewport, against 475px with no floor. Model holds 155px at 375 and 420, with Status and Rows whole in the first view at both.
 
-Figures and badges stay on one line, so a row stays 28px and the virtualizer's estimate holds.
+Figures, badges and cut text stay on one line, so a row stays 28px and the virtualizer's estimate holds.
 
 **In a virtualized table, a `figure` column holds still and an `align: 'numeric'` column may not.** The table measures only the rows it renders. It prints a `figure` column itself, so it can reserve room for that column's widest figure across every row. An `align: 'numeric'` column's `cell` is yours, so the table can't know what a row further down will print, and the column's width can follow the rows on screen. So use `figure` where a column needs no custom `cell`, and give any other figure column a `size`, which holds it still unless the table is squeezed. A status column sorted by status moves the same way, and with no `size`, filtering can move a column in any table.
 
-`apps/storybook/tests/density.spec.ts` measures every figure and badge against its cell, and the `Squeezed` story shows the result.
+**A text column holds still in a virtualized table, with or without a `size`.** Its cells count for nothing there, and the header reserves the floor from the column's longest value across every row. That's the value, not what a `cell` renderer shows: a value that isn't text or a number reserves nothing, so that column falls back to its header's width. A letter is narrower than a `ch`, so a sans column can sit a little wider than its text, up to the same floor.
+
+`apps/storybook/tests/density.spec.ts` measures every figure and badge against its cell, and each text column against its floor. The `Squeezed` story shows the result, and `LongText` shows text past the floor.
+
+## Reading what a cell cut
+
+The text is whole in the DOM, so a screen reader and a copy always get all of it. Reading it on screen depends on the input:
+
+- **A pointer** resting on a cut cell gets a `Tooltip` with the full text. A cell that fits gets none. It's measured when it would open, so it works with any `cell` renderer, and a table that cuts nothing does no work for it.
+- **A keyboard** gets one tab stop for the whole table, on a cut cell on screen. The arrow keys move between cut cells, and the tooltip follows. Escape closes it and keeps your place, and Tab leaves the table. A table with nothing cut has no stop.
+- **A control in a cell** opens the same tooltip when it takes keyboard focus. That cell takes no stop, because the control is already the way in.
+- **Touch** gets no tooltip: Base UI's tooltip opens only for a mouse-like pointer. The floor is the help on a phone. Text past it can't be read by touch, so use `truncate: false` in a small table, or link to the full record.
+
+Three things that are deliberate:
+
+- **The `<td>` is the trigger, and no element joins the cell.** `TruncatedText` in a cell either doesn't work or breaks the copy: as an inline `<span>` it measures 0 and never opens, and as a `block` it breaks each copied row into lines (see Copying). As `inline-block` it works, but only on plain strings. Don't put it in a cell; the table does this itself.
+- **One stop, not one per cut cell.** A stop on each never ends in a virtualized table, because each one tabbed to renders more: 400 presses of Tab reached row 224.
+- **No `role="grid"`.** That role promises a whole keyboard pattern, and this isn't it. The arrow keys only move between cut cells. With nothing further cut, they scroll as usual.
+
+**The cost is up to 2ms a scroll step, or about 7ms on a machine four times slower.** Main thread per step in the `Virtualized` story, with 42 rows rendered, as one row / a 25-row jump. Production build, Chromium 156 on a Mac at a load of about 3 (2026-11-04):
+
+- **No tooltip:** 4.1 / 4.8ms. With the CPU throttled 4×, 7.3 / 13.9ms.
+- **This:** 4.8 / 6.5ms. Throttled, 13.6 / 20.9ms. A one-row step still holds 60fps there, and a jump takes about 19ms a frame, 26ms at the 95th percentile.
+
+`TruncatedText` in every cell costs more: throttled, 16.6 / 31.5ms in a session where no tooltip read 7.9 / 14ms.
+
+A windowed table also reads every row for the floor, about 30ms at 50,000 rows, when the data or a filter changes. A sort doesn't re-read them, and costs what it did.
+
+A tooltip stays open under a wheel: it moves to the row now under the pointer. Firefox, Safari and real screen readers aren't measured.
 
 ## What the table does not decide
 

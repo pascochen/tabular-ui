@@ -156,6 +156,66 @@ export const Squeezed: Story = {
   ),
 };
 
+type LongRow = { model: string; note: string; rows: number };
+
+const LONG_MODELS = [
+  'int_finance__gl_entries_by_cost_center_and_period',
+  'dim_accounts',
+  'int_finance__fx_rates_daily_by_currency_pair',
+  'stg_sap_bkpf',
+  'int_finance__cost_centers_with_hierarchy_flattened',
+];
+const NOTES = [
+  'Rebuilt after the SAP extract for period 2026-09 arrived a day late, then re-run against the corrected FX rates',
+  'Passed',
+  'Waiting on the controller to confirm the reclassification of intercompany balances before the close',
+];
+
+function makeLongRows(n: number): LongRow[] {
+  return Array.from({ length: n }, (_, i) => ({
+    model: `${LONG_MODELS[i % LONG_MODELS.length]}_${i}`,
+    note: NOTES[i % NOTES.length],
+    rows: Math.floor(Math.abs(Math.sin(i) * 2_400_000)),
+  }));
+}
+
+const longColumns: ColumnDef<LongRow, unknown>[] = [
+  { accessorKey: 'model', header: 'Model', meta: { content: 'mono' }, size: 260 },
+  { accessorKey: 'note', header: 'Note', size: 240 },
+  {
+    accessorKey: 'rows',
+    header: 'Rows',
+    meta: { align: 'numeric' },
+    size: 110,
+    cell: ({ getValue }) => (getValue() as number).toLocaleString('en-US'),
+  },
+];
+
+/**
+ * Text longer than its column. A pointer resting on a cut cell shows the whole of
+ * it. From the keyboard, the table takes one tab stop, and the arrow keys move
+ * between cut cells. See the README.
+ */
+export const LongText: Story = {
+  render: () => (
+    <div style={{ height: 254 }}>
+      <DataTable columns={longColumns} data={makeLongRows(16)} />
+    </div>
+  ),
+};
+
+/** The same at 50,000 rows: still one tab stop, however far the arrows go. */
+export const LongTextVirtualized: Story = {
+  render: function LongTextVirtualizedStory() {
+    const data = useMemo(() => makeLongRows(50_000), []);
+    return (
+      <div style={{ height: 254 }}>
+        <DataTable columns={longColumns} data={data} />
+      </div>
+    );
+  },
+};
+
 /** 50,000 rows, windowed. Scroll — the row height must not drift. */
 export const Virtualized: Story = {
   render: function VirtualizedStory() {
