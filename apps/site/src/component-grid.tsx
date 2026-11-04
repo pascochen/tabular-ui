@@ -1,7 +1,7 @@
 import { ExternalMark, Rail, Section, SectionHeader } from './components/layout';
 import { ComponentCard } from './components/specimen';
 import { components, external, moments } from './content';
-import { standaloneLink, textLink } from './lib/styles';
+import { standaloneLink } from './lib/styles';
 import {
   AgentBlockSpecimen,
   AttachmentSpecimen,
@@ -85,17 +85,14 @@ export function ComponentsSection() {
         <SectionHeader
           id="components-title"
           title={`${components.length} components`}
-          lead="Try each one with data from Kasane, a fictional printer maker. Grouped by the moment of the run they belong to."
+          lead="Grouped by the moment of a run where each one appears. The data comes from Kasane, a fictional printer maker."
+          action={
+            <a href={external.storybook.href} className={`${standaloneLink} text-text-body`}>
+              All components in Storybook
+              <ExternalMark />
+            </a>
+          }
         />
-        <p className="max-w-[var(--site-w-prose)] text-site-small text-text-secondary">
-          These are the {components.length} components of an agent run. The library has more: the controls, tables and
-          shell they sit in are all in{' '}
-          <a href={external.storybook.href} className={textLink}>
-            {external.storybook.label}
-            <ExternalMark />
-          </a>
-          .
-        </p>
 
         <nav aria-label="Components by moment" className="border border-border p-[var(--site-gap-tight)]">
           <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">

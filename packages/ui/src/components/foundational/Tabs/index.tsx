@@ -13,8 +13,9 @@ import { tabsListVariants, tabVariants } from './variants';
  * `line` is the default: §7.8 reserves the 2px border width for exactly three
  * things, and "active tab indicator" is one of them. `segmented` stays
  * available for switching view modes, where the tabs read as a control rather
- * than as navigation. `bordered` stands boxed tabs on a 1px ink rule, selected
- * in ink, and its appearance is exported for links that need it (`tabVariants`).
+ * than as navigation. `bordered` frames the strip in one 1px rectangle, with the
+ * selected tab in ink to its edge, and its appearance is exported for links that
+ * need it (`tabVariants`).
  */
 function Tabs({ className, orientation = 'horizontal', ...props }: TabsPrimitive.Root.Props) {
   return (
@@ -115,13 +116,7 @@ function TabsTrigger({ className, ...props }: Omit<TabsPrimitive.Tab.Props, 'ren
       )}
       className={cn(
         listStyle.variant === 'bordered'
-          ? [
-              tabVariants({ size: listStyle.size }),
-              // Vertical turns the strip a quarter: the rule is on the inline
-              // edge, as `line`'s is.
-              'group-data-vertical/tabs:justify-start',
-              'group-data-vertical/tabs:border-b group-data-vertical/tabs:border-r-0',
-            ]
+          ? [tabVariants({ size: listStyle.size }), 'group-data-vertical/tabs:justify-start']
           : lineOrSegmentedTrigger,
         className,
       )}
