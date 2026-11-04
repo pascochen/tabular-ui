@@ -81,7 +81,12 @@ const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleS
 
 /** A finding's files as `Sources` rows, numbered in the order the finding cites them. */
 export function sourcesOf(e: Exception): Source[] {
-  return e.sources.map((name) => {
+  return sourcesOfNames(e.sources);
+}
+
+/** Files by name as `Sources` rows, for an answer that cites them. */
+export function sourcesOfNames(names: readonly string[]): Source[] {
+  return names.map((name) => {
     const f = packFile(name);
     return { id: name, name, size: f ? kb(f.bytes) : undefined };
   });

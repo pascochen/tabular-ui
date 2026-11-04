@@ -4,6 +4,7 @@ import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, c
 
 import type { ExceptionState } from '../../lib/close-state';
 import { close, memberName, sourcesOf, type Exception } from '../../lib/kasane';
+import { CitedSentence } from '../CitedSentence';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
 
@@ -45,9 +46,6 @@ export function ExceptionCard({
   const repliesOpen = chosen ?? (defaultRepliesOpen || state.replies.length > atLanding);
   const sourcesId = useId();
   const sources = sourcesOf(e);
-  const split = e.summary.lastIndexOf(' ') + 1;
-  const lead = e.summary.slice(0, split);
-  const lastWord = e.summary.slice(split);
 
   return (
     <ChannelMessage
@@ -74,16 +72,11 @@ export function ExceptionCard({
           </h2>
           <ExceptionStatus status={state.status} awaitsYou={awaitsYou} />
         </div>
-        <p>
-          {lead}
-          {/* The marks stay on the line of the word they follow: wrapped alone, they cite nothing. */}
-          <span className="whitespace-nowrap">
-            {lastWord}
-            {sources.map((s, i) => (
-              <InlineCitation key={s.id} number={i + 1} source={s} />
-            ))}
-          </span>
-        </p>
+        <CitedSentence text={e.summary}>
+          {sources.map((s, i) => (
+            <InlineCitation key={s.id} number={i + 1} source={s} />
+          ))}
+        </CitedSentence>
         {state.status === 'waiting' && 'waiting' in e && e.waiting ? (
           <p className="text-sm text-text-secondary">
             Waiting on the {e.waiting.on.charAt(0).toLowerCase() + e.waiting.on.slice(1)}.

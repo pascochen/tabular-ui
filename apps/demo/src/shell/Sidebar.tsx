@@ -63,7 +63,6 @@ const PLACES = {
 export function Sidebar() {
   const { state } = useClose();
   const open = openCount(state);
-  const builtAgents: typeof agents = [];
   return (
     <AppShellNav aria-label="Workspace">
       {BUILT_PLACES.length ? (
@@ -101,15 +100,13 @@ export function Sidebar() {
           </NavLink>
         ))}
       </AppShellNavGroup>
-      {builtAgents.length ? (
-        <AppShellNavGroup label="Agents">
-          {builtAgents.map((a) => (
-            <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} avatar={<MemberAvatar memberKey={a.key} />}>
-              {a.name}
-            </NavLink>
-          ))}
-        </AppShellNavGroup>
-      ) : null}
+      <AppShellNavGroup label="Agents">
+        {agents.map((a) => (
+          <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} avatar={<MemberAvatar memberKey={a.key} />}>
+            {a.name}
+          </NavLink>
+        ))}
+      </AppShellNavGroup>
       <AppShellNavGroup label="Direct messages">
         {directMessages.map((key) => (
           <NavLink key={key} view={{ kind: 'dm', member: key }} avatar={<MemberAvatar memberKey={key} />}>
