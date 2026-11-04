@@ -133,6 +133,29 @@ export const SortedByFigure: Story = {
   },
 };
 
+const squeezedColumns: ColumnDef<Model, unknown>[] = [
+  ...columns.slice(0, 2),
+  // Rows is the one column set by `figure` rather than `align`: both hold their width.
+  { accessorKey: 'rows', header: 'Rows', size: 110, meta: { figure: { decimals: 0, unit: 'rows' } } },
+  ...columns.slice(3),
+];
+
+/**
+ * Narrower than its columns ask for. Figures and badges hold their width, text
+ * gives way, and past that the table scrolls sideways. See the README.
+ */
+export const Squeezed: Story = {
+  render: () => (
+    <div style={{ width: 420, maxWidth: '100%', height: 254 }}>
+      <DataTable
+        columns={squeezedColumns}
+        data={makeRows(8)}
+        rowClassName={(row) => runStatusRowTreatment[row.original.status]}
+      />
+    </div>
+  ),
+};
+
 /** 50,000 rows, windowed. Scroll — the row height must not drift. */
 export const Virtualized: Story = {
   render: function VirtualizedStory() {

@@ -170,19 +170,149 @@ test('a sortable `figure` column takes the same edge, with the caret on its inne
 });
 
 /**
- * Where the reservation earns its keep. Squeezed, a column is as wide as its
+ * Where the reservation earns its keep. Squeezed, a column can be as wide as its
  * header's content, so a caret that took no space until drawn would resize the
- * column it appears in. Labels only: a squeezed cell clips its figure, so the
- * figure has no edge to share here.
+ * column it appears in. The figures hold their width there too, so the label
+ * still has an edge to share.
  */
-test('in a squeezed table, a sort resizes no column', async ({ page }) => {
+test('in a squeezed table, labels sit on their figures and a sort resizes no column', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 700 });
   await gotoStory(page, 'product-datatable--default');
   await page.mouse.move(0, 0);
   const rest = await readHeaders(page);
+  expectLabelsOnTheirEdges(rest, ['Rows', 'Duration', 'Variance']);
   await page.getByRole('button', { name: 'Variance' }).click();
   await page.mouse.move(0, 0);
   expectNothingMoved(await readHeaders(page), rest);
+});
+
+/**
+ * A cell cuts only what an ellipsis can stand in for. `2,019,530` read `2,019…`
+ * until 2026-11-03, which hides the magnitude, and `PROPOSED` read `PROPOS`, with
+ * no ellipsis, because a badge is an atomic box. Each is measured against its
+ * cell's content box, in rendered rows. The row height is read too: a figure that
+ * wrapped instead of clipping would pass the width and break the virtualizer.
+ */
+const readCells = (page: Page) =>
+  page.evaluate(async () => {
+    await document.fonts.load('400 13px "Source Sans 3 Variable"', '0');
+    await document.fonts.load('500 10px "Source Sans 3 Variable"', 'A');
+    await document.fonts.ready;
+    const table = document.querySelector('#storybook-root table')!;
+    const scroller = table.parentElement!;
+    const rows = Array.from(table.querySelectorAll<HTMLElement>('tbody tr[data-row-id]'));
+    const cells = rows.flatMap((row) => Array.from(row.children));
+    const contentWidth = (td: Element) => {
+      const s = getComputedStyle(td);
+      return (
+        td.getBoundingClientRect().width -
+        parseFloat(s.paddingLeft) -
+        parseFloat(s.paddingRight) -
+        parseFloat(s.borderLeftWidth) -
+        parseFloat(s.borderRightWidth)
+      );
+    };
+    const textWidth = (td: Element) => {
+      const range = document.createRange();
+      range.selectNodeContents(td);
+      return range.getBoundingClientRect().width;
+    };
+    const badge = (td: Element) => td.querySelector(':scope > [data-slot="badge"]');
+    // The cell's own class: the table's text inherits tabular figures everywhere.
+    const isFigure = (td: Element) => td.classList.contains('tabular-nums');
+    return {
+      rowHeight: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--h-row-sm')),
+      rowHeights: [...new Set(rows.map((row) => row.getBoundingClientRect().height))],
+      firstRow: rows[0].dataset.rowId,
+      headerHeight: table.querySelector('thead')!.getBoundingClientRect().height,
+      scrollHeight: scroller.scrollHeight,
+      sideways: scroller.scrollWidth - scroller.clientWidth,
+      figures: cells.filter(isFigure).map((td) => ({
+        text: td.textContent ?? '',
+        overhang: textWidth(td) - contentWidth(td),
+        whiteSpace: getComputedStyle(td).whiteSpace,
+      })),
+      badges: cells.filter(badge).map((td) => ({
+        text: td.textContent ?? '',
+        overhang: badge(td)!.getBoundingClientRect().width - contentWidth(td),
+      })),
+      // Text still gives way: a column that stopped truncating would pass everything above.
+      textCut: cells
+        .filter((td) => !isFigure(td) && !badge(td))
+        .some((td) => textWidth(td) > contentWidth(td) && getComputedStyle(td).textOverflow === 'ellipsis'),
+    };
+  });
+
+type Cells = Awaited<ReturnType<typeof readCells>>;
+
+const expectNothingCut = (cells: Cells) => {
+  expect(cells.figures.length, 'expected figures in the table').toBeGreaterThan(0);
+  for (const f of cells.figures) {
+    expect(f.overhang, `"${f.text}" is cut`).toBeLessThanOrEqual(0.1);
+    expect(f.whiteSpace, `"${f.text}" can wrap`).toBe('nowrap');
+  }
+  for (const b of cells.badges) expect(b.overhang, `"${b.text}" is cut`).toBeLessThanOrEqual(0.1);
+  expect(cells.rowHeights, 'every row at --h-row-sm').toEqual([cells.rowHeight]);
+};
+
+// The sized table across the range where it squeezes; a `figure` column, which sets
+// no `align`, with no total or reservation holding it open; a table with no `size`
+// at all, whose columns share out what's left; and a figure with a space in it.
+const squeezedTables: [story: string, width: number][] = [
+  ['product-datatable--default', 320],
+  ['product-datatable--default', 420],
+  ['product-datatable--default', 560],
+  ['product-datatable--default', 768],
+  ['product-datatable--squeezed', 1280],
+  ['product-appbar--in-dashboard', 320],
+  ['product-appshell--with-table', 768],
+];
+
+for (const [story, width] of squeezedTables) {
+  test(`a squeezed table cuts no figure and no badge — ${story} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await gotoStory(page, story);
+    const cells = await readCells(page);
+    expectNothingCut(cells);
+    expect(cells.badges.length, 'expected badges in the table').toBeGreaterThan(0);
+  });
+}
+
+test('text gives way first, and past that the table scrolls sideways', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await gotoStory(page, 'product-datatable--default');
+  const cells = await readCells(page);
+  expect(cells.textCut, 'a text cell stopped truncating').toBe(true);
+  expect(cells.sideways, 'the table should scroll sideways').toBeGreaterThan(0);
+});
+
+/**
+ * Only rendered rows are measured, so a window of short figures can leave a
+ * column narrower than the figures further down. A figure must still fit when it
+ * scrolls in. Sorted, because the widest figures then sit at one end. The scroll
+ * height is the virtualizer's estimate, and a row that grew would drift from it.
+ */
+test('a squeezed virtualized table cuts no figure as it scrolls, and keeps its height', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 800 });
+  await gotoStory(page, 'product-datatable--virtualized');
+  await page.getByRole('button', { name: 'Rows' }).click();
+  let cells = await readCells(page);
+  expectNothingCut(cells);
+  const height = 50_000 * cells.rowHeight + cells.headerHeight;
+  expect(cells.scrollHeight).toBe(height);
+  for (const fraction of [0.5, 1]) {
+    const previous = cells.firstRow;
+    await page.locator('#storybook-root table').evaluate((table, top) => {
+      table.parentElement!.scrollTop = top;
+    }, fraction * height);
+    await page.waitForFunction(
+      (id) => document.querySelector<HTMLElement>('tbody tr[data-row-id]')?.dataset.rowId !== id,
+      previous,
+    );
+    cells = await readCells(page);
+    expectNothingCut(cells);
+    expect(cells.scrollHeight).toBe(height);
+  }
 });
 
 /**

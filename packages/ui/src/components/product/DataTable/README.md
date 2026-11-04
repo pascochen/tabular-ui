@@ -31,12 +31,30 @@ Rows virtualize past `virtualizeAfter` (default 100). Below that every row rende
 
 | `meta` | Effect |
 |---|---|
-| `align: 'numeric'` | Right-aligns and applies `tabular-nums` |
+| `align: 'numeric'` | Right-aligns and applies `tabular-nums`. The cell never truncates or wraps |
 | `content: 'mono'` | `--font-mono` one step down (§8.3) — model names, IDs, account codes |
-| `truncate: false` | Opts a cell out of truncation |
+| `truncate: false` | Opts a text cell out of truncation, so it wraps. A `numeric` or `figure` column ignores it |
 | `figure: { decimals, unit }` | The table prints the column itself: right-aligned, tabular, never truncated. Needed for a [totals row](#totals-row) |
 
 **Every figure column needs `align: 'numeric'` or `figure`.** §0 rule 6 calls misaligned figure columns a correctness hazard, not an aesthetic one.
+
+## A squeezed table
+
+A cell cuts only what an ellipsis can stand in for (owner, 2026-11-03).
+
+- **A figure is never cut.** A `numeric` or `figure` cell stays on one line, and its widest figure sets the column's minimum width. `2,019,530` used to read `2,019…`, which hides the magnitude.
+- **A badge is never cut.** A cell whose direct child is a `Badge` or `StatusBadge` keeps its width as well. A badge is an atomic box, so it can't end in an ellipsis, and its letters were simply cut: `PROPOS`. Put it straight in the cell: wrapped in another element, the table can't see it and it is cut as before.
+- **Text gives way.** A text cell truncates, as far down as its header's width. Scrolling doesn't reveal what it cut.
+- **Past that, the table scrolls sideways.**
+
+Figures and badges stay on one line, so a row stays 28px and the virtualizer's estimate holds.
+
+**In a virtualized table, a `figure` column holds still and an `align: 'numeric'` column may not.** The table measures only the rows it renders. It prints a `figure` column itself, so it can reserve room for that column's widest figure across every row. An `align: 'numeric'` column's `cell` is yours, so the table can't know what a row further down will print, and the column's width can follow the rows on screen. So use `figure` where a column needs no custom `cell`, and give any other figure column a `size`.
+
+- **With a `size`** wide enough for its figures, an `align: 'numeric'` column moves only when the table is squeezed. Sorted by its figures and scrolled end to end, the `Virtualized` story's Rows column moves 8.4px at a 420px viewport, and not at all at 1280. A status column does the same when sorted by status: 40px at 420.
+- **With no `size`,** it moves at any width, because those columns share out spare width by their content. In a table with figures from 37 to 925,000,000, scrolling moved the column by 125px at 1280. Filtering can move a column in a table that isn't virtualized, too.
+
+`apps/storybook/tests/density.spec.ts` measures every figure and badge against its cell, and the `Squeezed` story shows the result.
 
 ## What the table does not decide
 
@@ -67,7 +85,7 @@ A `totals` key must be the column's id. TanStack turns `accessorKey: 'cost.yen'`
 
 **A figure past 15 significant digits prints empty**, and warns in development, because a double can't hold it exactly: 80000000000000.01 would print as .02. At 2 decimals, the limit is 9,999,999,999,999.99.
 
-**A figure is never truncated, so it can widen its column.** A windowed table measures only the rows it renders, so each figure column reserves room for its widest figure across every row. The columns hold still as you scroll.
+**A figure is never truncated, so it can widen its column.** A windowed table measures only the rows it renders, so each `figure` column reserves room for its widest figure across every row, and holds still as you scroll. An `align: 'numeric'` column can't, because its `cell` is yours: see [A squeezed table](#a-squeezed-table).
 
 ### What shows
 
