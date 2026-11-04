@@ -9,7 +9,7 @@ App-local, as the plan puts it (`kasane-close-demo-plan.md` §3). It composes `C
 | Decision | Why |
 |---|---|
 | A message by its agent, so `authorship` is set | `ChannelMessage` then puts the body in an `AgentBlock`: the agent found this exception, and the rail and label say so (§5) |
-| Status is a `StatusBadge`: `needs-review` labelled "Open", `passed` labelled "Resolved" | §5's mapping, in its one place. The icon and the word carry the state in grayscale too |
+| Status is a `StatusBadge`: `open`, `needs-review` labelled "Needs your answer" when it waits on the visitor, `passed` labelled "Resolved" | §5's mapping, in its one place. The icon and the word carry the state in grayscale too |
 | The title is an `<h2>` with the exception's id | Under the page's `<h1>`, with no level skipped. `ExceptionLink`, in the close panel and in a channel's details, links to it |
 | Citations stay on the line of the sentence's last word | Wrapped onto a line of their own, the marks read as citing nothing |
 | Sources fold behind the replies' disclosure recipe | Two disclosures in one message read alike. Folded, a channel's cards stay scannable |

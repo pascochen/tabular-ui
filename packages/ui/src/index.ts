@@ -325,6 +325,7 @@ export { ProgressBar, type ProgressBarProps, type ProgressBarTone } from './comp
 export { MetricTile, type MetricTileProps } from './components/product/MetricTile';
 export { RunLogRow, type RunLogRowProps } from './components/product/RunLogRow';
 export { StatusBadge, type StatusBadgeProps } from './components/product/StatusBadge';
+export { StatusDot, type StatusDotProps, type StatusDotStatus } from './components/product/StatusDot';
 export { TruncatedText, type TruncatedTextProps } from './components/product/TruncatedText';
 export { Toolbar, ToolbarSpacer, ToolbarSeparator, type ToolbarProps } from './components/product/Toolbar';
 export { runStatuses, runStatusRowTreatment, type RunStatus } from './components/product/StatusBadge/statuses';

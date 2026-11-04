@@ -4,7 +4,7 @@ Check this file before building anything. If a component is listed, import or
 extend it; if it is not, `CLAUDE.md` says whether you may build it without
 asking (product: yes; foundational: never without asking).
 
-> **All 51 components are built.** The foundational 18 and the product 33 (the product `PresenceStack` added 2026-10-29, after `ChannelMessage`; the product `ChannelMessage` added 2026-10-29, for the Kasane close demo; the product `Tool` added 2026-10-28, after `Question`; the product `Question` added 2026-10-28, after `Confirmation`; the product `Confirmation` added 2026-10-28, after its definition on tabularui.com was signed off; the product `Sources` and `InlineCitation` added 2026-10-28; the foundational `Spinner` added 2026-10-20; the product `ChatStarter` added 2026-10-14; the foundational `Textarea` and the product `ChatComposer` added 2026-10-13; the foundational `MessageScroller` and the product `AgentReasoning`, `AgentPlan` and `ChatThread` added 2026-10-12; `OrgSwitcher` added 2026-10-06; `ContextSwitcher`, `ProjectSwitcher`, `TruncatedText`, `AccountMenu` and the foundational `Avatar` 2026-10-07 — beyond the original 14 + 16).
+> **All 52 components are built.** The foundational 18 and the product 34 (the product `StatusDot` added 2026-11-03, for §5's `open` status; the product `PresenceStack` added 2026-10-29, after `ChannelMessage`; the product `ChannelMessage` added 2026-10-29, for the Kasane close demo; the product `Tool` added 2026-10-28, after `Question`; the product `Question` added 2026-10-28, after `Confirmation`; the product `Confirmation` added 2026-10-28, after its definition on tabularui.com was signed off; the product `Sources` and `InlineCitation` added 2026-10-28; the foundational `Spinner` added 2026-10-20; the product `ChatStarter` added 2026-10-14; the foundational `Textarea` and the product `ChatComposer` added 2026-10-13; the foundational `MessageScroller` and the product `AgentReasoning`, `AgentPlan` and `ChatThread` added 2026-10-12; `OrgSwitcher` added 2026-10-06; `ContextSwitcher`, `ProjectSwitcher`, `TruncatedText`, `AccountMenu` and the foundational `Avatar` 2026-10-07 — beyond the original 14 + 16).
 >
 > **Validation status (first real screen: the onboarding journey,
 > `apps/demo`, 2026-08-24).** Exercised end to end by that screen:
@@ -53,7 +53,7 @@ Add via `pnpm dlx shadcn@latest add <component>`, then apply Tabular UI tokens.
 Always pull the **Base UI** variant (`/docs/components/base/*`, never
 `/radix/*`).
 
-## Product (33) — domain composites
+## Product (34) — domain composites
 
 Built **from** foundational components. Build these without asking, but check
 this table first. Never re-implement a primitive inline — extend it with a
@@ -67,7 +67,8 @@ variant.
 | RunLogRow | **built** | 24px via `--h-row-xs`. Composes `StatusBadge` + `runStatusRowTreatment`. Expands to show error detail when given `detail`. |
 | LineageTree | **built** | 24px rows, 12px indent per level via `--gap-tree-indent`. Nested lists with disclosure carets, so depth is announced, not only drawn. Not `role="tree"`, whose keyboard pattern it does not implement (2026-10-28). |
 | CodeView | **built** | Deliberately unhighlighted — syntax colour is decoration and would spend all five hues (§0 rule 1). Optional gutter; `highlightLines` marks an error line, which *is* state. Becomes a named, focusable region only when a line overflows, so the keyboard can scroll it. |
-| StatusBadge | **built** | §5's state mapping in one place. Nine statuses, each with an icon for the grayscale gate. Row treatments exported separately — a badge cannot tint its row. |
+| StatusBadge | **built** | §5's state mapping in one place. Ten statuses, each with an icon for the grayscale gate. Row treatments exported separately — a badge cannot tint its row. |
+| StatusDot | **built** | §7.7's 6px dot, where a badge won't fit. Solid ochre for `needs-review`, a hollow neutral ring for `open` (§5), so shape carries the difference in grayscale. Always `aria-hidden`: the caller puts the meaning beside it as text. |
 | ProgressBar | **built** | 2/4px track, determinate or indeterminate, five roles via `tone` (was `role`, still honoured). `label` required — a bare bar announces nothing. |
 | FilterChip | **built** | Composes `Chip`. Field/value split so a chip reads out of context. Neutral even when filtering for a state. |
 | Toolbar | **built** | `role="toolbar"`, neutral band. Spacer and separator parts; separator uses `--color-border-strong` to stay visible on surface. |

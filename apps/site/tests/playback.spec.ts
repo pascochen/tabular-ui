@@ -387,7 +387,7 @@ test.describe('with reduced motion', () => {
 
   test('every card stays at rest, and nothing animates', async ({ page }) => {
     await open(page, '/');
-    await expect(page.locator('#status-badge').getByRole('listitem')).toHaveCount(9);
+    await expect(page.locator('#status-badge').getByRole('listitem')).toHaveCount(10);
     await expect(page.locator('#run-log-row').getByText('No header row', { exact: false })).toBeVisible();
     const running = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
     expect(running).toBe(0);
