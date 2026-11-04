@@ -227,6 +227,14 @@ export function progress(state: CloseState) {
   return { resolved: all.filter((e) => e.status === 'resolved').length, total: all.length };
 }
 
+/**
+ * The Tasks count: contradictions still open (pages spec, D4). `waiting` isn't
+ * counted, because nobody here can settle it, so the count runs down to 0.
+ */
+export function openCount(state: CloseState): number {
+  return Object.values(state.exceptions).filter((e) => e.status === 'open').length;
+}
+
 /** A check's figure as shown: the generated label for the before or after value. */
 export function checkLabel(state: CloseState, id: string): string {
   const c = checks.find((x) => x.id === id)!;

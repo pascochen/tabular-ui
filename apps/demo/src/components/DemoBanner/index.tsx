@@ -11,6 +11,7 @@ import {
   DialogTitle,
   TruncatedText,
   buttonVariants,
+  cn,
 } from 'tabular-ui';
 
 import { sceneNow } from '../../lib/clock';
@@ -104,7 +105,12 @@ export function DemoBanner() {
             </p>
           </div>
           <DialogFooter>
-            <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
+            <a
+              className={cn(buttonVariants({ variant: 'outline' }))}
+              href={STORYBOOK_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
               Storybook
               <span className="sr-only"> (opens in a new tab)</span>
             </a>

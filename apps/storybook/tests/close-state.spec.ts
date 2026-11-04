@@ -4,6 +4,7 @@ import {
   awaitsVisitor,
   closeReducer,
   isReopened,
+  openCount,
   landingState,
   progress,
   type CloseAction,
@@ -58,6 +59,18 @@ test('keep September locked: resolved on posting, no rerun, the figure unchanged
   expect(hero(done).status).toBe('resolved');
   expect(done.checks['revenue-cut-off']).toBe(42720000);
   expect(done.log.at(-1)?.text).toMatch(/listed for the auditors/);
+});
+
+test('the Tasks count is the open contradictions: 4 at landing, 0 at the end, and waiting isn’t open', () => {
+  expect(openCount(landingState())).toBe(4);
+  // Answering isn't settling: the hero stays open until it ran.
+  expect(openCount(run({ type: 'answer', answer: 'reopen', at: '14:00' }))).toBe(4);
+  const end = closeReducer(landingState(), { type: 'skip', at: '14:00' });
+  expect(openCount(end)).toBe(0);
+  expect(end.exceptions['credit-limit'].status).toBe('waiting');
+  expect(progress(end).resolved).toBe(3);
+  // A skipped question stays the visitor's to settle.
+  expect(openCount(run({ type: 'answer', answer: 'skip', at: '14:00' }, { type: 'skip', at: '14:01' }))).toBe(1);
 });
 
 test('September reads as reopened only once the reversal is posted, and Start over locks it again', () => {
