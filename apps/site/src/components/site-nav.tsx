@@ -12,8 +12,8 @@ type Page = (typeof pages)[keyof typeof pages];
 // (owner, 2026-10-27): Storybook, GitHub, and Get started, the one page of this
 // site there, with no arrow. Principles left the nav and the footer the same
 // day; each component page that carries a principle links to it. The disabled
-// "Demo (soon)" button left the nav too: where the demo goes when it's ready
-// is still to decide. The hero and the closing band keep their demo action.
+// "Demo (soon)" button left the nav too: where the demo goes, now that it's live
+// (2026-11-04), is still to decide. The hero and the closing band keep their demo action.
 const system = [pages.components, pages.foundations, pages.vocabulary].filter((page) => page.live);
 const setUp: Page[] = [pages.gettingStarted].filter((page) => page.live);
 const elsewhere = [external.storybook, external.github];

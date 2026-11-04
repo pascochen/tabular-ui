@@ -35,6 +35,15 @@ export function exactMoney(value: number, currency: Currency = 'JPY'): string {
   return `${sign}${SYMBOL[currency]}${abs.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+
+/** A count in prose: `four`, and at the start of a sentence, `Four`. Fails the build past ten rather than print a digit. */
+export function numberWord(count: number, { capitalize = false } = {}): string {
+  const word = NUMBER_WORDS[count];
+  if (word === undefined) throw new Error(`No word for ${count}`);
+  return capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+}
+
 /** A file's size, as the demo shows it (apps/demo/src/lib/files.ts): `552 KB`, `1.3 MB`. */
 export function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

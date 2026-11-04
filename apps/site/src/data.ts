@@ -1,5 +1,5 @@
 import kasane from '../data/kasane.json';
-import { isCurrency, money } from './lib/format';
+import { isCurrency, money, numberWord } from './lib/format';
 
 /**
  * Every Kasane figure, ID, file name and date the site shows comes from here:
@@ -35,6 +35,17 @@ const step = (id: string) => {
 export const h1Gap = {
   shortfall: bridge.budget - bridge.actual,
   exchangeRates: -(step('fx-subsidiaries') + step('fx-intercompany')),
+};
+
+/**
+ * The closing band's specifics (docs/site.md D7): the demo's agent count as a
+ * word, and the visitor's role, the title's last word in lowercase ("Group
+ * Controller" reads "controller"). tests/pages.spec.ts asserts the sentence, so
+ * a title that doesn't read this way fails there.
+ */
+export const closingBand = {
+  agents: numberWord(kasane.agents, { capitalize: true }),
+  role: kasane.company.visitor.title.split(' ').at(-1)?.toLowerCase(),
 };
 
 /** A pack file's name, failing the build if the export stops producing it. */

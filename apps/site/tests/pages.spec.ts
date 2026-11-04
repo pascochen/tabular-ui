@@ -460,20 +460,39 @@ test.describe('the wordmark', () => {
   });
 });
 
-test.describe('the demo, while it is not ready', () => {
-  // Owner, 2026-10-26: every demo action reads "Demo (soon)" and is disabled,
-  // and no page links to demo.tabularui.com. Since 2026-10-27 the nav has none.
-  test('is a disabled "Demo (soon)" in the hero and the closing band, absent from the nav, and a link nowhere', async ({
+test.describe('the demo', () => {
+  const demo = 'https://demo.tabularui.com';
+
+  // Owner, 2026-11-04: the demo is live, so its actions are links. Where it goes
+  // in the nav is still to decide (docs/site.md §4), so the nav has none.
+  test('is a link in the hero, the closing band and the footer, absent from the nav, and "soon" nowhere', async ({
     page,
   }) => {
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
     await expect(page.getByRole('navigation', { name: 'Main' })).not.toContainText('Demo');
-    const soon = page.getByRole('button', { name: 'Demo (soon)' });
-    await expect(soon).toHaveCount(2);
-    for (const button of await soon.all()) await expect(button).toBeDisabled();
-    await expect(page.locator('a[href*="demo.tabularui.com"]')).toHaveCount(0);
-    await expect(page.getByRole('contentinfo').getByText('Demo (soon)')).toBeVisible();
+    for (const section of ['hero-title', 'closing-title']) {
+      const action = page.locator(`section[aria-labelledby="${section}"]`).getByRole('link', { name: 'Open the demo' });
+      await expect(action).toHaveAttribute('href', demo);
+    }
+    await expect(
+      page.getByRole('contentinfo').getByRole('list', { name: 'Try it' }).getByRole('link', { name: 'Demo' }),
+    ).toHaveAttribute('href', demo);
+    await expect(page.getByRole('button', { name: 'Demo (soon)' })).toHaveCount(0);
+    await expect(page.getByText('Demo (soon)')).toHaveCount(0);
+  });
+
+  // D7: the count, the company and the role come from data/kasane.json. Spelled
+  // out here so that data which no longer reads this way fails.
+  test('is what the closing band describes, from the data', async ({ page }) => {
+    await page.goto('/');
+    const band = page.locator('section[aria-labelledby="closing-title"]');
+    await expect(band.getByRole('heading', { level: 2 })).toHaveText(
+      'Four agents found contradictions in a finance team’s books. You decide.',
+    );
+    await expect(band.getByRole('paragraph')).toHaveText(
+      'Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller.',
+    );
   });
 });
 
@@ -678,7 +697,7 @@ test.describe('the footer', () => {
     const column = (name: string) => footer.getByRole('list', { name });
     await expect(column('Guide').getByRole('listitem')).toHaveText(['Components', 'Vocabulary', 'Get started']);
     await expect(column('Foundations').getByRole('listitem')).toHaveText(['Color', 'Typography', 'Density']);
-    await expect(column('Try it').getByRole('listitem')).toHaveText(['Demo (soon)', /^Storybook/]);
+    await expect(column('Try it').getByRole('listitem')).toHaveText([/^Demo/, /^Storybook/]);
     await expect(column('About').getByRole('listitem')).toHaveText([/^By Pascal/, /^MIT license/, /^GitHub/]);
     const about = column('About');
     for (const [name, href] of [
