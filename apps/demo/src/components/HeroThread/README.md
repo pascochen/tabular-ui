@@ -30,7 +30,7 @@ The state lives in `lib/close-state.ts` (`hero.rounds`), and the agent's timed s
 |---|---|
 | Nothing is resolved until it ran | A reopen resolves after the check reruns, not when it's posted: "Done" only once the action ran (`docs/agent-voice.md`, principle 3) |
 | A stop asks again rather than ending | The decision is the demo. One decline shouldn't strand the visitor |
-| Skip is final until Start over | Skip is a real answer, and Question answers once. Start over is in the top nav |
+| Skip is final until Start over | Skip is a real answer, and Question answers once. Start over is at the foot of the sidebar |
 | The rerun posts as "System" with a neutral badge | A deterministic check, not the agent (`docs/agent-voice.md`, rule 1) |
 | The rerun row has no timestamp | The reply's header already gives the time |
 | On a phone, the channel opens scrolled to the whole decision | At 375×812 the second answer lands under the composer, and testers missed these answers. It scrolls by the least that clears it, once on opening, and never a page already scrolled (`lib/decision-in-view.ts`). The cost: the top of the Revenue cut-off card is off screen on landing |

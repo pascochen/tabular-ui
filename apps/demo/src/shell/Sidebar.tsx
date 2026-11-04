@@ -6,6 +6,7 @@ import { agents, channels, close, directMessages, kasaneCompany, memberName, vis
 import { BUILT_CHANNELS, BUILT_PLACES, hrefFor, onViewLinkClick, placeOf, useView, type View } from '../lib/view';
 import { useClose } from '../lib/close-context';
 import { channelMark, channelMarkText, isUnread, openCount } from '../lib/close-state';
+import { DemoActions } from '../components/DemoActions';
 import { MemberAvatar } from './members';
 
 function NavLink({
@@ -132,14 +133,20 @@ export function SidebarHeader() {
   );
 }
 
-/** Who the visitor is playing, on two lines. Not a control: the demo has no account to manage. */
+/**
+ * The demo's controls, then who the visitor is playing, on two lines. The
+ * visitor isn't a control: the demo has no account to manage.
+ */
 export function SidebarFooter() {
   return (
-    <div className={`${itemInset} flex h-[var(--h-control)] min-w-0 items-center gap-[var(--gap-control-icon)]`}>
-      <MemberAvatar memberKey="visitor" />
-      <div className="flex min-w-0 flex-col">
-        <TruncatedText className="text-sm text-text-body">{visitor.name}</TruncatedText>
-        <TruncatedText className="text-xs text-text-secondary">{visitor.title}</TruncatedText>
+    <div className="flex flex-col gap-[var(--gap-inline)]">
+      <DemoActions />
+      <div className={`${itemInset} flex h-[var(--h-control)] min-w-0 items-center gap-[var(--gap-control-icon)]`}>
+        <MemberAvatar memberKey="visitor" />
+        <div className="flex min-w-0 flex-col">
+          <TruncatedText className="text-sm text-text-body">{visitor.name}</TruncatedText>
+          <TruncatedText className="text-xs text-text-secondary">{visitor.title}</TruncatedText>
+        </div>
       </div>
     </div>
   );

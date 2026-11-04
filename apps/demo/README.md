@@ -11,7 +11,7 @@ The public demo at [demo.tabularui.com](https://demo.tabularui.com): a finance w
 - Under reduced motion it applies everything at once, with no typing indicators.
 - Only one timer exists at a time, so none outlives a view.
 
-**Skip to the end** and **Start over** sit in the top nav and work at any point. Skip finishes the decision as "Choose for me" would, unless the visitor already answered, then applies every event left. `?at=end` opens on the end state.
+**Skip to the end** and **Start over** sit at the foot of the sidebar and work at any point. Skip finishes the decision as "Choose for me" would, unless the visitor already answered, then applies every event left. `?at=end` opens on the end state.
 
 **One store.** `src/lib/close-state.ts` holds each exception's status and replies, the decision log and each check's figure. The panel, the tiles and the sidebar's open count are derived from it.
 
@@ -29,7 +29,7 @@ A visitor plays Daisuke Onodera, Group Controller at **Kasane Corporation**, a f
 - **Nobody replies to what the visitor writes.** The first post gets a one-line note from System that says so, and each post scrolls the channel to its foot, where it lands. The note is derived from the post, so Start over clears it.
 - **Under 1024px the panel is a dialog** (`src/shell/PanelSheet.tsx`), opened from a button in the page header, or by selecting a row whose detail it shows. Never on load. `AppShell`'s panel pushes main at every width and is 440px, so at 375px main measured 0 and the decision couldn't be seen. Beside the panel, main is 583px at 1023px and narrower than a 375px phone from 815px. A dialog covers main instead, so the channel keeps its width, its scroll and anything typed. 1024px and wider are unchanged. This is enough to follow the story on a phone, not a phone layout: pinning the sidebar at 375px still leaves main 135px, and the proposed entry's table scrolls inside its card.
 - **The four agents are role word + "AI"**: Cut-off AI, Payments AI, Approvals AI and Credit AI, in every message header, as `docs/agent-voice.md` rule 1 allows since 2026-11-03. The word was "AI" alone while there was one agent (`docs/reviews/demo-first-pass-2026-10-30.md`).
-- `DemoBanner`, in the top nav, says all of this in one line; see its README.
+- **About this demo** says what is fictional, scripted and real. It sits at the foot of the sidebar, and in the top nav while the sidebar is collapsed. The top nav shows only then; see `DemoActions`'s README.
 
 ## Data
 
@@ -63,4 +63,4 @@ That builds the package, then runs the demo with the package rebuilding on chang
 
 Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's built declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
 
-`src/components/` holds what only this app needs: `DemoBanner`, `ExceptionCard`, `ClosePanel` and `HeroThread`. `src/shell/` is the sidebar and member avatars, and `src/views/` what each view puts in the shell's slots.
+`src/components/` holds what only this app needs: `DemoActions`, `ExceptionCard`, `ClosePanel` and `HeroThread`. `src/shell/` is the sidebar and member avatars, and `src/views/` what each view puts in the shell's slots.
