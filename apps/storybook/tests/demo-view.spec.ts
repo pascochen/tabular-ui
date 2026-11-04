@@ -72,6 +72,11 @@ test('the binder opens by its URL, on a source and a record', () => {
   });
 });
 
+test('Search opens by its URL, with or without a query', () => {
+  expect(parseView('?view=search')).toEqual({ kind: 'search' });
+  expect(parseView('?view=search&q=Great+Lakes')).toEqual({ kind: 'search', q: 'Great Lakes' });
+});
+
 test('a view’s link carries what it selects, and encodes it', () => {
   expect(hrefFor({ kind: 'tasks' })).toBe('?view=tasks');
   expect(hrefFor({ kind: 'tasks', task: 'revenue-cut-off' })).toBe('?view=tasks&task=revenue-cut-off');
