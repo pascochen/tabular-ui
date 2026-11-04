@@ -257,72 +257,91 @@ for (const mode of ['dark', 'light'] as const) {
     ];
 
     for (const { name, story, selected, other, toOther } of surfaces) {
-      test(`${name}: the rule paints unbroken, with no side border crossing it`, async ({ page }) => {
+      test(`${name}: the frame paints along the strip's edge, and the selected fill covers it`, async ({ page }) => {
         await gotoStory(page, story, mode);
         const list = page.locator('[data-slot="tabs-list"], nav ul');
         const box = (await list.boundingBox())!;
-        // A computed border isn't a painted one: read the row of pixels itself.
-        // Inset at the ends, so a fractional width can't catch the canvas.
-        const row = await page.screenshot({
-          clip: {
-            x: Math.ceil(box.x) + 1,
-            y: Math.round(box.y + box.height) - 1,
-            width: Math.floor(box.width) - 3,
-            height: 1,
-          },
-        });
-        const colours = await page.evaluate(async (base64) => {
-          const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob());
-          const context = new OffscreenCanvas(image.width, 1).getContext('2d')!;
-          context.drawImage(image, 0, 0);
-          const { data } = context.getImageData(0, 0, image.width, 1);
-          const seen = new Set<string>();
-          for (let i = 0; i < data.length; i += 4) seen.add(`${data[i]},${data[i + 1]},${data[i + 2]}`);
-          return [...seen];
-        }, row.toString('base64'));
-        expect(colours).toHaveLength(1);
-      });
-
-      test(`${name}: --color-border on the top and sides, and no bottom border, on every item`, async ({ page }) => {
-        await gotoStory(page, story, mode);
-        const border = await rgba(page, await token(page, '--color-border'));
-        for (const item of [selected(page), other(page)]) {
-          const sides = await item.evaluate((el) => {
-            const s = getComputedStyle(el);
-            return (['Top', 'Right', 'Left'] as const).map((side) => ({
-              width: s[`border${side}Width`],
-              color: s[`border${side}Color`],
-            }));
+        const fill = await rgba(page, await token(page, '--color-fill-interactive'));
+        // A computed border isn't a painted one: read the rows of pixels
+        // themselves, on both edges. Inset at the ends, so a fractional width
+        // can't catch the canvas.
+        for (const y of [Math.round(box.y), Math.round(box.y + box.height) - 1]) {
+          const row = await page.screenshot({
+            clip: { x: Math.ceil(box.x) + 1, y, width: Math.floor(box.width) - 3, height: 1 },
           });
-          for (const side of sides) {
-            expect(side.width).toBe('1px');
-            expect(await rgba(page, side.color)).toEqual(border);
-          }
-          expect(await item.evaluate((el) => getComputedStyle(el).borderBottomWidth)).toBe('0px');
+          const colours = await page.evaluate(async (base64) => {
+            const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob());
+            const context = new OffscreenCanvas(image.width, 1).getContext('2d')!;
+            context.drawImage(image, 0, 0);
+            const { data } = context.getImageData(0, 0, image.width, 1);
+            const seen = new Set<string>();
+            for (let i = 0; i < data.length; i += 4) seen.add(`${data[i]},${data[i + 1]},${data[i + 2]}`);
+            return [...seen];
+          }, row.toString('base64'));
+          // Ink under the selected item, then one colour to the end. A line
+          // crossing the edge would add a third.
+          expect(colours).toHaveLength(2);
+          expect(colours[0]).toBe(fill.slice(0, 3).join(','));
         }
       });
 
-      test(`${name}: a 1px ink rule stops at the last item, and the strip stays one control height`, async ({
+      test(`${name}: the list draws a 1px --color-border frame, and an item's border is transparent`, async ({
         page,
       }) => {
         await gotoStory(page, story, mode);
+        const border = await rgba(page, await token(page, '--color-border'));
         const list = page.locator('[data-slot="tabs-list"], nav ul');
-        const rule = await list.evaluate((el) => {
-          const s = getComputedStyle(el, '::after');
-          return { width: s.borderBottomWidth, color: s.borderBottomColor };
+        const frame = await list.evaluate((el) => {
+          const s = getComputedStyle(el, '::before');
+          return (['Top', 'Right', 'Bottom', 'Left'] as const).map((side) => ({
+            width: s[`border${side}Width`],
+            color: s[`border${side}Color`],
+          }));
         });
-        expect(rule.width).toBe('1px');
-        expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+        for (const side of frame) {
+          expect(side.width).toBe('1px');
+          expect(await rgba(page, side.color)).toEqual(border);
+        }
+        for (const item of [selected(page), other(page)]) {
+          const edge = await item.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return { width: s.borderTopWidth, color: s.borderTopColor };
+          });
+          expect(edge.width).toBe('1px');
+          expect(await rgba(page, edge.color)).toEqual([0, 0, 0, 0]);
+        }
+      });
 
+      test(`${name}: the strip is one control tall, and its items reach its edges`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        const list = page.locator('[data-slot="tabs-list"], nav ul');
         const listBox = (await list.boundingBox())!;
         const box = (await selected(page).boundingBox())!;
-        expect(listBox.height, 'the rule adds no height: the strip is one item tall').toBe(box.height);
-        expect(box.y + box.height, 'the selected fill meets the rule').toBe(listBox.y + listBox.height);
+        expect(listBox.height, 'the frame adds no height: the strip is one item tall').toBe(box.height);
+        expect(box.y, 'the selected fill reaches the top').toBe(listBox.y);
+        expect(box.x, 'and the first item the start').toBe(listBox.x);
         const lastRight = await list.evaluate((el) => {
           const items = [...el.querySelectorAll('[data-slot="tabs-trigger"], a')];
           return items[items.length - 1].getBoundingClientRect().right;
         });
-        expect(listBox.x + listBox.width, 'the rule ends with the last item').toBe(lastRight);
+        expect(listBox.x + listBox.width, 'the frame ends with the last item').toBe(lastRight);
+      });
+
+      test(`${name}: a label starts where a Button's does, 9px in`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        // Button's is 8px of padding and its 1px border, inside the box.
+        const inset = await other(page).evaluate((el) => {
+          const s = getComputedStyle(el);
+          return [s.paddingLeft, s.borderLeftWidth];
+        });
+        expect(inset).toEqual(['8px', '1px']);
+      });
+
+      test(`${name}: the hover overlay reaches the item's edge`, async ({ page }) => {
+        await gotoStory(page, story, mode);
+        // Over the 1px border, or the selected item would keep a line of plain ink.
+        const inset = await selected(page).evaluate((el) => getComputedStyle(el, '::after').left);
+        expect(inset).toBe('-1px');
       });
 
       test(`${name}: selected is the ink fill and its on-colour`, async ({ page }) => {
@@ -346,7 +365,7 @@ for (const mode of ['dark', 'light'] as const) {
           .toEqual(await rgba(page, await token(page, '--color-bg-hover-inverse')));
       });
 
-      test(`${name}: the ring is inside the shared line, so a neighbour's border can't cover it`, async ({ page }) => {
+      test(`${name}: the ring leaves a pixel of the item's ground outside it`, async ({ page }) => {
         await gotoStory(page, story, mode);
         await page.keyboard.press('Tab');
         await expect(selected(page)).toBeFocused();
@@ -391,49 +410,48 @@ for (const mode of ['dark', 'light'] as const) {
         expect(
           await page
             .locator('[data-slot="tabs-list"], nav ul')
-            .evaluate((el) => getComputedStyle(el, '::after').borderBottomStyle),
-          'the rule is a border, so it stays',
+            .evaluate((el) => getComputedStyle(el, '::before').borderTopStyle),
+          'the frame is a border, so it stays',
         ).toBe('solid');
       });
     }
 
-    test('neighbours share one line, and selecting moves nothing', async ({ page }) => {
+    test('neighbours touch, with no line between them, and selecting moves nothing', async ({ page }) => {
       await gotoStory(page, 'foundational-tabs--bordered', mode);
       const boxes = () => Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()));
       const before = await boxes();
       for (let i = 1; i < before.length; i++) {
-        expect(before[i]!.x, 'each item starts on the last pixel of the one before').toBe(
-          before[i - 1]!.x + before[i - 1]!.width - 1,
+        expect(before[i]!.x, 'each item starts where the one before ends').toBe(
+          before[i - 1]!.x + before[i - 1]!.width,
         );
       }
       await tab(page, 'Lineage').click();
       expect(await boxes()).toEqual(before);
     });
 
-    test('vertical: the rule is on the inline edge, and neighbours share a line on the block axis', async ({
-      page,
-    }) => {
+    test('vertical: the same frame, with the items stacked and the fill reaching both sides', async ({ page }) => {
       await gotoStory(page, 'foundational-tabs--bordered-vertical', mode);
       const list = page.getByRole('tablist');
-      const rule = await list.evaluate((el) => {
-        const s = getComputedStyle(el, '::after');
+      const frame = await list.evaluate((el) => {
+        const s = getComputedStyle(el, '::before');
         return { right: s.borderRightWidth, bottom: s.borderBottomWidth, color: s.borderRightColor };
       });
-      expect([rule.right, rule.bottom]).toEqual(['1px', '0px']);
-      expect(await rgba(page, rule.color)).toEqual(await rgba(page, await token(page, '--color-fill-interactive')));
+      expect([frame.right, frame.bottom]).toEqual(['1px', '1px']);
+      expect(await rgba(page, frame.color)).toEqual(await rgba(page, await token(page, '--color-border')));
       const trigger = await tab(page, 'Lineage').evaluate((el) => {
         const s = getComputedStyle(el);
         return { right: s.borderRightWidth, bottom: s.borderBottomWidth };
       });
-      expect(trigger).toEqual({ right: '0px', bottom: '1px' });
+      expect(trigger).toEqual({ right: '1px', bottom: '1px' });
       const listBox = (await list.boundingBox())!;
       const item = (await tab(page, 'Lineage').boundingBox())!;
-      expect(item.x + item.width, 'the selected fill meets the rule').toBe(listBox.x + listBox.width);
+      expect(item.x, 'the selected fill reaches the start').toBe(listBox.x);
+      expect(item.x + item.width, 'and the end').toBe(listBox.x + listBox.width);
       const boxes = (await Promise.all(['Runs', 'Lineage', 'Tests'].map((n) => tab(page, n).boundingBox()))).map(
         (b) => b!,
       );
       for (let i = 1; i < boxes.length; i++) {
-        expect(boxes[i].y).toBe(boxes[i - 1].y + boxes[i - 1].height - 1);
+        expect(boxes[i].y).toBe(boxes[i - 1].y + boxes[i - 1].height);
         expect(boxes[i].x).toBe(boxes[0].x);
         expect(boxes[i].width).toBe(boxes[0].width);
       }

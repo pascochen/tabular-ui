@@ -567,9 +567,7 @@ test.describe('the Foundations pages', () => {
           await expect(page.getByRole('heading', { level: 1 })).toHaveText(target);
         });
 
-        test(`${route}: the current page alone is ink, on an ink rule that stops at the last link`, async ({
-          page,
-        }) => {
+        test(`${route}: the current page alone is ink, in one rectangle around the links`, async ({ page }) => {
           const nav = await open(page);
           const fill = await token(page, '--color-fill-interactive');
           const on = await token(page, '--color-on-interactive');
@@ -579,18 +577,14 @@ test.describe('the Foundations pages', () => {
             await expect(link).toHaveCSS('background-color', isCurrent ? fill : 'rgba(0, 0, 0, 0)');
             if (isCurrent) await expect(link).toHaveCSS('color', on);
             await expect(link).toHaveCSS('font-weight', '600');
-            for (const side of ['top', 'right', 'left']) {
-              await expect(link).toHaveCSS(`border-${side}-width`, '1px');
-              await expect(link).toHaveCSS(`border-${side}-color`, border);
-            }
-            await expect(link).toHaveCSS('border-bottom-width', '0px');
+            await expect(link).toHaveCSS('border-left-color', 'rgba(0, 0, 0, 0)');
           }
           const list = nav.getByRole('list');
-          const rule = await list.evaluate((el) => {
-            const s = getComputedStyle(el, '::after');
-            return { width: s.borderBottomWidth, color: s.borderBottomColor };
+          const frame = await list.evaluate((el) => {
+            const s = getComputedStyle(el, '::before');
+            return { top: s.borderTopWidth, bottom: s.borderBottomWidth, color: s.borderTopColor };
           });
-          expect(rule).toEqual({ width: '1px', color: fill });
+          expect(frame).toEqual({ top: '1px', bottom: '1px', color: border });
 
           const boxes = await nav.getByRole('link').evaluateAll((els) =>
             els.map((el) => {
@@ -598,9 +592,9 @@ test.describe('the Foundations pages', () => {
               return { left, right, bottom, height };
             }),
           );
-          // Neighbours share one line.
-          for (let i = 1; i < boxes.length; i++) expect(boxes[i].left).toBe(boxes[i - 1].right - 1);
-          // The strip is one control tall, and the links meet the rule at its end.
+          // Neighbours touch, with no line between them.
+          for (let i = 1; i < boxes.length; i++) expect(boxes[i].left).toBe(boxes[i - 1].right);
+          // The strip is one control tall, and the links reach its edges.
           const strip = (await list.boundingBox())!;
           expect(strip.height).toBe(36);
           expect(strip.x + strip.width).toBe(boxes[boxes.length - 1].right);
@@ -636,6 +630,8 @@ test.describe('the Foundations pages', () => {
             await expect(link).toHaveCSS('text-decoration-line', isCurrent ? 'underline' : 'none');
             await expect(link).toHaveCSS('border-top-style', 'solid');
           }
+          const frame = await nav.getByRole('list').evaluate((el) => getComputedStyle(el, '::before').borderTopStyle);
+          expect(frame).toBe('solid');
           await expect(nav.locator('[aria-current="page"]')).toHaveCSS('text-decoration-thickness', '2px');
         });
       }

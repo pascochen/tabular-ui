@@ -28,24 +28,16 @@ export const tabsListVariants = cva(
           'gap-[var(--gap-chip)] rounded-md bg-bg-hover p-[2px]',
           'group-data-horizontal/tabs:h-[var(--h-control)]',
         ],
-        // A 1px ink rule the strip stands on, which stops at the last item: a
-        // rule running on would promise a panel a link can't deliver. It's on
-        // ::after, painted over the items' last pixel, so the strip stays one
-        // control height and no side border can cross it. A border, not a
-        // background, which forced colours would remove.
-        //
-        // Every item after the first pulls back over its neighbour, so two
-        // borders read as one line. The list does this rather than the item
-        // because it holds for any direct child: a trigger here, an <li> around
-        // a link elsewhere.
+        // One 1px frame around the whole strip, as the site's nav and a table
+        // have, with no line between items. It's on ::before, so it adds no
+        // height, and an item paints over it: positioned, and later in the
+        // tree. So the selected fill reaches the strip's edge, like an inked
+        // cell in a ruled row. A border, not a background, which forced colours
+        // would remove.
         bordered: [
-          "relative after:pointer-events-none after:absolute after:z-[1] after:content-['']",
-          'after:inset-x-0 after:bottom-0 after:border-b after:border-fill-interactive',
-          '[&>*+*]:-ml-px',
+          "relative before:pointer-events-none before:absolute before:inset-0 before:content-['']",
+          'before:border before:border-border',
           'group-data-vertical/tabs:items-stretch',
-          'group-data-vertical/tabs:after:inset-x-auto group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:right-0',
-          'group-data-vertical/tabs:after:border-b-0 group-data-vertical/tabs:after:border-r',
-          'group-data-vertical/tabs:[&>*+*]:ml-0 group-data-vertical/tabs:[&>*+*]:-mt-px',
         ],
       },
     },
@@ -58,7 +50,8 @@ export const tabsListVariants = cva(
  * link can wear it: `TabsTrigger` renders a <button>, which is wrong for a nav
  * that changes the page, and does nothing before hydration. Same reasoning as
  * `buttonVariants` on AppBar's links. Pass the result through `cn()`: it
- * resolves the ring offset below against controlBase's.
+ * resolves the ring offset, background clip and overlay inset below against
+ * controlBase's.
  *
  * `line` and `segmented` don't use this. Their triggers are styled in
  * index.tsx, against the list's `data-variant`.
@@ -69,14 +62,17 @@ export const tabVariants = cva(
     ...controlOverlay,
     'relative inline-flex select-none items-center justify-center whitespace-nowrap',
     'gap-[var(--gap-control-icon)] px-[var(--pad-control-x)]',
-    // No bottom border: the list's rule takes that pixel, so the selected fill
-    // meets it, and the ring below sits one pixel in on all four sides.
-    'border border-b-0 border-border font-semibold text-text-body',
+    // The list draws the frame, so this border is transparent, as a Button's is,
+    // and a label starts where a Button's does. Forced colours paint it, which
+    // keeps an edge on each item when the fill is gone. The fill and the overlay
+    // reach through it, or a line of the frame would show around the ink.
+    'border border-transparent bg-clip-border after:-inset-px',
+    'font-semibold text-text-body',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
 
-    // Inset by the ring and the item's own border, so the ring clears the line
-    // it shares with its neighbour. At -2px the next item's border, painted
-    // later, covers the ring's outer pixel.
+    // Inset by the ring and one pixel more, the frame's width. At -2px the ring
+    // would reach the item's edge, and on the selected item, a paper ring at the
+    // edge of the ink meets a paper canvas: the fill just looks smaller.
     'focus-visible:outline-offset-[calc((var(--ring-width)+var(--border-width))*-1)]',
 
     // Selected is ink. Base UI marks a tab with data-active, and a link says
