@@ -1,0 +1,76 @@
+import { expect, test } from '@playwright/test';
+
+import {
+  BUILT_CHANNELS,
+  DEFAULT_VIEW,
+  hrefFor,
+  parseAtEnd,
+  parseView,
+  placeOf,
+  sameView,
+} from '../../demo/src/lib/view';
+
+/**
+ * The Kasane app's URLs (apps/demo/src/lib/view.ts): the URL is the store, so
+ * every view must round-trip through it, and an old or unbuilt URL must open the
+ * default, never a dead end.
+ *
+ * Nothing here needs a browser.
+ */
+
+test('`/` opens #revenue, and #revenue’s link is `/`', () => {
+  expect(parseView('')).toEqual({ kind: 'channel', channel: 'revenue' });
+  expect(DEFAULT_VIEW).toEqual({ kind: 'channel', channel: 'revenue' });
+  expect(hrefFor(DEFAULT_VIEW)).toBe('/');
+  expect(parseView('?view=revenue')).toEqual(DEFAULT_VIEW);
+});
+
+test('old and unknown URLs open the default', () => {
+  for (const search of [
+    '?view=sep-close',
+    '?view=rev-check',
+    '?view=nope',
+    '?dm=controller',
+    '?dm=agent',
+    '?dm=nope',
+  ]) {
+    expect(parseView(search), search).toEqual(DEFAULT_VIEW);
+  }
+});
+
+test('every built channel round-trips through its URL', () => {
+  for (const channel of BUILT_CHANNELS) {
+    const view = { kind: 'channel', channel } as const;
+    expect(sameView(parseView(hrefFor(view).replace('/', '')), view), channel).toBe(true);
+  }
+});
+
+test('a direct message round-trips', () => {
+  for (const member of ['fpaHead', 'apLead']) {
+    expect(parseView(`?dm=${member}`), member).toEqual({ kind: 'dm', member });
+    expect(hrefFor({ kind: 'dm', member })).toBe(`?dm=${member}`);
+  }
+});
+
+test('a view’s link carries what it selects, and encodes it', () => {
+  expect(hrefFor({ kind: 'tasks' })).toBe('?view=tasks');
+  expect(hrefFor({ kind: 'tasks', task: 'revenue-cut-off' })).toBe('?view=tasks&task=revenue-cut-off');
+  expect(hrefFor({ kind: 'sources', source: 'S-17', record: 'INV-KJP-2609-00363' })).toBe(
+    '?view=sources&source=S-17&record=INV-KJP-2609-00363',
+  );
+  expect(hrefFor({ kind: 'search', q: 'Great Lakes' })).toBe('?view=search&q=Great+Lakes');
+});
+
+test('a sidebar item stays active whatever its view has selected inside', () => {
+  expect(placeOf({ kind: 'tasks', task: 'credit-limit' })).toBe(placeOf({ kind: 'tasks' }));
+  expect(placeOf({ kind: 'sources', source: 'S-1' })).toBe(placeOf({ kind: 'sources' }));
+  expect(placeOf({ kind: 'dm', member: 'apLead' })).not.toBe(placeOf({ kind: 'dm', member: 'fpaHead' }));
+});
+
+test('?at=end opens the end state with any view', () => {
+  expect(parseAtEnd('?at=end')).toBe(true);
+  expect(parseAtEnd('?view=revenue&at=end')).toBe(true);
+  expect(parseAtEnd('?dm=apLead&at=end')).toBe(true);
+  expect(parseAtEnd('?view=revenue')).toBe(false);
+  expect(parseView('?dm=apLead&at=end')).toEqual({ kind: 'dm', member: 'apLead' });
+});

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { AppShellPanelBody, MetricTile, ProgressBar, buttonVariants, cn } from 'tabular-ui';
 
-import { awaitsVisitor, checkLabel, isTiedOut, progress, type CloseState } from '../../lib/close-state';
+import { awaitsVisitor, checkLabel, isReopened, isTiedOut, progress, type CloseState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { checks, close, lastClosedMonth } from '../../lib/kasane';
@@ -42,6 +42,9 @@ export function ClosePanel() {
   return (
     <AppShellPanelBody className="flex flex-col gap-[var(--gap-section)]">
       <div className="flex flex-col gap-[var(--gap-field)]">
+        <p className="text-sm text-text-body tabular-nums">
+          {isReopened(state) ? close.period.reopened : close.period.locked}
+        </p>
         <p className="text-sm text-text-body">
           <span className="tabular-nums">
             {resolved} of {total}

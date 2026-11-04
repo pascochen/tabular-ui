@@ -238,6 +238,11 @@ export function awaitsVisitor(state: CloseState, id: string): boolean {
   return id === HERO && !current(state).answer;
 }
 
+/** "Reopen September" has been posted: #close's panel says the month reopened (pages spec, D7). */
+export function isReopened(state: CloseState): boolean {
+  return state.hero.rounds.some((r) => r.answer === 'reopen' && r.postedAt);
+}
+
 export function isTiedOut(state: CloseState, id: string): boolean {
   return state.checks[id] === checks.find((x) => x.id === id)!.after;
 }
