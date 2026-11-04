@@ -22,4 +22,8 @@ Setup, the tokens, the colour mode and the tooltip provider included, is in the 
 
 ## License
 
-[MIT](LICENSE) © Pascal Chenier
+[MIT](https://github.com/pascochen/tabular-ui/blob/main/LICENSE) © Pascal Chenier
+
+Use it in personal and commercial work, change it, ship it, sell what you build with it. Keep the copyright and license notice with any copy of the code. Provided as-is: no warranty, and no liability for the author.
+
+This is a summary. The [LICENSE](https://github.com/pascochen/tabular-ui/blob/main/LICENSE) file is the legal text.
