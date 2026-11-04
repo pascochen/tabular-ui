@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { AppShellPanelBody, MetricTile, ProgressBar, buttonVariants, cn } from 'tabular-ui';
+import { AppShellPanelBody, MetricTile, ProgressBar } from 'tabular-ui';
 
-import { awaitsVisitor, checkLabel, isReopened, isTiedOut, progress, type CloseState } from '../../lib/close-state';
+import { checkLabel, isReopened, isTiedOut, progress, type CloseState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
-import { ExceptionStatus } from '../ExceptionStatus';
-import { checks, close, lastClosedMonth } from '../../lib/kasane';
+import { ExceptionLink } from '../ExceptionLink';
+import { checks, close, exceptions, lastClosedMonth } from '../../lib/kasane';
 
 /** §8.1's micro-label tier, as AppShell's sidebar section labels. A heading, so the panel has an outline. */
 export function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -31,11 +31,12 @@ function caption(state: CloseState, c: (typeof checks)[number]) {
 }
 
 /**
- * The right panel of #sep-close: the record. How far the close is, each
- * check's figure, each exception's status and the decisions so far. It stores
- * nothing: every line is derived from the close state.
+ * The right panel of #close: the record. How far the close is, each check's
+ * figure, each exception's status and the decisions so far. It stores nothing:
+ * every line is derived from the close state. `children` follow the record: the
+ * channel's own topic, owner and members.
  */
-export function ClosePanel() {
+export function ClosePanel({ children }: { children?: ReactNode }) {
   const { state } = useClose();
   const { resolved, total } = progress(state);
 
@@ -71,23 +72,11 @@ export function ClosePanel() {
 
       <Section title="Exceptions">
         <ul role="list" className="-mx-[var(--pad-control-x)] flex flex-col">
-          {close.exceptions.map((e) => {
-            return (
-              <li key={e.id}>
-                {/* A link to the exception's message in the channel. */}
-                <a
-                  href={`#${e.id}`}
-                  className={cn(
-                    buttonVariants({ variant: 'ghost' }),
-                    'w-full justify-between font-normal text-text-body',
-                  )}
-                >
-                  <span className="min-w-0 truncate">{e.title}</span>
-                  <ExceptionStatus status={state.exceptions[e.id].status} awaitsYou={awaitsVisitor(state, e.id)} />
-                </a>
-              </li>
-            );
-          })}
+          {exceptions.map((e) => (
+            <li key={e.id}>
+              <ExceptionLink exception={e} />
+            </li>
+          ))}
         </ul>
       </Section>
 
@@ -113,6 +102,8 @@ export function ClosePanel() {
           <p className="text-sm text-text-secondary">No decisions yet.</p>
         )}
       </Section>
+
+      {children}
     </AppShellPanelBody>
   );
 }

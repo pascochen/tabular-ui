@@ -28,7 +28,14 @@ export type View =
   | { kind: 'search'; q?: string };
 
 /** The channels a visitor can open, in sidebar order. */
-export const BUILT_CHANNELS: readonly ChannelId[] = ['revenue'];
+export const BUILT_CHANNELS: readonly ChannelId[] = [
+  'close',
+  'cash',
+  'receivables',
+  'payables',
+  'revenue',
+  'intercompany',
+];
 
 /** The places above the channels that are built, in sidebar order. */
 export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['tasks'];

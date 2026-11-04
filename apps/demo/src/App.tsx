@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tabular-ui';
 
 import { DemoBanner } from './components/DemoBanner';
@@ -6,7 +6,7 @@ import { HeroAnnouncer } from './components/HeroThread/Announcer';
 import { TimelineAnnouncer } from './components/TimelineAnnouncer';
 import { CloseContext } from './lib/close-context';
 import { sceneNow } from './lib/clock';
-import { closeReducer, endState, landingState } from './lib/close-state';
+import { closeReducer, endState, landingState, repliesIn } from './lib/close-state';
 import { useHeroScript } from './lib/hero-script';
 import { PanelSheetContext } from './lib/panel-sheet';
 import { useTimeline } from './lib/timeline-script';
@@ -17,10 +17,9 @@ import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
 import { slotsFor } from './views/slots';
 
 /**
- * The close demo: a team chat for Kasane's September close. One shell, and
- * the view in the URL decides what fills it (`lib/view.ts`). The sidebar,
- * the page header and the right panel follow the view; nothing else is
- * routed.
+ * The Kasane app: a finance workspace laid out as a team chat. One shell, and
+ * the view in the URL decides what fills it (`lib/view.ts`). The sidebar, the
+ * page header and the right panel follow the view; nothing else is routed.
  */
 export function App() {
   const view = useView();
@@ -34,6 +33,12 @@ export function App() {
   // The scripted steps run here, not in the channel, so they land from any view.
   useHeroScript(state, dispatch);
   useTimeline(state, dispatch);
+  // The open channel's replies are seen as they land, so it never marks itself unread.
+  const openChannel = view.kind === 'channel' ? view.channel : null;
+  const repliesHere = openChannel ? repliesIn(state, openChannel) : 0;
+  useEffect(() => {
+    if (openChannel) dispatch({ type: 'seen', channel: openChannel });
+  }, [openChannel, repliesHere]);
   const panelAsSheet = useNoRoomForPanel() && slots.panel != null;
   const place = placeOf(view);
   // Which place's sheet is open, so one never stays open over the next view.

@@ -6,7 +6,8 @@ import { channels, lastClosedMonth, memberName, selectedTask } from '../lib/kasa
 import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
 import { NoMessages, Profile } from './parts';
-import { SepCloseChannel } from './SepClose';
+import { ChannelDetails, ChannelFacts } from './ChannelDetails';
+import { ChannelView } from './Channel';
 import { TaskPanel, TasksView } from './Tasks';
 
 /**
@@ -62,16 +63,31 @@ export function slotsFor(view: View): ViewSlots {
   const title = `# ${channel.name}`;
   return {
     title,
-    actions: <ChannelPresence channel="revenue" />,
-    body: <SepCloseChannel />,
-    panel: {
-      label: `${lastClosedMonth} close`,
-      content: (
-        <>
-          <AppShellPanelHeader title={`${lastClosedMonth} close`} />
-          <ClosePanel />
-        </>
-      ),
-    },
+    actions: <ChannelPresence channel={view.channel} />,
+    // Keyed so a link's landing runs again on each way into a channel.
+    body: <ChannelView key={view.channel} channel={view.channel} />,
+    // #close keeps the record. Every other channel shows its details.
+    panel:
+      view.channel === 'close'
+        ? {
+            label: `${lastClosedMonth} close`,
+            content: (
+              <>
+                <AppShellPanelHeader title={`${lastClosedMonth} close`} />
+                <ClosePanel>
+                  <ChannelFacts channel="close" />
+                </ClosePanel>
+              </>
+            ),
+          }
+        : {
+            label: 'Channel details',
+            content: (
+              <>
+                <AppShellPanelHeader title="Channel details" />
+                <ChannelDetails channel={view.channel} />
+              </>
+            ),
+          },
   };
 }

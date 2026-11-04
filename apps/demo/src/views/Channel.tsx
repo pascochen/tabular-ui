@@ -1,6 +1,7 @@
 import { Fragment, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { ChannelMessage, ChannelMessageList, ChatComposer } from 'tabular-ui';
+import { HashIcon } from '@phosphor-icons/react';
+import { ChannelMessage, ChannelMessageList, ChatComposer, EmptyState } from 'tabular-ui';
 
 import { ExceptionCard } from '../components/ExceptionCard';
 import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
@@ -8,38 +9,55 @@ import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
 import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
-import { close, exceptions, memberName, type Exception } from '../lib/kasane';
+import { channels, close, exceptions, findings, memberName, type ChannelId, type Exception } from '../lib/kasane';
 import { MemberAvatar } from '../shell/members';
+import { ChannelGaps } from './Tasks';
 
 const titleOf = (id: string) => exceptions.find((e) => e.id === id)!.title;
+const channelOf = (id: string) => exceptions.find((e) => e.id === id)!.channel;
 
 const isHero = (e: Exception) => 'hero' in e && e.hero === true;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /**
- * Said once, under the visitor's first post, by a system that isn't the agent or
+ * Said once, under the visitor's first post, by a system that isn't an agent or
  * a person (docs/agent-voice.md, rule 1). "To your message": the people do still
  * reply, in their threads.
  */
 const SCRIPTED_NOTE = 'The people and the AI are scripted, so nobody will reply to your message.';
 
 /**
- * #revenue: one message per exception with its replies inline, the decision
- * first so it opens above the fold, then whatever the visitor writes, and the
- * composer. The decision and the
- * timeline change it all through the close state.
+ * A channel: one message per finding it holds, with its replies inline, then
+ * whatever the visitor writes, and the composer. The decision and the timeline
+ * change it all through the close state. A channel holding no finding shows its
+ * topic and the gap linked to it.
+ *
+ * App keys this by channel, so `useExceptionLink` and `useDecisionInView` run
+ * again on each way in.
  */
-export function SepCloseChannel() {
+export function ChannelView({ channel }: { channel: ChannelId }) {
   const { state, dispatch } = useClose();
   const heroReplies = useHeroReplies();
   const composerBar = useRef<HTMLDivElement>(null);
   useDecisionInView(composerBar);
   useExceptionLink();
   const [heard, setHeard] = useState('');
+  const c = channels.find((x) => x.id === channel)!;
+  const held = exceptions.filter((e) => e.channel === channel);
+  const posts = state.posts.filter((p) => p.where === channel);
+  const gaps = findings.gaps.filter((g) => c.gaps.includes(g.id));
+  // Only this channel's: elsewhere, the sidebar's unread mark says it when the reply lands.
+  const typing = state.typing && channelOf(state.typing.exception) === channel ? state.typing : null;
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
-      <ChannelMessageList aria-label="Messages in revenue">
-        {exceptions.map((e) => (
+      {held.length === 0 ? (
+        <div className="flex flex-col gap-[var(--gap-group)]">
+          <EmptyState icon={HashIcon} title={`Nothing open in #${c.name}`} description={c.topic} />
+          <ChannelGaps gaps={gaps} />
+        </div>
+      ) : null}
+      <ChannelMessageList aria-label={`Messages in ${c.name}`}>
+        {held.map((e) => (
           <ExceptionCard
             key={e.id}
             awaitsYou={awaitsVisitor(state, e.id)}
@@ -50,14 +68,14 @@ export function SepCloseChannel() {
             extraReplies={isHero(e) ? heroReplies : undefined}
           />
         ))}
-        {state.posts.map((p, i) => (
+        {posts.map((p, i) => (
           <Fragment key={i}>
             <ChannelMessage
               author={{ name: memberName('visitor'), avatar: <MemberAvatar memberKey="visitor" /> }}
               time={p.at}
               dateTime={dateTime(p.at)}
               // The second post follows the note: headerless, it would read as System's.
-              continued={i > 1 && state.posts[i - 1].at === p.at}
+              continued={i > 1 && posts[i - 1].at === p.at}
             >
               {p.text}
             </ChannelMessage>
@@ -91,17 +109,17 @@ export function SepCloseChannel() {
       >
         <p aria-hidden="true" className="min-h-[var(--text-xs--line-height)] text-xs text-text-secondary">
           {/* Names the card, since its thread may be off screen. */}
-          {state.typing ? `${memberName(state.typing.who)} is replying on ${titleOf(state.typing.exception)}…` : null}
+          {typing ? `${memberName(typing.who)} is replying on ${titleOf(typing.exception)}…` : null}
         </p>
         <ChatComposer
-          label="Message revenue"
-          placeholder="Message #revenue"
+          label={`Message ${c.name}`}
+          placeholder={`Message #${c.name}`}
           onSend={(text) => {
-            flushSync(() => dispatch({ type: 'say', text, at: sceneNow() }));
+            flushSync(() => dispatch({ type: 'say', where: channel, text, at: sceneNow() }));
             // A post lands at the channel's foot, off screen from anywhere above it.
             const scroller = composerBar.current?.closest('[data-slot="app-shell-main-body"]');
             scroller?.scrollTo({ top: scroller.scrollHeight });
-            if (state.posts.length === 0) {
+            if (posts.length === 0) {
               setHeard(SCRIPTED_NOTE);
               setTimeout(() => setHeard(''), 7000);
             }

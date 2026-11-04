@@ -501,6 +501,28 @@ export const LongPageTitle: Story = {
  * count, or the `agent` badge that marks the AI as a member. A long name
  * truncates before its trailing content does.
  */
+/** One channel unread beside one read and one active: a brighter name at the resting weight, never semibold. */
+export const Unread: Story = {
+  args: {
+    ...Expanded.args,
+    sidebar: (
+      <AppShellNav>
+        <AppShellNavGroup label="Channels">
+          <AppShellNavItem href="#" icon={<HashIcon />} active>
+            revenue
+          </AppShellNavItem>
+          <AppShellNavItem href="#" icon={<HashIcon />} unread>
+            payables
+          </AppShellNavItem>
+          <AppShellNavItem href="#" icon={<HashIcon />}>
+            cash
+          </AppShellNavItem>
+        </AppShellNavGroup>
+      </AppShellNav>
+    ),
+  },
+};
+
 export const PeopleAndCounts: Story = {
   args: {
     ...Expanded.args,

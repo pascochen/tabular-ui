@@ -3,7 +3,7 @@
 // close panel, the tiles and the counts are derived from it, never stored
 // (kasane-close-demo-plan.md §5).
 
-import { checks, close } from './kasane';
+import { checks, close, exceptions, type ChannelId } from './kasane';
 import { timeline } from './timeline';
 
 export type ExceptionId = (typeof close.exceptions)[number]['id'];
@@ -54,8 +54,10 @@ export type CloseState = {
   typing: { who: string; exception: ExceptionId } | null;
   /** The scripted run is over: Skip has nothing left to do. */
   ended: boolean;
-  /** What the visitor wrote in the composer. Nobody replies to it. */
-  posts: { text: string; at: string }[];
+  /** What the visitor wrote in a composer, and where. Nobody replies to it. */
+  posts: { where: string; text: string; at: string }[];
+  /** How many replies the visitor has seen in each channel. Fewer than it holds: the sidebar marks it unread. */
+  seen: Partial<Record<ChannelId, number>>;
 };
 
 const HERO = close.hero.exception as ExceptionId;
@@ -66,13 +68,16 @@ const HERO = close.hero.exception as ExceptionId;
  * delay is scripted to arrive later.
  */
 export function landingState(): CloseState {
-  const exceptions = {} as CloseState['exceptions'];
-  for (const e of close.exceptions) {
+  const landing = {} as CloseState['exceptions'];
+  const seen: CloseState['seen'] = {};
+  for (const e of exceptions) {
     const replies = e.replies.flatMap((r) => ('at' in r && r.at ? [{ author: r.author, text: r.text, at: r.at }] : []));
-    exceptions[e.id] = { status: 'open', replies };
+    landing[e.id] = { status: 'open', replies };
+    // Everything posted before landing counts as read.
+    seen[e.channel] = (seen[e.channel] ?? 0) + replies.length;
   }
   return {
-    exceptions,
+    exceptions: landing,
     hero: { rounds: [{ askedAt: close.hero.askedAt }] },
     log: [],
     checks: Object.fromEntries(checks.map((c) => [c.id, c.before])),
@@ -80,6 +85,7 @@ export function landingState(): CloseState {
     typing: null,
     ended: false,
     posts: [],
+    seen,
   };
 }
 
@@ -104,8 +110,10 @@ export type CloseAction =
   | { type: 'event'; index: number; at: string; quiet?: boolean }
   /** Skip to the end: finish the decision if it's open, then apply every event left. */
   | { type: 'skip'; at: string }
-  /** The visitor posted in the composer. */
-  | { type: 'say'; text: string; at: string };
+  /** The visitor posted in a composer. */
+  | { type: 'say'; where: string; text: string; at: string }
+  /** The visitor has a channel open, so every reply in it is seen. */
+  | { type: 'seen'; channel: ChannelId };
 
 const current = (state: CloseState) => state.hero.rounds[state.hero.rounds.length - 1];
 
@@ -186,8 +194,14 @@ export function closeReducer(state: CloseState, action: CloseAction): CloseState
     }
     case 'say':
       return action.text.trim()
-        ? { ...state, posts: [...state.posts, { text: action.text.trim(), at: action.at }] }
+        ? { ...state, posts: [...state.posts, { where: action.where, text: action.text.trim(), at: action.at }] }
         : state;
+    case 'seen': {
+      const count = repliesIn(state, action.channel);
+      return state.seen[action.channel] === count
+        ? state
+        : { ...state, seen: { ...state.seen, [action.channel]: count } };
+    }
     case 'answer': {
       if (round.answer) return state;
       if (action.answer === 'skip')
@@ -225,6 +239,21 @@ export function closeReducer(state: CloseState, action: CloseAction): CloseState
 export function progress(state: CloseState) {
   const all = Object.values(state.exceptions);
   return { resolved: all.filter((e) => e.status === 'resolved').length, total: all.length };
+}
+
+/** How many replies a channel holds, across the findings in it. */
+export function repliesIn(state: CloseState, channel: ChannelId): number {
+  return exceptions.filter((e) => e.channel === channel).reduce((n, e) => n + state.exceptions[e.id].replies.length, 0);
+}
+
+/** A channel holds a reply the visitor hasn't seen. Opening it clears this. */
+export function isUnread(state: CloseState, channel: ChannelId): boolean {
+  return repliesIn(state, channel) > (state.seen[channel] ?? 0);
+}
+
+/** A channel holds a contradiction still open: its dot. In step with the Tasks count. */
+export function holdsOpen(state: CloseState, channel: ChannelId): boolean {
+  return exceptions.some((e) => e.channel === channel && state.exceptions[e.id].status === 'open');
 }
 
 /**
