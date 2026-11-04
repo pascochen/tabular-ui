@@ -46,11 +46,14 @@ declare module '@tanstack/react-table' {
   // this declaration does not reference it.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData, TValue> {
-    /** `numeric` right-aligns and applies tabular-nums. Use for every figure. */
+    /**
+     * `numeric` right-aligns and applies tabular-nums, and the cell never
+     * truncates or wraps. Use for every figure.
+     */
     align?: 'text' | 'numeric';
     /** `mono` renders identifiers in --font-mono, one step down (§8.3). */
     content?: 'text' | 'mono';
-    /** Cells truncate by default; set false for cells that must wrap. */
+    /** Text cells truncate by default; set false for cells that must wrap. A `numeric` or `figure` column ignores this. */
     truncate?: boolean;
     /**
      * The table prints this column itself, and its `cell` is ignored, so what
@@ -138,8 +141,8 @@ function isClickForSelection(event: React.MouseEvent<HTMLTableRowElement>, press
 }
 
 /**
- * Right-aligned, tabular and double-clicked whole. One test, because writing it
- * out at each use is how a double-click first missed `figure` columns.
+ * Right-aligned, tabular, never cut and double-clicked whole. One test, because
+ * writing it out at each use is how a double-click first missed `figure` columns.
  */
 function isNumeric<TData>(meta: ColumnMeta<TData, unknown> | undefined) {
   return meta?.align === 'numeric' || meta?.figure !== undefined;
@@ -288,8 +291,9 @@ function selectWholeFigure(event: React.MouseEvent<HTMLTableCellElement>) {
  * silently does nothing.
  *
  * **Numeric columns must set `meta.align: 'numeric'`.** That is what applies
- * `tabular-nums` and right-alignment; §0 rule 6 calls misaligned figure
- * columns a correctness hazard, not an aesthetic one.
+ * `tabular-nums` and right-alignment, and what keeps a figure from being cut;
+ * §0 rule 6 calls misaligned figure columns a correctness hazard, not an
+ * aesthetic one.
  *
  * **The double rule comes from a check, never a prop (§7.8).** `totals` gives the
  * table the total as your records state it; the table adds the rows on display
@@ -373,7 +377,8 @@ function DataTable<TData>({
   );
   // A figure is never truncated, so it widens its column. A windowed table measures
   // only the rows it renders, so a wide figure scrolling in would shift every column.
-  // Each figure column reserves room for its widest figure, across every row.
+  // Each `figure` column reserves room for its widest figure, across every row. An
+  // `align: 'numeric'` column can't: its `cell` is the caller's, so it gets a `size`.
   const figureLengths = useMemo(
     () => (shouldVirtualize ? widestFigures(rows, leafColumns) : null),
     [shouldVirtualize, rows, leafColumns],
@@ -558,7 +563,17 @@ function DataTable<TData>({
                         // runs one step below adjacent sans (§8.3).
                         isNumeric(meta) && 'text-right tabular-nums',
                         meta?.content === 'mono' && 'font-mono text-xs',
-                        meta?.figure ? 'whitespace-nowrap' : meta?.truncate !== false && 'max-w-0 truncate',
+                        // A cell cuts only what an ellipsis can stand in for.
+                        // `max-w-0` takes a cell's content out of its column's
+                        // width, so anything in it can be cut. A figure stays out
+                        // of that: `2,019…` hides a magnitude, so the widest figure
+                        // sets the column's minimum, and the table scrolls sideways
+                        // first. So does a badge: an atomic box can't end in an
+                        // ellipsis, so its letters are simply cut (`PROPOS`). Both
+                        // stay on one line, which holds the row at --h-row-sm.
+                        isNumeric(meta)
+                          ? 'whitespace-nowrap'
+                          : meta?.truncate !== false && 'max-w-0 truncate has-[>[data-slot=badge]]:max-w-none',
                       )}
                     >
                       {meta?.figure

@@ -170,19 +170,90 @@ test('a sortable `figure` column takes the same edge, with the caret on its inne
 });
 
 /**
- * Where the reservation earns its keep. Squeezed, a column is as wide as its
+ * Where the reservation earns its keep. Squeezed, a column can be as wide as its
  * header's content, so a caret that took no space until drawn would resize the
- * column it appears in. Labels only: a squeezed cell clips its figure, so the
- * figure has no edge to share here.
+ * column it appears in. The figures hold their width there too, so the label
+ * still has an edge to share.
  */
-test('in a squeezed table, a sort resizes no column', async ({ page }) => {
+test('in a squeezed table, labels sit on their figures and a sort resizes no column', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 700 });
   await gotoStory(page, 'product-datatable--default');
   await page.mouse.move(0, 0);
   const rest = await readHeaders(page);
+  expectLabelsOnTheirEdges(rest, ['Rows', 'Duration', 'Variance']);
   await page.getByRole('button', { name: 'Variance' }).click();
   await page.mouse.move(0, 0);
   expectNothingMoved(await readHeaders(page), rest);
+});
+
+/**
+ * A cell cuts only what an ellipsis can stand in for. `2,019,530` read `2,019…`
+ * until 2026-11-03, which hides the magnitude, and `PROPOSED` read `PROPOS`, with
+ * no ellipsis, because a badge is an atomic box. The row height is read too: a
+ * figure that wrapped instead of clipping would fit its cell and break the
+ * virtualizer.
+ */
+const readCells = (page: Page) =>
+  page.evaluate(async () => {
+    await document.fonts.load('400 13px "Source Sans 3 Variable"', '0');
+    await document.fonts.load('500 10px "Source Sans 3 Variable"', 'A');
+    await document.fonts.ready;
+    const table = document.querySelector('#storybook-root table')!;
+    const scroller = table.parentElement!;
+    const rows = Array.from(table.querySelectorAll('tbody tr[data-row-id]'));
+    const cells = rows.flatMap((row) => Array.from(row.children));
+    const isCut = (td: Element) => td.scrollWidth > td.clientWidth;
+    const isBadge = (td: Element) => td.querySelector(':scope > [data-slot="badge"]') !== null;
+    // The cell's own class: the table's text inherits tabular figures everywhere.
+    const isFigure = (td: Element) => td.classList.contains('tabular-nums');
+    const read = (td: Element) => ({
+      text: td.textContent ?? '',
+      cut: isCut(td),
+      whiteSpace: getComputedStyle(td).whiteSpace,
+    });
+    return {
+      rowHeight: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--h-row-sm')),
+      rowHeights: [...new Set(rows.map((row) => row.getBoundingClientRect().height))],
+      sideways: scroller.scrollWidth - scroller.clientWidth,
+      figures: cells.filter(isFigure).map(read),
+      badges: cells.filter(isBadge).map(read),
+      // Text still gives way: a column that stopped truncating would pass the rest.
+      textCut: cells.filter((td) => !isFigure(td) && !isBadge(td)).some(isCut),
+    };
+  });
+
+// Figures at 420 and badges at 768, in the sized table; a `figure` column, which
+// sets no `align`, with no total or reservation holding it open; and a table with
+// no `size` at all, whose columns share out what's left.
+const squeezedTables: [story: string, width: number][] = [
+  ['product-datatable--default', 420],
+  ['product-datatable--default', 768],
+  ['product-datatable--squeezed', 1280],
+  ['product-appbar--in-dashboard', 320],
+];
+
+for (const [story, width] of squeezedTables) {
+  test(`a squeezed table cuts no figure and no badge — ${story} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await gotoStory(page, story);
+    const cells = await readCells(page);
+    expect(cells.figures.length, 'expected figures in the table').toBeGreaterThan(0);
+    expect(cells.badges.length, 'expected badges in the table').toBeGreaterThan(0);
+    for (const f of cells.figures) {
+      expect(f.cut, `"${f.text}" is cut`).toBe(false);
+      expect(f.whiteSpace, `"${f.text}" can wrap`).toBe('nowrap');
+    }
+    for (const b of cells.badges) expect(b.cut, `"${b.text}" is cut`).toBe(false);
+    expect(cells.rowHeights, 'every row at --h-row-sm').toEqual([cells.rowHeight]);
+  });
+}
+
+test('text gives way first, and past that the table scrolls sideways', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await gotoStory(page, 'product-datatable--default');
+  const cells = await readCells(page);
+  expect(cells.textCut, 'a text cell stopped truncating').toBe(true);
+  expect(cells.sideways, 'the table should scroll sideways').toBeGreaterThan(0);
 });
 
 /**

@@ -43,14 +43,14 @@ const columns: DataTableProps<Line>['columns'] = [
     accessorKey: 'debit',
     header: 'Debit',
     size: 96,
-    meta: { align: 'numeric', truncate: false },
+    meta: { align: 'numeric' },
     cell: ({ getValue }) => yen(getValue<number>()),
   },
   {
     accessorKey: 'credit',
     header: 'Credit',
     size: 96,
-    meta: { align: 'numeric', truncate: false },
+    meta: { align: 'numeric' },
     cell: ({ getValue }) => yen(getValue<number>()),
   },
 ];
