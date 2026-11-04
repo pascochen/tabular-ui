@@ -311,3 +311,30 @@ export const DeprecatedDestructiveSpelling: Story = {
     await expect(buttonVariants({ variant: 'destructive' })).toBe(buttonVariants({ variant: 'danger' }));
   },
 };
+
+/**
+ * A real `<a>` wearing the button's appearance, which is how a link looks like a
+ * button without being announced as one. Its border must paint: bare, the cva's
+ * `border-transparent` used to win over `outline`'s `border-border`.
+ */
+export const AsLink: Story = {
+  render: () => (
+    <div className="flex items-center gap-[var(--gap-inline)]">
+      <a href="#outline" className={buttonVariants({ variant: 'outline' })}>
+        Outline link
+      </a>
+      <a href="#ghost" className={buttonVariants({ variant: 'ghost' })}>
+        Ghost link
+      </a>
+      <a href="#default" className={buttonVariants()}>
+        Default link
+      </a>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const border = (name: string) => getComputedStyle(canvas.getByRole('link', { name })).borderTopColor;
+    await expect(border('Outline link')).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(border('Ghost link')).toBe('rgba(0, 0, 0, 0)');
+  },
+};

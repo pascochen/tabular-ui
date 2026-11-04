@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { citedBy } from '../../demo/src/lib/kasane';
 import {
   BUILT_CHANNELS,
   DEFAULT_VIEW,
@@ -98,4 +99,14 @@ test('?at=end opens the end state with any view', () => {
   expect(parseAtEnd('?dm=apLead&at=end')).toBe(true);
   expect(parseAtEnd('?view=revenue')).toBe(false);
   expect(parseView('?dm=apLead&at=end')).toEqual({ kind: 'dm', member: 'apLead' });
+});
+
+test('a source says which findings cite it, and only findings', () => {
+  const ids = (name: string) => citedBy(name).map((e) => e.id);
+  expect(ids('sales_invoices_2026-09.csv')).toEqual(['revenue-cut-off']);
+  // Two findings rest on what the controller said.
+  expect(ids('03_interview_controller_2026-10-13.txt')).toEqual(['revenue-cut-off', 'self-approved-entry']);
+  // Only a gap and a question cite the bank export and the chart of accounts.
+  expect(ids('bank_export_kjp_2026-09.csv')).toEqual([]);
+  expect(ids('chart_of_accounts.csv')).toEqual([]);
 });

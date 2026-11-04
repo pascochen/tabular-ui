@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
 
+import { cn } from '../../../lib/utils';
 import { controlBase, controlGrounds, pressableBase } from '../controlBase';
 
 /**
@@ -9,7 +10,7 @@ import { controlBase, controlGrounds, pressableBase } from '../controlBase';
  * Structure, focus, hover/press and disabled come from the shared control
  * contract. Only what is specific to a labelled button lives here.
  */
-export const buttonVariants = cva(
+const buttonCva = cva(
   [
     ...controlBase,
     ...pressableBase,
@@ -35,3 +36,12 @@ export const buttonVariants = cva(
     },
   },
 );
+
+/**
+ * The button's classes, resolved. A bare cva string keeps every class it was given,
+ * so an `<a>` styled with it held the base's `border-transparent` beside `outline`'s
+ * `border-border`, and CSS order let the transparent one win: an outline link with
+ * no border, and no error. `Button` always went through `cn()`, so only links showed
+ * it. Resolved here, a link can't get it wrong.
+ */
+export const buttonVariants = (...args: Parameters<typeof buttonCva>) => cn(buttonCva(...args));

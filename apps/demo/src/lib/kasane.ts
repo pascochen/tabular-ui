@@ -96,6 +96,9 @@ export type BinderSource = {
 /** The binder: every file a finding, gap or question cites, or an agent reads (`sources.json`). */
 export const binder = sourcesData as BinderSource[];
 
+/** The findings that cite a file, for its exhibit's way back. A gap or question names files too, but isn't a finding. */
+export const citedBy = (name: string): Exception[] => exceptions.filter((e) => e.sources.includes(name));
+
 /** A file's exhibit ID: "S-17". The export puts every cited file in the binder, so one that isn't is a bug. */
 export function exhibitOf(name: string): string {
   const source = binder.find((s) => s.name === name);

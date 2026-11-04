@@ -34,7 +34,7 @@ export type HeroRound = {
   delegated?: boolean;
   answeredAt?: string;
   /**
-   * After an answer: reading the delivery note, then the proposal, then (for
+   * After an answer: reading the delivery date, then the proposal, then (for
    * a reopen) the check rerunning, then done. `stopped` is "Don't post it".
    */
   stage?: 'reading' | 'proposed' | 'rerunning' | 'done' | 'stopped' | 'skipped';
@@ -101,7 +101,7 @@ export type CloseAction =
   | { type: 'reset' }
   /** The visitor answered the hero question: an option, Skip, or Choose for me. */
   | { type: 'answer'; answer: HeroOption | 'skip' | 'delegate'; at: string }
-  /** The agent finished reading the delivery note and posts its proposal. */
+  /** The agent finished reading the delivery date and posts its proposal. */
   | { type: 'read' }
   /** The visitor confirmed the proposal. */
   | { type: 'post'; at: string }
