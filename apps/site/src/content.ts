@@ -50,9 +50,9 @@ export function componentPage(name: string): string {
 
 export const external = {
   storybook: { href: 'https://storybook.tabularui.com', label: 'Storybook' },
-  // Not ready yet (owner, 2026-10-26): every demo action shows "Demo (soon)",
-  // disabled, until this is true.
-  demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: false as boolean },
+  // Live since 2026-11-04 (owner): every demo action is a link. Set to false,
+  // each one shows "Demo (soon)", disabled.
+  demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: true as boolean },
   github: { href: 'https://github.com/pascochen/tabular-ui', label: 'GitHub' },
   license: { href: 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE', label: 'MIT license' },
   // The footer's About column names the author (owner, 2026-10-27).

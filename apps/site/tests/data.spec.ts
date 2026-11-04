@@ -5,7 +5,15 @@ import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
 import { percentChange, percentDelta, money as storyMoney } from '../../../packages/ui/src/fixtures/format';
-import { exactMoney, money } from '../src/lib/format';
+import { exactMoney, money, numberWord } from '../src/lib/format';
+
+test('numberWord() writes a count as a word, and refuses what it has no word for', () => {
+  expect(numberWord(4)).toBe('four');
+  expect(numberWord(4, { capitalize: true })).toBe('Four');
+  expect(numberWord(10)).toBe('ten');
+  expect(() => numberWord(11)).toThrow();
+  expect(() => numberWord(1.5)).toThrow();
+});
 
 /**
  * The site formats money by the stories' rules, kept in its own copy because it

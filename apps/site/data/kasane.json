@@ -4,8 +4,9 @@
     "legalName": "Kasane Corporation",
     "lastClosedPeriod": "2026-09",
     "openPeriod": "2026-10",
-    "persona": { "name": "Mei Tachibana", "title": "Head of FP&A" }
+    "visitor": { "title": "Group Controller" }
   },
+  "agents": 4,
   "pack": [
     { "name": "01_kickoff_cfo_2026-10-12.txt", "kind": "transcript", "bytes": 6899 },
     { "name": "02_interview_fpa_2026-10-13.txt", "kind": "transcript", "bytes": 7356 },

@@ -4,7 +4,7 @@ import { DemoAction } from './components/demo-action';
 import { Rail, Section } from './components/layout';
 import { SpecimenFrame } from './components/specimen';
 import { componentGrid, pages } from './content';
-import { kasane } from './data';
+import { closingBand, kasane } from './data';
 import { HeroSpecimen } from './specimens';
 
 /** Home's hero and closing band (wireframe `76:23`, mobile `77:96`). The component grid between them is in component-grid.tsx. */
@@ -69,13 +69,15 @@ export function ClosingBand() {
     <Section labelledBy="closing-title" className="p-0">
       <div data-theme="dark" className="bg-canvas py-[var(--site-section-y)] text-text-body">
         <Rail size="reading" className="flex flex-col items-center gap-[var(--site-gap)] text-center">
-          <h2 id="closing-title" className="text-site-heading-sm font-semibold text-text-primary md:text-site-heading">
-            Give an agent a finance team’s files.
+          <h2
+            id="closing-title"
+            className="text-site-heading-sm font-semibold text-balance text-text-primary md:text-site-heading"
+          >
+            {closingBand.agents} agents found contradictions in a finance team’s books. You decide.
           </h2>
-          <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-            {kasane.company.name} is a fictional printer maker. You play its {kasane.company.persona.title} while a
-            scripted agent reads {kasane.pack.length} of its files. The duplicate payment above is one of the
-            contradictions it finds.
+          <p className="max-w-[var(--site-w-prose)] text-site-lead text-balance text-text-secondary">
+            {kasane.company.name} is a fictional printer maker. Its team works in channels, like Slack, and you play its{' '}
+            {closingBand.role}.
           </p>
           <DemoAction label="Open the demo" />
         </Rail>

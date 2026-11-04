@@ -22,7 +22,7 @@
 //   apps/demo/data/checks.json           each close check's figure before and after its fix
 //   apps/demo/data/sources.json          the binder: each file a finding cites or an agent reads, its
 //                                        exhibit ID and a trimmed excerpt
-//   apps/site/data/kasane.json           the public site's specimen records (docs/site.md §5)
+//   apps/site/data/kasane.json           the public site's specimen records and closing band (docs/site.md §5)
 //
 // Only what the demo's screens read is written: no whole files, only the binder's excerpts.
 // Re-running it on an unchanged dataset produces no diff.
@@ -810,40 +810,6 @@ await writeJson('apps/demo/data/findings.json', {
   followUps: followUps.map(curlyCopy),
 });
 
-// The public site (apps/site, docs/site.md §5 and D5): exactly the records its specimens show, and
-// nothing it would have to type. The hero proposes reversing the duplicate supplier invoice; once a
-// person posts it, the entry takes the next journal number in that entity's open month. Numbers run
-// per entity per month (JE-KUK-2608-00055), so the next one is computed from the journal, never assumed.
-const JE_ID = /^JE-[A-Z]{3}-\d{4}-\d{5}$/;
-must(
-  journal.some((l) => JE_ID.test(l.je_id)),
-  'journal entry IDs in the JE-<entity>-<YYMM>-<number> form',
-);
-const jePrefix = `JE-${dup[0].entity_id}-${OPEN.period.slice(2, 4)}${OPEN.period.slice(5, 7)}-`;
-const openNumbers = journal.filter((l) => l.je_id.startsWith(jePrefix)).map((l) => Number(l.je_id.slice(-5)));
-await writeJson('apps/site/data/kasane.json', {
-  company: {
-    name: fixtures.company.name,
-    legalName: fixtures.company.legalName,
-    lastClosedPeriod: fixtures.company.lastClosedPeriod,
-    openPeriod: fixtures.company.openPeriod,
-    persona: { name: people.fpa.name, title: people.fpa.title },
-  },
-  pack: pack.map(({ name, kind, bytes }) => ({ name, kind, bytes })),
-  findings: { contradictions: contradictions.length, gaps: gaps.length, followUps: followUps.length },
-  duplicatePayment: {
-    entity: dup[0].entity_id,
-    supplierInvoice: dup[0].supplier_invoice_number,
-    entries: dup.map((d) => d.ap_invoice_id),
-    amount: num(dup[0].gross_amount),
-    currency: dup[0].currency,
-    paid: dupPaid,
-    sources: [T.arap, P.supplierInvoices],
-    nextJournalId: `${jePrefix}${String(Math.max(0, ...openNumbers) + 1).padStart(5, '0')}`,
-  },
-  operatingBridge: fixtures.operatingBridge,
-});
-
 // ---------------------------------------------------------------------------
 // The Kasane app: the scripted workspace. The copy is authored in onboarding/close-demo.json; every
 // figure in it is a {token} filled here from the data, and the people are employee ids.
@@ -1485,6 +1451,42 @@ await writeJson('apps/demo/data/close.json', {
   }),
 });
 await writeJson('apps/demo/data/checks.json', closeChecks);
+
+// The public site (apps/site, docs/site.md §5 and D5): exactly the records it shows, and nothing it
+// would have to type. It comes after the workspace because the closing band (D7) names the workspace's
+// agents and visitor. The hero proposes reversing the duplicate supplier invoice; once a person posts
+// it, the entry takes the next journal number in that entity's open month. Numbers run per entity per
+// month (JE-KUK-2608-00055), so the next one is computed from the journal, never assumed.
+const JE_ID = /^JE-[A-Z]{3}-\d{4}-\d{5}$/;
+must(
+  journal.some((l) => JE_ID.test(l.je_id)),
+  'journal entry IDs in the JE-<entity>-<YYMM>-<number> form',
+);
+const jePrefix = `JE-${dup[0].entity_id}-${OPEN.period.slice(2, 4)}${OPEN.period.slice(5, 7)}-`;
+const openNumbers = journal.filter((l) => l.je_id.startsWith(jePrefix)).map((l) => Number(l.je_id.slice(-5)));
+await writeJson('apps/site/data/kasane.json', {
+  company: {
+    name: fixtures.company.name,
+    legalName: fixtures.company.legalName,
+    lastClosedPeriod: fixtures.company.lastClosedPeriod,
+    openPeriod: fixtures.company.openPeriod,
+    visitor: { title: closePeople.visitor.title },
+  },
+  agents: closeSource.agents.length,
+  pack: pack.map(({ name, kind, bytes }) => ({ name, kind, bytes })),
+  findings: { contradictions: contradictions.length, gaps: gaps.length, followUps: followUps.length },
+  duplicatePayment: {
+    entity: dup[0].entity_id,
+    supplierInvoice: dup[0].supplier_invoice_number,
+    entries: dup.map((d) => d.ap_invoice_id),
+    amount: num(dup[0].gross_amount),
+    currency: dup[0].currency,
+    paid: dupPaid,
+    sources: [T.arap, P.supplierInvoices],
+    nextJournalId: `${jePrefix}${String(Math.max(0, ...openNumbers) + 1).padStart(5, '0')}`,
+  },
+  operatingBridge: fixtures.operatingBridge,
+});
 
 console.log(
   `kasane fixtures: ${pack.length} pack files (${(sum(pack.map((f) => f.bytes)) / 1024 / 1024).toFixed(1)} MB), ` +
