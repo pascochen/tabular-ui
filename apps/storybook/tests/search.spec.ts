@@ -81,7 +81,7 @@ test('a person is found by name or title, and links to their direct message, or 
   expect(inGroup('Kenta', 'People')[0].view).toEqual({ kind: 'dm', member: 'apLead' });
   expect(inGroup('Head of FP&A', 'People')[0].title).toBe('Mei Tachibana');
   expect(inGroup('Shun', 'People')[0].view).toEqual({ kind: 'channel', channel: 'close' });
-  // Ren owns #cash and isn't one of its proposed members.
+  // Ren owns #cash and belongs to it.
   expect(inGroup('Ren Fujisawa', 'People')[0].view).toEqual({ kind: 'channel', channel: 'cash' });
 });
 

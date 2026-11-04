@@ -3,13 +3,13 @@ import type { Dispatch } from 'react';
 import { sceneNow, useScriptedStep } from './clock';
 import type { CloseAction, CloseState } from './close-state';
 
-/** How long the agent reads the delivery note, and the check takes to rerun ("reran in 2s"). */
+/** How long the agent reads the delivery date, and the check takes to rerun ("reran in 2s"). */
 const READ_MS = 1500;
 const RERUN_MS = 2000;
 
 /**
  * The agent's side of the hero decision, after the visitor's answer: read the
- * delivery note, then propose; after the visitor posts a reopen, rerun the
+ * delivery date, then propose; after the visitor posts a reopen, rerun the
  * cut-off check. App runs it, so a step still lands if the visitor has moved
  * to another view meanwhile.
  */

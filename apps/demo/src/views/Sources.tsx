@@ -4,7 +4,8 @@ import { AttachmentRow, DataTable, EmptyState, Switch, cn, type DataTableProps }
 
 import { useClose } from '../lib/close-context';
 import { isSourceOn } from '../lib/close-state';
-import { binder, type BinderSource, type TableExcerpt, type TextExcerpt } from '../lib/kasane';
+import { binder, citedBy, memberName, type BinderSource, type TableExcerpt, type TextExcerpt } from '../lib/kasane';
+import { linkClassName } from '../lib/link';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 
 type Row = Record<string, string>;
@@ -149,6 +150,29 @@ function SourceList({ selected }: { selected: string }) {
   );
 }
 
+/** The way back from a record to the findings that rest on it. Nothing to say for a file no finding cites. */
+function CitedBy({ source }: { source: BinderSource }) {
+  const findings = citedBy(source.name);
+  if (findings.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-[var(--gap-bonded)] text-sm">
+      <p className="text-xs font-medium text-text-secondary">Cited by</p>
+      <ul role="list" className="flex flex-col gap-[var(--gap-bonded)]">
+        {findings.map((e) => {
+          const task: View = { kind: 'tasks', task: e.id };
+          return (
+            <li key={e.id}>
+              <a href={hrefFor(task)} onClick={onViewLinkClick(task)} className={linkClassName}>
+                {e.title}, raised by {memberName(e.agent)}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 function OpenSource({ source, record }: { source: BinderSource; record?: string }) {
   const { state, dispatch } = useClose();
   useRecordInView(source.id, record);
@@ -171,6 +195,7 @@ function OpenSource({ source, record }: { source: BinderSource; record?: string 
           Agents read this
         </label>
       </div>
+      <CitedBy source={source} />
       {excerpt ? <p className="text-sm text-text-secondary tabular-nums">{excerpt.count}</p> : null}
       {excerpt?.type === 'table' ? (
         <DataTable

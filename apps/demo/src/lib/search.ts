@@ -33,10 +33,10 @@ const tableRows = (s: BinderSource) => (s.excerpt as TableExcerpt).rows;
 const matches = (q: string, ...texts: (string | undefined)[]) =>
   texts.some((text) => text?.toLowerCase().includes(q.toLowerCase()));
 
-/** Where a person is: their direct message if they have one, else the first channel they belong to or own. */
+/** Where a person is: their direct message if they have one, else the first channel they belong to. */
 function viewOfPerson(key: string): View {
   if (directMessages.includes(key)) return { kind: 'dm', member: key };
-  const channel = channels.find((c) => c.members.includes(key) || c.owner === key)!;
+  const channel = channels.find((c) => c.members.includes(key))!;
   return { kind: 'channel', channel: channel.id };
 }
 

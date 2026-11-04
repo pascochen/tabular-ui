@@ -4,7 +4,7 @@ The visitor's one decision, in the Revenue cut-off thread (`kasane-close-demo-pl
 
 1. **The question** (`Question`, in an `AgentBlock` labelled "Cut-off AI · Awaiting your answer"): reopen September or keep it locked, with the line it rests on. The policy says revenue belongs to the month of delivery, and it doesn't say whether a locked month is reopened.
 2. **The proposal**, once answered (`AgentBlock` labelled "Cut-off AI · Awaiting confirmation"):
-   - a `Tool` line, "Reading the delivery note…" then "Read…"
+   - a `Tool` line, "Reading the delivery date on…" then "Read…". It reads the invoice's delivery date, because the material holds no delivery note, and the finding's "not checked" list says so
    - the reason
    - for a reopen, the reversal's five lines in a `DataTable`
    - a `Confirmation` saying what changes and who it reaches
