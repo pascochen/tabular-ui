@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react';
 import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tabular-ui';
 
-import { DemoBanner } from './components/DemoBanner';
+import { AboutDemoButton } from './components/DemoActions';
 import { HeroAnnouncer } from './components/HeroThread/Announcer';
 import { TimelineAnnouncer } from './components/TimelineAnnouncer';
 import { CloseContext } from './lib/close-context';
@@ -47,15 +47,18 @@ export function App() {
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
       <PanelSheetContext.Provider value={() => panelAsSheet && setSheetFor(place)}>
+        {/* Outside the shell, which every view keeps, so a change is heard anywhere. The top nav hides, and a hidden live region says nothing. */}
+        <HeroAnnouncer />
+        <TimelineAnnouncer />
         <AppShell
           className="font-sans text-base text-text-body"
           topNav={
-            <AppBar brand={<AppShellSidebarToggle />}>
-              <DemoBanner />
-              {/* In the top nav, which every view keeps, so a change is heard anywhere. */}
-              <HeroAnnouncer />
-              <TimelineAnnouncer />
-            </AppBar>
+            // Only while the sidebar is collapsed: pinned, the sidebar holds the toggle and About.
+            <AppBar
+              brand={<AppShellSidebarToggle />}
+              actions={<AboutDemoButton />}
+              className="in-data-[sidebar=pinned]:hidden"
+            />
           }
           sidebarHeader={<SidebarHeader />}
           sidebar={<Sidebar />}
