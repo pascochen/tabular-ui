@@ -730,15 +730,18 @@ test.describe('the footer', () => {
 
 test.describe('standalone links', () => {
   // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
-  // index) is ink at rest and turns the ivy of a text link on hover, with no
-  // underline. A link inside a sentence stays ivy and underlined. The nav's
-  // links are ghost buttons, not standalone links.
+  // index, section header) is ink at rest and turns the ivy of a text link on
+  // hover, with no underline. A link inside a sentence stays ivy and
+  // underlined. The nav's links are ghost buttons, not standalone links.
   test('are ink at rest, and ivy with no underline on hover', async ({ page }) => {
+    // Home has no link inside a sentence, so the ivy comes from Getting started.
+    await page.goto('/getting-started');
+    const ivy = await page.locator('main p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
-    const ivy = await page.locator('#components p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
     const links = [
       page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }),
+      page.locator('#components').getByRole('link', { name: 'All components in Storybook' }),
       page.getByRole('navigation', { name: 'Components by moment' }).getByRole('link', { name: 'Agent plan' }),
       page.getByRole('contentinfo').getByRole('link', { name: 'Vocabulary' }),
     ];
