@@ -33,6 +33,8 @@ Only `danger` carries a hue. Everything else is neutral, per §0 rule 1 — colo
 </div>
 ```
 
+**A link wears `buttonVariants`.** A real `<a>` that should look like a button takes `className={buttonVariants({ variant: 'outline' })}`, because Base UI's `Button` would announce it as a button. The function resolves its own classes (since 2026-11-03). Until then a bare call kept `border-transparent` beside `outline`'s `border-border`, and an outline link drew no border, with no error (`AsLink` story).
+
 **`danger`, not `destructive`.** Until 2026-10-10 this variant was `destructive`, while Badge, ProgressBar and every token called the same role `danger`. The old spelling still renders the same and logs a one-time warning in development (`foundational/dangerVariant.ts`); `buttonVariants({ variant: 'destructive' })` is honoured too. Lint rejects `variant="destructive"` and `variant: 'destructive'`, so new code uses `danger`. The deprecated spelling will be removed in a later, separate change.
 
 **`danger` is a tint, not a solid fill.** A permanently-red solid button in a toolbar competes with genuine failure state in the data. `--color-fill-danger` / `--color-on-danger` stay available if a confirmation dialog later needs a solid destructive; that would be a new variant, not a change to this one.
