@@ -1,5 +1,5 @@
 import { UserIcon } from '@phosphor-icons/react';
-import { AppShellPanelBody, EmptyState, buttonVariants, cn } from 'tabular-ui';
+import { AppShellPanelBody, EmptyState, buttonVariants } from 'tabular-ui';
 
 import { people } from '../lib/kasane';
 import { DEFAULT_VIEW, hrefFor, onViewLinkClick } from '../lib/view';
@@ -19,7 +19,7 @@ export function NoMessages({ memberKey }: { memberKey: string }) {
       description="The close is happening in #revenue."
       action={
         <a
-          className={cn(buttonVariants({ variant: 'outline' }))}
+          className={buttonVariants({ variant: 'outline' })}
           href={hrefFor(DEFAULT_VIEW)}
           onClick={onViewLinkClick(DEFAULT_VIEW)}
         >

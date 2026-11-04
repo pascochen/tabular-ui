@@ -241,8 +241,7 @@ export function TaskPanel({ task }: { task: Exception }) {
         </div>
       </AgentBlock>
       <a
-        // Through cn: bare, the variant's border loses to the base's `border-transparent` (CLAUDE.md, failure log).
-        className={cn(buttonVariants({ variant: 'outline' }))}
+        className={buttonVariants({ variant: 'outline' })}
         href={`${hrefFor(channel)}${hash}`}
         onClick={onViewLinkClick(channel, hash)}
       >
