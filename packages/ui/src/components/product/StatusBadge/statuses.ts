@@ -30,6 +30,7 @@ export type RunStatus =
   | 'passed'
   | 'failed'
   | 'stale'
+  | 'open'
   | 'needs-review'
   | 'agent-working'
   | 'agent-proposed'
@@ -55,6 +56,8 @@ const entries: Record<RunStatus, Omit<RunStatusEntry, 'role' | 'spin'>> = {
   passed: { label: 'passed', tone: 'success', icon: CheckCircleIcon },
   failed: { label: 'failed', tone: 'danger', icon: XCircleIcon },
   stale: { label: 'stale', tone: 'warning', icon: WarningIcon },
+  // Unsettled, and not waiting on the viewer (§5, owner, 2026-11-03). Eye, as needs-review: the label separates them.
+  open: { label: 'open', tone: 'neutral', icon: EyeIcon },
   'needs-review': { label: 'needs review', tone: 'warning', icon: EyeIcon },
   // Spinner, as running (§11.5, 2026-10-20). The robot spun here until then and tumbled.
   // "AI", agent-voice's word for the role: with the mark shared, the label is the badge's authorship signal (2026-10-25).

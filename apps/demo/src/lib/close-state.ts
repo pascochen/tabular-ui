@@ -296,10 +296,32 @@ export function checkLabel(state: CloseState, id: string): string {
   return state.checks[id] === c.after ? c.afterLabel : c.beforeLabel;
 }
 
-/** The exception waiting on the visitor: the hero, while its question has no answer. */
+/**
+ * The exception waiting on the visitor: the hero, while its question has no
+ * answer, and again while its proposal waits for them to confirm it.
+ */
 export function awaitsVisitor(state: CloseState, id: string): boolean {
-  return id === HERO && !current(state).answer;
+  const round = current(state);
+  return id === HERO && (!round.answer || round.stage === 'proposed');
 }
+
+/**
+ * A channel's dot (§5): `needs-review` if an open finding in it waits on the
+ * visitor, `open` if its open findings don't, and `null` if it holds neither.
+ */
+export function channelMark(state: CloseState, channel: ChannelId): 'needs-review' | 'open' | null {
+  if (!holdsOpen(state, channel)) return null;
+  const waitsOnVisitor = exceptions.some(
+    (e) => e.channel === channel && state.exceptions[e.id].status === 'open' && awaitsVisitor(state, e.id),
+  );
+  return waitsOnVisitor ? 'needs-review' : 'open';
+}
+
+/** What a dot says to a screen reader, after the channel's name: a dot is `aria-hidden`. */
+export const channelMarkText = {
+  'needs-review': ', needs your answer',
+  open: ', open finding',
+} as const;
 
 /** "Reopen September" has been posted: #close's panel says the month reopened (pages spec, D7). */
 export function isReopened(state: CloseState): boolean {
