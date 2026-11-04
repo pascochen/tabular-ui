@@ -47,6 +47,12 @@ await page.evaluate(() => {
   const block = document.querySelector('[data-slot="question"]').closest('[data-slot="agent-block"]');
   const bar = document.querySelector('[data-slot="chat-composer"]').parentElement;
   scroller.scrollTop += block.getBoundingClientRect().bottom - bar.getBoundingClientRect().top;
+
+  // The sidebar is cut off at this height. Its foot goes to the first agent's,
+  // so the Agents heading has a row under it.
+  const sidebar = document.querySelector('[data-slot="app-shell-sidebar-body"]');
+  const agent = [...sidebar.querySelectorAll('a')].find((a) => a.textContent.includes('Cut-off AI'));
+  sidebar.scrollTop += agent.getBoundingClientRect().bottom - sidebar.getBoundingClientRect().bottom;
 });
 
 await page.mouse.move(0, 0);
