@@ -51,6 +51,7 @@ type Close = {
   hero: {
     exception: string;
     authorship: { asked: string };
+    tool: { running: string; done: string };
     options: { id: string; description: string }[];
     entry: { lines: Line[] };
     delegate: { reason: string };
@@ -227,6 +228,10 @@ test('six channels, in the sidebar’s order, each with a topic and an owner', (
   }
 });
 
+test('every channel’s owner belongs to it', () => {
+  for (const c of close.channels) expect(c.members, c.id).toContain(c.owner);
+});
+
 test('the quiet channels each link a gap that exists', () => {
   const gapsOf = (id: string) => close.channels.find((c) => c.id === id)?.gaps;
   expect(gapsOf('cash')).toEqual(['cash-forecast']);
@@ -249,6 +254,14 @@ test('two suggested questions an agent, 8 in all, each with its sources and what
       for (const f of q.sources) expect(a.reads, q.question).toContain(f);
     }
   }
+});
+
+test('the hero’s tool line claims only what the material holds', () => {
+  // The material has an invoice's delivery date and no delivery note, as "not checked" says.
+  const { tool } = close.hero;
+  expect(tool.done).toMatch(/^Read the delivery date on /);
+  expect(tool.running).toMatch(/^Reading the delivery date on /);
+  expect(close.exceptions.find((e) => e.id === close.hero.exception)?.notChecked[0]).toMatch(/^The delivery note: /);
 });
 
 test('D6: the binder is 18 files, deduplicated, in a fixed order', () => {
