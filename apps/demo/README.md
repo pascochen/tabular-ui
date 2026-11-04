@@ -57,6 +57,8 @@ pnpm dev
 
 That builds the package, then runs the demo with the package rebuilding on change. `pnpm build:demo` builds it for production; build the package first (`pnpm build:ui`).
 
+`public/og.png`, the social image, is a screenshot of that build. Nothing fails when it goes stale, so run `node apps/demo/scripts/og-image.mjs` after a build whenever the landing screen, the sidebar or the data changes.
+
 ## How it uses Tabular UI
 
 Like any app that installs the package: every component comes from `tabular-ui`, never by a path into `packages/ui/src`, and type-checking goes through the package's built declarations. `src/index.css` imports `tabular-ui/styles.css` and adds the `@source` line that lets Tailwind see the package's classes.
