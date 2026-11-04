@@ -48,6 +48,17 @@ export const Default: Story = {
   },
 };
 
+/** The locator as a link to the record: one citation's own place in the file, which the shared `Source` can't hold. */
+export const RecordLink: Story = {
+  args: { locator: 'S-18, API-KUS-2607-00007', locatorHref: '#record' },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: /^Source 1/ }));
+    const popup = await within(document.body).findByRole('dialog', { name: /supplier_invoices_fy2026_h1\.csv/ });
+    const link = within(popup).getByRole('link', { name: 'S-18, API-KUS-2607-00007' });
+    await expect(link).toHaveAttribute('href', '#record');
+  },
+};
+
 /**
  * Open: the file, as a link, and where in it the figure comes from. A
  * Popover, so all of it reaches a screen reader, and Escape returns focus to

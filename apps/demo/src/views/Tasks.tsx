@@ -13,7 +13,7 @@ import {
 
 import { ExceptionStatus } from '../components/ExceptionStatus';
 import { useClose } from '../lib/close-context';
-import { awaitsVisitor, openCount } from '../lib/close-state';
+import { awaitsVisitor, notCheckedWith, openCount } from '../lib/close-state';
 import {
   close,
   exceptions,
@@ -21,11 +21,11 @@ import {
   findings,
   memberName,
   selectedTask,
-  sourcesOf,
   type ChannelId,
   type Exception,
 } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
+import { citationOf, exhibitView, sourcesOf } from '../lib/sources';
 import { usePanelSheet } from '../lib/panel-sheet';
 import { hrefFor, navigate, onViewLinkClick, useView, type View } from '../lib/view';
 
@@ -89,7 +89,20 @@ const taskColumns: DataTableProps<Exception>['columns'] = [
 
 function Exhibits({ sources }: { sources: string[] }) {
   // Mono runs one step below adjacent sans (§8.3).
-  return <span className="font-mono text-xs">{sources.map(exhibitOf).join(', ')}</span>;
+  return (
+    <span className="flex flex-wrap gap-x-[var(--gap-inline)] font-mono text-xs">
+      {sources.map(exhibitOf).map((id) => (
+        <a
+          key={id}
+          href={hrefFor(exhibitView(id))}
+          onClick={onViewLinkClick(exhibitView(id))}
+          className={linkClassName}
+        >
+          {id}
+        </a>
+      ))}
+    </span>
+  );
 }
 
 const itemColumns = (label: string, withChannel: boolean): DataTableProps<Item>['columns'] => [
@@ -215,16 +228,16 @@ export function TaskPanel({ task }: { task: Exception }) {
           <Part label="What was said">
             <p>
               {task.claim}
-              <InlineCitation number={1} source={sources[0]} locator={task.citations[0].locator} />
+              <InlineCitation number={1} source={sources[0]} {...citationOf(task, 0)} />
             </p>
           </Part>
           <Part label="What the books show">
             <p>
               {task.evidence}
-              <InlineCitation number={2} source={sources[1]} locator={task.citations[1].locator} />
+              <InlineCitation number={2} source={sources[1]} {...citationOf(task, 1)} />
             </p>
           </Part>
-          <Sources sources={sources} notChecked={task.notChecked} />
+          <Sources sources={sources} notChecked={notCheckedWith(state, task.sources, task.notChecked)} />
         </div>
       </AgentBlock>
       <a

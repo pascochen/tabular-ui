@@ -521,192 +521,192 @@
       "columns": [
         { "key": "period" },
         { "key": "customer_id", "mono": true },
+        { "key": "total_open", "numeric": true },
         { "key": "currency" },
         { "key": "current", "numeric": true },
         { "key": "past_due_1_30", "numeric": true },
         { "key": "past_due_31_60", "numeric": true },
-        { "key": "total_open", "numeric": true },
         { "key": "oldest_due_date" }
       ],
       "rows": [
         {
           "period": "2025-04",
           "customer_id": "C-KUS-0001",
+          "total_open": "557637.66",
           "currency": "USD",
           "current": "385386.82",
           "past_due_1_30": "172250.84",
           "past_due_31_60": "0",
-          "total_open": "557637.66",
           "oldest_due_date": "2025-04-17"
         },
         {
           "period": "2025-05",
           "customer_id": "C-KUS-0001",
+          "total_open": "571958.41",
           "currency": "USD",
           "current": "374743.59",
           "past_due_1_30": "197214.82",
           "past_due_31_60": "0",
-          "total_open": "571958.41",
           "oldest_due_date": "2025-05-30"
         },
         {
           "period": "2025-06",
           "customer_id": "C-KUS-0001",
+          "total_open": "472803.14",
           "currency": "USD",
           "current": "472803.14",
           "past_due_1_30": "0",
           "past_due_31_60": "0",
-          "total_open": "472803.14",
           "oldest_due_date": "2025-07-10"
         },
         {
           "period": "2025-07",
           "customer_id": "C-KUS-0001",
+          "total_open": "450353.74",
           "currency": "USD",
           "current": "359498.74",
           "past_due_1_30": "90855",
           "past_due_31_60": "0",
-          "total_open": "450353.74",
           "oldest_due_date": "2025-07-28"
         },
         {
           "period": "2025-08",
           "customer_id": "C-KUS-0001",
+          "total_open": "473941.59",
           "currency": "USD",
           "current": "473941.59",
           "past_due_1_30": "0",
           "past_due_31_60": "0",
-          "total_open": "473941.59",
           "oldest_due_date": "2025-09-11"
         },
         {
           "period": "2025-09",
           "customer_id": "C-KUS-0001",
+          "total_open": "641673.89",
           "currency": "USD",
           "current": "423333.49",
           "past_due_1_30": "218340.4",
           "past_due_31_60": "0",
-          "total_open": "641673.89",
           "oldest_due_date": "2025-09-27"
         },
         {
           "period": "2025-10",
           "customer_id": "C-KUS-0001",
+          "total_open": "564583.61",
           "currency": "USD",
           "current": "564583.61",
           "past_due_1_30": "0",
           "past_due_31_60": "0",
-          "total_open": "564583.61",
           "oldest_due_date": "2025-11-03"
         },
         {
           "period": "2025-11",
           "customer_id": "C-KUS-0001",
+          "total_open": "627554.46",
           "currency": "USD",
           "current": "489068.46",
           "past_due_1_30": "138486",
           "past_due_31_60": "0",
-          "total_open": "627554.46",
           "oldest_due_date": "2025-11-22"
         },
         {
           "period": "2025-12",
           "customer_id": "C-KUS-0001",
+          "total_open": "541567.14",
           "currency": "USD",
           "current": "356900.8",
           "past_due_1_30": "184666.34",
           "past_due_31_60": "0",
-          "total_open": "541567.14",
           "oldest_due_date": "2025-12-27"
         },
         {
           "period": "2026-01",
           "customer_id": "C-KUS-0001",
+          "total_open": "530989.9",
           "currency": "USD",
           "current": "238597.47",
           "past_due_1_30": "292392.43",
           "past_due_31_60": "0",
-          "total_open": "530989.9",
           "oldest_due_date": "2026-01-04"
         },
         {
           "period": "2026-02",
           "customer_id": "C-KUS-0001",
+          "total_open": "280823.42",
           "currency": "USD",
           "current": "280823.42",
           "past_due_1_30": "0",
           "past_due_31_60": "0",
-          "total_open": "280823.42",
           "oldest_due_date": "2026-03-26"
         },
         {
           "period": "2026-03",
           "customer_id": "C-KUS-0001",
+          "total_open": "608984.69",
           "currency": "USD",
           "current": "517988.69",
           "past_due_1_30": "90996",
           "past_due_31_60": "0",
-          "total_open": "608984.69",
           "oldest_due_date": "2026-03-26"
         },
         {
           "period": "2026-04",
           "customer_id": "C-KUS-0001",
+          "total_open": "637387.13",
           "currency": "USD",
           "current": "616996.91",
           "past_due_1_30": "0",
           "past_due_31_60": "20390.22",
-          "total_open": "637387.13",
           "oldest_due_date": "2026-03-26"
         },
         {
           "period": "2026-05",
           "customer_id": "C-KUS-0001",
+          "total_open": "886057.04",
           "currency": "USD",
           "current": "359567.13",
           "past_due_1_30": "526489.91",
           "past_due_31_60": "0",
-          "total_open": "886057.04",
           "oldest_due_date": "2026-05-07"
         },
         {
           "period": "2026-06",
           "customer_id": "C-KUS-0001",
+          "total_open": "795765.08",
           "currency": "USD",
           "current": "428488.44",
           "past_due_1_30": "168948",
           "past_due_31_60": "198328.64",
-          "total_open": "795765.08",
           "oldest_due_date": "2026-05-28"
         },
         {
           "period": "2026-07",
           "customer_id": "C-KUS-0001",
+          "total_open": "704159.94",
           "currency": "USD",
           "current": "197230.5",
           "past_due_1_30": "428488.44",
           "past_due_31_60": "78441",
-          "total_open": "704159.94",
           "oldest_due_date": "2026-06-25"
         },
         {
           "period": "2026-08",
           "customer_id": "C-KUS-0001",
+          "total_open": "1064974.94",
           "currency": "USD",
           "current": "499710.5",
           "past_due_1_30": "58335",
           "past_due_31_60": "428488.44",
-          "total_open": "1064974.94",
           "oldest_due_date": "2026-06-25"
         },
         {
           "period": "2026-09",
           "customer_id": "C-KUS-0001",
+          "total_open": "1422722.93",
           "currency": "USD",
           "current": "490731.99",
           "past_due_1_30": "366726.5",
           "past_due_31_60": "58335",
-          "total_open": "1422722.93",
           "oldest_due_date": "2026-06-25"
         }
       ],
@@ -1321,198 +1321,198 @@
       "columns": [
         { "key": "je_id", "mono": true },
         { "key": "line_no", "numeric": true },
-        { "key": "entity_id" },
-        { "key": "posting_date" },
-        { "key": "account_id", "mono": true },
-        { "key": "account_name" },
+        { "key": "created_by", "mono": true },
+        { "key": "approved_by", "mono": true },
         { "key": "debit", "numeric": true },
         { "key": "credit", "numeric": true },
         { "key": "currency" },
-        { "key": "created_by", "mono": true },
-        { "key": "approved_by", "mono": true }
+        { "key": "account_id", "mono": true },
+        { "key": "account_name" },
+        { "key": "posting_date" },
+        { "key": "entity_id" }
       ],
       "rows": [
         {
           "je_id": "JE-KJP-2606-00088",
           "line_no": "1",
-          "entity_id": "KJP",
-          "posting_date": "2026-06-24",
-          "account_id": "3200",
-          "account_name": "Retained earnings",
+          "created_by": "E0012",
+          "approved_by": "E0002",
           "debit": "1720000000",
           "credit": "0",
           "currency": "JPY",
-          "created_by": "E0012",
-          "approved_by": "E0002"
+          "account_id": "3200",
+          "account_name": "Retained earnings",
+          "posting_date": "2026-06-24",
+          "entity_id": "KJP"
         },
         {
           "je_id": "JE-KJP-2606-00088",
           "line_no": "2",
-          "entity_id": "KJP",
-          "posting_date": "2026-06-24",
-          "account_id": "2900",
-          "account_name": "Dividends payable",
+          "created_by": "E0012",
+          "approved_by": "E0002",
           "debit": "0",
           "credit": "1720000000",
           "currency": "JPY",
-          "created_by": "E0012",
-          "approved_by": "E0002"
+          "account_id": "2900",
+          "account_name": "Dividends payable",
+          "posting_date": "2026-06-24",
+          "entity_id": "KJP"
         },
         {
           "je_id": "JE-KJP-2607-00054",
           "line_no": "1",
-          "entity_id": "KJP",
-          "posting_date": "2026-07-14",
-          "account_id": "2150",
-          "account_name": "Accrued sales rebates",
+          "created_by": "E0015",
+          "approved_by": "E0010",
           "debit": "0",
           "credit": "33",
           "currency": "JPY",
-          "created_by": "E0015",
-          "approved_by": "E0010"
+          "account_id": "2150",
+          "account_name": "Accrued sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KJP"
         },
         {
           "je_id": "JE-KJP-2607-00054",
           "line_no": "2",
-          "entity_id": "KJP",
-          "posting_date": "2026-07-14",
-          "account_id": "4900",
-          "account_name": "Sales rebates",
+          "created_by": "E0015",
+          "approved_by": "E0010",
           "debit": "33",
           "credit": "0",
           "currency": "JPY",
-          "created_by": "E0015",
-          "approved_by": "E0010"
+          "account_id": "4900",
+          "account_name": "Sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KJP"
         },
         {
           "je_id": "JE-KUS-2607-00029",
           "line_no": "1",
-          "entity_id": "KUS",
-          "posting_date": "2026-07-14",
-          "account_id": "2150",
-          "account_name": "Accrued sales rebates",
+          "created_by": "E1003",
+          "approved_by": "E1002",
           "debit": "0",
           "credit": "0.01",
           "currency": "USD",
-          "created_by": "E1003",
-          "approved_by": "E1002"
+          "account_id": "2150",
+          "account_name": "Accrued sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KUS"
         },
         {
           "je_id": "JE-KUS-2607-00029",
           "line_no": "2",
-          "entity_id": "KUS",
-          "posting_date": "2026-07-14",
-          "account_id": "4900",
-          "account_name": "Sales rebates",
+          "created_by": "E1003",
+          "approved_by": "E1002",
           "debit": "0.01",
           "credit": "0",
           "currency": "USD",
-          "created_by": "E1003",
-          "approved_by": "E1002"
+          "account_id": "4900",
+          "account_name": "Sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KUS"
         },
         {
           "je_id": "JE-KDE-2607-00029",
           "line_no": "1",
-          "entity_id": "KDE",
-          "posting_date": "2026-07-14",
-          "account_id": "2150",
-          "account_name": "Accrued sales rebates",
+          "created_by": "E2004",
+          "approved_by": "E2002",
           "debit": "2461.66",
           "credit": "0",
           "currency": "EUR",
-          "created_by": "E2004",
-          "approved_by": "E2002"
+          "account_id": "2150",
+          "account_name": "Accrued sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KDE"
         },
         {
           "je_id": "JE-KDE-2607-00029",
           "line_no": "2",
-          "entity_id": "KDE",
-          "posting_date": "2026-07-14",
-          "account_id": "4900",
-          "account_name": "Sales rebates",
+          "created_by": "E2004",
+          "approved_by": "E2002",
           "debit": "0",
           "credit": "2461.66",
           "currency": "EUR",
-          "created_by": "E2004",
-          "approved_by": "E2002"
+          "account_id": "4900",
+          "account_name": "Sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KDE"
         },
         {
           "je_id": "JE-KUK-2607-00024",
           "line_no": "1",
-          "entity_id": "KUK",
-          "posting_date": "2026-07-14",
-          "account_id": "2150",
-          "account_name": "Accrued sales rebates",
+          "created_by": "E3003",
+          "approved_by": "E3002",
           "debit": "0.02",
           "credit": "0",
           "currency": "GBP",
-          "created_by": "E3003",
-          "approved_by": "E3002"
+          "account_id": "2150",
+          "account_name": "Accrued sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KUK"
         },
         {
           "je_id": "JE-KUK-2607-00024",
           "line_no": "2",
-          "entity_id": "KUK",
-          "posting_date": "2026-07-14",
-          "account_id": "4900",
-          "account_name": "Sales rebates",
+          "created_by": "E3003",
+          "approved_by": "E3002",
           "debit": "0",
           "credit": "0.02",
           "currency": "GBP",
-          "created_by": "E3003",
-          "approved_by": "E3002"
+          "account_id": "4900",
+          "account_name": "Sales rebates",
+          "posting_date": "2026-07-14",
+          "entity_id": "KUK"
         },
         {
           "je_id": "JE-KUK-2608-00055",
           "line_no": "1",
-          "entity_id": "KUK",
-          "posting_date": "2026-08-31",
-          "account_id": "1300",
-          "account_name": "Prepaid expenses",
+          "created_by": "E3003",
+          "approved_by": "E3003",
           "debit": "18400",
           "credit": "0",
           "currency": "GBP",
-          "created_by": "E3003",
-          "approved_by": "E3003"
+          "account_id": "1300",
+          "account_name": "Prepaid expenses",
+          "posting_date": "2026-08-31",
+          "entity_id": "KUK"
         },
         {
           "je_id": "JE-KUK-2608-00055",
           "line_no": "2",
-          "entity_id": "KUK",
-          "posting_date": "2026-08-31",
-          "account_id": "6100",
-          "account_name": "Advertising and promotion",
+          "created_by": "E3003",
+          "approved_by": "E3003",
           "debit": "0",
           "credit": "18400",
           "currency": "GBP",
-          "created_by": "E3003",
-          "approved_by": "E3003"
+          "account_id": "6100",
+          "account_name": "Advertising and promotion",
+          "posting_date": "2026-08-31",
+          "entity_id": "KUK"
         },
         {
           "je_id": "JE-KUS-2609-00075",
           "line_no": "1",
-          "entity_id": "KUS",
-          "posting_date": "2026-09-30",
-          "account_id": "6800",
-          "account_name": "Provision for doubtful accounts",
+          "created_by": "E1003",
+          "approved_by": "E1002",
           "debit": "797834.64",
           "credit": "0",
           "currency": "USD",
-          "created_by": "E1003",
-          "approved_by": "E1002"
+          "account_id": "6800",
+          "account_name": "Provision for doubtful accounts",
+          "posting_date": "2026-09-30",
+          "entity_id": "KUS"
         },
         {
           "je_id": "JE-KUS-2609-00075",
           "line_no": "2",
-          "entity_id": "KUS",
-          "posting_date": "2026-09-30",
-          "account_id": "1110",
-          "account_name": "Allowance for doubtful accounts",
+          "created_by": "E1003",
+          "approved_by": "E1002",
           "debit": "0",
           "credit": "797834.64",
           "currency": "USD",
-          "created_by": "E1003",
-          "approved_by": "E1002"
+          "account_id": "1110",
+          "account_name": "Allowance for doubtful accounts",
+          "posting_date": "2026-09-30",
+          "entity_id": "KUS"
         }
       ],
       "citedRows": [10, 11]
@@ -1530,112 +1530,112 @@
       "count": "Showing 11 of 887 rows, 7 of 25 columns",
       "columns": [
         { "key": "invoice_id", "mono": true },
-        { "key": "entity_id" },
-        { "key": "customer_id", "mono": true },
         { "key": "invoice_date" },
         { "key": "delivery_date" },
         { "key": "net_amount", "numeric": true },
-        { "key": "currency" }
+        { "key": "currency" },
+        { "key": "entity_id" },
+        { "key": "customer_id", "mono": true }
       ],
       "rows": [
         {
           "invoice_id": "INV-KDE-2609-00142",
-          "entity_id": "KDE",
-          "customer_id": "C-KDE-0051",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "31445.52",
-          "currency": "EUR"
+          "currency": "EUR",
+          "entity_id": "KDE",
+          "customer_id": "C-KDE-0051"
         },
         {
           "invoice_id": "INV-KDE-2609-00143",
-          "entity_id": "KDE",
-          "customer_id": "C-KDE-0052",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "45780.32",
-          "currency": "EUR"
+          "currency": "EUR",
+          "entity_id": "KDE",
+          "customer_id": "C-KDE-0052"
         },
         {
           "invoice_id": "INV-KUK-2609-00108",
-          "entity_id": "KUK",
-          "customer_id": "C-KUK-0042",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "793.3",
-          "currency": "GBP"
+          "currency": "GBP",
+          "entity_id": "KUK",
+          "customer_id": "C-KUK-0042"
         },
         {
           "invoice_id": "INV-KUK-2609-00109",
-          "entity_id": "KUK",
-          "customer_id": "C-KUK-0045",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "1211.05",
-          "currency": "GBP"
+          "currency": "GBP",
+          "entity_id": "KUK",
+          "customer_id": "C-KUK-0045"
         },
         {
           "invoice_id": "INV-KCN-2609-00099",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0016",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "516534.3",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0016"
         },
         {
           "invoice_id": "INV-KCN-2609-00100",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0017",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "1580876.8",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0017"
         },
         {
           "invoice_id": "INV-KCN-2609-00101",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0024",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "1297142.4",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0024"
         },
         {
           "invoice_id": "INV-KCN-2609-00102",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0043",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "117902.4",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0043"
         },
         {
           "invoice_id": "INV-KCN-2609-00103",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0046",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "276469.6",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0046"
         },
         {
           "invoice_id": "INV-KCN-2609-00104",
-          "entity_id": "KCN",
-          "customer_id": "C-KCN-0056",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-09-30",
           "net_amount": "103653.8",
-          "currency": "CNY"
+          "currency": "CNY",
+          "entity_id": "KCN",
+          "customer_id": "C-KCN-0056"
         },
         {
           "invoice_id": "INV-KJP-2609-00363",
-          "entity_id": "KJP",
-          "customer_id": "C-KJP-0004",
           "invoice_date": "2026-09-30",
           "delivery_date": "2026-10-02",
           "net_amount": "42720000",
-          "currency": "JPY"
+          "currency": "JPY",
+          "entity_id": "KJP",
+          "customer_id": "C-KJP-0004"
         }
       ],
       "citedRows": [10]
@@ -1653,103 +1653,103 @@
       "count": "Showing 8 of 559 rows, 9 of 23 columns: every row for Midwest Freight Logistics LLC",
       "columns": [
         { "key": "ap_invoice_id", "mono": true },
-        { "key": "entity_id" },
-        { "key": "supplier_id", "mono": true },
         { "key": "supplier_invoice_number", "mono": true },
         { "key": "invoice_date" },
         { "key": "description" },
         { "key": "gross_amount", "numeric": true },
         { "key": "amount_paid", "numeric": true },
-        { "key": "currency" }
+        { "key": "currency" },
+        { "key": "entity_id" },
+        { "key": "supplier_id", "mono": true }
       ],
       "rows": [
         {
           "ap_invoice_id": "API-KUS-2604-00003",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-11815",
           "invoice_date": "2026-04-01",
           "description": "Outbound freight and packing 2026-03",
           "gross_amount": "116166.37",
           "amount_paid": "116166.37",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2605-00003",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-98647",
           "invoice_date": "2026-05-04",
           "description": "Outbound freight and packing 2026-04",
           "gross_amount": "112889.17",
           "amount_paid": "112889.17",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2606-00003",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-73349",
           "invoice_date": "2026-06-04",
           "description": "Outbound freight and packing 2026-05",
           "gross_amount": "107479.65",
           "amount_paid": "107479.65",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2607-00006",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-24903",
           "invoice_date": "2026-07-08",
           "description": "Outbound freight and packing 2026-06",
           "gross_amount": "113979.44",
           "amount_paid": "113979.44",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2607-00007",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MFL-58821",
           "invoice_date": "2026-07-14",
           "description": "Outbound freight - June 2026 linehaul surcharge",
           "gross_amount": "48216.4",
           "amount_paid": "48216.4",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2607-00011",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MFL-58821",
           "invoice_date": "2026-07-21",
           "description": "Outbound freight - Jun 2026 linehaul surcharge",
           "gross_amount": "48216.4",
           "amount_paid": "48216.4",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2608-00003",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-17356",
           "invoice_date": "2026-08-04",
           "description": "Outbound freight and packing 2026-07",
           "gross_amount": "150996",
           "amount_paid": "150996",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         },
         {
           "ap_invoice_id": "API-KUS-2609-00004",
-          "entity_id": "KUS",
-          "supplier_id": "S-KUS-001",
           "supplier_invoice_number": "MID-23310",
           "invoice_date": "2026-09-04",
           "description": "Outbound freight and packing 2026-08",
           "gross_amount": "137601.52",
           "amount_paid": "137601.52",
-          "currency": "USD"
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
         }
       ],
       "citedRows": [4, 5]

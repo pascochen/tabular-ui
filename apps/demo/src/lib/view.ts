@@ -38,7 +38,7 @@ export const BUILT_CHANNELS: readonly ChannelId[] = [
 ];
 
 /** The places above the channels that are built, in sidebar order. */
-export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['tasks'];
+export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['search', 'tasks', 'sources'];
 
 const DEFAULT_CHANNEL: ChannelId = 'revenue';
 export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };
@@ -124,6 +124,12 @@ export function useView(): View {
 export function navigate(view: View, hash = '') {
   if (sameView(parseView(window.location.search), view) && !hash) return;
   window.history.pushState(null, '', `${hrefFor(view)}${hash}`);
+  window.dispatchEvent(new Event(NAVIGATE));
+}
+
+/** Goes to a view without a history entry, for a query as it's typed: Back leaves Search, not one letter. */
+export function replaceView(view: View) {
+  window.history.replaceState(null, '', hrefFor(view));
   window.dispatchEvent(new Event(NAVIGATE));
 }
 
