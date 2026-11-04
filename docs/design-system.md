@@ -447,12 +447,47 @@ Map product concepts onto the six roles. Do not introduce new hues here.
 | Passed / verified | success | `--color-text-success` |
 | Failed | danger | `--color-text-danger` + `--color-bg-danger` row tint |
 | Degraded / stale | warning | `--color-text-warning` |
+| Open | neutral | neutral `StatusBadge` (`--color-text-secondary`), no hue (below) |
 | Needs review | warning | `--color-text-warning` + `--color-border-warning` |
 | AI working | agent | `--color-text-agent` + `Spinner` (§11.5) |
 | Agent proposed | agent | `--color-bg-agent` ground + 2px left rail in solid `--color-text-agent`, the rail `AgentBlock` draws (below) |
 | Skipped / disabled | neutral | neutral `StatusBadge` (`--color-text-secondary`); a *disabled control* takes `--color-text-disabled` |
 
 **"AI working", not "agent working" — decided 2026-10-25 (owner).** `docs/agent-voice.md` gives the agent role one word, "AI". Since `running` and this state share the `Spinner` (§11.5), the label is the badge's only non-colour authorship signal, so it keeps the actor and names it the same way. The status key stays `agent-working`.
+
+**Open is neutral, and ochre is for what waits on the viewer — decided 2026-11-03 (owner, after a side-by-side in Storybook: both modes, in colour, in grayscale and under deuteranopia).**
+
+An unsettled item takes its status from who can act on it:
+
+| Status | Label | Tone | Icon | Means |
+|---|---|---|---|---|
+| `needs-review` | needs review | warning | Eye | It is waiting on the person looking at it |
+| `open` | open | neutral | Eye | It is unsettled, and not waiting on the person looking at it |
+| `queued` | queued | neutral | Clock | Nobody here can settle it yet |
+
+*Why.* In the demo every open finding drew the same ochre, and in the user tests every tester missed the one decision that was theirs. The badge then gained the words "Needs your answer", but kept the ochre of every finding around it. Ochre on every open item is what §0 rule 1 warns about: the colour stops saying anything about the one that needs attention. Now ochre says "this is yours", and a list with nothing waiting on the viewer draws none. An `open` item stays visible, in the Tasks count and by its badge. Neither the words nor this change has been retested with users.
+
+*Rejected.* **Federal:** it is `running`'s tone (§1), and `running` means the system is working, not that a person has to act. Under deuteranopia it sits 3.0 (light) and 3.2 (dark) from the orchid authorship label beside the badge (§1's method). **Ink** (neutral ground, `--color-text-primary`, a `--color-fill-interactive` dot): `open` drew the eye before `needs-review` in both modes, which inverts the order this decision exists to set.
+
+*Costs, accepted.*
+
+- `open` and `queued` share a tone, so only the icon and the word separate what can be settled from what can't. Those are what §10's grayscale check asks for.
+- `open` and `needs-review` share Eye, as `running` and `agent-working` share `Spinner`: the same kind of state, told apart by the label. In light mode their text is the same lightness (L 46), so in grayscale the label is all that separates them. In colour they are 10.4 apart in light mode, the edge of §1's "hard to tell apart", and 16.2 in dark. Under deuteranopia: 10.4 and 15.5.
+- In dark mode `open` is brighter than `needs-review` (10.15:1 against 7.24:1 on the canvas). Hue carries the order, not lightness.
+
+*The sidebar dot: solid for `needs-review`, hollow for `open` — decided 2026-11-03 (owner, after a side-by-side of solid and hollow, in the same views).* Both are 6px (§7.7).
+
+| The channel holds | Dot | Hidden text after the label |
+|---|---|---|
+| A `needs-review` item, with or without `open` items | Solid, `--color-fill-warning` | ", needs your answer" |
+| Only `open` items | Hollow: a `--border-width` ring in `--color-text-secondary`, no fill | ", open finding" |
+| Neither | None | None |
+
+*Why hollow.* A solid neutral dot differed from the ochre one by colour alone, against §11.1, and shape now carries the difference: in grayscale the channel that needs the viewer holds the only solid dot. It also sets the order. The ochre dot has the lower contrast in both modes (3.35:1 against 6.64:1 light, 7.24:1 against 10.15:1 dark), and a solid neutral dot beside it read first. The ring has about 55% of a solid dot's area, and in the side-by-side the ochre dot read first in both modes.
+
+*Costs, accepted.* The ring is the system's only hollow status mark, and it could read as "empty" or "done with" rather than "open". It was checked on a 2x display only, so at 1x it may render rougher. Neither has been tested with users.
+
+*Where it lives.* `open` is in `runStatuses`, and the dot is the product component `StatusDot`, so a screen can't draw its own. The solid dot takes the system's `CanvasText` in forced colours, which replace backgrounds and keep borders, or the one dot that matters most is the one that disappears. `apps/storybook/tests/status-dot.spec.ts` reads the painted pixels in both modes, with and without forced colours, and `close-state.spec.ts` asserts which channel takes which dot.
 
 ### Financial polarity
 
@@ -708,7 +743,7 @@ Four objects commonly get conflated. They are not the same thing.
 | **Status badge** — "passed", "stale", "failed" | No | `--radius-xs` | Tint bg, no border |
 | **Filter chip** — "SAP", "Q2 FY2026" | Yes | `--radius-md` | Border, transparent bg, hover state |
 | **Count badge** — "3", "12" | No | `--radius-full` | 1–2 characters only |
-| **Status dot** — 6px, no text | No | `--radius-full` | A circle because it is a circle |
+| **Status dot** — 6px, no text | No | `--radius-full` | A circle because it is a circle. Solid, or a 1px ring for `open` (§5) |
 
 ```
 --radius-xs    0px     status badge, cell focus outline, checkbox

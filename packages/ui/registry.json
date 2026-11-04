@@ -1104,6 +1104,26 @@
       ]
     },
     {
+      "name": "status-dot",
+      "type": "registry:component",
+      "title": "StatusDot",
+      "description": "A status as a 6px mark, where a badge will not fit: solid when it waits on the viewer, hollow when it does not.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/StatusDot/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/StatusDot/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "tool",
       "type": "registry:component",
       "title": "Tool",
@@ -1350,6 +1370,7 @@
         "https://tabularui.com/r/sources.json",
         "https://tabularui.com/r/spinner.json",
         "https://tabularui.com/r/status-badge.json",
+        "https://tabularui.com/r/status-dot.json",
         "https://tabularui.com/r/switch.json",
         "https://tabularui.com/r/tabs.json",
         "https://tabularui.com/r/textarea.json",

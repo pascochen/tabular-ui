@@ -93,6 +93,8 @@ const descriptions = {
   RunLogRow: 'One pipeline run in a log.',
   Sources: 'What an answer rests on, numbered, and what was not checked.',
   StatusBadge: 'A run or validation status.',
+  StatusDot:
+    'A status as a 6px mark, where a badge will not fit: solid when it waits on the viewer, hollow when it does not.',
   Tool: 'Each call the agent makes, as one line: what it’s doing, what it did, or what failed and what’s next. Sits inside an AgentBlock.',
   Toolbar: 'A row of controls above a table or view.',
   TruncatedText: 'Text cut to fit, with the full text in a tooltip.',

@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 import {
   awaitsVisitor,
+  channelMark,
+  channelMarkText,
   closeReducer,
   holdsOpen,
   isUnread,
@@ -85,6 +87,26 @@ test('a channel’s dot is its open finding, and clears when that resolves or st
   const end = closeReducer(landing, { type: 'skip', at: '14:00' });
   expect(dots(end)).toEqual([]);
   expect(openCount(end)).toBe(0);
+});
+
+test('a channel’s dot is solid while its finding waits on the visitor, and hollow once it doesn’t (§5)', () => {
+  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const marks = (s: CloseState) => Object.fromEntries(channels.map((c) => [c, channelMark(s, c)]));
+  expect(marks(landingState())).toEqual({
+    close: 'open',
+    cash: null,
+    receivables: 'open',
+    payables: 'open',
+    revenue: 'needs-review',
+    intercompany: null,
+  });
+  // Answered, the finding is still open but no longer the visitor's to act on.
+  expect(marks(run({ type: 'answer', answer: 'reopen', at: '14:00' })).revenue).toBe('open');
+  expect(
+    Object.values(marks(closeReducer(landingState(), { type: 'skip', at: '14:00' }))).every((m) => m === null),
+  ).toBe(true);
+  // A dot is aria-hidden, so each kind says what it means in text.
+  expect(channelMarkText).toEqual({ 'needs-review': ', needs your answer', open: ', open finding' });
 });
 
 test('a reply marks its channel unread until it’s opened, and everything before landing counts as read', () => {
@@ -265,9 +287,18 @@ test('the decision awaits the visitor until it is answered, and nothing else doe
   expect(Object.keys(s.exceptions).filter((id) => awaitsVisitor(s, id))).toEqual(['revenue-cut-off']);
   const answered = closeReducer(s, { type: 'answer', answer: 'keep-locked', at: '14:00' });
   expect(awaitsVisitor(answered, 'revenue-cut-off')).toBe(false);
+  // The proposal waits for the visitor to confirm it, so it is theirs again.
+  const proposed = closeReducer(answered, { type: 'read' });
+  expect(awaitsVisitor(proposed, 'revenue-cut-off')).toBe(true);
+  expect(channelMark(proposed, 'revenue')).toBe('needs-review');
+  expect(awaitsVisitor(closeReducer(proposed, { type: 'post', at: '14:01' }), 'revenue-cut-off')).toBe(false);
   // After "Don't post it" the agent asks again, so it is the visitor's again.
-  const asked = closeReducer(closeReducer(answered, { type: 'read' }), { type: 'stop', at: '14:01' });
+  const asked = closeReducer(proposed, { type: 'stop', at: '14:01' });
   expect(awaitsVisitor(asked, 'revenue-cut-off')).toBe(true);
+  // A skip has no buttons left to press: "stays open until someone decides".
+  expect(awaitsVisitor(closeReducer(s, { type: 'answer', answer: 'skip', at: '14:00' }), 'revenue-cut-off')).toBe(
+    false,
+  );
 });
 
 test('each typing indicator names the card its reply lands on', () => {
