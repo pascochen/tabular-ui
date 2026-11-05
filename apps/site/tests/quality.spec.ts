@@ -355,7 +355,9 @@ test.describe('links', () => {
     hrefs.some((h) => h.endsWith(`/components/${slug(name)}`));
   const slug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
   for (const route of routes) {
-    test(`${route}: one name, one destination; ↗ on every external link and no other`, async ({ page }) => {
+    test(`${route}: one name, one destination; ↗ and a new tab on every external link and no other`, async ({
+      page,
+    }) => {
       await page.goto(route);
       const links = await page.locator('a[href]').evaluateAll((as) =>
         as
@@ -371,6 +373,8 @@ test.describe('links', () => {
               href: new URL(a.getAttribute('href')!, location.href).href.replace(/\/$/, ''),
               external: new URL(a.getAttribute('href')!, location.href).origin !== location.origin,
               arrow: hidden.some((h) => h.includes('↗')),
+              newTab: (a as HTMLAnchorElement).target === '_blank' && (a as HTMLAnchorElement).rel === 'noreferrer',
+              saysSo: a.textContent?.includes('(opens in a new tab)') ?? false,
             };
           }),
       );
@@ -379,6 +383,8 @@ test.describe('links', () => {
         if (!byName.has(link.name)) byName.set(link.name, new Set());
         byName.get(link.name)!.add(link.href);
         expect(link.arrow, `${link.name} (${link.href})`).toBe(link.external);
+        expect(link.newTab, `${link.name} (${link.href}): new tab`).toBe(link.external);
+        expect(link.saysSo, `${link.name} (${link.href}): says so`).toBe(link.external);
       }
       for (const [name, hrefs] of byName) {
         if (jumpToCard(route, name, [...hrefs])) continue;

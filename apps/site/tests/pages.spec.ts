@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { componentPages, routes } from './routes';
 
@@ -281,6 +281,51 @@ test.describe('Components in the nav', () => {
       /^GitHub/,
       'Get started',
     ]);
+  });
+
+  // Real gestures, because a target attribute is a claim about what a click does.
+  // The other site is stubbed: this is about the tab, not whether Storybook is up.
+  test.describe('a link to another site opens a new tab and leaves this page where it was', () => {
+    test.beforeEach(async ({ context }) => {
+      await context.route(/^https:\/\/(storybook\.tabularui\.com|github\.com)\//, (route) =>
+        route.fulfill({ contentType: 'text/html', body: '<title>Elsewhere</title>' }),
+      );
+    });
+
+    test('from the bar, by click', async ({ context, page }) => {
+      await page.goto('/getting-started');
+      await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+      const opened = context.waitForEvent('page');
+      await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'GitHub' }).click();
+      await expect(await opened).toHaveURL('https://github.com/pascochen/tabular-ui');
+      await expect(page).toHaveURL('/getting-started');
+    });
+
+    for (const [gesture, act] of [
+      ['click', (item: Locator) => item.click()],
+      ['Enter', (item: Locator) => item.press('Enter')],
+    ] as const) {
+      test(`from the phone menu, by ${gesture}`, async ({ context, page }) => {
+        await page.setViewportSize({ width: 390, height: 800 });
+        await page.goto('/getting-started');
+        await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+        await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Menu' }).click();
+        const item = page.getByRole('menuitem', { name: 'Storybook' });
+        await item.focus();
+        const opened = context.waitForEvent('page');
+        await act(item);
+        await expect(await opened).toHaveURL('https://storybook.tabularui.com/');
+        await expect(page).toHaveURL('/getting-started');
+      });
+    }
+
+    test('a page of this site stays in this tab', async ({ context, page }) => {
+      await page.goto('/getting-started');
+      await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+      await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Vocabulary' }).click();
+      await expect(page).toHaveURL('/vocabulary');
+      expect(context.pages()).toHaveLength(1);
+    });
   });
 
   // At 768px, where the bar first shows its links, everything sits inside its

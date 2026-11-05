@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-import { demoSoonLabel, external, pages } from '../content';
+import { demoSoonLabel, external, newTab, pages } from '../content';
 import { standaloneLink } from '../lib/styles';
 import { ExternalMark, Rail } from './layout';
 
@@ -62,7 +62,11 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
             {link.soon ? (
               <span className="text-site-small text-text-secondary">{link.label}</span>
             ) : (
-              <a href={link.href} className={`${standaloneLink} text-site-small text-text-body`}>
+              <a
+                href={link.href}
+                {...(link.external ? newTab : {})}
+                className={`${standaloneLink} text-site-small text-text-body`}
+              >
                 {link.label}
                 {link.external ? <ExternalMark /> : null}
               </a>

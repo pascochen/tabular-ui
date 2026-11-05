@@ -1,6 +1,6 @@
 import { Button, buttonVariants } from 'tabular-ui';
 
-import { demoSoonLabel, external } from '../content';
+import { demoSoonLabel, external, newTab } from '../content';
 import { ExternalMark } from './layout';
 
 /**
@@ -12,7 +12,7 @@ import { ExternalMark } from './layout';
 export function DemoAction({ label = external.demo.label }: { label?: string }) {
   if (external.demo.ready) {
     return (
-      <a href={external.demo.href} className={buttonVariants({ size: 'lg' })}>
+      <a href={external.demo.href} {...newTab} className={buttonVariants({ size: 'lg' })}>
         {label}
         <ExternalMark />
       </a>

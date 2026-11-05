@@ -167,7 +167,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 |---|---|---|
 | Heading | Four agents checked a finance team's books and raised four issues. You decide. | The first "Four": the number of `agents` in `apps/demo/data/close.json`, exported as `agents` in `apps/site/data/kasane.json`. The second: the number of findings, exported as `findings`. Each is written as a word (`numberWord`) |
 | Line | Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller. | "Kasane": `company.name` in `kasane.json`; "controller": the last word of the visitor's title in `apps/demo/data/people.json` (`visitor`, Group Controller), exported as `company.visitor.title` and set in lowercase |
-| Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo" |
+| Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo (opens in a new tab)" |
 
 Changed 2026-11-04 (owner): the band names the four agents and the controller, the visitor's role in the demo's workspace. It replaces the onboarding journey's copy (Head of FP&A, 20 files, the duplicate payment above).
 
@@ -552,7 +552,7 @@ Components already pass axe in Storybook in both modes. These checks are what th
 
 **Content:**
 - Links make sense out of context, and no two links share a name but go to different places. One exception, approved by the owner on 2026-10-27: on Home, a built component's jump-index link goes to its card and its card title to its page (step 5b, as built).
-- ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it.
+- ↗ marks a link to another site. The arrow is `aria-hidden`, and the name doesn't depend on it. *Changed 2026-11-05 (owner):* every such link opens a new tab (`target="_blank"`, `rel="noreferrer"`), and visually hidden text, "(opens in a new tab)", tells a screen reader, as in the demo's About dialog. Links within the site stay in the same tab.
 - Contrast is measured on the ground the text sits on, including the dark closing band and every dark component-page plate (D3). axe measures them in the page checks.
 - To build versus built is carried by text and a dashed border, not tone alone.
 

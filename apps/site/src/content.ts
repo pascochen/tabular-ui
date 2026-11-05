@@ -59,6 +59,9 @@ export const external = {
   author: { href: 'https://www.linkedin.com/in/pascal-chenier/', label: 'By Pascal' },
 } as const;
 
+/** A link to another site opens a new tab (owner, 2026-11-05). Spread it on the `<a>`, with ExternalMark inside. */
+export const newTab = { target: '_blank', rel: 'noreferrer' } as const;
+
 /** The demo's label while it isn't ready (owner, 2026-10-26). */
 export const demoSoonLabel = `${external.demo.label} (soon)`;
 
