@@ -312,7 +312,7 @@ A repository ruleset named `main` (Settings → Rules → Rulesets, since 2026-1
 | `python3 -I apps/site/scripts/serif-trim.py` | Rewrite the site's trimmed serif (`apps/site/src/fonts/`) from the installed Source Serif 4. On demand, when that package changes; `apps/site/tests/quality.spec.ts` fails until it's run |
 | `pnpm --filter tabular-ui palette` | Regenerate the palette |
 | `pnpm --filter tabular-ui contrast` | Check every colour token's contrast |
-| `KASANE_DATA_DIR=… pnpm --filter tabular-ui-demo export-fixtures` | Rebuild the demo's, the stories' and the site's Kasane data from the full dataset (`onboarding/` included) |
+| `KASANE_DATA_DIR=… pnpm --filter tabular-ui-demo export-fixtures` | Rebuild the demo's, the stories' and the site's Kasane data from the full dataset (`demo/` included) |
 
 Note: there is no `test:ui`. It was ambiguous between Vitest UI mode and "test the UI" — use `pnpm test:watch` or `pnpm storybook` explicitly.
 

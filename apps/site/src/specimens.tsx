@@ -550,8 +550,7 @@ type Read = ToolCall & { id: string };
 /**
  * The three files the answer read, in order. The first two are the answer's
  * sources; the third is the pack's only bank export, and its failure is real:
- * it has no header row (findings.json, bank-header), the same failure Run log
- * row shows. The next step agrees with Sources' not-checked line.
+ * it has no header row, the same failure Run log row shows. The next step agrees with Sources' not-checked line.
  */
 function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' | 'detail'> }[] {
   const d = duplicatePayment;
@@ -580,7 +579,11 @@ function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' 
             Read <Ident>{answerSources[1].name}</Ident>
           </>
         ),
-        detail: 'In the interview, accounts payable says the system blocks repeated invoice numbers.',
+        detail: (
+          <>
+            Both entries were paid, as <Ident>{d.payments[0]}</Ident> and <Ident>{d.payments[1]}</Ident>.
+          </>
+        ),
       },
     },
     { file: packFile(bankFiles[0]) },
@@ -608,7 +611,7 @@ function readCalls(ran: number): Read[] {
             Couldn’t read the columns in <Ident>{file}</Ident>: it has no header row.
           </>
         ),
-        next: 'I’ll take both payments as the invoice file records them.',
+        next: 'I’ll take both payments as the payment file records them.',
       };
     });
 }
@@ -726,11 +729,11 @@ function packSource(name: string): Source {
 
 const answerSources = (() => {
   const invoices = duplicatePayment.sources.find((s) => s.endsWith('.csv'));
-  const interview = duplicatePayment.sources.find((s) => s.endsWith('.txt'));
-  if (!invoices || !interview)
-    throw new Error('kasane.json’s duplicate payment no longer cites an invoice file and an interview');
-  // Citation order: the figure's file first, then the interview.
-  return [packSource(invoices), packSource(interview)];
+  const payments = duplicatePayment.sources.find((s) => s.startsWith('supplier_payments'));
+  if (!invoices || !payments)
+    throw new Error('kasane.json’s duplicate payment no longer cites an invoice file and a payment file');
+  // Citation order: the figure's file first, then the payments.
+  return [packSource(invoices), packSource(payments)];
 })();
 
 const bankFiles = kasane.pack.filter((f) => f.name.startsWith('bank_export_')).map((f) => f.name);
@@ -747,7 +750,7 @@ function Ident({ children }: { children: React.ReactNode }) {
 const notChecked = [
   <>
     {duplicatePayment.entity}’s bank statements: the only bank file is <Ident>{bankFiles.join(', ')}</Ident>, so both
-    payments are as the invoice file records them.
+    payments are as the payment file records them.
   </>,
   <>
     Invoices outside H1: <Ident>{answerSources[0].name}</Ident> holds H1 only.
@@ -766,8 +769,8 @@ function CitedAnswer({ cited }: { cited: boolean }) {
         {cited ? <InlineCitation number={1} source={answerSources[0]} locator={d.entries.join(' and ')} /> : null}
       </p>
       <p className="text-text-secondary">
-        AP says the system blocks a repeated supplier invoice number.
-        {cited ? <InlineCitation number={2} source={answerSources[1]} /> : null}
+        Each entry has its own payment.
+        {cited ? <InlineCitation number={2} source={answerSources[1]} locator={d.payments.join(' and ')} /> : null}
       </p>
     </div>
   );
@@ -831,8 +834,7 @@ const runFiles = ['trial_balance_monthly.csv', 'supplier_invoices_fy2026_h1.csv'
 
 /**
  * Run log row: the files read one by one, the last failing and opening to its
- * error. The failure is real: the bank export has no header row (findings.json,
- * bank-header). No times or durations: the data has none.
+ * error. The failure is real: the bank export has no header row. No times or durations: the data has none.
  */
 export function RunLogSpecimen() {
   const names = runFiles.map(packFile);

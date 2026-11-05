@@ -1,13 +1,8 @@
 [
-  { "name": "01_kickoff_cfo_2026-10-12.txt", "kind": "transcript", "bytes": 6899 },
-  { "name": "02_interview_fpa_2026-10-13.txt", "kind": "transcript", "bytes": 7356 },
-  { "name": "03_interview_controller_2026-10-13.txt", "kind": "transcript", "bytes": 5264 },
-  { "name": "04_interview_treasury_2026-10-14.txt", "kind": "transcript", "bytes": 4250 },
-  { "name": "05_interview_ar_ap_2026-10-14.txt", "kind": "transcript", "bytes": 4376 },
-  { "name": "06_interview_plant_cost_2026-10-15.txt", "kind": "transcript", "bytes": 4077 },
   { "name": "company_profile.md", "kind": "document", "bytes": 5912 },
   { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
   { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
+  { "name": "finance_team.md", "kind": "document", "bytes": 3511 },
   { "name": "close_memo_2026-09.md", "kind": "document", "bytes": 4804 },
   { "name": "forecast_memo_fy2026_6+6.md", "kind": "document", "bytes": 3702 },
   {
@@ -53,10 +48,15 @@
     "firstLine": "invoice_id,entity_id,document_type,customer_id,invoice_date,delivery_date,period,due_date,payment_terms,currency,net_amount,tax_amount,gross_amount,fx_rate_to_functional,gross_amount_functional,amount_open,amount_written_off,written_off_date,status_at_data_cut,is_intercompany,contract_id,sales_rep_id,created_by,note,published_as"
   },
   {
+    "name": "supplier_payments_fy2026_h1.csv",
+    "kind": "spreadsheet",
+    "bytes": 52076,
+    "firstLine": "payment_id,entity_id,supplier_id,payment_date,ap_invoice_id,amount,currency,method"
+  },
+  {
     "name": "bank_export_kjp_2026-09.csv",
     "kind": "spreadsheet",
     "bytes": 2904,
     "firstLine": "2026-09-01,RCT-KJP-2609-00006,Intercompany settlement received INV-KJP-2607-00080,,535423123,22214101453"
-  },
-  { "name": "org_chart_finance_2026-10.png", "kind": "image", "bytes": 119615 }
+  }
 ]

@@ -130,7 +130,7 @@ test.describe('the Tool card', () => {
       }),
     ).toBeVisible();
     await expect(
-      tool(page).getByText('I’ll take both payments as the invoice file records them.', { exact: true }),
+      tool(page).getByText('I’ll take both payments as the payment file records them.', { exact: true }),
     ).toBeVisible();
   });
 

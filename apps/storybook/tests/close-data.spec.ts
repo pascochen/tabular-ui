@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { expect, test } from '@playwright/test';
@@ -18,18 +18,20 @@ const read = <T>(name: string): T => JSON.parse(readFileSync(path.join(dataDir, 
 
 type Line = { account: string; name: string; debit: number; credit: number };
 type Reply = { author: string; text: string };
-type Citation = { source: string; exhibit: string; record: string; locator: string };
+type Citation = { source: string; exhibit: string; record: string; locator: string; backs: 'rule' | 'evidence' };
 type Exception = {
   id: string;
+  summary: string;
   agent: string;
   channel: string;
   scope: string;
-  claim: string;
+  rule: string;
+  evidence: string;
   sources: string[];
   citations: Citation[];
   replies: Reply[];
   resolution?: { by: string; log: string };
-  waiting?: { followUp: string };
+  waiting?: { on: string };
   notChecked: string[];
 };
 type Agent = {
@@ -40,7 +42,7 @@ type Agent = {
   reads: string[];
   starters: { question: string; answer: string; sources: string[]; notChecked: string[] }[];
 };
-type Channel = { id: string; topic: string; owner: string; members: string[]; gaps: string[] };
+type Channel = { id: string; topic: string; owner: string; members: string[] };
 type Close = {
   period: { open: string; locked: string; reopened: string };
   agentRules: { never: string[]; setUpBy: string };
@@ -68,27 +70,21 @@ type TextExcerpt = { type: 'text'; count: string; lines: { n: number; text: stri
 type Source = {
   id: string;
   name: string;
-  kind: 'transcript' | 'document' | 'image' | 'csv';
+  kind: 'document' | 'csv';
   covers: string;
   total: { count: number; unit: string } | null;
   records: string[];
-  excerpt: TableExcerpt | TextExcerpt | null;
+  excerpt: TableExcerpt | TextExcerpt;
 };
 
 const close = read<Close>('close.json');
 const people = read<Record<string, { id: string; name: string }>>('people.json');
 const checks = read<{ id: string; before: number; after: number }[]>('checks.json');
-const findings = read<{
-  contradictions: { id: string; evidence: string; sources: string[] }[];
-  gaps: { id: string; sources: string[] }[];
-  followUps: { id: string; sources: string[] }[];
-}>('findings.json');
 const sources = read<Source[]>('sources.json');
 const pack = new Set(read<{ name: string }[]>('pack.json').map((f) => f.name));
 const members = new Set([...Object.keys(people), ...close.agents.map((a) => a.key)]);
 
-test('there is one exception per contradiction, and each rests on pack files', () => {
-  expect(close.exceptions.map((e) => e.id).sort()).toEqual(findings.contradictions.map((c) => c.id).sort());
+test('each finding rests on pack files', () => {
   for (const e of close.exceptions) for (const s of e.sources) expect(pack, `${e.id}: ${s}`).toContain(s);
   for (const a of close.agents) for (const f of a.reads) expect(pack, `${a.key} reads ${f}`).toContain(f);
 });
@@ -108,11 +104,8 @@ test("every exception says what wasn't checked, [] for nothing", () => {
   for (const e of close.exceptions) expect(Array.isArray(e.notChecked), e.id).toBe(true);
 });
 
-test('an unresolved exception waits on a follow-up that exists', () => {
-  for (const e of close.exceptions.filter((x) => !x.resolution)) {
-    expect(e.waiting, e.id).toBeDefined();
-    expect(findings.followUps.map((f) => f.id)).toContain(e.waiting!.followUp);
-  }
+test('an unresolved exception says what it waits on', () => {
+  for (const e of close.exceptions.filter((x) => !x.resolution)) expect(e.waiting?.on, e.id).toBeTruthy();
 });
 
 test('the proposed reversal balances and moves exactly the revenue the cut-off check finds', () => {
@@ -176,14 +169,31 @@ test('D2: the visitor is Daisuke Onodera, and Mei is a teammate', () => {
   expect(close.agentRules.setUpBy).toBe('visitor');
 });
 
-test('D2: the two findings that contradict the visitor say so in the second person', () => {
-  const claim = (id: string) => close.exceptions.find((e) => e.id === id)?.claim;
-  expect(claim('revenue-cut-off')).toBe(
-    'You said the September 2026 cut-off was clean, in the controller interview on 13 Oct.',
-  );
-  expect(claim('self-approved-entry')).toBe(
-    'You said every manual journal has a different approver, enforced group-wide.',
-  );
+test('each finding states a rule and what the books show, and quotes nobody', () => {
+  for (const e of close.exceptions) {
+    expect(e.rule, e.id).toBeTruthy();
+    expect(e.evidence, e.id).toBeTruthy();
+    expect(`${e.rule} ${e.evidence} ${e.summary}`, e.id).not.toMatch(/\b(you said|says|said)\b/i);
+  }
+});
+
+test('a finding’s rule cites a document, unless no document states it', () => {
+  const backing = Object.fromEntries(close.exceptions.map((e) => [e.id, e.citations.map((c) => c.backs)]));
+  expect(backing).toEqual({
+    'revenue-cut-off': ['rule', 'evidence'],
+    'duplicate-payment': ['evidence', 'evidence'],
+    'self-approved-entry': ['rule', 'evidence'],
+    'credit-limit': ['rule', 'evidence'],
+  });
+});
+
+test('the data stays on checks and ledgers: no interview source, no claim, no gap or question list', () => {
+  const names = readdirSync(dataDir);
+  for (const gone of ['discovery.json', 'findings.json']) expect(names).not.toContain(gone);
+  for (const name of names) {
+    const text = readFileSync(path.join(dataDir, name), 'utf8');
+    expect(text, name).not.toMatch(/\.txt"|"claim"|"gaps"|"followUp"|contradict|interview|transcript/i);
+  }
 });
 
 test('D2: nobody replies or resolves as the visitor but the visitor’s own decision', () => {
@@ -232,11 +242,9 @@ test('every channel’s owner belongs to it', () => {
   for (const c of close.channels) expect(c.members, c.id).toContain(c.owner);
 });
 
-test('the quiet channels each link a gap that exists', () => {
-  const gapsOf = (id: string) => close.channels.find((c) => c.id === id)?.gaps;
-  expect(gapsOf('cash')).toEqual(['cash-forecast']);
-  expect(gapsOf('intercompany')).toEqual(['transfer-price-policy']);
-  for (const c of close.channels) for (const g of c.gaps) expect(findings.gaps.map((x) => x.id)).toContain(g);
+test('the quiet channels hold no finding', () => {
+  const quiet = close.channels.filter((c) => !close.exceptions.some((e) => e.channel === c.id)).map((c) => c.id);
+  expect(quiet).toEqual(['cash', 'intercompany']);
 });
 
 test('direct messages are people only, and the visitor isn’t one of them', () => {
@@ -264,32 +272,25 @@ test('the hero’s tool line claims only what the material holds', () => {
   expect(close.exceptions.find((e) => e.id === close.hero.exception)?.notChecked[0]).toMatch(/^The delivery note: /);
 });
 
-test('D6: the binder is 18 files, deduplicated, in a fixed order', () => {
+test('D6: the binder is 9 files, deduplicated, in a fixed order', () => {
   const names = sources.map((s) => s.name);
-  expect(names).toHaveLength(18);
-  expect(new Set(names).size).toBe(18);
+  expect(names).toHaveLength(9);
+  expect(new Set(names).size).toBe(9);
   expect(sources.map((s) => s.id)).toEqual(names.map((_, i) => `S-${i + 1}`));
-  const ranges = { transcript: [1, 6], document: [7, 11], image: [7, 11], csv: [12, 18] };
+  const ranges = { document: [1, 4], csv: [5, 9] };
   for (const s of sources) {
     const n = Number(s.id.slice(2));
     expect(n, s.name).toBeGreaterThanOrEqual(ranges[s.kind][0]);
     expect(n, s.name).toBeLessThanOrEqual(ranges[s.kind][1]);
   }
-  expect(sources.find((s) => s.id === 'S-17')?.name).toBe('sales_invoices_2026-09.csv');
+  expect(sources.find((s) => s.id === 'S-7')?.name).toBe('sales_invoices_2026-09.csv');
   expect(names).not.toContain('trial_balance_monthly.csv');
   expect(names).not.toContain('company_profile.md');
 });
 
-test('D6: every file a finding, gap or question cites, or an agent reads, is in the binder', () => {
-  const names = sources.map((s) => s.name);
-  const cited = [
-    ...findings.contradictions.flatMap((f) => f.sources),
-    ...findings.gaps.flatMap((f) => f.sources),
-    ...findings.followUps.flatMap((f) => f.sources),
-    ...close.agents.flatMap((a) => a.reads),
-  ];
-  for (const f of cited) expect(names, f).toContain(f);
-  expect(new Set(cited).size).toBe(18);
+test('D6: every file a finding cites or an agent reads is in the binder, and nothing else is', () => {
+  const cited = [...close.exceptions.flatMap((e) => e.sources), ...close.agents.flatMap((a) => a.reads)];
+  expect([...new Set(cited)].sort()).toEqual(sources.map((s) => s.name).sort());
 });
 
 test('every citation names a real exhibit and a record its excerpt shows', () => {
@@ -317,10 +318,6 @@ test('every citation names a real exhibit and a record its excerpt shows', () =>
 
 test('an excerpt’s count is the truth about what it shows', () => {
   for (const s of sources) {
-    if (!s.excerpt) {
-      expect(s.kind, s.name).toBe('image');
-      continue;
-    }
     const shown = s.excerpt.type === 'table' ? s.excerpt.rows.length : s.excerpt.lines.length;
     expect(s.excerpt.count, s.name).toContain(
       `${shown.toLocaleString('en-US')} of ${s.total?.count.toLocaleString('en-US')} ${s.total?.unit}`,
@@ -337,24 +334,24 @@ test('an excerpt’s count is the truth about what it shows', () => {
 test('a CSV excerpt is the cited record and up to 10 rows either side, or every row for one customer', () => {
   const excerpt = (id: string) => sources.find((s) => s.id === id)?.excerpt as TableExcerpt;
   // The cited invoice is the file's last row, so only the rows above it exist.
-  expect(excerpt('S-17').rows).toHaveLength(11);
-  expect(excerpt('S-17').rows[excerpt('S-17').citedRows[0]].invoice_id).toBe('INV-KJP-2609-00363');
-  // Its seven months over the limit aren't next to each other.
-  expect(excerpt('S-12').count).toContain('every row for Great Lakes Duplicating Supply');
-  expect(excerpt('S-12').citedRows).toHaveLength(7);
-  for (const row of excerpt('S-12').rows) expect(row.customer_id).toBe('C-KUS-0001');
-  // A file nothing cites a record in: its first 21 rows.
-  expect(excerpt('S-13').rows).toHaveLength(21);
-  expect(excerpt('S-13').citedRows).toEqual([]);
+  expect(excerpt('S-7').rows).toHaveLength(11);
+  expect(excerpt('S-7').rows[excerpt('S-7').citedRows[0]].invoice_id).toBe('INV-KJP-2609-00363');
+  // Its eight month-ends over the limit aren't next to each other.
+  expect(excerpt('S-5').count).toContain('every row for Great Lakes Duplicating Supply');
+  expect(excerpt('S-5').citedRows).toHaveLength(8);
+  for (const row of excerpt('S-5').rows) expect(row.customer_id).toBe('C-KUS-0001');
+  // The two payments of the duplicate, in the payment file.
+  const paid = excerpt('S-9');
+  expect(paid.citedRows.map((i) => paid.rows[i].ap_invoice_id)).toEqual(['API-KUS-2607-00007', 'API-KUS-2607-00011']);
 });
 
-test('a transcript’s excerpt marks the lines a finding rests on, with up to five either side', () => {
-  const lines = (sources.find((s) => s.id === 'S-3')?.excerpt as TextExcerpt).lines;
-  expect(lines.filter((l) => l.cited).map((l) => l.n)).toEqual([23, 24, 25, 26, 27, 39, 40, 41, 42, 43]);
-  expect(lines.map((l) => l.n)).toContain(18);
-  expect(lines.map((l) => l.n)).toContain(48);
-  expect(lines.map((l) => l.n)).not.toContain(17);
-  expect(lines.find((l) => l.n === 39)?.text).toContain('September cut-off was clean.');
+test('a document’s excerpt marks the lines a rule rests on, inside the section it shows', () => {
+  const lines = (sources.find((s) => s.id === 'S-1')?.excerpt as TextExcerpt).lines;
+  expect(lines.filter((l) => l.cited).map((l) => l.n)).toEqual([26]);
+  expect(lines.find((l) => l.n === 26)?.text).toContain('revenue belongs to the period in which delivery occurs');
+  const memo = (sources.find((s) => s.id === 'S-3')?.excerpt as TextExcerpt).lines;
+  expect(memo.filter((l) => l.cited).map((l) => l.n)).toEqual([37, 38, 39]);
+  expect(memo.find((l) => l.n === 39)?.text).toContain('credit hold since 10 Sep');
 });
 
 test('the period lines say what #close’s panel and the header show (D7)', () => {

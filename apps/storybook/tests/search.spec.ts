@@ -33,11 +33,11 @@ test('a task is found by its title or summary, and links to itself', () => {
 });
 
 test('a source is found by its ID, its name or a record it cites, and links to that record', () => {
-  expect(inGroup('S-17', 'Sources')[0].view).toEqual({ kind: 'sources', source: 'S-17', record: undefined });
-  expect(inGroup('ar_aging', 'Sources')[0].key).toBe('S-12');
+  expect(inGroup('S-7', 'Sources')[0].view).toEqual({ kind: 'sources', source: 'S-7', record: undefined });
+  expect(inGroup('ar_aging', 'Sources')[0].key).toBe('S-5');
   expect(inGroup('INV-KJP-2609-00363', 'Sources')[0].view).toEqual({
     kind: 'sources',
-    source: 'S-17',
+    source: 'S-7',
     record: 'INV-KJP-2609-00363',
   });
 });
@@ -46,9 +46,9 @@ test('a cited record is found by anything in its row, and links to the record', 
   // The supplier's own number isn't the record's ID: the wireframe's example.
   expect(inGroup('MFL-58821', 'Sources')).toEqual([
     expect.objectContaining({
-      key: 'S-18',
+      key: 'S-8',
       detail: 'API-KUS-2607-00007 and API-KUS-2607-00011',
-      view: { kind: 'sources', source: 'S-18', record: 'API-KUS-2607-00007' },
+      view: { kind: 'sources', source: 'S-8', record: 'API-KUS-2607-00007' },
     }),
   ]);
 });

@@ -1,341 +1,11 @@
 [
   {
     "id": "S-1",
-    "name": "01_kickoff_cfo_2026-10-12.txt",
-    "kind": "transcript",
-    "covers": "Kickoff with the CFO, 12 Oct 2026",
-    "total": { "count": 94, "unit": "lines" },
-    "records": [],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 21 of 94 lines",
-      "lines": [
-        { "n": 1, "text": "KASANE CORPORATION — TABULAR UI ONBOARDING" },
-        { "n": 2, "text": "Discovery session 1 of 6: Kickoff with the CFO" },
-        { "n": 3, "text": "Date: Monday 12 October 2026, 10:00–10:52 JST" },
-        { "n": 4, "text": "Location: Kasane head office, Minato-ku, 6F meeting room \"Drum\"" },
-        {
-          "n": 5,
-          "text": "Attendees: Keiko Arimura (CFO), Daisuke Onodera (Group Controller), Mei Tachibana (Head of FP&A), Aoi Kanzaki (Finance Data & BI Analyst), Interviewer (Tabular UI onboarding)"
-        },
-        { "n": 6, "text": "Recording: auto-transcribed, lightly cleaned. Fictional company; all names invented." },
-        { "n": 7, "text": "" },
-        {
-          "n": 8,
-          "text": "[00:00:41] Interviewer: Thanks for making time in close week. Can we start with why you're doing this now?"
-        },
-        { "n": 9, "text": "" },
-        {
-          "n": 10,
-          "text": "[00:00:52] Keiko Arimura: Close week is every week, it feels like. [laughter] So. Why now. Three reasons. First, we're about a seventy-billion-yen business, five companies, five currencies, and the group numbers still go through one Excel workbook that Sayaka owns. If Sayaka is sick in the first week of the month, the group has no numbers."
-        },
-        { "n": 11, "text": "" },
-        {
-          "n": 12,
-          "text": "[00:01:20] Keiko Arimura: Second, the board. We present half-year results on the fifth of November. The board doesn't ask \"what is operating profit\", they ask \"why\". Why are we three hundred and fifty million under plan. And it takes Mei's team two days to build the bridge every time."
-        },
-        { "n": 13, "text": "" },
-        {
-          "n": 14,
-          "text": "[00:01:41] Mei Tachibana: Two days if nothing changes. If Daisuke posts a late adjustment, we start again."
-        },
-        { "n": 15, "text": "" },
-        {
-          "n": 16,
-          "text": "[00:01:46] Keiko Arimura: Third reason. Our printers are a printer-and-ink business. The machine is sold thin. The ink pays the bills. More than half our sales are consumables. If the installed base shrinks one percent we feel it for ten years. Nobody in this building can tell me on a Monday morning how many machines are in the field, by country, and what they bought last month. Aoi can, if I give her a week."
-        },
-        { "n": 17, "text": "" },
-        { "n": 18, "text": "[00:02:15] Aoi Kanzaki: Four days." },
-        { "n": 19, "text": "" },
-        { "n": 20, "text": "[00:02:17] Keiko Arimura: Four days. [laughs]" },
-        { "n": 21, "text": "" }
-      ]
-    }
-  },
-  {
-    "id": "S-2",
-    "name": "02_interview_fpa_2026-10-13.txt",
-    "kind": "transcript",
-    "covers": "FP&A: budget, forecast, variance, 13 Oct 2026",
-    "total": { "count": 99, "unit": "lines" },
-    "records": [],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 21 of 99 lines",
-      "lines": [
-        { "n": 1, "text": "KASANE CORPORATION — TABULAR UI ONBOARDING" },
-        { "n": 2, "text": "Discovery session 2 of 6: FP&A — budget, forecast, variance" },
-        { "n": 3, "text": "Date: Tuesday 13 October 2026, 09:30–10:41 JST" },
-        {
-          "n": 4,
-          "text": "Attendees: Mei Tachibana (Head of FP&A), Nanami Okabe (FP&A Analyst), Interviewer (Tabular UI onboarding)"
-        },
-        { "n": 5, "text": "Recording: auto-transcribed, lightly cleaned. Fictional company; all names invented." },
-        { "n": 6, "text": "" },
-        { "n": 7, "text": "[00:00:15] Interviewer: Let's start with the budget. How is it built?" },
-        { "n": 8, "text": "" },
-        {
-          "n": 9,
-          "text": "[00:00:20] Mei Tachibana: Bottom-up-ish. We take last year's actuals by entity, account, cost center and product line. Then we apply growth assumptions. For FY2026 that was things like equipment up eight percent in Japan because of Flux 16, consumables up four, the ink price increase in January. Salaries up three for the shuntō. Then we phase it by last year's months, because our seasonality is very strong. March is huge in Japan."
-        },
-        { "n": 10, "text": "" },
-        {
-          "n": 11,
-          "text": "[00:00:49] Nanami Okabe: Schools and city offices spend their budget before the thirty-first of March. Equipment in March is two and a half times a normal month."
-        },
-        { "n": 12, "text": "" },
-        { "n": 13, "text": "[00:00:57] Interviewer: Approved when?" },
-        { "n": 14, "text": "" },
-        {
-          "n": 15,
-          "text": "[00:00:59] Mei Tachibana: Board approved it thirteenth of March. Budget rates fixed then: a hundred and fifty to the dollar, a hundred and seventy-two to the euro, two hundred to the pound, twenty-one point two for the yuan."
-        },
-        { "n": 16, "text": "" },
-        { "n": 17, "text": "[00:01:12] Interviewer: And forecasts?" },
-        { "n": 18, "text": "" },
-        {
-          "n": 19,
-          "text": "[00:01:14] Mei Tachibana: Three a year. Three-plus-nine in July. Six-plus-six — I submitted it last Friday, the ninth. Nine-plus-three in January. Actual months, plus the remaining budget months adjusted for how we're running. We take sixty percent of the run-rate gap, not a hundred. If Europe is ten percent behind, we assume they recover some of it."
-        },
-        { "n": 20, "text": "" },
-        { "n": 21, "text": "[00:01:37] Interviewer: Where did the six-plus-six land?" }
-      ]
-    }
-  },
-  {
-    "id": "S-3",
-    "name": "03_interview_controller_2026-10-13.txt",
-    "kind": "transcript",
-    "covers": "Group Controller: the close, 13 Oct 2026",
-    "total": { "count": 77, "unit": "lines" },
-    "records": ["L39-43", "L23-27"],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 30 of 77 lines",
-      "lines": [
-        { "n": 18, "text": "" },
-        {
-          "n": 19,
-          "text": "[00:01:16] Shun Morimoto: Receivables to the open-invoice list, payables to open supplier invoices, inventory to the stock report, fixed assets to the register, contract liabilities to the maintenance contract schedule. Five entities, every month. All tie. September tied to the yen. Intercompany within two yen, rounding."
-        },
-        { "n": 20, "text": "" },
-        { "n": 21, "text": "[00:01:35] Interviewer: How do you control manual journal entries?" },
-        { "n": 22, "text": "" },
-        {
-          "n": 23,
-          "text": "[00:01:38] Daisuke Onodera: Every manual journal has a preparer and a different approver. The ERP enforces it. You cannot approve your own entry. Group-wide. No exceptions.",
-          "cited": true
-        },
-        { "n": 24, "text": "", "cited": true },
-        { "n": 25, "text": "[00:01:47] Interviewer: Including the subsidiaries?", "cited": true },
-        { "n": 26, "text": "", "cited": true },
-        {
-          "n": 27,
-          "text": "[00:01:49] Daisuke Onodera: Including the subsidiaries. Same rule. Approval limits by person, in local currency. The limits are in the employee master.",
-          "cited": true
-        },
-        { "n": 28, "text": "" },
-        { "n": 29, "text": "[00:01:58] Shun Morimoto: The UK is small, though. Two people in finance." },
-        { "n": 30, "text": "" },
-        { "n": 31, "text": "[00:02:01] Daisuke Onodera: Fiona approves Tom's entries. Same rule." },
-        { "n": 32, "text": "" },
-        { "n": 34, "text": "" },
-        {
-          "n": 35,
-          "text": "[00:02:08] Daisuke Onodera: Revenue is recognised on delivery. Every invoice has a delivery date. On day one AR runs a cut-off review: invoices in the last three days of the month against delivery confirmations from logistics."
-        },
-        { "n": 36, "text": "" },
-        { "n": 37, "text": "[00:02:20] Interviewer: And September?" },
-        { "n": 38, "text": "" },
-        {
-          "n": 39,
-          "text": "[00:02:22] Daisuke Onodera: September cut-off was clean. We checked the deliveries. There were some big dealer orders at the end of the half — dealers always buy at the end of the half — but they shipped.",
-          "cited": true
-        },
-        { "n": 40, "text": "", "cited": true },
-        {
-          "n": 41,
-          "text": "[00:02:33] Shun Morimoto: I put it as an open item in the memo, for the auditors.",
-          "cited": true
-        },
-        { "n": 42, "text": "", "cited": true },
-        {
-          "n": 43,
-          "text": "[00:02:36] Daisuke Onodera: For the auditors. It's a formality. It's clean.",
-          "cited": true
-        },
-        { "n": 44, "text": "" },
-        { "n": 45, "text": "[00:02:41] Interviewer: Tell me about the allowance." },
-        { "n": 46, "text": "" },
-        {
-          "n": 47,
-          "text": "[00:02:43] Daisuke Onodera: Aging method. Not due, half a percent. One to thirty days, one and a half. Thirty-one to sixty, five. Sixty-one to ninety, fifteen. Ninety-one to one-eighty, forty. Over one-eighty, a hundred. Plus specific reserves for named customers. Great Lakes in the US: sixty percent from September. Shimokita in Japan last year: a hundred percent, then written off in January."
-        },
-        { "n": 48, "text": "" }
-      ]
-    }
-  },
-  {
-    "id": "S-4",
-    "name": "04_interview_treasury_2026-10-14.txt",
-    "kind": "transcript",
-    "covers": "Treasury: cash, FX, debt, 14 Oct 2026",
-    "total": { "count": 55, "unit": "lines" },
-    "records": [],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 21 of 55 lines",
-      "lines": [
-        { "n": 1, "text": "KASANE CORPORATION — TABULAR UI ONBOARDING" },
-        { "n": 2, "text": "Discovery session 4 of 6: Treasury — cash, FX, debt" },
-        { "n": 3, "text": "Date: Wednesday 14 October 2026, 09:00–09:48 JST" },
-        { "n": 4, "text": "Attendees: Ren Fujisawa (Treasury Manager), Interviewer (Tabular UI onboarding)" },
-        { "n": 5, "text": "Recording: auto-transcribed, lightly cleaned. Fictional company; all names invented." },
-        { "n": 6, "text": "" },
-        { "n": 7, "text": "[00:00:08] Interviewer: Start with cash. Where is it?" },
-        { "n": 8, "text": "" },
-        {
-          "n": 9,
-          "text": "[00:00:11] Ren Fujisawa: Group cash at the end of September, thirty point three billion yen. About twenty-two billion of that is in Japan. The subsidiaries hold the rest in their own currencies. They don't pay us dividends at the moment, so their cash builds up. That's a discussion for next year."
-        },
-        { "n": 10, "text": "" },
-        { "n": 11, "text": "[00:00:28] Interviewer: Debt?" },
-        { "n": 12, "text": "" },
-        {
-          "n": 13,
-          "text": "[00:00:30] Ren Fujisawa: One long-term bank loan at the parent. We repay two hundred fifty million a quarter. Shanghai had a working-capital line; they repaid it in March. Net cash is about twenty-five point nine billion."
-        },
-        { "n": 14, "text": "" },
-        { "n": 15, "text": "[00:00:43] Interviewer: The half had a buyback." },
-        { "n": 16, "text": "" },
-        {
-          "n": 17,
-          "text": "[00:00:45] Ren Fujisawa: Two billion yen. Board resolution thirteenth of May, executed May to July. Plus the year-end dividend, one point seven two billion, paid the day after the AGM in June. So H1 we returned three point seven two billion. More than free cash flow. It's policy. The CFO likes the total return number."
-        },
-        { "n": 18, "text": "" },
-        { "n": 19, "text": "[00:01:04] Interviewer: FX. How do you manage it?" },
-        { "n": 20, "text": "" },
-        {
-          "n": 21,
-          "text": "[00:01:06] Ren Fujisawa: We don't hedge. Natural hedge, mostly. The subsidiaries buy and sell in their own currency. The exposure is in Japan: our export receivables to the distributors in dollars, and the intercompany receivables from the four subsidiaries in their currencies."
-        }
-      ]
-    }
-  },
-  {
-    "id": "S-5",
-    "name": "05_interview_ar_ap_2026-10-14.txt",
-    "kind": "transcript",
-    "covers": "Receivables, credit and payables, 14 Oct 2026",
-    "total": { "count": 65, "unit": "lines" },
-    "records": ["L45-49", "L21"],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 26 of 65 lines",
-      "lines": [
-        { "n": 16, "text": "" },
-        {
-          "n": 17,
-          "text": "[00:01:06] Marcus Bell: Hi. Yeah. So, the US is different. Dealers are net forty-five, schools net forty-five, churches and studios net thirty. Schools pay late but they always pay. The district finance offices batch everything."
-        },
-        { "n": 18, "text": "" },
-        { "n": 19, "text": "[00:01:19] Interviewer: And Great Lakes?" },
-        { "n": 20, "text": "" },
-        {
-          "n": 21,
-          "text": "[00:01:21] Marcus Bell: Great Lakes Duplicating Supply. Michigan. One of our biggest dealers — fourteen, fifteen hundred machines in their territory. Good customer for years. Their credit limit is six hundred thousand dollars. They were never over their limit until August. Then it jumped. They stopped paying, we put them on credit hold on the tenth of September, and we booked a sixty percent specific reserve in the September close. I prepared it, Dana approved it.",
-          "cited": true
-        },
-        { "n": 22, "text": "" },
-        { "n": 23, "text": "[00:01:47] Interviewer: When did they last pay?" },
-        { "n": 24, "text": "" },
-        {
-          "n": 25,
-          "text": "[00:01:49] Marcus Bell: Twenty-first of July. Since then, nothing. At the end of September they owed us one point four two million."
-        },
-        { "n": 26, "text": "" },
-        { "n": 40, "text": "" },
-        {
-          "n": 41,
-          "text": "[00:02:36] Kenta Ishiguro: Two payment runs a month. Business day eight and the last business day. Japanese practice is to pay at month-end. Subsidiaries pay every Friday. Approval by the controller, larger invoices by the CFO."
-        },
-        { "n": 42, "text": "" },
-        { "n": 43, "text": "[00:02:49] Interviewer: How do you prevent paying an invoice twice?" },
-        { "n": 44, "text": "" },
-        {
-          "n": 45,
-          "text": "[00:02:51] Kenta Ishiguro: We can't pay an invoice twice. The system blocks a duplicate supplier invoice number from the same supplier. If you enter it again, it stops you.",
-          "cited": true
-        },
-        { "n": 46, "text": "", "cited": true },
-        { "n": 47, "text": "[00:03:00] Interviewer: Is that the same in the subsidiaries?", "cited": true },
-        { "n": 48, "text": "", "cited": true },
-        { "n": 49, "text": "[00:03:02] Kenta Ishiguro: Same rule everywhere. Same ERP template.", "cited": true },
-        { "n": 50, "text": "" },
-        { "n": 51, "text": "[00:03:05] Marcus Bell: [audio drops] — Priya does ours, I think it's the same, yeah." },
-        { "n": 52, "text": "" },
-        { "n": 53, "text": "[00:03:09] Interviewer: Capex suppliers?" },
-        { "n": 54, "text": "" }
-      ]
-    }
-  },
-  {
-    "id": "S-6",
-    "name": "06_interview_plant_cost_2026-10-15.txt",
-    "kind": "transcript",
-    "covers": "Tsukuba plant: standard cost, variances, assets, 15 Oct 2026",
-    "total": { "count": 50, "unit": "lines" },
-    "records": [],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 21 of 50 lines",
-      "lines": [
-        { "n": 1, "text": "KASANE CORPORATION — TABULAR UI ONBOARDING" },
-        { "n": 2, "text": "Discovery session 6 of 6: Tsukuba plant — standard cost, variances, assets" },
-        { "n": 3, "text": "Date: Thursday 15 October 2026, 13:30–14:25 JST" },
-        { "n": 4, "text": "Location: Tsukuba plant, Building B office, and video" },
-        {
-          "n": 5,
-          "text": "Attendees: Takumi Hoshino (Plant Cost Accountant), Ryota Iwasaki (Fixed Assets Accountant, on video from Tokyo), Interviewer (Tabular UI onboarding)"
-        },
-        {
-          "n": 6,
-          "text": "Recording: auto-transcribed, lightly cleaned. Fictional company; all names invented. Background noise from the ink filling line."
-        },
-        { "n": 7, "text": "" },
-        { "n": 8, "text": "[00:00:12] Interviewer: Start with how products are costed." },
-        { "n": 9, "text": "" },
-        {
-          "n": 10,
-          "text": "[00:00:15] Takumi Hoshino: Standard costing. Every product has a standard cost per unit: material, labour, overhead. Set once a year, before April. When we finish a unit, it goes into finished goods at standard. What we actually spend goes in as actual. The difference is the variance. It goes to cost of sales that month."
-        },
-        { "n": 11, "text": "" },
-        { "n": 12, "text": "[00:00:36] Interviewer: What changed in the FY2026 standards?" },
-        { "n": 13, "text": "" },
-        {
-          "n": 14,
-          "text": "[00:00:39] Takumi Hoshino: Labour plus four percent, the shuntō. Pigments plus twelve, carbon black plus six, master film plus three, metals and electronics plus two. The coloured inks and the Flux inks took the biggest increase."
-        },
-        { "n": 15, "text": "" },
-        { "n": 16, "text": "[00:00:53] Interviewer: Why pigments?" },
-        { "n": 17, "text": "" },
-        {
-          "n": 18,
-          "text": "[00:00:55] Takumi Hoshino: The pigment price jumped in January. Twelve percent. Our supplier in Aizu passed it straight through. So January, February, March last year — I mean FY2025 — the material variance was big. Seventy million in January. Fifty-something in February and March. Because the FY2025 standard didn't have it."
-        },
-        { "n": 19, "text": "" },
-        { "n": 20, "text": "[00:01:16] Interviewer: And now?" },
-        { "n": 21, "text": "" }
-      ]
-    }
-  },
-  {
-    "id": "S-7",
     "name": "accounting_policies.md",
     "kind": "document",
     "covers": "The group’s accounting policies",
     "total": { "count": 103, "unit": "lines" },
-    "records": [],
+    "records": ["L26"],
     "excerpt": {
       "type": "text",
       "count": "Showing the Revenue section: 16 of 103 lines",
@@ -368,14 +38,15 @@
         },
         {
           "n": 26,
-          "text": "- **Cut-off:** revenue belongs to the period in which delivery occurs. The `delivery_date` on each invoice is the control field."
+          "text": "- **Cut-off:** revenue belongs to the period in which delivery occurs. The `delivery_date` on each invoice is the control field.",
+          "cited": true
         },
         { "n": 27, "text": "" }
       ]
     }
   },
   {
-    "id": "S-8",
+    "id": "S-2",
     "name": "close_calendar.md",
     "kind": "document",
     "covers": "The group’s month-end close, as it stood on 16 Oct 2026",
@@ -450,66 +121,105 @@
     }
   },
   {
-    "id": "S-9",
+    "id": "S-3",
     "name": "close_memo_2026-09.md",
     "kind": "document",
     "covers": "The controller’s memo on the September 2026 close",
     "total": { "count": 74, "unit": "lines" },
-    "records": [],
+    "records": ["L37-39"],
     "excerpt": {
       "type": "text",
-      "count": "Showing 10 of 74 lines",
+      "count": "Showing the What drove the month section: 24 of 74 lines",
       "lines": [
-        { "n": 1, "text": "# September 2026 month-end close: controller's memo" },
-        { "n": 2, "text": "" },
-        { "n": 3, "text": "**To:** Keiko Arimura, CFO" },
-        { "n": 4, "text": "**From:** Daisuke Onodera, Group Controller" },
-        { "n": 5, "text": "**Cc:** Mei Tachibana (FP&A), Sayaka Kurosawa (Consolidation), subsidiary controllers" },
-        { "n": 6, "text": "**Date:** 8 October 2026 (BD6)" },
-        { "n": 7, "text": "**Status:** September closed and locked. H1 consolidation complete." },
-        { "n": 8, "text": "" },
-        { "n": 9, "text": "---" },
-        { "n": 10, "text": "" }
-      ]
-    }
-  },
-  {
-    "id": "S-10",
-    "name": "forecast_memo_fy2026_6+6.md",
-    "kind": "document",
-    "covers": "FP&A’s memo on the FY2026 6+6 forecast",
-    "total": { "count": 63, "unit": "lines" },
-    "records": [],
-    "excerpt": {
-      "type": "text",
-      "count": "Showing 9 of 63 lines",
-      "lines": [
-        { "n": 1, "text": "# FY2026 \"6+6\" forecast: FP&A memo" },
-        { "n": 2, "text": "" },
+        { "n": 25, "text": "## What drove the month" },
+        { "n": 26, "text": "" },
         {
-          "n": 3,
-          "text": "**From:** Mei Tachibana, Head of FP&A (prepared with Nanami Okabe and the subsidiary controllers)"
+          "n": 27,
+          "text": "**1. Sales above budget in local currency in every printing segment.** September is back-to-school month in Europe and the US. In yen, Americas (¥1,064m vs ¥1,089m) and China (¥884m vs ¥892m) came in slightly below budget because of the exchange rate."
         },
-        { "n": 4, "text": "**To:** Keiko Arimura, CFO" },
-        { "n": 5, "text": "**Date:** 9 October 2026" },
-        { "n": 6, "text": "**Version in the data:** `FC-FY2026-6+6` in `04_planning/budget_forecast_monthly.csv`" },
-        { "n": 7, "text": "" },
-        { "n": 8, "text": "---" },
-        { "n": 9, "text": "" }
+        {
+          "n": 28,
+          "text": "- Japan ¥3,568m external. Equipment was helped by several large dealer orders invoiced in the last days of the month."
+        },
+        {
+          "n": 29,
+          "text": "- Europe ¥1,153m. KDE and KUK both had their best month of the year (Sept school restart). Operating margin was 16–17% for the month."
+        },
+        { "n": 30, "text": "- Americas ¥1,064m. Sales were ahead of budget in dollars." },
+        { "n": 31, "text": "- China ¥884m." },
+        { "n": 32, "text": "" },
+        {
+          "n": 33,
+          "text": "**2. Gross margin 1.2pt below budget.** The stronger yen is the main cause: transfer prices are fixed at budget rates, so goods sold by the subsidiaries earn fewer yen. The plant also had a ¥18m unfavourable variance (material ¥12m, absorption ¥6m). Material variance is now small: pigment prices eased in July and sit below the FY2026 standard, which offsets some material-usage overrun."
+        },
+        { "n": 34, "text": "" },
+        { "n": 35, "text": "**3. Provisions ¥186m vs ¥63m budget.**" },
+        { "n": 36, "text": "- **Great Lakes Duplicating Supply (C-KUS-0001)**, US dealer, Michigan." },
+        { "n": 37, "text": "  - **Balance:** $1.42m outstanding at 30 Sep vs a $600k credit limit.", "cited": true },
+        {
+          "n": 38,
+          "text": "  - **Payment history:** no payment received since 21 July. $507k is now more than 60 days past due.",
+          "cited": true
+        },
+        {
+          "n": 39,
+          "text": "  - **Actions:** account on credit hold since 10 Sep. 60% specific reserve booked (prepared by Marcus Bell, approved by Dana Whitfield). KUS allowance up from $173k to $971k.",
+          "cited": true
+        },
+        { "n": 40, "text": "  - **Next step:** legal is reviewing whether to file a claim." },
+        { "n": 41, "text": "- The balance is warranty provisions on the higher equipment volume." },
+        { "n": 42, "text": "" },
+        {
+          "n": 43,
+          "text": "**4. Personnel costs ¥82m under budget.** The hiring freeze has been in place since April. Group headcount was 2,788 at 30 Sep, 47 below March."
+        },
+        { "n": 44, "text": "" },
+        {
+          "n": 45,
+          "text": "**5. Real estate.** Rent was ¥26.0m vs ¥38.6m budget. The 7th floor, vacated by Atago Data Labs on 31 March, is still empty. The budget assumed a new tenant from July."
+        },
+        { "n": 46, "text": "" },
+        {
+          "n": 47,
+          "text": "**6. FX.** The dollar averaged ¥141.2 (budget ¥150.0). KJP booked a ¥32m FX gain in September as the yen weakened slightly from August's ¥139.6."
+        },
+        { "n": 48, "text": "" }
       ]
     }
   },
   {
-    "id": "S-11",
-    "name": "org_chart_finance_2026-10.png",
-    "kind": "image",
-    "covers": "The finance team, October 2026",
-    "total": null,
-    "records": [],
-    "excerpt": null
+    "id": "S-4",
+    "name": "finance_team.md",
+    "kind": "document",
+    "covers": "Who owns what in finance, and the approval rules",
+    "total": { "count": 71, "unit": "lines" },
+    "records": ["L68"],
+    "excerpt": {
+      "type": "text",
+      "count": "Showing the Approval rules section: 7 of 71 lines",
+      "lines": [
+        { "n": 65, "text": "## Approval rules" },
+        { "n": 66, "text": "" },
+        {
+          "n": 67,
+          "text": "- **Supplier invoices** are approved by the entity controller. Invoices over 10× the approver's normal limit go to the entity head (CFO for KJP)."
+        },
+        {
+          "n": 68,
+          "text": "- **Manual journal entries** must be created by one person and approved by another (**segregation of duties**).",
+          "cited": true
+        },
+        { "n": 69, "text": "- **Write-offs** of receivables need the CFO." },
+        {
+          "n": 70,
+          "text": "- **Intercompany invoices** are auto-approved by the `AUTO-IC` rule when they match a KJP shipment."
+        },
+        { "n": 71, "text": "- `SYS-ERP` is the system user for automated subledger postings." }
+      ]
+    }
   },
   {
-    "id": "S-12",
+    "id": "S-5",
     "name": "ar_aging_monthly.csv",
     "kind": "csv",
     "covers": "All 5 entities, Apr 2025 to Sep 2026",
@@ -710,606 +420,11 @@
           "oldest_due_date": "2026-06-25"
         }
       ],
-      "citedRows": [5, 7, 11, 12, 13, 14, 15]
+      "citedRows": [5, 7, 11, 12, 13, 14, 15, 16]
     }
   },
   {
-    "id": "S-13",
-    "name": "bank_export_kjp_2026-09.csv",
-    "kind": "csv",
-    "covers": "KJP, Sep 2026",
-    "total": { "count": 35, "unit": "rows" },
-    "records": [],
-    "excerpt": {
-      "type": "table",
-      "count": "Showing 21 of 35 rows, 6 of 6 columns",
-      "columns": [
-        { "key": "date" },
-        { "key": "ref", "mono": true },
-        { "key": "desc" },
-        { "key": "out", "numeric": true },
-        { "key": "in", "numeric": true },
-        { "key": "balance", "numeric": true }
-      ],
-      "rows": [
-        {
-          "date": "2026-09-01",
-          "ref": "RCT-KJP-2609-00006",
-          "desc": "Intercompany settlement received INV-KJP-2607-00080",
-          "out": "",
-          "in": 535423123,
-          "balance": 22214101453
-        },
-        {
-          "date": "2026-09-01",
-          "ref": "RCT-KJP-2609-00007",
-          "desc": "Intercompany settlement received INV-KJP-2607-00081",
-          "out": "",
-          "in": 169253875,
-          "balance": 22383355328
-        },
-        {
-          "date": "2026-09-01",
-          "ref": "RCT-KJP-2609-00008",
-          "desc": "Intercompany settlement received INV-KJP-2607-00082",
-          "out": "",
-          "in": 112880853,
-          "balance": 22496236181
-        },
-        {
-          "date": "2026-09-01",
-          "ref": "RCT-KJP-2609-00009",
-          "desc": "Intercompany settlement received INV-KJP-2607-00083",
-          "out": "",
-          "in": 470418677,
-          "balance": 22966654858
-        },
-        {
-          "date": "2026-09-01",
-          "ref": "CR-BATCH-KJP-20260901",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 128870673,
-          "balance": 23095525531
-        },
-        {
-          "date": "2026-09-02",
-          "ref": "CR-BATCH-KJP-20260902",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 93630665,
-          "balance": 23189156196
-        },
-        {
-          "date": "2026-09-03",
-          "ref": "CR-BATCH-KJP-20260903",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 3837609,
-          "balance": 23192993805
-        },
-        {
-          "date": "2026-09-04",
-          "ref": "CR-BATCH-KJP-20260904",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 47376400,
-          "balance": 23240370205
-        },
-        {
-          "date": "2026-09-07",
-          "ref": "CR-BATCH-KJP-20260907",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 36918582,
-          "balance": 23277288787
-        },
-        {
-          "date": "2026-09-08",
-          "ref": "CR-BATCH-KJP-20260908",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 425799,
-          "balance": 23277714586
-        },
-        {
-          "date": "2026-09-09",
-          "ref": "CR-BATCH-KJP-20260909",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 43219531,
-          "balance": 23320934117
-        },
-        {
-          "date": "2026-09-10",
-          "ref": "CR-BATCH-KJP-20260910",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 11270146,
-          "balance": 23332204263
-        },
-        {
-          "date": "2026-09-11",
-          "ref": "CR-BATCH-KJP-20260911",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 84144113,
-          "balance": 23416348376
-        },
-        {
-          "date": "2026-09-14",
-          "ref": "CR-BATCH-KJP-20260914",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 26039620,
-          "balance": 23442387996
-        },
-        {
-          "date": "2026-09-15",
-          "ref": "CR-BATCH-KJP-20260915",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 24651,
-          "balance": 23442412647
-        },
-        {
-          "date": "2026-09-16",
-          "ref": "CR-BATCH-KJP-20260916",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 59929335,
-          "balance": 23502341982
-        },
-        {
-          "date": "2026-09-17",
-          "ref": "CR-BATCH-KJP-20260917",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 1704032,
-          "balance": 23504046014
-        },
-        {
-          "date": "2026-09-18",
-          "ref": "CR-BATCH-KJP-20260918",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 33402930,
-          "balance": 23537448944
-        },
-        {
-          "date": "2026-09-21",
-          "ref": "CR-BATCH-KJP-20260921",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 62933074,
-          "balance": 23600382018
-        },
-        {
-          "date": "2026-09-22",
-          "ref": "CR-BATCH-KJP-20260922",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 39742646,
-          "balance": 23640124664
-        },
-        {
-          "date": "2026-09-23",
-          "ref": "CR-BATCH-KJP-20260923",
-          "desc": "Customer receipts",
-          "out": "",
-          "in": 54980421,
-          "balance": 23695105085
-        }
-      ],
-      "citedRows": []
-    }
-  },
-  {
-    "id": "S-14",
-    "name": "budget_forecast_monthly.csv",
-    "kind": "csv",
-    "covers": "All 5 entities, Apr 2025 to Mar 2027",
-    "total": { "count": 13788, "unit": "rows" },
-    "records": [],
-    "excerpt": {
-      "type": "table",
-      "count": "Showing 21 of 13,788 rows, 8 of 14 columns",
-      "columns": [
-        { "key": "version_id", "mono": true },
-        { "key": "entity_id" },
-        { "key": "period" },
-        { "key": "measure" },
-        { "key": "account_id", "mono": true },
-        { "key": "product_line" },
-        { "key": "value", "numeric": true },
-        { "key": "currency" }
-      ],
-      "rows": [
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-04",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-14242092.47",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-05",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-14034211.93",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-06",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-15745969.55",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-07",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-13959614.28",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-08",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-14867893.79",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-09",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-15767092.77",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-10",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-14387016.31",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-11",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-17619291.95",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-12",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-21725637.71",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2026-01",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-13799425.75",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2026-02",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-9582725.75",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2026-03",
-          "measure": "amount",
-          "account_id": "4000",
-          "product_line": "EQUIPMENT",
-          "value": "-18047571.79",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-04",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-21583155.24",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-05",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-20578515.07",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-06",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-21447563.46",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-07",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-20449778.24",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-08",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-19553866.96",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-09",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-22625494.32",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-10",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-19958682.06",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-11",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-21525759.32",
-          "currency": "CNY"
-        },
-        {
-          "version_id": "BUD-FY2025",
-          "entity_id": "KCN",
-          "period": "2025-12",
-          "measure": "amount",
-          "account_id": "4100",
-          "product_line": "CONSUMABLES",
-          "value": "-21155441.43",
-          "currency": "CNY"
-        }
-      ],
-      "citedRows": []
-    }
-  },
-  {
-    "id": "S-15",
-    "name": "chart_of_accounts.csv",
-    "kind": "csv",
-    "covers": "The group’s chart of accounts",
-    "total": { "count": 88, "unit": "rows" },
-    "records": [],
-    "excerpt": {
-      "type": "table",
-      "count": "Showing 21 of 88 rows, 5 of 8 columns",
-      "columns": [
-        { "key": "account_id", "mono": true },
-        { "key": "account_name" },
-        { "key": "account_class" },
-        { "key": "statement" },
-        { "key": "normal_balance" }
-      ],
-      "rows": [
-        {
-          "account_id": "1000",
-          "account_name": "Cash and deposits",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1100",
-          "account_name": "Trade receivables",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1110",
-          "account_name": "Allowance for doubtful accounts",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        },
-        {
-          "account_id": "1150",
-          "account_name": "Intercompany receivables",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1200",
-          "account_name": "Merchandise and finished goods",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1210",
-          "account_name": "Raw materials and supplies",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1220",
-          "account_name": "Work in process",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1300",
-          "account_name": "Prepaid expenses",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1320",
-          "account_name": "Input consumption tax / VAT receivable",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1500",
-          "account_name": "Buildings and structures",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1501",
-          "account_name": "Accumulated depreciation - buildings",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        },
-        {
-          "account_id": "1510",
-          "account_name": "Machinery and equipment",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1511",
-          "account_name": "Accumulated depreciation - machinery",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        },
-        {
-          "account_id": "1520",
-          "account_name": "Tools, furniture and fixtures",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1521",
-          "account_name": "Accumulated depreciation - tools, furniture",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        },
-        {
-          "account_id": "1530",
-          "account_name": "Vehicles",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1531",
-          "account_name": "Accumulated depreciation - vehicles",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        },
-        {
-          "account_id": "1540",
-          "account_name": "Land",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1550",
-          "account_name": "Construction in progress",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1560",
-          "account_name": "Rental property - buildings",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Debit"
-        },
-        {
-          "account_id": "1561",
-          "account_name": "Accumulated depreciation - rental property",
-          "account_class": "Asset",
-          "statement": "BS",
-          "normal_balance": "Credit"
-        }
-      ],
-      "citedRows": []
-    }
-  },
-  {
-    "id": "S-16",
+    "id": "S-6",
     "name": "manual_journal_entries_fy2026_h1.csv",
     "kind": "csv",
     "covers": "KJP, KUS, KDE, KUK, Apr 2026 to Sep 2026",
@@ -1519,7 +634,7 @@
     }
   },
   {
-    "id": "S-17",
+    "id": "S-7",
     "name": "sales_invoices_2026-09.csv",
     "kind": "csv",
     "covers": "All 5 entities, Sep 2026",
@@ -1642,7 +757,7 @@
     }
   },
   {
-    "id": "S-18",
+    "id": "S-8",
     "name": "supplier_invoices_fy2026_h1.csv",
     "kind": "csv",
     "covers": "All 5 entities, Apr 2026 to Sep 2026",
@@ -1753,6 +868,102 @@
         }
       ],
       "citedRows": [4, 5]
+    }
+  },
+  {
+    "id": "S-9",
+    "name": "supplier_payments_fy2026_h1.csv",
+    "kind": "csv",
+    "covers": "All 5 entities, payments dated Apr 2026 to Sep 2026",
+    "total": { "count": 560, "unit": "rows" },
+    "records": ["PAY-KUS-2608-0002", "PAY-KUS-2608-0003"],
+    "excerpt": {
+      "type": "table",
+      "count": "Showing 8 of 560 rows, 7 of 8 columns: every row for Midwest Freight Logistics LLC",
+      "columns": [
+        { "key": "payment_id", "mono": true },
+        { "key": "ap_invoice_id", "mono": true },
+        { "key": "payment_date" },
+        { "key": "amount", "numeric": true },
+        { "key": "currency" },
+        { "key": "entity_id" },
+        { "key": "supplier_id", "mono": true }
+      ],
+      "rows": [
+        {
+          "payment_id": "PAY-KUS-2604-0002",
+          "ap_invoice_id": "API-KUS-2603-00005",
+          "payment_date": "2026-04-03",
+          "amount": "95778.94",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2605-0002",
+          "ap_invoice_id": "API-KUS-2604-00003",
+          "payment_date": "2026-05-01",
+          "amount": "116166.37",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2606-0002",
+          "ap_invoice_id": "API-KUS-2605-00003",
+          "payment_date": "2026-06-05",
+          "amount": "112889.17",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2607-0002",
+          "ap_invoice_id": "API-KUS-2606-00003",
+          "payment_date": "2026-07-03",
+          "amount": "107479.65",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2608-0001",
+          "ap_invoice_id": "API-KUS-2607-00006",
+          "payment_date": "2026-08-07",
+          "amount": "113979.44",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2608-0002",
+          "ap_invoice_id": "API-KUS-2607-00007",
+          "payment_date": "2026-08-14",
+          "amount": "48216.4",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2608-0003",
+          "ap_invoice_id": "API-KUS-2607-00011",
+          "payment_date": "2026-08-21",
+          "amount": "48216.4",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        },
+        {
+          "payment_id": "PAY-KUS-2609-0002",
+          "ap_invoice_id": "API-KUS-2608-00003",
+          "payment_date": "2026-09-04",
+          "amount": "150996",
+          "currency": "USD",
+          "entity_id": "KUS",
+          "supplier_id": "S-KUS-001"
+        }
+      ],
+      "citedRows": [5, 6]
     }
   }
 ]

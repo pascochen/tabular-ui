@@ -9,10 +9,9 @@ import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
 import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
-import { channels, close, exceptions, findings, memberName, type ChannelId, type Exception } from '../lib/kasane';
+import { channels, close, exceptions, memberName, type ChannelId, type Exception } from '../lib/kasane';
 import { SCRIPTED_NOTE } from '../lib/scripted-note';
 import { MemberAvatar } from '../shell/members';
-import { ChannelGaps } from './Tasks';
 
 const titleOf = (id: string) => exceptions.find((e) => e.id === id)!.title;
 const channelOf = (id: string) => exceptions.find((e) => e.id === id)!.channel;
@@ -24,7 +23,7 @@ const dateTime = (at: string) => `${close.scene.date}T${at}`;
  * A channel: one message per finding it holds, with its replies inline, then
  * whatever the visitor writes, and the composer. The decision and the timeline
  * change it all through the close state. A channel holding no finding shows its
- * topic and the gap linked to it.
+ * topic.
  *
  * App keys this by channel, so `useExceptionLink` and `useDecisionInView` run
  * again on each way in.
@@ -39,16 +38,12 @@ export function ChannelView({ channel }: { channel: ChannelId }) {
   const c = channels.find((x) => x.id === channel)!;
   const held = exceptions.filter((e) => e.channel === channel);
   const posts = state.posts.filter((p) => p.where === channel);
-  const gaps = findings.gaps.filter((g) => c.gaps.includes(g.id));
   // Only this channel's: elsewhere, the sidebar's unread mark says it when the reply lands.
   const typing = state.typing && channelOf(state.typing.exception) === channel ? state.typing : null;
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
       {held.length === 0 ? (
-        <div className="flex flex-col gap-[var(--gap-group)]">
-          <EmptyState icon={HashIcon} title={`Nothing open in #${c.name}`} description={c.topic} />
-          <ChannelGaps gaps={gaps} />
-        </div>
+        <EmptyState icon={HashIcon} title={`Nothing open in #${c.name}`} description={c.topic} />
       ) : null}
       <ChannelMessageList aria-label={`Messages in ${c.name}`}>
         {held.map((e) => (

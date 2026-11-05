@@ -26,7 +26,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live |
-| D7 | Closing band | "Four agents found contradictions in a finance team's books. You decide."; Home only |
+| D7 | Closing band | "Four agents checked a finance team's books and raised four issues. You decide."; Home only |
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
@@ -133,11 +133,11 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **D5. The stories and their figures — decided 2026-10-25 (owner).** None of the wireframes' figures are in the data: no ¥184m gap, no ¥121m Tsukuba variance, no account 5900, no ¥12.6m rebate accrual, and no "Operating profit, Sep, ¥312m". September operating profit was ¥819m against a ¥794m budget, ahead rather than behind (`lastMonth` in `packages/ui/src/fixtures/kasane.ts`). A site whose second principle is "Every number opens down to the entry behind it" opens with figures that have entries behind them.
 
-1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/findings.json`, `duplicate-payment`).
-   - AP says the system blocks a duplicate supplier invoice number in every entity. KUS entered supplier invoice MFL-58821 twice, as API-KUS-2607-00007 and API-KUS-2607-00011, $48,216.40 each, and paid both. The sources are `05_interview_ar_ap_2026-10-14.txt` and `supplier_invoices_fy2026_h1.csv`.
+1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/close.json`, `duplicate-payment`).
+   - KUS entered supplier invoice MFL-58821 twice, as API-KUS-2607-00007 and API-KUS-2607-00011, $48,216.40 each, and paid both. The sources are `supplier_invoices_fy2026_h1.csv` and `supplier_payments_fy2026_h1.csv`.
    - The agent proposes reversing API-KUS-2607-00011, so the supplier owes the amount back. A person posts it.
    - *Changed 2026-10-26 (owner review):* the question is "Did we pay any invoice twice?" ("this half" assumed the reader knows fiscal halves). The answer leads in plain words, "Invoice MFL-58821 was entered twice and paid twice, $48,216.40 each time", and the entry ID moves to the smaller source line. The proposed entry reads "Reverse the duplicate payment". The entity code and the first entry's ID no longer show, and the source line cites the invoice file only.
-   - Why this story: the figure is exact, and the correction posts in October, which is open. The risk is plain, since money left the company. And the finding contradicts a person's claim, which is why a person decides.
+   - Why this story: the figure is exact, and the correction posts in October, which is open. The risk is plain, since money left the company, which is why a person decides.
    - The September cut-off (`revenue-cut-off`) was the first proposal and was set aside. September was locked on 8 Oct 2026 (`close-length`), so its correction would need explaining.
 2. **Lineage tree, Agent reasoning and Chat thread tell the H1 gap.** H1 operating profit was ¥2.2bn against a ¥2.5bn budget, ¥355m under. `operatingBridge` splits the gap into six named steps, and exchange rates account for ¥317m of it (the two FX steps, summed in code). Together the two stories cover both halves of the product's promise: explain the numbers, and stop before changing the books.
 3. **Prose is compact; parts beside their total are exact.**
@@ -160,12 +160,12 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
 **D7. Closing band copy — decided 2026-10-25 (owner).** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components".
-- `demo.tabularui.com` is the Kasane app, a finance workspace laid out as a team chat (`apps/demo/README.md`). The visitor plays Daisuke Onodera, Kasane's Group Controller. Four scripted agents have each found a contradiction, the visitor makes one decision, and teammates resolve the rest.
+- `demo.tabularui.com` is the Kasane app, a finance workspace laid out as a team chat (`apps/demo/README.md`). The visitor plays Daisuke Onodera, Kasane's Group Controller. Four scripted agents have each raised a finding, the visitor makes one decision, and teammates resolve the rest.
 - The band's first copy was written for the onboarding journey the demo replaced, which neither wireframe line described.
 
 | Slot | Copy | Source of each specific |
 |---|---|---|
-| Heading | Four agents found contradictions in a finance team's books. You decide. | "Four": the number of `agents` in `apps/demo/data/close.json`, exported as `agents` in `apps/site/data/kasane.json` and written as a word (`numberWord`) |
+| Heading | Four agents checked a finance team's books and raised four issues. You decide. | The first "Four": the number of `agents` in `apps/demo/data/close.json`, exported as `agents` in `apps/site/data/kasane.json`. The second: the number of findings, exported as `findings`. Each is written as a word (`numberWord`) |
 | Line | Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller. | "Kasane": `company.name` in `kasane.json`; "controller": the last word of the visitor's title in `apps/demo/data/people.json` (`visitor`, Group Controller), exported as `company.visitor.title` and set in lowercase |
 | Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo" |
 
@@ -262,7 +262,7 @@ Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `Exte
 
 **A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5): the two duplicate entries, the operating bridge, the pack's file names and sizes, the agent count, the visitor's title, and the next KUS October journal number.
 - Entries are numbered per entity per month (`JE-KUK-2608-00055`). The script takes the highest number in KUS's open month from the journal and adds one, and stops if the journal's IDs no longer follow that form. *Corrected 2026-10-26:* this spec first assumed October had no entries yet, so `JE-KUS-2610-00001`. The `october-open` gap means October has no month-end entries; its daily entries run to 15 Oct, 39 of them for KUS, so the first export wrote `JE-KUS-2610-00040`. Assuming would have shipped a number that already exists.
-- The export needs the full dataset, `onboarding/` included: a copy without the interview transcripts stops at its first check. Run against the right copy, the export reproduces every file already in the repo byte for byte. That is the check that the dataset is the one the repo was generated from.
+- The export needs the full dataset, `demo/` included: a copy without it stops at its first check. Run against the right copy, the export reproduces every file already in the repo byte for byte. That is the check that the dataset is the one the repo was generated from.
 - It reads the full Kasane dataset, which lives outside the repo, so the owner runs it, once the change lands and before PR 4.
 
 ---
@@ -598,7 +598,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **Density lists the frame tier** with two line-level lint disables, each with its reason: the page names the tokens and draws each at its size, and spaces nothing with them.
 - **The Components page** has the jump index, a `Tabs` filter (segmented, a view switch on one page) with the prerendered HTML on "All", and all ten built specimens at rest. The jump index's links sit 6px apart, because at 2px they missed WCAG 2.5.8's 24px target spacing (axe again).
 - **Specimen data:**
-  - The Run log row's failure is real: the bank export has no header row (`findings.json`, `bank-header`). The rows carry no times or durations, because the data has none.
+  - The Run log row's failure is real: the bank export has no header row. The rows carry no times or durations, because the data has none.
   - The Lineage tree shows the bridge in exact yen, and a test checks that budget plus its steps equals the actual.
   - The Chat thread's scroller is bounded by an aspect ratio, not a height, which keeps it inside the control-height cap.
 - **Components and Foundations are live** in the nav, footer and outline, and a principle's built component tags link to their cards.
@@ -647,7 +647,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - Tool's first use line ends "see what it used", not "what it touched", which read as changing something; the agent only reads.
   - Tool's pair caption: "Each line changes from Reading to Read only when the file is done. A failure says what happens next."
   - Tool's group summary is "Read 2 of 3 files", not "Read 3 files": the third read failed, and its failure shows right under the line, so a summary claiming all three contradicted it. The library's README and stories now say the same ("`summary` counts what ran"), and its usage snippet, which the Tool page shows, reads "Read 1 of 2 files".
-  - The second read's detail names its source and spells out the team: "In the interview, accounts payable says the system blocks repeated invoice numbers." The answer's own sentence, in Inline citation and Sources, keeps "AP says…": its citation mark names the interview, and that copy was approved on 2026-10-28.
+  - The second read's detail names the two payments behind the two entries, and the answer's second sentence, in Inline citation and Sources, says each entry has its own payment. Changed 2026-11-05.
   - The failure: "Couldn’t read the columns in `bank_export_kjp_2026-09.csv`: it has no header row." ("Match to fields" was pipeline jargon.) `docs/agent-voice.md` quotes it.
   - Question's avoid lines: "One meaning is far more likely. The agent should go with it and say so." ("reading" was jargon, and "you" could be the builder or the agent) and "The agent needs permission to act. Use `Confirmation`."
   - Question's Skip outcome names who skipped, as "Answered by you" and Confirmation's "Sent once, by you." do: "Skipped by you. I’ll cover all entities, and say so in the summary."

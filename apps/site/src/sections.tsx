@@ -73,7 +73,8 @@ export function ClosingBand() {
             id="closing-title"
             className="text-site-heading-sm font-semibold text-balance text-text-primary md:text-site-heading"
           >
-            {closingBand.agents} agents found contradictions in a finance team’s books. You decide.
+            {closingBand.agents} agents checked a finance team’s books and raised {closingBand.findings} issues. You
+            decide.
           </h2>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-balance text-text-secondary">
             {kasane.company.name} is a fictional printer maker. Its team works in channels, like Slack, and you play its{' '}
