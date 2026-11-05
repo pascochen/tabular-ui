@@ -2,6 +2,7 @@ import { MetricTile } from 'tabular-ui';
 
 import { FoundationsHeader, ModePair, TokenLabel } from '../components/foundations';
 import { Rail, Section, SectionHeader } from '../components/layout';
+import { PageKey } from '../components/page-key';
 import { pages } from '../content';
 import { kasane, packFile } from '../data';
 import { cn } from '../lib/cn';
@@ -40,11 +41,51 @@ const texts = [
   { token: 'text-tertiary', className: 'text-text-tertiary' },
 ];
 
+/**
+ * PROTOTYPE, the frontispiece (docs/reviews/inner-page-heads-2026-11-05.md):
+ * the lead's three families, each doing its job at its real size, with the
+ * figure a tile shows. Text from the Kasane story.
+ */
+function TypographyKey({ figure }: { figure: string }) {
+  return (
+    <PageKey
+      label="What each family is for"
+      rows={[
+        {
+          mark: (
+            <span className="font-display text-site-title-sm font-semibold text-text-primary">Explain the H1 gap</span>
+          ),
+          meaning: 'Headings',
+          name: '--font-heading',
+        },
+        {
+          mark: <span className="font-display text-metric font-semibold text-text-primary tabular-nums">{figure}</span>,
+          meaning: 'The one figure a tile shows',
+          name: '--text-metric',
+        },
+        {
+          mark: <span className="text-base text-text-body">The supplier owes it back.</span>,
+          meaning: 'Reading, at the 13px base',
+          name: '--font-sans',
+        },
+        {
+          mark: (
+            <span className="font-mono text-sm text-text-primary">{packFile('supplier_invoices_fy2026_h1.csv')}</span>
+          ),
+          meaning: 'Identifiers, one step down',
+          name: '--font-mono',
+        },
+      ]}
+    />
+  );
+}
+
 export default function Typography() {
   const bridge = kasane.operatingBridge;
   return (
     <>
       <FoundationsHeader
+        aside={<TypographyKey figure={money(bridge.actual)} />}
         current={pages.typography}
         title="Typography"
         lead="A 13px base for dense tools, sized in rem. One superfamily: sans for reading, serif for headings and the single figure a tile exists to show, mono for identifiers."
