@@ -48,7 +48,7 @@ const labels = [
   { label: 'AI · Not posted', use: 'A proposal a person declined.' },
 ];
 
-/** Words shipping products use, and the ones Tabular uses instead (wireframe `79:445`). Owner copy. */
+/** Words shipping products use, and the ones Tabular UI uses instead (wireframe `79:445`). Owner copy. */
 const insteadOf = [
   {
     use: <StatusBadge status="needs-review" />,
@@ -113,8 +113,8 @@ export default function Vocabulary() {
           <>
             <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Vocabulary</h1>
             <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-              The words Tabular uses when an agent is working, waiting for you, or done. Each word names one state, so a
-              label never means two things.
+              The words Tabular UI uses when an agent is working, waiting for you, or done. Each word names one state,
+              so a label never means two things.
             </p>
           </>
         }
@@ -226,7 +226,7 @@ export default function Vocabulary() {
 
           <table className="w-full border-collapse border border-border text-site-small">
             <caption className="pb-[var(--gap-inline)] text-left text-site-small text-text-secondary">
-              The words Tabular uses, and the ones it doesn’t.
+              The words Tabular UI uses, and the ones it doesn’t.
             </caption>
             <thead>
               <tr>
