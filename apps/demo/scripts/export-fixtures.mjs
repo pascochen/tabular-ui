@@ -9,19 +9,17 @@
 //
 // Writes:
 //   packages/ui/src/fixtures/kasane.ts   story fixtures (never exported from src/index.ts)
-//   apps/demo/data/pack.json             the files a visitor "uploads": name, kind, size, and a
-//                                        spreadsheet's first line, which the header check reads
 //   apps/demo/data/company.json          the company and the visitor's persona
 //   apps/demo/data/people.json           the close demo's people, by role, from employees.csv
 //   apps/demo/data/close.json            the scripted workspace: agents, channels, exceptions, replies,
 //                                        the hero decision and its proposed entry (copy from
 //                                        demo/close-demo.json, figures from the data)
 //   apps/demo/data/checks.json           each close check's figure before and after its fix
-//   apps/demo/data/sources.json          the binder: each file a finding cites or an agent reads, its
-//                                        exhibit ID and a trimmed excerpt
+//   apps/demo/data/documents.json        each file a finding rests on or an agent reads, with a trimmed
+//                                        extract. A document knows nothing about the findings
 //   apps/site/data/kasane.json           the public site's specimen records and closing band (docs/site.md §5)
 //
-// Only what the demo's screens read is written: no whole files, only the binder's excerpts.
+// Only what the demo's screens read is written: no whole files, only the documents' extracts.
 // Re-running it on an unchanged dataset produces no diff.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -455,7 +453,7 @@ const dupPayments = (dup ?? []).map((d) => supplierPayments.find((p) => p.ap_inv
 must(dupPayments.every(Boolean), 'a payment against each entry of the duplicate');
 
 // A finding states the rule the check applies, then what the books show. `words` must still be in the
-// lines of the document that close-demo.json cites for the rule. A rule no document states has none.
+// lines of the document that close-demo.json gives for the rule. A rule no document states has none.
 const findings = [
   {
     id: 'self-approved-entry',
@@ -674,7 +672,6 @@ await writeFormatted(
       .join(''),
 );
 
-await writeJson('apps/demo/data/pack.json', pack);
 await writeJson('apps/demo/data/company.json', {
   ...fixtures.company,
   persona: { name: people.fpa.name, title: people.fpa.title },
@@ -737,7 +734,7 @@ const auditFieldwork = calendarText.match(/Auditor interim review fieldwork \| (
 must(auditFieldwork, "close_calendar.md gives the auditors' interim fieldwork dates");
 const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
 must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
-// What the agents' scripted answers claim, each read from the file the answer cites.
+// What the agents' scripted answers claim, each read from the file the answer names.
 const lateInvoices = salesRows.filter((r) => r.delivery_date.slice(0, 7) > LAST_CLOSED);
 must(lateInvoices.length === 1, `one ${LAST_CLOSED} invoice delivered after the month`);
 const numbersEnteredTwice = Object.values(
@@ -838,25 +835,41 @@ const FINDING_SCOPE = {
   'credit-limit': `${gl.entity_id}, up to ${fmtPeriod(glHistory.at(-1).period)}`,
 };
 
-// The binder (pages spec, D6): every file a finding cites or an agent reads. Each gets an exhibit ID in
-// a fixed order: documents, then CSVs, each alphabetical. The same dataset always produces the same IDs.
-const BINDER_GROUP = { document: 0, spreadsheet: 1 };
+// The documents: every file a finding rests on or an agent reads, in a fixed order: text files, then
+// CSVs, each alphabetical. The same dataset always produces the same order.
+const DOCUMENT_ORDER = { document: 0, spreadsheet: 1 };
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
-const binderFiles = [...new Set([...findings.flatMap((f) => f.sources), ...closeSource.agents.flatMap((a) => a.reads)])]
+const documentFiles = [
+  ...new Set([...findings.flatMap((f) => f.sources), ...closeSource.agents.flatMap((a) => a.reads)]),
+]
   .map((name) => {
     const file = pack.find((f) => f.name === name);
     must(file, `${name} (a finding's source or an agent's read) is a pack file`);
     return file;
   })
-  .sort((a, b) => BINDER_GROUP[a.kind] - BINDER_GROUP[b.kind] || byCodeUnit(a.name, b.name));
-const exhibitOf = Object.fromEntries(binderFiles.map((f, i) => [f.name, `S-${i + 1}`]));
+  .sort((a, b) => DOCUMENT_ORDER[a.kind] - DOCUMENT_ORDER[b.kind] || byCodeUnit(a.name, b.name));
+const SLUGS = {
+  [P.policies]: 'accounting-policies',
+  [P.closeCalendar]: 'close-calendar',
+  [P.closeMemo]: 'close-memo',
+  [P.financeTeam]: 'finance-team',
+  [P.aging]: 'ar-aging',
+  [P.manualJournals]: 'manual-journals',
+  [P.salesInvoices]: 'sales-invoices',
+  [P.supplierInvoices]: 'supplier-invoices',
+  [P.supplierPayments]: 'supplier-payments',
+};
+const slugOf = (name) => {
+  must(SLUGS[name], `a slug for ${name}`);
+  return SLUGS[name];
+};
 
-// What each CSV excerpt shows. Only the columns a reader needs to follow the citation, the evidence
-// first, so it's on screen before the table has to scroll: the count above the excerpt says how many
+// What each CSV extract shows. Only the columns a reader needs to check a finding, the evidence
+// first, so it's on screen before the table has to scroll: the count above the extract says how many
 // were left out. Headers are the file's own names (docs/agent-voice.md).
-const mono = (key) => ({ key, mono: true });
-const text = (key) => ({ key });
-const figure = (key) => ({ key, numeric: true });
+const mono = (name) => ({ name, style: 'id' });
+const text = (name) => ({ name });
+const figure = (name) => ({ name, style: 'figure' });
 const CSV_TABLES = {
   [P.aging]: {
     rows: arAging,
@@ -933,78 +946,76 @@ const CSV_TABLES = {
   },
 };
 
-// Which records in a CSV a finding cites. When they aren't next to each other, the excerpt is the
-// file's rows for `whole` instead (pages spec §4), and the count says so.
+// The records in a CSV each finding rests on. When they aren't next to each other, the extract is the
+// file's rows for `whole` instead, and the count says so.
 const dupSupplierName = readCsv('01_master_data/suppliers.csv').find(
   (r) => r.supplier_id === dupFirst.supplier_id,
 )?.supplier_name;
 must(dupSupplierName, `supplier ${dupFirst.supplier_id} in suppliers.csv`);
 const supplierRowsOfDup = { label: dupSupplierName, match: (r) => r.supplier_id === dupFirst.supplier_id };
-const CITED_RECORDS = [
+const ITEM_RECORDS = [
   {
     finding: 'revenue-cut-off',
     file: P.salesInvoices,
     ids: [cutoff.invoice_id],
-    isCited: (r) => r.invoice_id === cutoff.invoice_id,
+    isRecord: (r) => r.invoice_id === cutoff.invoice_id,
   },
   {
     finding: 'duplicate-payment',
     file: P.supplierInvoices,
     ids: dup.map((d) => d.ap_invoice_id),
-    isCited: (r) => dup.some((d) => d.ap_invoice_id === r.ap_invoice_id),
+    isRecord: (r) => dup.some((d) => d.ap_invoice_id === r.ap_invoice_id),
     whole: supplierRowsOfDup,
   },
   {
     finding: 'duplicate-payment',
     file: P.supplierPayments,
     ids: dupPayments.map((p) => p.payment_id),
-    isCited: (r) => dupPayments.some((p) => p.payment_id === r.payment_id),
+    isRecord: (r) => dupPayments.some((p) => p.payment_id === r.payment_id),
     whole: supplierRowsOfDup,
   },
-  { finding: 'self-approved-entry', file: P.manualJournals, ids: [sa.je_id], isCited: (r) => r.je_id === sa.je_id },
+  { finding: 'self-approved-entry', file: P.manualJournals, ids: [sa.je_id], isRecord: (r) => r.je_id === sa.je_id },
   {
     finding: 'credit-limit',
     file: P.aging,
     ids: [gl.customer_id],
-    isCited: (r) => r.customer_id === gl.customer_id && glOverBeforeHold.some((m) => m.period === r.period),
+    isRecord: (r) => r.customer_id === gl.customer_id && glOverBeforeHold.some((m) => m.period === r.period),
     whole: { label: gl.customer_name, match: (r) => r.customer_id === gl.customer_id },
   },
 ];
 
-const EXCERPT_ROWS_EITHER_SIDE = 10;
-const EXCERPT_FIRST_ROWS = 21;
+const EXTRACT_ROWS_EITHER_SIDE = 10;
 const count = (n) => n.toLocaleString('en-US');
 
-function csvExcerpt(name) {
+// The extract, and which of its rows hold the record: the finding's ref keeps those, not the document.
+const recordRows = {};
+function csvTable(name) {
   const table = CSV_TABLES[name];
-  must(table, `an excerpt layout for ${name}`);
-  const citedBy = CITED_RECORDS.find((c) => c.file === name);
-  let rows = table.rows.slice(0, EXCERPT_FIRST_ROWS);
-  let whole;
-  if (citedBy) {
-    const hits = table.rows.flatMap((r, i) => (citedBy.isCited(r) ? [i] : []));
-    must(hits.length > 0, `${name} holds what it is cited for (${citedBy.ids.join(', ')})`);
-    if (hits.at(-1) - hits[0] + 1 === hits.length) {
-      rows = table.rows.slice(
-        Math.max(0, hits[0] - EXCERPT_ROWS_EITHER_SIDE),
-        hits.at(-1) + EXCERPT_ROWS_EITHER_SIDE + 1,
-      );
-    } else {
-      must(citedBy.whole, `${name}'s cited rows are apart, so its excerpt needs whole rows to show`);
-      rows = table.rows.filter(citedBy.whole.match);
-      whole = citedBy.whole.label;
-    }
+  must(table, `an extract layout for ${name}`);
+  const record = ITEM_RECORDS.find((c) => c.file === name);
+  must(record, `the record ${name} is read for`);
+  const hits = table.rows.flatMap((r, i) => (record.isRecord(r) ? [i] : []));
+  must(hits.length > 0, `${name} holds its record (${record.ids.join(', ')})`);
+  let rows;
+  let rowsFor;
+  if (hits.at(-1) - hits[0] + 1 === hits.length) {
+    rows = table.rows.slice(
+      Math.max(0, hits[0] - EXTRACT_ROWS_EITHER_SIDE),
+      hits.at(-1) + EXTRACT_ROWS_EITHER_SIDE + 1,
+    );
+  } else {
+    must(record.whole, `${name}'s records are apart, so its extract needs whole rows to show`);
+    rows = table.rows.filter(record.whole.match);
+    rowsFor = record.whole.label;
   }
-  const columns = table.columns.map((c) => c.key);
+  recordRows[name] = rows.flatMap((r, i) => (record.isRecord(r) ? [i] : []));
+  const names = table.columns.map((c) => c.name);
   return {
-    type: 'table',
-    count:
-      `Showing ${count(rows.length)} of ${count(table.rows.length)} rows, ` +
-      `${count(columns.length)} of ${count(table.all)} columns` +
-      (whole ? `: every row for ${whole}` : ''),
+    rowCount: table.rows.length,
+    columnCount: table.all,
+    ...(rowsFor ? { rowsFor } : {}),
     columns: table.columns,
-    rows: rows.map((r) => Object.fromEntries(columns.map((k) => [k, r[k]]))),
-    citedRows: citedBy ? rows.flatMap((r, i) => (citedBy.isCited(r) ? [i] : [])) : [],
+    rows: rows.map((r) => names.map((k) => r[k])),
   };
 }
 
@@ -1013,50 +1024,34 @@ function fileLines(name) {
   return lines.at(-1) === '' ? lines.slice(0, -1) : lines;
 }
 
-function textExcerpt(lines, from, to, cited, label = '') {
-  const shown = lines.slice(from, to);
-  return {
-    type: 'text',
-    count: `Showing ${label}${count(shown.length)} of ${count(lines.length)} lines`,
-    lines: shown.map((text, i) => ({
-      n: from + i + 1,
-      text,
-      ...(cited.includes(from + i + 1) ? { cited: true } : {}),
-    })),
-  };
-}
-
-// A document's named section, as close-demo.json gives it, or its first section, with the lines a
-// finding's rule rests on marked. A section runs to the next heading at its level or above.
-function documentExcerpt(name) {
+// A document's named section, as close-demo.json gives it, or its first section. A section runs to the
+// next heading at its level or above.
+function documentText(name) {
   const lines = fileLines(name);
   const section = closeSource.sources[name]?.section;
   const level = (line) => line.match(/^(#+) /)?.[1].length ?? 0;
-  const cited = closeSource.exceptions
-    .filter((e) => e.quote?.file === name)
-    .flatMap(
-      ({
-        quote: {
-          lines: [from, to],
-        },
-      }) => Array.from({ length: to - from + 1 }, (_, i) => from + i),
-    );
-  let excerpt;
+  let from = 0;
+  let to;
   if (section) {
-    const start = lines.findIndex((l) => level(l) > 0 && l.replace(/^#+ /, '').startsWith(section));
-    must(start >= 0, `${name} has a section named "${section}"`);
-    const rest = lines.slice(start + 1).findIndex((l) => level(l) > 0 && level(l) <= level(lines[start]));
-    excerpt = textExcerpt(lines, start, rest < 0 ? lines.length : start + 1 + rest, cited, `the ${section} section: `);
+    from = lines.findIndex((l) => level(l) > 0 && l.replace(/^#+ /, '').startsWith(section));
+    must(from >= 0, `${name} has a section named "${section}"`);
+    const rest = lines.slice(from + 1).findIndex((l) => level(l) > 0 && level(l) <= level(lines[from]));
+    to = rest < 0 ? lines.length : from + 1 + rest;
   } else {
     const second = lines.slice(1).findIndex((l) => level(l) > 0);
-    excerpt = textExcerpt(lines, 0, second < 0 ? lines.length : second + 1, cited);
+    to = second < 0 ? lines.length : second + 1;
   }
-  for (const n of cited)
+  for (const e of closeSource.exceptions.filter((x) => x.quote?.file === name))
     must(
-      excerpt.lines.some((l) => l.n === n),
-      `${name}'s excerpt shows line ${n}, which a finding cites`,
+      e.quote.lines[0] > from && e.quote.lines[1] <= to,
+      `${name}'s extract shows lines ${e.quote.lines.join(' to ')}, which ${e.id}'s rule rests on`,
     );
-  return excerpt;
+  return {
+    ...(section ? { section } : {}),
+    firstLine: from + 1,
+    lineCount: lines.length,
+    lines: lines.slice(from, to),
+  };
 }
 
 function csvCovers(name) {
@@ -1071,67 +1066,37 @@ function csvCovers(name) {
   return `${who}, ${when}`;
 }
 
-const SOURCE_KIND = { document: 'document', spreadsheet: 'csv' };
-const binder = binderFiles.map((file, i) => {
-  const kind = SOURCE_KIND[file.kind];
+const documents = documentFiles.map((file) => {
+  const csv = file.kind === 'spreadsheet';
   const authored = closeSource.sources[file.name]?.covers;
-  const excerpt = kind === 'csv' ? csvExcerpt(file.name) : documentExcerpt(file.name);
-  const covers = authored ? fill(authored) : kind === 'csv' ? csvCovers(file.name) : undefined;
-  must(covers, `close-demo.json says what ${file.name} covers`);
-  const records = [
-    ...CITED_RECORDS.filter((c) => c.file === file.name).flatMap((c) => c.ids),
-    ...closeSource.exceptions.filter((e) => e.quote?.file === file.name).map((e) => lineRecord(e.quote.lines)),
-  ];
+  const about = authored ? fill(authored) : csv ? csvCovers(file.name) : undefined;
+  must(about, `close-demo.json says what ${file.name} covers`);
   return {
-    id: `S-${i + 1}`,
-    name: file.name,
-    kind,
-    covers,
-    total:
-      kind === 'csv'
-        ? { count: CSV_TABLES[file.name].rows.length, unit: 'rows' }
-        : { count: fileLines(file.name).length, unit: 'lines' },
-    records,
-    excerpt,
+    slug: slugOf(file.name),
+    file: file.name,
+    about,
+    size: file.bytes,
+    ...(csv ? { table: csvTable(file.name) } : { text: documentText(file.name) }),
   };
 });
 
-function lineRecord([from, to]) {
-  return from === to ? `L${from}` : `L${from}-${to}`;
-}
-
-// How a finding cites each of its files: the exhibit, the record or the lines in it, and whether the
-// citation backs the rule or the evidence.
-function citationsOf(e, finding) {
+// A finding owns its links: the lines its rule rests on, and the rows that show the evidence.
+function refsOf(e, finding) {
   return finding.sources.map((name) => {
-    const exhibit = exhibitOf[name];
-    if (name === e.quote?.file) {
-      const [from, to] = e.quote.lines;
-      return {
-        source: name,
-        exhibit,
-        record: lineRecord(e.quote.lines),
-        locator: from === to ? `${exhibit}, line ${from}` : `${exhibit}, lines ${from} to ${to}`,
-        backs: 'rule',
-      };
-    }
-    const cited = CITED_RECORDS.find((c) => c.finding === e.id && c.file === name);
-    must(cited, `${e.id} says which record in ${name} it cites`);
-    return {
-      source: name,
-      exhibit,
-      record: cited.ids[0],
-      locator: `${exhibit}, ${cited.ids.join(' and ')}`,
-      backs: 'evidence',
-    };
+    if (name === e.quote?.file) return { doc: slugOf(name), lines: e.quote.lines };
+    must(
+      ITEM_RECORDS.some((c) => c.finding === e.id && c.file === name),
+      `${e.id} says which record in ${name} it rests on`,
+    );
+    return { doc: slugOf(name), rows: recordRows[name] };
   });
 }
 
-// A rule a document states: the lines it cites must still say it.
+// A rule a document states: its lines must still say it.
 const ruleStands = (e, finding) => {
-  must(!finding.words === !e.quote, `${e.id} cites a document exactly when its rule rests on one`);
+  must(!finding.words === !e.quote, `${e.id} quotes a document exactly when its rule rests on one`);
   if (!e.quote) return;
-  must(e.quote.file === finding.sources[0], `${e.id} cites ${finding.sources[0]} for its rule`);
+  must(e.quote.file === finding.sources[0], `${e.id} quotes ${finding.sources[0]} for its rule`);
   const lines = fileLines(e.quote.file);
   const [from, to] = e.quote.lines;
   must(from >= 1 && to >= from && to <= lines.length, `${e.quote.file} has lines ${from} to ${to} (${e.id})`);
@@ -1172,8 +1137,7 @@ const closeExceptions = closeSource.exceptions.map((e) => {
     scope: FINDING_SCOPE[e.id],
     rule: curly(finding.rule),
     evidence: curly(finding.evidence),
-    sources: finding.sources,
-    citations: citationsOf(e, finding),
+    refs: refsOf(e, finding),
   });
 });
 
@@ -1231,7 +1195,6 @@ const closeChecks = [
     currency: 'JPY',
     before: cutoffBefore,
     after: 0,
-    sources: [P.salesInvoices],
   },
   {
     id: 'duplicate-payment',
@@ -1240,19 +1203,22 @@ const closeChecks = [
     currency: dup[0].currency,
     before: num(dup[0].gross_amount) * (dupPaid.filter(Boolean).length - 1),
     after: 0,
-    sources: [P.supplierInvoices],
   },
 ].map((c) => ({ ...c, beforeLabel: money(c.before, c.currency), afterLabel: money(c.after, c.currency) }));
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
 must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
 await writeJson('apps/demo/data/people.json', closePeople);
-await writeJson('apps/demo/data/sources.json', binder);
+await writeJson('apps/demo/data/documents.json', documents);
 await writeJson('apps/demo/data/close.json', {
   scene: closeSource.scene,
   period: fillAll(closeSource.period),
   agentRules: closeSource.agentRules,
-  agents: fillAll(closeSource.agents),
+  agents: fillAll(closeSource.agents).map((a) => ({
+    ...a,
+    reads: a.reads.map(slugOf),
+    starters: a.starters.map((q) => ({ ...q, sources: q.sources.map(slugOf) })),
+  })),
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   typingMs: closeSource.typingMs,

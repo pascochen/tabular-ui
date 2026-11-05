@@ -5,9 +5,8 @@
 import checksData from '../../data/checks.json' with { type: 'json' };
 import closeData from '../../data/close.json' with { type: 'json' };
 import company from '../../data/company.json' with { type: 'json' };
-import pack from '../../data/pack.json' with { type: 'json' };
+import documentsData from '../../data/documents.json' with { type: 'json' };
 import peopleData from '../../data/people.json' with { type: 'json' };
-import sourcesData from '../../data/sources.json' with { type: 'json' };
 
 export const kasaneCompany = company;
 
@@ -69,41 +68,45 @@ export const directMessages = close.directMessages;
 
 export const checks = checksData;
 
-/** A file in Kasane's pack: its name and size, for a `Sources` row. No contents. */
-export function packFile(name: string): { name: string; bytes: number } | undefined {
-  return pack.find((f) => f.name === name);
-}
-
-export type TableExcerpt = {
-  type: 'table';
-  count: string;
-  columns: { key: string; mono?: boolean; numeric?: boolean }[];
-  rows: Record<string, string>[];
-  citedRows: number[];
+export type TableColumn = { name: string; style?: 'id' | 'figure' };
+export type DocumentTable = {
+  rowCount: number;
+  columnCount: number;
+  /** Set when the extract is every row for one party, not a run of the file. */
+  rowsFor?: string;
+  columns: TableColumn[];
+  rows: string[][];
 };
-export type TextExcerpt = { type: 'text'; count: string; lines: { n: number; text: string; cited?: boolean }[] };
-export type BinderSource = {
-  id: string;
-  name: string;
-  kind: string;
-  covers: string;
-  total: { count: number; unit: string } | null;
-  records: string[];
-  excerpt: TableExcerpt | TextExcerpt | null;
+export type DocumentText = { section?: string; firstLine: number; lineCount: number; lines: string[] };
+/** A file the agents read, with a trimmed extract: `text` or `table`, never both. It knows nothing about the findings. */
+export type SourceDocument = {
+  slug: string;
+  file: string;
+  about: string;
+  size: number;
+  text?: DocumentText;
+  table?: DocumentTable;
 };
 
-/** The binder: every file a finding cites or an agent reads (`sources.json`). */
-export const binder = sourcesData as BinderSource[];
+export const documents = documentsData as SourceDocument[];
 
-/** The findings that cite a file, for its exhibit's way back. */
-export const citedBy = (name: string): Exception[] => exceptions.filter((e) => e.sources.includes(name));
-
-/** A file's exhibit ID: "S-17". The export puts every cited file in the binder, so one that isn't is a bug. */
-export function exhibitOf(name: string): string {
-  const source = binder.find((s) => s.name === name);
-  if (!source) throw new Error(`${name} isn't in sources.json`);
-  return source.id;
+export function documentOf(slug: string): SourceDocument {
+  const found = documents.find((d) => d.slug === slug);
+  if (!found) throw new Error(`${slug} isn't in documents.json`);
+  return found;
 }
+
+/** The documents a finding rests on, in its order. */
+export const docsOf = (e: Exception): string[] => e.refs.map((r) => r.doc);
+
+/** The findings that rest on a document, for its way back. */
+export const usedBy = (slug: string): Exception[] => exceptions.filter((e) => docsOf(e).includes(slug));
+
+export type Ref = { doc: string; lines?: number[]; rows?: number[] };
+
+/** Where a finding points into a document. None: browsing to the file selects nothing. */
+export const refOf = (item: string | undefined, slug: string): Ref | undefined =>
+  exceptions.find((e) => e.id === item)?.refs.find((r) => r.doc === slug);
 
 const MONTHS = [
   'January',

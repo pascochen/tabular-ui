@@ -32,25 +32,34 @@ test('a task is found by its title or summary, and links to itself', () => {
   ]);
 });
 
-test('a source is found by its ID, its name or a record it cites, and links to that record', () => {
-  expect(inGroup('S-7', 'Sources')[0].view).toEqual({ kind: 'sources', source: 'S-7', record: undefined });
-  expect(inGroup('ar_aging', 'Sources')[0].key).toBe('S-5');
-  expect(inGroup('INV-KJP-2609-00363', 'Sources')[0].view).toEqual({
-    kind: 'sources',
-    source: 'S-7',
-    record: 'INV-KJP-2609-00363',
-  });
+test('a source is found by its name or what it covers, and opens with nothing selected', () => {
+  expect(inGroup('ar_aging', 'Sources')[0]).toEqual(
+    expect.objectContaining({ key: 'ar-aging', view: { kind: 'sources', source: 'ar-aging', item: undefined } }),
+  );
 });
 
-test('a cited record is found by anything in its row, and links to the record', () => {
+test('a record is found by anything in its row, and opens with its finding selected', () => {
   // The supplier's own number isn't the record's ID: the wireframe's example.
   expect(inGroup('MFL-58821', 'Sources')).toEqual([
     expect.objectContaining({
-      key: 'S-8',
-      detail: 'API-KUS-2607-00007 and API-KUS-2607-00011',
-      view: { kind: 'sources', source: 'S-8', record: 'API-KUS-2607-00007' },
+      key: 'supplier-invoices',
+      detail: 'Duplicate payment',
+      view: { kind: 'sources', source: 'supplier-invoices', item: 'duplicate-payment' },
     }),
   ]);
+  expect(inGroup('INV-KJP-2609-00363', 'Sources')[0].view).toEqual({
+    kind: 'sources',
+    source: 'sales-invoices',
+    item: 'revenue-cut-off',
+  });
+});
+
+test('a row outside any finding’s records still finds the file, with nothing selected', () => {
+  expect(inGroup('INV-KDE-2609-00142', 'Sources')[0].view).toEqual({
+    kind: 'sources',
+    source: 'sales-invoices',
+    item: undefined,
+  });
 });
 
 test('a message is found by its body, and lands on its finding in its channel', () => {

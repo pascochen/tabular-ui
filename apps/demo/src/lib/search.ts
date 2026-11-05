@@ -3,15 +3,15 @@
 
 import type { CloseState } from './close-state';
 import {
-  binder,
   channels,
   close,
   directMessages,
+  documents,
   exceptions,
   memberName,
   people,
-  type BinderSource,
-  type TableExcerpt,
+  type Ref,
+  type SourceDocument,
 } from './kasane';
 import type { View } from './view';
 
@@ -28,10 +28,20 @@ export type SearchResult = {
   hash?: string;
 };
 
-const tableRows = (s: BinderSource) => (s.excerpt as TableExcerpt).rows;
-
 const matches = (q: string, ...texts: (string | undefined)[]) =>
   texts.some((text) => text?.toLowerCase().includes(q.toLowerCase()));
+
+/** A document's extract as lines of text: a table's rows, or a text file's lines. */
+const extractLines = (doc: SourceDocument): string[][] =>
+  doc.table ? doc.table.rows : (doc.text?.lines ?? []).map((line) => [line]);
+
+/** What a finding's ref selects in a document, as lines of `extractLines`. */
+function selected(doc: SourceDocument, ref: Ref): string[][] {
+  if (ref.rows) return ref.rows.map((i) => doc.table!.rows[i]);
+  const [from, to] = ref.lines!;
+  const first = doc.text!.firstLine;
+  return doc.text!.lines.slice(from - first, to - first + 1).map((line) => [line]);
+}
 
 /** Where a person is: their direct message if they have one, else the first channel they belong to. */
 function viewOfPerson(key: string): View {
@@ -62,24 +72,21 @@ export function search(state: CloseState, query: string): SearchResult[] {
     }
   }
 
-  for (const s of binder) {
-    // A cited record is found by anything in its row, as a supplier's own invoice number.
-    const citedValues =
-      s.excerpt?.type === 'table' ? s.excerpt.citedRows.flatMap((i) => Object.values(tableRows(s)[i])) : [];
-    const inRecord = matches(q, ...s.records, ...citedValues);
-    if (matches(q, s.id, s.name) || inRecord) {
-      results.push({
-        group: 'Sources',
-        key: s.id,
-        title: `${s.id}, ${s.name}`,
-        detail: inRecord ? s.records.join(' and ') : s.covers,
-        view: {
-          kind: 'sources',
-          source: s.id,
-          record: inRecord ? (s.records.find((r) => matches(q, r)) ?? s.records[0]) : undefined,
-        },
-      });
-    }
+  for (const doc of documents) {
+    // Anything in the extract finds the file, as a supplier's own invoice number. Inside a finding's
+    // records, it opens with that finding's records selected.
+    const inExtract = extractLines(doc).some((line) => matches(q, ...line));
+    if (!matches(q, doc.file, doc.about) && !inExtract) continue;
+    const owner = exceptions.find((e) =>
+      e.refs.some((r) => r.doc === doc.slug && selected(doc, r).some((line) => matches(q, ...line))),
+    );
+    results.push({
+      group: 'Sources',
+      key: doc.slug,
+      title: doc.file,
+      detail: owner ? owner.title : doc.about,
+      view: { kind: 'sources', source: doc.slug, item: owner?.id },
+    });
   }
 
   for (const e of exceptions) {

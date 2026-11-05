@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { AppShellPanelHeader } from 'tabular-ui';
 
 import { ClosePanel } from '../components/ClosePanel';
-import { binder, channels, lastClosedMonth, member, memberName, selectedTask } from '../lib/kasane';
+import { channels, documents, lastClosedMonth, member, memberName, selectedTask } from '../lib/kasane';
 import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
 import { NoMessages, Profile } from './parts';
@@ -48,8 +48,8 @@ export function slotsFor(view: View): ViewSlots {
   if (view.kind === 'sources') {
     return {
       title: 'Sources',
-      actions: <span className="text-sm text-text-secondary tabular-nums">{binder.length} files</span>,
-      body: <SourcesView source={view.source} record={view.record} />,
+      actions: <span className="text-sm text-text-secondary tabular-nums">{documents.length} files</span>,
+      body: <SourcesView source={view.source} item={view.item} />,
       contentWidth: 'full',
     };
   }

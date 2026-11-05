@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { citedBy } from '../../demo/src/lib/kasane';
+import { usedBy } from '../../demo/src/lib/kasane';
 import {
   BUILT_CHANNELS,
   DEFAULT_VIEW,
@@ -64,12 +64,12 @@ test('Tasks opens by its URL, with or without a task', () => {
   expect(parseView('?view=tasks&task=credit-limit')).toEqual({ kind: 'tasks', task: 'credit-limit' });
 });
 
-test('the binder opens by its URL, on a source and a record', () => {
+test('Sources opens by its URL, on a document and a finding’s records', () => {
   expect(parseView('?view=sources')).toEqual({ kind: 'sources' });
-  expect(parseView('?view=sources&source=S-17&record=INV-KJP-2609-00363')).toEqual({
+  expect(parseView('?view=sources&source=sales-invoices&item=revenue-cut-off')).toEqual({
     kind: 'sources',
-    source: 'S-17',
-    record: 'INV-KJP-2609-00363',
+    source: 'sales-invoices',
+    item: 'revenue-cut-off',
   });
 });
 
@@ -81,15 +81,15 @@ test('Search opens by its URL, with or without a query', () => {
 test('a view’s link carries what it selects, and encodes it', () => {
   expect(hrefFor({ kind: 'tasks' })).toBe('?view=tasks');
   expect(hrefFor({ kind: 'tasks', task: 'revenue-cut-off' })).toBe('?view=tasks&task=revenue-cut-off');
-  expect(hrefFor({ kind: 'sources', source: 'S-17', record: 'INV-KJP-2609-00363' })).toBe(
-    '?view=sources&source=S-17&record=INV-KJP-2609-00363',
+  expect(hrefFor({ kind: 'sources', source: 'sales-invoices', item: 'revenue-cut-off' })).toBe(
+    '?view=sources&source=sales-invoices&item=revenue-cut-off',
   );
   expect(hrefFor({ kind: 'search', q: 'Great Lakes' })).toBe('?view=search&q=Great+Lakes');
 });
 
 test('a sidebar item stays active whatever its view has selected inside', () => {
   expect(placeOf({ kind: 'tasks', task: 'credit-limit' })).toBe(placeOf({ kind: 'tasks' }));
-  expect(placeOf({ kind: 'sources', source: 'S-1' })).toBe(placeOf({ kind: 'sources' }));
+  expect(placeOf({ kind: 'sources', source: 'accounting-policies' })).toBe(placeOf({ kind: 'sources' }));
   expect(placeOf({ kind: 'dm', member: 'apLead' })).not.toBe(placeOf({ kind: 'dm', member: 'fpaHead' }));
 });
 
@@ -101,11 +101,11 @@ test('?at=end opens the end state with any view', () => {
   expect(parseView('?dm=apLead&at=end')).toEqual({ kind: 'dm', member: 'apLead' });
 });
 
-test('a source says which findings cite it, and only findings', () => {
-  const ids = (name: string) => citedBy(name).map((e) => e.id);
-  expect(ids('sales_invoices_2026-09.csv')).toEqual(['revenue-cut-off']);
+test('a document says which findings use it', () => {
+  const ids = (slug: string) => usedBy(slug).map((e) => e.id);
+  expect(ids('sales-invoices')).toEqual(['revenue-cut-off']);
   // The duplicate rests on both the invoice file and the payment file.
-  expect(ids('supplier_payments_fy2026_h1.csv')).toEqual(['duplicate-payment']);
-  // An agent reads the close calendar, and no finding cites it.
-  expect(ids('close_calendar.md')).toEqual([]);
+  expect(ids('supplier-payments')).toEqual(['duplicate-payment']);
+  // An agent reads the close calendar, and no finding rests on it.
+  expect(ids('close-calendar')).toEqual([]);
 });
