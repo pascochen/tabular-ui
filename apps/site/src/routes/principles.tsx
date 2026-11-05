@@ -21,7 +21,7 @@ export default function Principles() {
         <Rail size="reading" className="flex flex-col gap-[var(--gap-group)]">
           <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Principles</h1>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-            Three rules every Tabular component follows. Each one has a check you can run against any component.
+            Three rules every Tabular UI component follows. Each one has a check you can run against any component.
           </p>
         </Rail>
       </Section>
