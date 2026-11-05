@@ -1,12 +1,11 @@
 import { useId, useState, type ReactElement } from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
-import { Button, ChannelMessage, ChannelMessageReply, InlineCitation, Sources, cn } from 'tabular-ui';
+import { Button, ChannelMessage, ChannelMessageReply, Sources, cn } from 'tabular-ui';
 
 import { notCheckedWith, type ExceptionState } from '../../lib/close-state';
 import { useClose } from '../../lib/close-context';
-import { close, memberName, type Exception } from '../../lib/kasane';
-import { citationOf, sourcesOf } from '../../lib/sources';
-import { CitedSentence } from '../CitedSentence';
+import { close, docsOf, memberName, type Exception } from '../../lib/kasane';
+import { sourcesOf } from '../../lib/sources';
 import { ExceptionStatus } from '../ExceptionStatus';
 import { MemberAvatar } from '../../shell/members';
 
@@ -75,11 +74,7 @@ export function ExceptionCard({
           </h2>
           <ExceptionStatus status={state.status} awaitsYou={awaitsYou} />
         </div>
-        <CitedSentence text={e.summary}>
-          {sources.map((s, i) => (
-            <InlineCitation key={s.id} number={i + 1} source={s} {...citationOf(e, i)} />
-          ))}
-        </CitedSentence>
+        <p>{e.summary}</p>
         {state.status === 'waiting' && 'waiting' in e && e.waiting ? (
           <p className="text-sm text-text-secondary">
             Waiting on the {e.waiting.on.charAt(0).toLowerCase() + e.waiting.on.slice(1)}.
@@ -103,7 +98,11 @@ export function ExceptionCard({
           </Button>
           {sourcesOpen ? (
             <div id={sourcesId} className="w-full">
-              <Sources sources={sources} notChecked={notCheckedWith(closeState, e.sources, e.notChecked)} />
+              <Sources
+                numbered={false}
+                sources={sources}
+                notChecked={notCheckedWith(closeState, docsOf(e), e.notChecked)}
+              />
             </div>
           ) : null}
         </div>

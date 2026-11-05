@@ -8,7 +8,7 @@ import { agents, directMessages, type ChannelId } from './kasane';
  *
  *   ?view=revenue (default, `/`) and the other channels
  *   ?view=tasks · ?view=tasks&task=revenue-cut-off
- *   ?view=sources · ?view=sources&source=S-17&record=INV-KJP-2609-00363
+ *   ?view=sources · ?view=sources&source=sales-invoices&item=revenue-cut-off
  *   ?view=search · ?view=search&q=cut-off
  *   ?dm=fpaHead · ?dm=apLead · ?dm=cutoff-ai
  *   ?at=end, with any of them: the end state, for screenshots and sharing
@@ -24,7 +24,7 @@ export type View =
   | { kind: 'channel'; channel: ChannelId }
   | { kind: 'dm'; member: string }
   | { kind: 'tasks'; task?: string }
-  | { kind: 'sources'; source?: string; record?: string }
+  | { kind: 'sources'; source?: string; item?: string }
   | { kind: 'search'; q?: string };
 
 /** The channels a visitor can open, in sidebar order. */
@@ -52,7 +52,7 @@ export function parseView(search: string): View {
     return { kind: 'tasks', task: params.get('task') ?? undefined };
   }
   if (view === 'sources' && BUILT_PLACES.includes('sources')) {
-    return { kind: 'sources', source: params.get('source') ?? undefined, record: params.get('record') ?? undefined };
+    return { kind: 'sources', source: params.get('source') ?? undefined, item: params.get('item') ?? undefined };
   }
   if (view === 'search' && BUILT_PLACES.includes('search')) {
     return { kind: 'search', q: params.get('q') ?? undefined };
@@ -79,7 +79,7 @@ export function hrefFor(view: View): string {
     case 'tasks':
       return query({ view: 'tasks', task: view.task });
     case 'sources':
-      return query({ view: 'sources', source: view.source, record: view.record });
+      return query({ view: 'sources', source: view.source, item: view.item });
     case 'search':
       return query({ view: 'search', q: view.q });
     case 'channel':
@@ -91,7 +91,7 @@ export function sameView(a: View, b: View): boolean {
   return hrefFor(a) === hrefFor(b);
 }
 
-/** The sidebar item a view belongs to, whatever it has selected inside: a task, a record, a query. */
+/** The sidebar item a view belongs to, whatever it has selected inside: a task, a document, a query. */
 export function placeOf(view: View): string {
   switch (view.kind) {
     case 'channel':

@@ -141,18 +141,20 @@ test('a post stays in the place it was written, and Start over clears it', () =>
 
 test('turning a source off adds a line to what wasn’t checked, changes no figure, and Start over turns it back on', () => {
   const landing = landingState();
-  expect(isSourceOn(landing, 'S-7')).toBe(true);
-  const off = closeReducer(landing, { type: 'source', id: 'S-7', on: false });
-  expect(isSourceOn(off, 'S-7')).toBe(false);
-  expect(notCheckedWith(off, ['sales_invoices_2026-09.csv'], ['A line.'])).toEqual([
+  expect(isSourceOn(landing, 'sales-invoices')).toBe(true);
+  const off = closeReducer(landing, { type: 'source', id: 'sales-invoices', on: false });
+  expect(isSourceOn(off, 'sales-invoices')).toBe(false);
+  expect(notCheckedWith(off, ['sales-invoices'], ['A line.'])).toEqual([
     'A line.',
-    'S-7 is turned off, so this can’t be rechecked.',
+    'sales_invoices_2026-09.csv is turned off, so this can’t be rechecked.',
   ]);
-  // Only a finding that cites it gains the line.
-  expect(notCheckedWith(off, ['ar_aging_monthly.csv'], [])).toEqual([]);
+  // Only a finding that rests on it gains the line.
+  expect(notCheckedWith(off, ['ar-aging'], [])).toEqual([]);
   expect(off.checks).toEqual(landing.checks);
   expect(off.exceptions).toEqual(landing.exceptions);
-  expect(isSourceOn(closeReducer(off, { type: 'source', id: 'S-7', on: true }), 'S-7')).toBe(true);
+  expect(isSourceOn(closeReducer(off, { type: 'source', id: 'sales-invoices', on: true }), 'sales-invoices')).toBe(
+    true,
+  );
   expect(closeReducer(off, { type: 'reset' }).sourcesOff).toEqual([]);
 });
 

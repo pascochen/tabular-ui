@@ -6,7 +6,6 @@ import {
   ChatComposer,
   ChatStarter,
   ChatThread,
-  InlineCitation,
   Sources,
   ToolGroup,
   cn,
@@ -14,14 +13,13 @@ import {
   type ChatTurn,
 } from 'tabular-ui';
 
-import { CitedSentence } from '../components/CitedSentence';
 import { Section } from '../components/ClosePanel';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { isSourceOn, notCheckedWith } from '../lib/close-state';
-import { close, exceptions, exhibitOf, visitor, type Agent } from '../lib/kasane';
+import { close, documentOf, exceptions, visitor, type Agent } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
-import { citationOf, exhibitView, sourcesOf, sourcesOfNames } from '../lib/sources';
+import { documentView, sourcesOfSlugs } from '../lib/sources';
 import { SCRIPTED_NOTE } from '../lib/scripted-note';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 import { MemberAvatar } from '../shell/members';
@@ -40,33 +38,28 @@ const sameQuestion = (a: string, b: string) => a.trim().toLowerCase() === b.trim
  */
 function AgentRun({ agent }: { agent: Agent }) {
   const finding = exceptions.find((e) => e.id === agent.finding)!;
-  const sources = sourcesOf(finding);
   const task: View = { kind: 'tasks', task: finding.id };
   return (
     <AgentBlock authorship={agent.name} meta={finding.postedAt}>
       <div className="flex flex-col gap-[var(--gap-field)]">
         <ToolGroup
           summary={agent.reads.length === 1 ? 'Read 1 file' : `Read ${agent.reads.length} files`}
-          calls={agent.reads.map((name) => ({
-            id: name,
+          calls={agent.reads.map((slug) => ({
+            id: slug,
             status: 'done',
             running: (
               <>
-                Reading <FileName>{name}</FileName>
+                Reading <FileName>{documentOf(slug).file}</FileName>
               </>
             ),
             done: (
               <>
-                Read <FileName>{name}</FileName>
+                Read <FileName>{documentOf(slug).file}</FileName>
               </>
             ),
           }))}
         />
-        <CitedSentence text={finding.summary}>
-          {sources.map((s, i) => (
-            <InlineCitation key={s.id} number={i + 1} source={s} {...citationOf(finding, i)} />
-          ))}
-        </CitedSentence>
+        <p>{finding.summary}</p>
         <a href={hrefFor(task)} onClick={onViewLinkClick(task)} className={cn(linkClassName, 'w-fit text-sm')}>
           Open the task
         </a>
@@ -98,7 +91,6 @@ export function AgentView({ agent }: { agent: Agent }) {
     const user: ChatTurn = { id: `q${i}`, role: 'user', text: p.text };
     const starter = agent.starters.find((q) => sameQuestion(q.question, p.text));
     if (!starter) return [user];
-    const sources = sourcesOfNames(starter.sources);
     return [
       user,
       {
@@ -108,12 +100,12 @@ export function AgentView({ agent }: { agent: Agent }) {
         meta: p.at,
         text: (
           <div className="flex flex-col gap-[var(--gap-group)] whitespace-normal">
-            <CitedSentence text={starter.answer}>
-              {sources.map((s, n) => (
-                <InlineCitation key={s.id} number={n + 1} source={s} />
-              ))}
-            </CitedSentence>
-            <Sources sources={sources} notChecked={notCheckedWith(state, starter.sources, starter.notChecked)} />
+            <p>{starter.answer}</p>
+            <Sources
+              numbered={false}
+              sources={sourcesOfSlugs(starter.sources)}
+              notChecked={notCheckedWith(state, starter.sources, starter.notChecked)}
+            />
           </div>
         ),
       },
@@ -172,22 +164,18 @@ export function AgentProfile({ agent }: { agent: Agent }) {
       </Section>
       <Section title="Reads">
         <ul role="list" className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
-          {agent.reads.map((name) => {
-            const id = exhibitOf(name);
-            const view = exhibitView(id);
+          {agent.reads.map((slug) => {
+            const view = documentView(slug);
             return (
-              <li key={name} className="flex min-w-0 flex-col gap-[var(--gap-bonded)]">
-                <span className="flex min-w-0 gap-[var(--gap-inline)]">
-                  <span className="w-[5ch] shrink-0 font-mono text-xs">{id}</span>
-                  <a
-                    href={hrefFor(view)}
-                    onClick={onViewLinkClick(view)}
-                    className={cn(linkClassName, 'min-w-0 break-all font-mono text-xs')}
-                  >
-                    {name}
-                  </a>
-                </span>
-                {isSourceOn(state, id) ? null : (
+              <li key={slug} className="flex min-w-0 flex-col gap-[var(--gap-bonded)]">
+                <a
+                  href={hrefFor(view)}
+                  onClick={onViewLinkClick(view)}
+                  className={cn(linkClassName, 'min-w-0 break-all font-mono text-xs')}
+                >
+                  {documentOf(slug).file}
+                </a>
+                {isSourceOn(state, slug) ? null : (
                   <span className="text-xs text-text-secondary">Not read: turned off in Sources</span>
                 )}
               </li>

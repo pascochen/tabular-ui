@@ -90,6 +90,23 @@ export const WithCitations: Story = {
 };
 
 /**
+ * An answer with no `InlineCitation` marks: nothing refers to a number, so the rows
+ * carry none, and the name lines up with the label above it.
+ */
+export const Unnumbered: Story = {
+  args: { numbered: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('list', { name: 'Sources' });
+    await expect(list.tagName).toBe('UL');
+    const rows = within(list).getAllByRole('listitem');
+    await expect(rows).toHaveLength(2);
+    await expect(rows[0]).toHaveTextContent(/^supplier_invoices_fy2026_h1\.csv/);
+    await expect(rows[1]).toHaveTextContent(/^05_interview/);
+  },
+};
+
+/**
  * Long names truncate in their row, as AttachmentRow's do, and a long
  * not-checked line wraps: it's a sentence, and a cut one says less than it
  * should. Ten sources keep their numbers aligned.

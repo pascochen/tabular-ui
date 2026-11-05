@@ -1,0 +1,518 @@
+[
+  {
+    "slug": "accounting-policies",
+    "file": "accounting_policies.md",
+    "about": "The group’s accounting policies",
+    "size": 9018,
+    "text": {
+      "section": "Revenue",
+      "firstLine": 12,
+      "lineCount": 103,
+      "lines": [
+        "## Revenue",
+        "",
+        "| Stream | When it is recognised | Account |",
+        "|---|---|---|",
+        "| Equipment (duplicators, printers, drums) | On delivery to the customer. For dealers, on delivery to the dealer | 4000 |",
+        "| Consumables (ink, masters) | On delivery | 4100 |",
+        "| Maintenance contracts, annual billing | Billed at the start of the term into contract liabilities (2400). Recognised evenly over the 12 months | 2400 → 4200 |",
+        "| Maintenance contracts, monthly billing | When billed each month | 4200 |",
+        "| Repair labour and parts | When the work is done or the part delivered | 4200 |",
+        "| Rental income | Monthly, over the lease | 4300 |",
+        "| Intercompany sales | Same rules. Eliminated on consolidation | 4500 |",
+        "",
+        "- **Revenue excludes consumption tax / VAT / sales tax** (税抜方式). Tax collected is a liability (2300).",
+        "- **Dealer volume rebates** reduce revenue. They are accrued monthly at 2.5% (KJP), 3% (KUS) or 2% (KDE, KUK) of dealer equipment and consumables sales, and settled quarterly by credit note on the 10th business day after quarter-end, for dealers above the quarterly threshold (¥20m / $120k / €100k / £60k). Accrual not used is released at settlement.",
+        "- **Cut-off:** revenue belongs to the period in which delivery occurs. The `delivery_date` on each invoice is the control field.",
+        ""
+      ]
+    }
+  },
+  {
+    "slug": "close-calendar",
+    "file": "close_calendar.md",
+    "about": "The group’s month-end close, as it stood on 16 Oct 2026",
+    "size": 4947,
+    "text": {
+      "section": "Where things stand today",
+      "firstLine": 5,
+      "lineCount": 75,
+      "lines": [
+        "## Where things stand today (Friday 16 October 2026, BD12 of October)",
+        "",
+        "| Item | Status |",
+        "|---|---|",
+        "| **September 2026 close** (FY2026-P06, end of H1) | ✅ Closed on **8 Oct (BD6)**. Ledgers locked |",
+        "| **H1 consolidation** | ✅ Done. Consolidated statements, segments and KPIs published to `05_reporting/` |",
+        "| **FY2026 6+6 forecast** | ✅ Submitted 9 Oct. Version `FC-FY2026-6+6` |",
+        "| **Q2 dealer rebate credit notes** | ✅ Issued 14 Oct (BD10) |",
+        "| **October 2026** (FY2026-P07) | 🟡 **Open.** Daily postings through 15 Oct only |",
+        "| H1 results board meeting | Thu 5 Nov 2026 |",
+        "| H1 earnings release (決算短信) | Fri 6 Nov 2026, 15:00 JST |",
+        "| Auditor interim review fieldwork | 19–30 Oct (Marunouchi Audit LLC) |",
+        "| KJP interim corporate tax payment | 30 Nov 2026 (H1 tax payable at 30 Sep: ¥0.48bn group) |",
+        "| October close | Target 9 Nov (BD6) |",
+        "",
+        "### What October's numbers do and don't contain yet",
+        "",
+        "October looks small and odd on any dashboard. **That is expected.** It must be flagged, not compared with full months.",
+        "",
+        "| Already in October | Not in October yet |",
+        "|---|---|",
+        "| Customer invoices and receipts to 15 Oct | Second half of the month's sales and collections |",
+        "| Supplier invoices received; Friday payment runs (subsidiaries); KJP mid-month run | KJP month-end payment run (30 Oct) |",
+        "| Intercompany shipments (BD3) | Month-end entries: depreciation, accruals (bonus, warranty, rebates, property tax), deferred revenue release, allowance, FX revaluation, income tax |",
+        "| US payroll (15 Oct), first half | Japan payroll (23 Oct, as the 25th is a Sunday), UK (28 Oct), Germany/China and US second half (30 Oct) |",
+        "| Reversal of September's FX revaluation (1 Oct) | Manufacturing month-end variance; production on 16, 23 and 30 Oct |",
+        "| Q2 rebate credit notes | |",
+        "| Consumption tax / VAT / payroll remittances due in October | |",
+        "",
+        "So October currently shows revenue without most of its costs, and receivables with no allowance update.",
+        ""
+      ]
+    }
+  },
+  {
+    "slug": "close-memo",
+    "file": "close_memo_2026-09.md",
+    "about": "The controller’s memo on the September 2026 close",
+    "size": 4804,
+    "text": {
+      "section": "What drove the month",
+      "firstLine": 25,
+      "lineCount": 74,
+      "lines": [
+        "## What drove the month",
+        "",
+        "**1. Sales above budget in local currency in every printing segment.** September is back-to-school month in Europe and the US. In yen, Americas (¥1,064m vs ¥1,089m) and China (¥884m vs ¥892m) came in slightly below budget because of the exchange rate.",
+        "- Japan ¥3,568m external. Equipment was helped by several large dealer orders invoiced in the last days of the month.",
+        "- Europe ¥1,153m. KDE and KUK both had their best month of the year (Sept school restart). Operating margin was 16–17% for the month.",
+        "- Americas ¥1,064m. Sales were ahead of budget in dollars.",
+        "- China ¥884m.",
+        "",
+        "**2. Gross margin 1.2pt below budget.** The stronger yen is the main cause: transfer prices are fixed at budget rates, so goods sold by the subsidiaries earn fewer yen. The plant also had a ¥18m unfavourable variance (material ¥12m, absorption ¥6m). Material variance is now small: pigment prices eased in July and sit below the FY2026 standard, which offsets some material-usage overrun.",
+        "",
+        "**3. Provisions ¥186m vs ¥63m budget.**",
+        "- **Great Lakes Duplicating Supply (C-KUS-0001)**, US dealer, Michigan.",
+        "  - **Balance:** $1.42m outstanding at 30 Sep vs a $600k credit limit.",
+        "  - **Payment history:** no payment received since 21 July. $507k is now more than 60 days past due.",
+        "  - **Actions:** account on credit hold since 10 Sep. 60% specific reserve booked (prepared by Marcus Bell, approved by Dana Whitfield). KUS allowance up from $173k to $971k.",
+        "  - **Next step:** legal is reviewing whether to file a claim.",
+        "- The balance is warranty provisions on the higher equipment volume.",
+        "",
+        "**4. Personnel costs ¥82m under budget.** The hiring freeze has been in place since April. Group headcount was 2,788 at 30 Sep, 47 below March.",
+        "",
+        "**5. Real estate.** Rent was ¥26.0m vs ¥38.6m budget. The 7th floor, vacated by Atago Data Labs on 31 March, is still empty. The budget assumed a new tenant from July.",
+        "",
+        "**6. FX.** The dollar averaged ¥141.2 (budget ¥150.0). KJP booked a ¥32m FX gain in September as the yen weakened slightly from August's ¥139.6.",
+        ""
+      ]
+    }
+  },
+  {
+    "slug": "finance-team",
+    "file": "finance_team.md",
+    "about": "Who owns what in finance, and the approval rules",
+    "size": 3511,
+    "text": {
+      "section": "Approval rules",
+      "firstLine": 65,
+      "lineCount": 71,
+      "lines": [
+        "## Approval rules",
+        "",
+        "- **Supplier invoices** are approved by the entity controller. Invoices over 10× the approver's normal limit go to the entity head (CFO for KJP).",
+        "- **Manual journal entries** must be created by one person and approved by another (**segregation of duties**).",
+        "- **Write-offs** of receivables need the CFO.",
+        "- **Intercompany invoices** are auto-approved by the `AUTO-IC` rule when they match a KJP shipment.",
+        "- `SYS-ERP` is the system user for automated subledger postings."
+      ]
+    }
+  },
+  {
+    "slug": "ar-aging",
+    "file": "ar_aging_monthly.csv",
+    "about": "All 5 entities, Apr 2025 to Sep 2026",
+    "size": 690470,
+    "table": {
+      "rowCount": 8313,
+      "columnCount": 16,
+      "rowsFor": "Great Lakes Duplicating Supply",
+      "columns": [
+        { "name": "period" },
+        { "name": "customer_id", "style": "id" },
+        { "name": "total_open", "style": "figure" },
+        { "name": "currency" },
+        { "name": "current", "style": "figure" },
+        { "name": "past_due_1_30", "style": "figure" },
+        { "name": "past_due_31_60", "style": "figure" },
+        { "name": "oldest_due_date" }
+      ],
+      "rows": [
+        ["2025-04", "C-KUS-0001", "557637.66", "USD", "385386.82", "172250.84", "0", "2025-04-17"],
+        ["2025-05", "C-KUS-0001", "571958.41", "USD", "374743.59", "197214.82", "0", "2025-05-30"],
+        ["2025-06", "C-KUS-0001", "472803.14", "USD", "472803.14", "0", "0", "2025-07-10"],
+        ["2025-07", "C-KUS-0001", "450353.74", "USD", "359498.74", "90855", "0", "2025-07-28"],
+        ["2025-08", "C-KUS-0001", "473941.59", "USD", "473941.59", "0", "0", "2025-09-11"],
+        ["2025-09", "C-KUS-0001", "641673.89", "USD", "423333.49", "218340.4", "0", "2025-09-27"],
+        ["2025-10", "C-KUS-0001", "564583.61", "USD", "564583.61", "0", "0", "2025-11-03"],
+        ["2025-11", "C-KUS-0001", "627554.46", "USD", "489068.46", "138486", "0", "2025-11-22"],
+        ["2025-12", "C-KUS-0001", "541567.14", "USD", "356900.8", "184666.34", "0", "2025-12-27"],
+        ["2026-01", "C-KUS-0001", "530989.9", "USD", "238597.47", "292392.43", "0", "2026-01-04"],
+        ["2026-02", "C-KUS-0001", "280823.42", "USD", "280823.42", "0", "0", "2026-03-26"],
+        ["2026-03", "C-KUS-0001", "608984.69", "USD", "517988.69", "90996", "0", "2026-03-26"],
+        ["2026-04", "C-KUS-0001", "637387.13", "USD", "616996.91", "0", "20390.22", "2026-03-26"],
+        ["2026-05", "C-KUS-0001", "886057.04", "USD", "359567.13", "526489.91", "0", "2026-05-07"],
+        ["2026-06", "C-KUS-0001", "795765.08", "USD", "428488.44", "168948", "198328.64", "2026-05-28"],
+        ["2026-07", "C-KUS-0001", "704159.94", "USD", "197230.5", "428488.44", "78441", "2026-06-25"],
+        ["2026-08", "C-KUS-0001", "1064974.94", "USD", "499710.5", "58335", "428488.44", "2026-06-25"],
+        ["2026-09", "C-KUS-0001", "1422722.93", "USD", "490731.99", "366726.5", "58335", "2026-06-25"]
+      ]
+    }
+  },
+  {
+    "slug": "manual-journals",
+    "file": "manual_journal_entries_fy2026_h1.csv",
+    "about": "KJP, KUS, KDE, KUK, Apr 2026 to Sep 2026",
+    "size": 4875,
+    "table": {
+      "rowCount": 20,
+      "columnCount": 26,
+      "columns": [
+        { "name": "je_id", "style": "id" },
+        { "name": "line_no", "style": "figure" },
+        { "name": "created_by", "style": "id" },
+        { "name": "approved_by", "style": "id" },
+        { "name": "debit", "style": "figure" },
+        { "name": "credit", "style": "figure" },
+        { "name": "currency" },
+        { "name": "account_id", "style": "id" },
+        { "name": "account_name" },
+        { "name": "posting_date" },
+        { "name": "entity_id" }
+      ],
+      "rows": [
+        [
+          "JE-KJP-2606-00088",
+          "1",
+          "E0012",
+          "E0002",
+          "1720000000",
+          "0",
+          "JPY",
+          "3200",
+          "Retained earnings",
+          "2026-06-24",
+          "KJP"
+        ],
+        [
+          "JE-KJP-2606-00088",
+          "2",
+          "E0012",
+          "E0002",
+          "0",
+          "1720000000",
+          "JPY",
+          "2900",
+          "Dividends payable",
+          "2026-06-24",
+          "KJP"
+        ],
+        [
+          "JE-KJP-2607-00054",
+          "1",
+          "E0015",
+          "E0010",
+          "0",
+          "33",
+          "JPY",
+          "2150",
+          "Accrued sales rebates",
+          "2026-07-14",
+          "KJP"
+        ],
+        ["JE-KJP-2607-00054", "2", "E0015", "E0010", "33", "0", "JPY", "4900", "Sales rebates", "2026-07-14", "KJP"],
+        [
+          "JE-KUS-2607-00029",
+          "1",
+          "E1003",
+          "E1002",
+          "0",
+          "0.01",
+          "USD",
+          "2150",
+          "Accrued sales rebates",
+          "2026-07-14",
+          "KUS"
+        ],
+        ["JE-KUS-2607-00029", "2", "E1003", "E1002", "0.01", "0", "USD", "4900", "Sales rebates", "2026-07-14", "KUS"],
+        [
+          "JE-KDE-2607-00029",
+          "1",
+          "E2004",
+          "E2002",
+          "2461.66",
+          "0",
+          "EUR",
+          "2150",
+          "Accrued sales rebates",
+          "2026-07-14",
+          "KDE"
+        ],
+        [
+          "JE-KDE-2607-00029",
+          "2",
+          "E2004",
+          "E2002",
+          "0",
+          "2461.66",
+          "EUR",
+          "4900",
+          "Sales rebates",
+          "2026-07-14",
+          "KDE"
+        ],
+        [
+          "JE-KUK-2607-00024",
+          "1",
+          "E3003",
+          "E3002",
+          "0.02",
+          "0",
+          "GBP",
+          "2150",
+          "Accrued sales rebates",
+          "2026-07-14",
+          "KUK"
+        ],
+        ["JE-KUK-2607-00024", "2", "E3003", "E3002", "0", "0.02", "GBP", "4900", "Sales rebates", "2026-07-14", "KUK"],
+        [
+          "JE-KUK-2608-00055",
+          "1",
+          "E3003",
+          "E3003",
+          "18400",
+          "0",
+          "GBP",
+          "1300",
+          "Prepaid expenses",
+          "2026-08-31",
+          "KUK"
+        ],
+        [
+          "JE-KUK-2608-00055",
+          "2",
+          "E3003",
+          "E3003",
+          "0",
+          "18400",
+          "GBP",
+          "6100",
+          "Advertising and promotion",
+          "2026-08-31",
+          "KUK"
+        ],
+        [
+          "JE-KUS-2609-00075",
+          "1",
+          "E1003",
+          "E1002",
+          "797834.64",
+          "0",
+          "USD",
+          "6800",
+          "Provision for doubtful accounts",
+          "2026-09-30",
+          "KUS"
+        ],
+        [
+          "JE-KUS-2609-00075",
+          "2",
+          "E1003",
+          "E1002",
+          "0",
+          "797834.64",
+          "USD",
+          "1110",
+          "Allowance for doubtful accounts",
+          "2026-09-30",
+          "KUS"
+        ]
+      ]
+    }
+  },
+  {
+    "slug": "sales-invoices",
+    "file": "sales_invoices_2026-09.csv",
+    "about": "All 5 entities, Sep 2026",
+    "size": 143488,
+    "table": {
+      "rowCount": 887,
+      "columnCount": 25,
+      "columns": [
+        { "name": "invoice_id", "style": "id" },
+        { "name": "invoice_date" },
+        { "name": "delivery_date" },
+        { "name": "net_amount", "style": "figure" },
+        { "name": "currency" },
+        { "name": "entity_id" },
+        { "name": "customer_id", "style": "id" }
+      ],
+      "rows": [
+        ["INV-KDE-2609-00142", "2026-09-30", "2026-09-30", "31445.52", "EUR", "KDE", "C-KDE-0051"],
+        ["INV-KDE-2609-00143", "2026-09-30", "2026-09-30", "45780.32", "EUR", "KDE", "C-KDE-0052"],
+        ["INV-KUK-2609-00108", "2026-09-30", "2026-09-30", "793.3", "GBP", "KUK", "C-KUK-0042"],
+        ["INV-KUK-2609-00109", "2026-09-30", "2026-09-30", "1211.05", "GBP", "KUK", "C-KUK-0045"],
+        ["INV-KCN-2609-00099", "2026-09-30", "2026-09-30", "516534.3", "CNY", "KCN", "C-KCN-0016"],
+        ["INV-KCN-2609-00100", "2026-09-30", "2026-09-30", "1580876.8", "CNY", "KCN", "C-KCN-0017"],
+        ["INV-KCN-2609-00101", "2026-09-30", "2026-09-30", "1297142.4", "CNY", "KCN", "C-KCN-0024"],
+        ["INV-KCN-2609-00102", "2026-09-30", "2026-09-30", "117902.4", "CNY", "KCN", "C-KCN-0043"],
+        ["INV-KCN-2609-00103", "2026-09-30", "2026-09-30", "276469.6", "CNY", "KCN", "C-KCN-0046"],
+        ["INV-KCN-2609-00104", "2026-09-30", "2026-09-30", "103653.8", "CNY", "KCN", "C-KCN-0056"],
+        ["INV-KJP-2609-00363", "2026-09-30", "2026-10-02", "42720000", "JPY", "KJP", "C-KJP-0004"]
+      ]
+    }
+  },
+  {
+    "slug": "supplier-invoices",
+    "file": "supplier_invoices_fy2026_h1.csv",
+    "about": "All 5 entities, Apr 2026 to Sep 2026",
+    "size": 118688,
+    "table": {
+      "rowCount": 559,
+      "columnCount": 23,
+      "rowsFor": "Midwest Freight Logistics LLC",
+      "columns": [
+        { "name": "ap_invoice_id", "style": "id" },
+        { "name": "supplier_invoice_number", "style": "id" },
+        { "name": "invoice_date" },
+        { "name": "description" },
+        { "name": "gross_amount", "style": "figure" },
+        { "name": "amount_paid", "style": "figure" },
+        { "name": "currency" },
+        { "name": "entity_id" },
+        { "name": "supplier_id", "style": "id" }
+      ],
+      "rows": [
+        [
+          "API-KUS-2604-00003",
+          "MID-11815",
+          "2026-04-01",
+          "Outbound freight and packing 2026-03",
+          "116166.37",
+          "116166.37",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2605-00003",
+          "MID-98647",
+          "2026-05-04",
+          "Outbound freight and packing 2026-04",
+          "112889.17",
+          "112889.17",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2606-00003",
+          "MID-73349",
+          "2026-06-04",
+          "Outbound freight and packing 2026-05",
+          "107479.65",
+          "107479.65",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2607-00006",
+          "MID-24903",
+          "2026-07-08",
+          "Outbound freight and packing 2026-06",
+          "113979.44",
+          "113979.44",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2607-00007",
+          "MFL-58821",
+          "2026-07-14",
+          "Outbound freight - June 2026 linehaul surcharge",
+          "48216.4",
+          "48216.4",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2607-00011",
+          "MFL-58821",
+          "2026-07-21",
+          "Outbound freight - Jun 2026 linehaul surcharge",
+          "48216.4",
+          "48216.4",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2608-00003",
+          "MID-17356",
+          "2026-08-04",
+          "Outbound freight and packing 2026-07",
+          "150996",
+          "150996",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ],
+        [
+          "API-KUS-2609-00004",
+          "MID-23310",
+          "2026-09-04",
+          "Outbound freight and packing 2026-08",
+          "137601.52",
+          "137601.52",
+          "USD",
+          "KUS",
+          "S-KUS-001"
+        ]
+      ]
+    }
+  },
+  {
+    "slug": "supplier-payments",
+    "file": "supplier_payments_fy2026_h1.csv",
+    "about": "All 5 entities, payments dated Apr 2026 to Sep 2026",
+    "size": 52076,
+    "table": {
+      "rowCount": 560,
+      "columnCount": 8,
+      "rowsFor": "Midwest Freight Logistics LLC",
+      "columns": [
+        { "name": "payment_id", "style": "id" },
+        { "name": "ap_invoice_id", "style": "id" },
+        { "name": "payment_date" },
+        { "name": "amount", "style": "figure" },
+        { "name": "currency" },
+        { "name": "entity_id" },
+        { "name": "supplier_id", "style": "id" }
+      ],
+      "rows": [
+        ["PAY-KUS-2604-0002", "API-KUS-2603-00005", "2026-04-03", "95778.94", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2605-0002", "API-KUS-2604-00003", "2026-05-01", "116166.37", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2606-0002", "API-KUS-2605-00003", "2026-06-05", "112889.17", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2607-0002", "API-KUS-2606-00003", "2026-07-03", "107479.65", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2608-0001", "API-KUS-2607-00006", "2026-08-07", "113979.44", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2608-0002", "API-KUS-2607-00007", "2026-08-14", "48216.4", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2608-0003", "API-KUS-2607-00011", "2026-08-21", "48216.4", "USD", "KUS", "S-KUS-001"],
+        ["PAY-KUS-2609-0002", "API-KUS-2608-00003", "2026-09-04", "150996", "USD", "KUS", "S-KUS-001"]
+      ]
+    }
+  }
+]

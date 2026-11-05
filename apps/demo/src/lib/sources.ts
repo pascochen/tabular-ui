@@ -1,7 +1,7 @@
 import { createElement, type ReactElement } from 'react';
 import type { Source } from 'tabular-ui';
 
-import { exhibitOf, packFile, type Exception } from './kasane';
+import { documentOf, type Exception } from './kasane';
 import { hrefFor, onViewLinkClick, type View } from './view';
 
 const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
@@ -10,28 +10,16 @@ const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleS
 const linkTo = (view: View) =>
   createElement('a', { href: hrefFor(view), onClick: onViewLinkClick(view) }) as ReactElement<{ className?: string }>;
 
-/** The binder's view of one exhibit, on one record when given. */
-export const exhibitView = (id: string, record?: string): View => ({ kind: 'sources', source: id, record });
+/** A document's view, with one finding's records selected when given. */
+export const documentView = (slug: string, item?: string): View => ({ kind: 'sources', source: slug, item });
 
-/** A file as a `Sources` row: its name links to its exhibit, and its exhibit ID goes where a size would. */
-export function sourceRow(name: string): Source {
-  const id = exhibitOf(name);
-  const file = packFile(name);
-  return {
-    id: name,
-    name,
-    size: file ? `${id}, ${kb(file.bytes)}` : id,
-    render: linkTo(exhibitView(id)),
-  };
+/** A document as a `Sources` row. Its name links to the file, at the finding's records when given. */
+export function sourceRow(slug: string, item?: string): Source {
+  const doc = documentOf(slug);
+  return { id: slug, name: doc.file, size: kb(doc.size), render: linkTo(documentView(slug, item)) };
 }
 
-export const sourcesOfNames = (names: readonly string[]): Source[] => names.map(sourceRow);
+export const sourcesOfSlugs = (slugs: readonly string[]): Source[] => slugs.map((slug) => sourceRow(slug));
 
-/** A finding's files as `Sources` rows, numbered in the order the finding cites them. */
-export const sourcesOf = (e: Exception): Source[] => sourcesOfNames(e.sources);
-
-/** What `InlineCitation` needs for one of a finding's citations: where in the file, and the link to that record. */
-export function citationOf(e: Exception, index: number) {
-  const c = e.citations[index];
-  return { locator: c.locator, locatorRender: linkTo(exhibitView(c.exhibit, c.record)) };
-}
+/** A finding's documents as `Sources` rows, each opening at what the finding rests on. */
+export const sourcesOf = (e: Exception): Source[] => e.refs.map((r) => sourceRow(r.doc, e.id));

@@ -15,13 +15,13 @@
       "name": "Cut-off AI",
       "checks": "Revenue lands in the month of delivery.",
       "finding": "revenue-cut-off",
-      "reads": ["sales_invoices_2026-09.csv", "close_calendar.md", "accounting_policies.md"],
+      "reads": ["sales-invoices", "close-calendar", "accounting-policies"],
       "ask": "Ask about the September cut-off.",
       "starters": [
         {
           "question": "Which other September invoices were delivered in October?",
           "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
-          "sources": ["sales_invoices_2026-09.csv"],
+          "sources": ["sales-invoices"],
           "notChecked": [
             "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
           ]
@@ -29,7 +29,7 @@
         {
           "question": "What does the policy say about the delivery date?",
           "answer": "Revenue belongs to the period in which delivery occurs. The delivery date on each invoice is the control field.",
-          "sources": ["accounting_policies.md"],
+          "sources": ["accounting-policies"],
           "notChecked": ["Whether a locked month is reopened: the policy doesn’t say."]
         }
       ]
@@ -39,19 +39,19 @@
       "name": "Payments AI",
       "checks": "Nothing is paid twice.",
       "finding": "duplicate-payment",
-      "reads": ["supplier_invoices_fy2026_h1.csv", "supplier_payments_fy2026_h1.csv"],
+      "reads": ["supplier-invoices", "supplier-payments"],
       "ask": "Ask about supplier invoices in FY2026 H1.",
       "starters": [
         {
           "question": "Is any other supplier invoice number entered twice?",
           "answer": "No. MFL-58821 is the only number entered twice by one supplier, across the 559 supplier invoices in FY2026 H1.",
-          "sources": ["supplier_invoices_fy2026_h1.csv"],
+          "sources": ["supplier-invoices"],
           "notChecked": ["Invoices with different numbers for the same amount: I compared numbers, not amounts."]
         },
         {
           "question": "How do the two entries differ?",
           "answer": "In the date and the description. API-KUS-2607-00007 is dated 14 Jul 2026 and reads \"Outbound freight - June 2026 linehaul surcharge\". API-KUS-2607-00011 is dated 21 Jul 2026 and reads \"Outbound freight - Jun 2026 linehaul surcharge\". The supplier, the invoice number and the amount match.",
-          "sources": ["supplier_invoices_fy2026_h1.csv"],
+          "sources": ["supplier-invoices"],
           "notChecked": [
             "Why the system let the second entry through: the file records the entries, not the ERP’s rule."
           ]
@@ -63,19 +63,19 @@
       "name": "Approvals AI",
       "checks": "Every manual entry has a different approver.",
       "finding": "self-approved-entry",
-      "reads": ["manual_journal_entries_fy2026_h1.csv", "finance_team.md"],
+      "reads": ["manual-journals", "finance-team"],
       "ask": "Ask about manual entries in FY2026 H1.",
       "starters": [
         {
           "question": "Is any other manual entry self-approved?",
           "answer": "No. JE-KUK-2608-00055 is the only one of the 10 manual entries in FY2026 H1 with the same person as creator and approver.",
-          "sources": ["manual_journal_entries_fy2026_h1.csv"],
+          "sources": ["manual-journals"],
           "notChecked": ["Entries outside FY2026 H1: the file covers those six months."]
         },
         {
           "question": "Who created and approved it?",
           "answer": "E3003 did both, on 31 Aug 2026. The entry moves £18,400 from advertising (6100) to prepaid expenses (1300).",
-          "sources": ["manual_journal_entries_fy2026_h1.csv"],
+          "sources": ["manual-journals"],
           "notChecked": ["The approver’s limit: the employee master isn’t in these files."]
         }
       ]
@@ -85,19 +85,19 @@
       "name": "Credit AI",
       "checks": "Customers stay within their credit limit.",
       "finding": "credit-limit",
-      "reads": ["ar_aging_monthly.csv", "close_memo_2026-09.md"],
+      "reads": ["ar-aging", "close-memo"],
       "ask": "Ask about Great Lakes Duplicating Supply’s balance.",
       "starters": [
         {
           "question": "Which month-ends before the credit hold were over the limit?",
           "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026, 8 month-ends in all. The limit is $600,000.",
-          "sources": ["ar_aging_monthly.csv"],
+          "sources": ["ar-aging"],
           "notChecked": ["Months before Apr 2025: the aging file starts there."]
         },
         {
           "question": "How much does Great Lakes owe now?",
           "answer": "$1.42m at the end of Sep 2026, against a limit of $600,000.",
-          "sources": ["ar_aging_monthly.csv"],
+          "sources": ["ar-aging"],
           "notChecked": ["Receipts after Sep 2026: the aging file stops at that month."]
         }
       ]
@@ -174,22 +174,9 @@
       "scope": "KJP, Sep 2026",
       "rule": "Revenue belongs to the month of delivery.",
       "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
-      "sources": ["accounting_policies.md", "sales_invoices_2026-09.csv"],
-      "citations": [
-        {
-          "source": "accounting_policies.md",
-          "exhibit": "S-1",
-          "record": "L26",
-          "locator": "S-1, line 26",
-          "backs": "rule"
-        },
-        {
-          "source": "sales_invoices_2026-09.csv",
-          "exhibit": "S-7",
-          "record": "INV-KJP-2609-00363",
-          "locator": "S-7, INV-KJP-2609-00363",
-          "backs": "evidence"
-        }
+      "refs": [
+        { "doc": "accounting-policies", "lines": [26, 26] },
+        { "doc": "sales-invoices", "rows": [10] }
       ]
     },
     {
@@ -220,22 +207,9 @@
       "scope": "KUS, Jul 2026",
       "rule": "A supplier invoice number is entered and paid once.",
       "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
-      "sources": ["supplier_invoices_fy2026_h1.csv", "supplier_payments_fy2026_h1.csv"],
-      "citations": [
-        {
-          "source": "supplier_invoices_fy2026_h1.csv",
-          "exhibit": "S-8",
-          "record": "API-KUS-2607-00007",
-          "locator": "S-8, API-KUS-2607-00007 and API-KUS-2607-00011",
-          "backs": "evidence"
-        },
-        {
-          "source": "supplier_payments_fy2026_h1.csv",
-          "exhibit": "S-9",
-          "record": "PAY-KUS-2608-0002",
-          "locator": "S-9, PAY-KUS-2608-0002 and PAY-KUS-2608-0003",
-          "backs": "evidence"
-        }
+      "refs": [
+        { "doc": "supplier-invoices", "rows": [4, 5] },
+        { "doc": "supplier-payments", "rows": [5, 6] }
       ]
     },
     {
@@ -261,16 +235,9 @@
       "scope": "KUK, Aug 2026",
       "rule": "One person creates a manual journal entry, and another approves it.",
       "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in these files.",
-      "sources": ["finance_team.md", "manual_journal_entries_fy2026_h1.csv"],
-      "citations": [
-        { "source": "finance_team.md", "exhibit": "S-4", "record": "L68", "locator": "S-4, line 68", "backs": "rule" },
-        {
-          "source": "manual_journal_entries_fy2026_h1.csv",
-          "exhibit": "S-6",
-          "record": "JE-KUK-2608-00055",
-          "locator": "S-6, JE-KUK-2608-00055",
-          "backs": "evidence"
-        }
+      "refs": [
+        { "doc": "finance-team", "lines": [68, 68] },
+        { "doc": "manual-journals", "rows": [10, 11] }
       ]
     },
     {
@@ -292,22 +259,9 @@
       "scope": "KUS, up to Sep 2026",
       "rule": "A customer’s balance stays within its credit limit.",
       "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026. The account went on credit hold on 10 Sep 2026, and the last payment arrived 21 Jul 2026.",
-      "sources": ["close_memo_2026-09.md", "ar_aging_monthly.csv"],
-      "citations": [
-        {
-          "source": "close_memo_2026-09.md",
-          "exhibit": "S-3",
-          "record": "L37-39",
-          "locator": "S-3, lines 37 to 39",
-          "backs": "rule"
-        },
-        {
-          "source": "ar_aging_monthly.csv",
-          "exhibit": "S-5",
-          "record": "C-KUS-0001",
-          "locator": "S-5, C-KUS-0001",
-          "backs": "evidence"
-        }
+      "refs": [
+        { "doc": "close-memo", "lines": [37, 39] },
+        { "doc": "ar-aging", "rows": [5, 7, 11, 12, 13, 14, 15, 16] }
       ]
     }
   ],

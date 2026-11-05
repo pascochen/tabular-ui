@@ -21,6 +21,12 @@ export type SourcesProps = {
   /** What the answer rests on, in citation order: the first is 1. */
   sources: readonly Source[];
   /**
+   * Number the rows from 1, for `InlineCitation` marks to point at. Turn it off
+   * where the answer carries no marks: a number that nothing refers to reads as a
+   * rank. Off, the rows are a plain list. Defaults to on.
+   */
+  numbered?: boolean;
+  /**
    * What wasn't checked, one sentence each, naming the part and why: "KUS's
    * bank statements: the pack holds KJP's September export only." **Required.**
    * Pass `[]` only when every part of the question was checked, and the
@@ -40,15 +46,17 @@ export type SourcesProps = {
  * component writes it out instead of drawing nothing.
  *
  * Numbered from 1 in the order given, so `InlineCitation` marks in the answer
- * point at a row by the same figure.
+ * point at a row by the same figure. An answer with no marks passes
+ * `numbered={false}`.
  *
  * Agent-authored sources render inside the turn's `AgentBlock`, like
  * `AgentReasoning` and `AgentPlan`, and draw no rail of their own.
  */
-function Sources({ sources, notChecked, className }: SourcesProps) {
+function Sources({ sources, numbered = true, notChecked, className }: SourcesProps) {
   const id = useId();
   const sourcesLabel = `${id}-sources`;
   const notCheckedLabel = `${id}-not-checked`;
+  const List = numbered ? 'ol' : 'ul';
 
   return (
     <div data-slot="sources" className={cn('flex flex-col gap-[var(--gap-group)] text-sm', className)}>
@@ -56,13 +64,15 @@ function Sources({ sources, notChecked, className }: SourcesProps) {
         <p id={sourcesLabel} className={labelClassName}>
           Sources
         </p>
-        <ol aria-labelledby={sourcesLabel} className="flex flex-col">
+        <List aria-labelledby={sourcesLabel} className="flex flex-col">
           {sources.map((source, i) => (
             // The row's hover moves to the item, so the number is inside it.
             <li key={source.id} data-slot="source" className="flex items-center hover:bg-bg-hover">
-              <span className="w-[2ch] shrink-0 pl-[var(--pad-cell-x)] text-right text-xs tabular-nums text-text-secondary box-content">
-                {i + 1}
-              </span>
+              {numbered ? (
+                <span className="w-[2ch] shrink-0 pl-[var(--pad-cell-x)] text-right text-xs tabular-nums text-text-secondary box-content">
+                  {i + 1}
+                </span>
+              ) : null}
               <AttachmentRow
                 name={source.name}
                 size={source.size}
@@ -72,7 +82,7 @@ function Sources({ sources, notChecked, className }: SourcesProps) {
               />
             </li>
           ))}
-        </ol>
+        </List>
       </div>
 
       <div className="flex flex-col gap-[var(--gap-bonded)]">

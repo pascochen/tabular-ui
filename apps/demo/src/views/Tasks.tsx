@@ -3,20 +3,18 @@ import {
   AppShellPanelBody,
   CountBadge,
   DataTable,
-  InlineCitation,
   Sources,
   buttonVariants,
   cn,
   type DataTableProps,
-  type Source,
 } from 'tabular-ui';
 
 import { ExceptionStatus } from '../components/ExceptionStatus';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor, notCheckedWith, openCount } from '../lib/close-state';
-import { close, exceptions, memberName, selectedTask, type Exception } from '../lib/kasane';
+import { close, docsOf, exceptions, memberName, selectedTask, type Exception } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
-import { citationOf, sourcesOf } from '../lib/sources';
+import { sourcesOf } from '../lib/sources';
 import { usePanelSheet } from '../lib/panel-sheet';
 import { hrefFor, navigate, onViewLinkClick, useView, type View } from '../lib/view';
 
@@ -125,20 +123,12 @@ function Part({ label, children }: { label: string; children: React.ReactNode })
 /**
  * The selected finding, in the right panel, inside the raising agent's
  * `AgentBlock`: the rule it checks, what the books show, and what it rests on,
- * with the required "not checked" list. A rule no document states carries no
- * citation; the check itself is the rule. Then the way to its channel.
+ * with the required "not checked" list. Then the way to its channel.
  */
 export function TaskPanel({ task }: { task: Exception }) {
   const { state } = useClose();
-  const sources: Source[] = sourcesOf(task);
   const channel: View = { kind: 'channel', channel: task.channel };
   const hash = `#${task.id}`;
-  const citations = (backs: 'rule' | 'evidence') =>
-    task.citations.flatMap((c, i) =>
-      c.backs === backs
-        ? [<InlineCitation key={c.source} number={i + 1} source={sources[i]} {...citationOf(task, i)} />]
-        : [],
-    );
   return (
     <AppShellPanelBody className="flex flex-col items-start gap-[var(--gap-group)]">
       <AgentBlock
@@ -147,18 +137,16 @@ export function TaskPanel({ task }: { task: Exception }) {
       >
         <div className="flex flex-col gap-[var(--gap-group)]">
           <Part label="Rule">
-            <p>
-              {task.rule}
-              {citations('rule')}
-            </p>
+            <p>{task.rule}</p>
           </Part>
           <Part label="What the books show">
-            <p>
-              {task.evidence}
-              {citations('evidence')}
-            </p>
+            <p>{task.evidence}</p>
           </Part>
-          <Sources sources={sources} notChecked={notCheckedWith(state, task.sources, task.notChecked)} />
+          <Sources
+            numbered={false}
+            sources={sourcesOf(task)}
+            notChecked={notCheckedWith(state, docsOf(task), task.notChecked)}
+          />
         </div>
       </AgentBlock>
       <a
