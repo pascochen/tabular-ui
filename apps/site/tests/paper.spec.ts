@@ -1,14 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The hero's paper (docs/site.md D3, item 3). A mask that fails paints nothing and
- * raises no error, and axe can't measure this hero: its contrast rule reports the
- * hero's text as incomplete, not passed. So these read pixels, with the text and the
- * rules hidden, on what a visitor's screen would show.
+ * The hero's paper and the closing band's ink (docs/site.md D3). A mask that fails
+ * paints nothing and raises no error, and axe can't measure this hero: its contrast
+ * rule reports the hero's text as incomplete, not passed. So these read pixels, with
+ * the text and the rules hidden, on what a visitor's screen would show.
  */
 
 const hero = 'section[aria-labelledby="hero-title"]';
 const lead = '#hero-title + p';
+const band = '.site-ink';
 
 type Box = { x: number; y: number; width: number; height: number };
 
@@ -21,7 +22,11 @@ async function groundBehindLead(page: Page) {
   const box = (await page.locator(lead).boundingBox()) as Box;
   const color = await page.locator(lead).evaluate((el) => getComputedStyle(el).color);
   await hideEverythingButThePaper(page);
-  const png = await page.screenshot({ clip: box, fullPage: true });
+  return groundIn(page, await page.screenshot({ clip: box, fullPage: true }), color);
+}
+
+/** How much a picture of the ground varies, and a text colour's contrast on its mean. */
+function groundIn(page: Page, png: Buffer, color: string) {
   return page.evaluate(
     async ({ base64, color }) => {
       const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -68,14 +73,19 @@ async function groundBehindLead(page: Page) {
 /**
  * The hero's marks, each against the mean of the 25px around it. A small mark over
  * 1.05:1 is what made ink specks read as a dirty screen: they scored 1,561 per
- * 100,000 pixels here.
+ * 100,000 pixels here. Both directions count: paper's marks are darker than their
+ * ground and ink's are lighter, so a ratio that looks only one way under-reads one
+ * of them.
  */
 async function marks(page: Page) {
   const box = (await page.locator(hero).boundingBox()) as Box;
   await hideEverythingButThePaper(page);
   const width = Math.min(1200, box.width - 40);
   const clip = { x: box.x + (box.width - width) / 2, y: box.y + 70, width, height: box.height - 140 };
-  const png = await page.screenshot({ clip, fullPage: true });
+  return marksIn(page, await page.screenshot({ clip, fullPage: true }));
+}
+
+function marksIn(page: Page, png: Buffer) {
   return page.evaluate(async (base64) => {
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
     const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
@@ -114,7 +124,9 @@ async function marks(page: Page) {
           area[top * (w + 1) + right] -
           area[bottom * (w + 1) + left] +
           area[top * (w + 1) + left];
-        const contrast = (total / ((right - left) * (bottom - top)) + 0.05) / (luminance[y * w + x] + 0.05);
+        const around = total / ((right - left) * (bottom - top));
+        const here = luminance[y * w + x];
+        const contrast = (Math.max(around, here) + 0.05) / (Math.min(around, here) + 0.05);
         strongest = Math.max(strongest, contrast);
         if (contrast > 1.05) marked[y * w + x] = 1;
       }
@@ -170,6 +182,67 @@ for (const { width, height, scale } of [
   });
 }
 
+/**
+ * A picture of the band with its text hidden, and the lead's colour. The ink tiles
+ * evenly, so the whole band stands for the ground behind the lead.
+ */
+async function theBand(page: Page) {
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  const color = await page.locator(`${band} p`).evaluate((el) => getComputedStyle(el).color);
+  await page.addStyleTag({ content: `${band} > * { visibility: hidden; }` });
+  return { color, png: await page.locator(band).screenshot() };
+}
+
+for (const { width, height, scale } of [
+  { width: 1440, height: 900, scale: 1 },
+  { width: 1440, height: 900, scale: 2 },
+  { width: 390, height: 844, scale: 3 },
+]) {
+  test.describe(`the closing band at ${width}px and ${scale}x`, () => {
+    test.use({ viewport: { width, height }, deviceScaleFactor: scale });
+
+    test('the ink paints, and the lead keeps its contrast', async ({ page }) => {
+      const { color, png } = await theBand(page);
+      const { deviation, contrast } = await groundIn(page, png, color);
+      expect(deviation, 'the ground varies, so the mask loaded').toBeGreaterThan(0.2);
+      expect(contrast, 'text-secondary on the ink').toBeGreaterThanOrEqual(9.8);
+    });
+
+    // 1.06: the hero's 1.05, with room for a machine's rounding. --tui-border-strong
+    // scored 1.08 and 1,654 dots at 1x. --color-border-strong, which stays at its
+    // light value in this band, scored 1.25.
+    test('no mark reads as dirt, and none outweighs the hero', async ({ page }) => {
+      const { png } = await theBand(page);
+      const { strongest, dotsPer100k } = await marksIn(page, png);
+      expect(dotsPer100k, 'isolated dots per 100,000 pixels').toBeLessThan(20);
+      expect(strongest, 'the hero measures 1.05:1').toBeLessThan(1.06);
+    });
+  });
+}
+
+test('the closing band keeps the canvas as its ground, under the ink', async ({ page }) => {
+  await page.goto('/');
+  const { theme, ground, canvas, isolation, inkLayer } = await page.locator(band).evaluate((el) => {
+    const probe = document.createElement('div');
+    probe.style.backgroundColor = 'var(--tui-canvas)';
+    el.append(probe);
+    const canvas = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return {
+      theme: el.getAttribute('data-theme'),
+      ground: getComputedStyle(el).backgroundColor,
+      canvas,
+      isolation: getComputedStyle(el).isolation,
+      inkLayer: getComputedStyle(el, '::before').zIndex,
+    };
+  });
+  expect(theme).toBe('dark');
+  expect(ground).toBe(canvas);
+  expect(isolation).toBe('isolate');
+  expect(inkLayer).toBe('-1');
+});
+
 test('the hero itself has no ground, so the canvas token stays paper', async ({ page }) => {
   await page.goto('/');
   const ground = await page.locator(hero).evaluate((el) => {
@@ -179,8 +252,10 @@ test('the hero itself has no ground, so the canvas token stays paper', async ({ 
   expect(ground).toEqual({ color: 'rgba(0, 0, 0, 0)', image: 'none' });
 });
 
-test('in forced colours, the paper drops with the sheet', async ({ page }) => {
+test('in forced colours, the paper drops with the sheet, and the ink with it', async ({ page }) => {
   await page.goto('/');
   await page.emulateMedia({ forcedColors: 'active' });
   await expect(page.locator('.site-sheet')).toBeHidden();
+  const ink = await page.locator(band).evaluate((el) => getComputedStyle(el, '::before').display);
+  expect(ink).toBe('none');
 });

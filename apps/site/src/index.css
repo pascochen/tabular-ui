@@ -110,14 +110,31 @@
    own decade. A soft grain and mottling in the paper's own warm tone. Inside the
    sheet, so it takes the sheet's fade, its aria-hidden and its forced-colours
    drop. A mask reads only alpha, so the colour stays a token. The guard keeps a
-   browser with no mask support from painting a solid tone. */
+   browser with no mask support from painting a solid tone.
+
+   The closing band's ink (D3) is the same tile: that sheet's tooth, showing
+   through a flood of ink. Its marks are lighter than its ground, so it needs the
+   band's `isolate` to sit above the ground and below the text. It reads --tui-*
+   because --color-* resolved at :root and stays at its light value inside
+   data-theme="dark", which would paint paper-coloured flecks with no error. The
+   sheet's 60% is not inherited here, so the band states its own strength. */
 @supports (mask-image: linear-gradient(black, black)) {
   .site-sheet::before {
+    background-color: var(--color-border-strong);
+    opacity: 0.5;
+  }
+
+  .site-ink::before {
+    z-index: -1;
+    background-color: var(--tui-border);
+    opacity: 0.3;
+  }
+
+  .site-sheet::before,
+  .site-ink::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-color: var(--color-border-strong);
-    opacity: 0.5;
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.05' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.4 0 0 0 -.85'/%3E%3C/filter%3E%3Cfilter id='t' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.32 .2' numOctaves='3' seed='21' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 -1.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)' opacity='.2'/%3E%3Crect width='100%25' height='100%25' filter='url(%23t)' opacity='.4'/%3E%3C/svg%3E");
     mask-size: 480px 480px;
   }
@@ -160,9 +177,11 @@
   }
 }
 
-/* Decoration only: forced colours keep the plate's frame and drop the rules. */
+/* Decoration only: forced colours keep the plate's frame and drop the rules,
+   and the closing band drops its ink. */
 @media (forced-colors: active) {
-  .site-sheet {
+  .site-sheet,
+  .site-ink::before {
     display: none;
   }
 }

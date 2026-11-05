@@ -62,12 +62,13 @@ export function HeroSection() {
 /**
  * The closing band (D7): Home only, and dark (D3, decided (c)): a section set to
  * data-theme="dark", so every token recomputes inside it, with its own ground
- * and text colour. No tint, no new token.
+ * and text colour. It's ink on the hero's paper, so the sheet's tooth shows
+ * through it (`site-ink`, D3). No new token.
  */
 export function ClosingBand() {
   return (
     <Section labelledBy="closing-title" className="p-0">
-      <div data-theme="dark" className="bg-canvas py-[var(--site-section-y)] text-text-body">
+      <div data-theme="dark" className="site-ink relative isolate bg-canvas py-[var(--site-section-y)] text-text-body">
         <Rail size="reading" className="flex flex-col items-center gap-[var(--site-gap)] text-center">
           <h2
             id="closing-title"
