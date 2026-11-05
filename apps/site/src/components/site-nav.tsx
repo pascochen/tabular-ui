@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router';
 import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
-import { external, pages } from '../content';
+import { external, newTab, pages } from '../content';
 import { cn } from '../lib/cn';
 import { focusRing } from '../lib/styles';
 import { ExternalMark } from './layout';
@@ -83,7 +83,7 @@ export function SiteNav() {
         <ul role="list" className="ml-auto hidden items-center gap-[var(--gap-inline)] md:flex">
           {elsewhere.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className={buttonVariants({ variant: 'ghost' })}>
+              <a href={link.href} {...newTab} className={buttonVariants({ variant: 'ghost' })}>
                 {link.label}
                 <ExternalMark />
               </a>
@@ -107,7 +107,7 @@ export function SiteNav() {
                 </MenuItem>
               ))}
               {elsewhere.map((link) => (
-                <MenuItem key={link.href} render={<a href={link.href} />}>
+                <MenuItem key={link.href} render={<a href={link.href} {...newTab} />}>
                   {link.label}
                   <ExternalMark />
                 </MenuItem>

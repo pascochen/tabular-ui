@@ -2,7 +2,7 @@ import readme from '../../../../packages/ui/README.md?raw';
 import { CodeView } from 'tabular-ui';
 
 import { ExternalMark, Rail, Section, SectionHeader } from '../components/layout';
-import { external } from '../content';
+import { external, newTab } from '../content';
 import { textLink } from '../lib/styles';
 import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/getting-started';
@@ -103,7 +103,7 @@ export default function GettingStarted() {
               <Code heading="Use" index={1} label="Importing one component" />
               <p className={prose}>
                 Every component, its props and its states are in{' '}
-                <a href={external.storybook.href} className={textLink}>
+                <a href={external.storybook.href} {...newTab} className={textLink}>
                   {external.storybook.label}
                   <ExternalMark />
                 </a>

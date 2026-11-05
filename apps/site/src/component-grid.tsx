@@ -1,6 +1,6 @@
 import { ExternalMark, Rail, Section, SectionHeader } from './components/layout';
 import { ComponentCard } from './components/specimen';
-import { components, external, moments } from './content';
+import { components, external, moments, newTab } from './content';
 import { standaloneLink } from './lib/styles';
 import {
   AgentBlockSpecimen,
@@ -87,7 +87,7 @@ export function ComponentsSection() {
           title={`${components.length} components`}
           lead="Grouped by the moment of a run where each one appears. The data comes from Kasane, a fictional printer maker."
           action={
-            <a href={external.storybook.href} className={`${standaloneLink} text-text-body`}>
+            <a href={external.storybook.href} {...newTab} className={`${standaloneLink} text-text-body`}>
               All components in Storybook
               <ExternalMark />
             </a>

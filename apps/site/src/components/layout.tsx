@@ -1,8 +1,17 @@
 import { cn } from '../lib/cn';
 
-/** Marks a link to another site. Decorative: the link's name never depends on it (§11). */
+/**
+ * Marks a link to another site. The arrow is decorative, so the link's name never
+ * depends on it (§11). The sr-only note says what the arrow can't: this link
+ * opens a new tab, in the words the demo's About dialog uses.
+ */
 export function ExternalMark() {
-  return <span aria-hidden="true"> ↗</span>;
+  return (
+    <>
+      <span aria-hidden="true"> ↗</span>
+      <span className="sr-only"> (opens in a new tab)</span>
+    </>
+  );
 }
 
 const railWidths = {

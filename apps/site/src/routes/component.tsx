@@ -4,7 +4,7 @@ import { Button, CodeView, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabu
 import { BridgeTable } from '../components/bridge-table';
 import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
-import { componentPage, components, pages, principles, storybookDocs } from '../content';
+import { componentPage, components, newTab, pages, principles, storybookDocs } from '../content';
 import { cn } from '../lib/cn';
 import { focusRing, standaloneLink } from '../lib/styles';
 import { install, usage } from '../component-usage';
@@ -241,7 +241,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
               <a href={pages.gettingStarted.href} className={`${standaloneLink} text-text-body`}>
                 Set up your app first
               </a>
-              <a href={storybookDocs(c.name)} className={`${standaloneLink} text-text-body`}>
+              <a href={storybookDocs(c.name)} {...newTab} className={`${standaloneLink} text-text-body`}>
                 {c.title} in Storybook
                 <ExternalMark />
               </a>
