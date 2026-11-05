@@ -2,7 +2,7 @@
 
 Product. Composed from `AttachmentRow`. Pairs with `InlineCitation`.
 
-What an answer rests on, numbered, and what wasn't checked.
+What an answer rests on, numbered unless you turn it off, and what wasn't checked.
 
 ```tsx
 <Sources
@@ -19,6 +19,7 @@ What an answer rests on, numbered, and what wasn't checked.
 | Prop | Type | Notes |
 |---|---|---|
 | `sources` | `Source[]` | Required. Numbered from 1 in the order given: citation order |
+| `numbered` | `boolean` | Default `true`. Pass `false` where the answer carries no `InlineCitation` marks: the rows become a plain list with no figures |
 | `notChecked` | `ReactNode[]` | **Required.** One sentence each, naming the part and why. Nodes, so a file name in one can be mono. `[]` says every part was checked |
 | `className` | `string` | |
 
@@ -26,13 +27,15 @@ What an answer rests on, numbered, and what wasn't checked.
 
 ## Geometry
 
-Two labelled lists, `--gap-group` (12px) apart. Each label is `--text-xs`, medium, `--color-text-secondary`, `--gap-bonded` above its list. A source is an `AttachmentRow` (28px) with its number in front. A not-checked line has `--pad-cell-x` and `--pad-cell-y`, so one line is 28px too and the two lists keep one rhythm. A longer sentence wraps.
+Two labelled lists, `--gap-group` (12px) apart. Each label is `--text-xs`, medium, `--color-text-secondary`, `--gap-bonded` above its list. A source is an `AttachmentRow` (28px), with its number in front when `numbered`. A not-checked line has `--pad-cell-x` and `--pad-cell-y`, so one line is 28px too and the two lists keep one rhythm. A longer sentence wraps.
 
 ## Mechanisms worth knowing
 
 **`notChecked` is required.** agent-voice.md's principle 4 is "Say what was not checked": confidence comes from scope, not adjectives. A rule the component can enforce belongs in the component (CLAUDE.md, failure log: `Button`'s icon weight), so an answer can't list its sources and stay silent about where they stop. `[]` is a claim as well, and the component writes it out: "Nothing. Every part of the question was checked." Pass it only when that's true.
 
 **Not-checked lines wrap; source names truncate.** A file name is an identifier, and `AttachmentRow` truncates it in mono. A not-checked line is a sentence, and a cut sentence says less than the agent meant.
+
+**A number needs something to point at it.** The figures exist so a mark in the answer can name a row. With no marks they read as a ranking the list doesn't mean, so `numbered={false}` drops them and the list becomes a `<ul>`, because the order no longer carries a claim. The row's icon then starts at `--pad-cell-x`, in line with the "Sources" label.
 
 **The number is part of the row.** The hover ground moves from `AttachmentRow` to the list item, so the number and the file light together. Numbers are `tabular-nums`, right-aligned in two figures' width, so 9 and 10 line up.
 

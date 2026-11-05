@@ -290,6 +290,18 @@ test('the hero’s tool line claims only what the material holds', () => {
   expect(close.exceptions.find((e) => e.id === close.hero.exception)?.notChecked[0]).toMatch(/^The delivery note: /);
 });
 
+test('every Sources list in the demo leaves its numbers off, since no mark points at them', () => {
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? walk(path.join(dir, e.name)) : e.name.endsWith('.tsx') ? [path.join(dir, e.name)] : [],
+    );
+  const uses = walk(path.resolve(dataDir, '../src')).flatMap((file) =>
+    [...readFileSync(file, 'utf8').matchAll(/<Sources\b[^>]*>/g)].map((m) => ({ file, tag: m[0] })),
+  );
+  expect(uses).toHaveLength(3);
+  for (const { file, tag } of uses) expect(tag, file).toContain('numbered={false}');
+});
+
 test('nine documents, text files then tables, each group in file-name order', () => {
   const files = (group: Doc[]) => group.map((d) => d.file);
   const text = documents.filter((d) => d.text);

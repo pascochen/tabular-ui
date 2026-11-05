@@ -142,7 +142,11 @@ export function TaskPanel({ task }: { task: Exception }) {
           <Part label="What the books show">
             <p>{task.evidence}</p>
           </Part>
-          <Sources sources={sourcesOf(task)} notChecked={notCheckedWith(state, docsOf(task), task.notChecked)} />
+          <Sources
+            numbered={false}
+            sources={sourcesOf(task)}
+            notChecked={notCheckedWith(state, docsOf(task), task.notChecked)}
+          />
         </div>
       </AgentBlock>
       <a

@@ -98,7 +98,11 @@ export function ExceptionCard({
           </Button>
           {sourcesOpen ? (
             <div id={sourcesId} className="w-full">
-              <Sources sources={sources} notChecked={notCheckedWith(closeState, docsOf(e), e.notChecked)} />
+              <Sources
+                numbered={false}
+                sources={sources}
+                notChecked={notCheckedWith(closeState, docsOf(e), e.notChecked)}
+              />
             </div>
           ) : null}
         </div>

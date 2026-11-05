@@ -102,6 +102,7 @@ export function AgentView({ agent }: { agent: Agent }) {
           <div className="flex flex-col gap-[var(--gap-group)] whitespace-normal">
             <p>{starter.answer}</p>
             <Sources
+              numbered={false}
               sources={sourcesOfSlugs(starter.sources)}
               notChecked={notCheckedWith(state, starter.sources, starter.notChecked)}
             />
