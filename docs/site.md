@@ -22,7 +22,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 |---|---|---|
 | D1 | Status words | From the components; principle 3 reworded; "AI working"; "AI · Posted" for a posted entry |
 | D2 | Before/after pair | No plate headings; the posted block keeps its rail and adds "posted by you"; a pair on every component page |
-| D3 | Grounds | Bands: rules only; the hero alone is ruled as a sheet, on 1980s paper (*changed 2026-11-03*). Plates: paper on the hero and in grids, dark on component pages. Closing band dark |
+| D3 | Grounds | Bands: rules only; the hero alone is ruled as a sheet, on 1980s paper (*changed 2026-11-03*). Plates: paper on the hero and in grids, dark on component pages. Closing band dark, ink on that paper (*changed 2026-11-05*) |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live |
@@ -94,7 +94,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **D3. Grounds — bands decided 2026-10-25, plates and the closing band 2026-10-26 (owner): (c), dark for single specimens.** The wireframes draw grey in two places, and they're separate questions. In light mode, canvas, surface and raised are all `ledger-50` (§3, "Paper on paper"), so the theme has no second paper tone, and lint rejects raw ramp names in `apps/`.
 
-1. **Section bands: rules only.** No band is tinted anywhere, with one exception since 2026-11-03 (owner): the hero's paper (item 3), which sits about 0.9 lightness points under the canvas behind the lead. It fades out with the sheet, so it leaves no edge, and it adds no token. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
+1. **Section bands: rules only.** No band is tinted anywhere, with two exceptions, neither adding a token. Since 2026-11-03 (owner), the hero's paper (item 3), which sits about 0.9 lightness points under the canvas behind the lead and fades out with the sheet, so it leaves no edge. Since 2026-11-05 (owner), the closing band's ink, below. Sections are separated by a full-width 1px `--color-border` rule (§0 rule 7, "Borders do the work whitespace does elsewhere"). `--color-bg-hover` is not a band colour: it's the interaction overlay, and a hovered row inside a hover-tinted band would composite to 12% and look different from one outside. A real band tone would be a library token for one site's decoration, and is not added.
 2. **Specimen plates: (c), dark for single specimens**, chosen from the comparison PR 2 built at `/plates`, with real components, at desktop width and on a phone. The hero and each component page sit on a dark plate; the Components grid stays on paper. The three options compared were:
    - *(a) Paper plates:* a 1px frame on paper. Nothing new, every contrast figure already measured. The risk is paper on paper on paper, with 15 cards reading as one flat sheet.
    - *(b) Dark plates:* each plate sets `data-theme="dark"`. `theme.css` scopes dark mode as `[data-theme='dark']`, not `:root[…]`, so every token recomputes inside the plate, and the components show in the mode they were designed for. The plate must set its own text colour, since inherited text comes from the light page. Contrast is then checked on two grounds per page. The risk is 15 dark rectangles making Components heavy.
@@ -116,6 +116,12 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
    - Component pages keep their dark plates, so the site still shows the components in dark mode, the mode they were designed for.
 
 **The closing band is dark**, decided with the plates. It isn't a tint: it's a section set to `data-theme="dark"`, with no new token, and it sets its own ground and text colour.
+
+**The closing band is ink on the hero's paper. Decided 2026-11-05 (owner).** The band stays dark, so it stands out on a light page. The sheet's tooth shows through the flood of ink. It's `.site-ink::before` in `index.css`, the same 480px tile as the paper, in `--tui-border` (`ledger-800`) at 30%.
+- **The strength is the hero's.** The owner chose it from six variants tried on the real band: 1.05:1, the hero's own figure, so it stays quiet on purpose. The same tile in `--tui-border-strong` (`ledger-700`) at 30% measured 1.08:1 with up to 1,654 isolated dots per 100,000 pixels, against 0 here and a limit of 20 in the test.
+- **Its marks are lighter than its ground,** because `ledger-950` is the darkest step (§0 rule 9), where the paper's are darker. So the mean ground rises: the lead's `text-secondary` goes from 10.15:1 to 9.91:1. `tests/paper.spec.ts` measures marks in both directions, because a ratio that looks only for darker marks under-reads ink.
+- **It reads `--tui-border`, not `--color-border`.** `--color-*` resolves at `:root` and stays at its light value inside `data-theme="dark"`, so the hero's CSS pasted here paints paper-coloured flecks, at 1.25:1, with no error.
+- **Only this band.** Component-page plates stay flat, so a specimen shows the component on the ground the product draws. The ink takes the paper's `@supports` guard, and it drops in forced colours.
 
 **D4. Colour mode — decided 2026-10-25 (owner).** Page mode and specimen mode are separate axes: `[data-theme='dark']` scopes to any element, so a light page can hold dark specimens. D3 decides specimen mode from PR 2's screenshots. This decides the page.
 
