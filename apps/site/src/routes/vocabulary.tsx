@@ -1,6 +1,7 @@
-import { AgentBlock, AgentPlan, AgentReasoning, runStatuses, StatusBadge, type RunStatus } from 'tabular-ui';
+import { AgentBlock, AgentPlan, AgentReasoning, Badge, runStatuses, StatusBadge, type RunStatus } from 'tabular-ui';
 
 import { Rail, Section, SectionHeader } from '../components/layout';
+import { KeyedHead, PageKey } from '../components/page-key';
 import { component, moments } from '../content';
 import { duplicatePayment } from '../data';
 import { pageMeta } from '../lib/meta';
@@ -62,18 +63,63 @@ const statuses = Object.keys(runStatuses) as RunStatus[];
 
 const cell = 'border-t border-border px-[var(--pad-cell-x)] py-2 text-left align-top';
 
+/**
+ * PROTOTYPE, the frontispiece (docs/reviews/inner-page-heads-2026-11-05.md):
+ * the lead's three states, each in StatusBadge's own word (D1: the site
+ * invents no status word).
+ */
+const keyStates: { status: RunStatus; meaning: string }[] = [
+  { status: 'agent-working', meaning: 'Working' },
+  { status: 'needs-review', meaning: 'Waiting for you' },
+  { status: 'passed', meaning: 'Done' },
+];
+
+/**
+ * The head stays still, as Home's hero does (D6). A working status draws the
+ * Spinner, so here it takes the static icon runStatuses keeps as its fallback,
+ * on the same Badge, tone and label: no restyle (D10). The proper fix is a
+ * still option in the library, which is its own decision.
+ */
+function StillStatus({ status }: { status: RunStatus }) {
+  const s = runStatuses[status];
+  if (!s.working) return <StatusBadge status={status} />;
+  const Icon = s.icon;
+  return (
+    <Badge tone={s.tone} data-status={status}>
+      <Icon weight="bold" aria-hidden="true" />
+      {s.label}
+    </Badge>
+  );
+}
+
+function VocabularyKey() {
+  return (
+    <PageKey
+      label="One word per state"
+      rows={keyStates.map(({ status, meaning }) => ({
+        mark: <StillStatus status={status} />,
+        meaning,
+        name: status,
+      }))}
+    />
+  );
+}
+
 export default function Vocabulary() {
   return (
     <>
-      <Section rule={false}>
-        <Rail className="flex flex-col gap-[var(--gap-group)]">
-          <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Vocabulary</h1>
-          <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
-            The words Tabular UI uses when an agent is working, waiting for you, or done. Each word names one state, so
-            a label never means two things.
-          </p>
-        </Rail>
-      </Section>
+      <KeyedHead
+        intro={
+          <>
+            <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Vocabulary</h1>
+            <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
+              The words Tabular UI uses when an agent is working, waiting for you, or done. Each word names one state,
+              so a label never means two things.
+            </p>
+          </>
+        }
+        keyPlate={<VocabularyKey />}
+      />
 
       <Section labelledBy="vocab-moments">
         <Rail className="flex flex-col gap-[var(--site-gap)]">

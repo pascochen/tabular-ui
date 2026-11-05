@@ -1,5 +1,6 @@
 import { FoundationsHeader, ModePair, TokenLabel } from '../components/foundations';
 import { Rail, Section, SectionHeader } from '../components/layout';
+import { PageKey } from '../components/page-key';
 import { pages } from '../content';
 import { cn } from '../lib/cn';
 import {
@@ -159,10 +160,52 @@ function Swatch({ step, hex }: { step: string; hex: string }) {
   );
 }
 
+/**
+ * PROTOTYPE, the frontispiece (docs/reviews/inner-page-heads-2026-11-05.md):
+ * the page's key, the lead's own list, each role's fill beside what it marks.
+ * A key, not a copy of Roles below: one mark per role, no steps or ratios.
+ * Both modes, as ModePair shows them; the dark half repeats the light one, so
+ * it is hidden from assistive technology.
+ */
+const marks: Record<Role, string> = {
+  interactive: 'Something you can click',
+  danger: 'An error',
+  warning: 'A warning',
+  success: 'A success',
+  agent: 'The AI’s work',
+  info: 'Information',
+};
+
+const fillOnly: Record<Role, string> = {
+  interactive: 'bg-fill-interactive',
+  danger: 'bg-fill-danger',
+  warning: 'bg-fill-warning',
+  success: 'bg-fill-success',
+  agent: 'bg-fill-agent',
+  info: 'bg-fill-info',
+};
+
+function ColorKey() {
+  // Light only: with a dark half the key read before the title in a squint
+  // test, as the dark hero plate did on 2026-10-26.
+  return (
+    <PageKey
+      label="What each color marks"
+      rows={roles.map((role) => ({
+        // Out of forced colours, as ModePair's panels are: the colour is the content.
+        mark: <span aria-hidden="true" className={cn('size-4 shrink-0 forced-color-adjust-none', fillOnly[role])} />,
+        meaning: marks[role],
+        name: role,
+      }))}
+    />
+  );
+}
+
 export default function Color() {
   return (
     <>
       <FoundationsHeader
+        aside={<ColorKey />}
         current={pages.color}
         title="Color"
         lead="Every color marks something: an error, a warning, a success, information, the AI’s work or something you can click. None is there to make something stand out. Five colors and a neutral, each checked for contrast in light and dark mode."
