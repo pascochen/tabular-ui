@@ -1,5 +1,6 @@
 import { FoundationsHeader, TokenLabel } from '../components/foundations';
 import { Rail, Section, SectionHeader } from '../components/layout';
+import { PageKey } from '../components/page-key';
 import { pages } from '../content';
 import { themeToken, themeTokensWith } from '../tokens';
 import { pageMeta } from '../lib/meta';
@@ -58,6 +59,41 @@ function TokenRows({
   );
 }
 
+/**
+ * PROTOTYPE, the frontispiece (docs/reviews/inner-page-heads-2026-11-05.md):
+ * the lead's three caps, drawn the way the page's own sections draw them, a
+ * Measure bar read from the token and the Shape swatch, and named by token.
+ */
+function DensityKey() {
+  return (
+    <PageKey
+      label="The three caps"
+      rows={[
+        {
+          mark: <Measure token="--gap-section" />,
+          meaning: 'The most space inside a component',
+          name: '--gap-section',
+        },
+        {
+          mark: <Measure token="--h-control-lg" axis="height" />,
+          meaning: 'The tallest control',
+          name: '--h-control-lg',
+        },
+        {
+          mark: (
+            <span
+              aria-hidden="true"
+              className={`block size-6 border border-border-strong bg-surface ${radiusClass['--radius-md']}`}
+            />
+          ),
+          meaning: 'Every corner, square',
+          name: '--radius-md',
+        },
+      ]}
+    />
+  );
+}
+
 export default function Density() {
   const spacing = [...themeTokensWith('--pad-'), ...themeTokensWith('--gap-')].filter(
     // eslint-disable-next-line no-restricted-syntax -- Density documents the frame tier: it lists the tokens and draws each at its size; it spaces nothing with them.
@@ -66,6 +102,7 @@ export default function Density() {
   return (
     <>
       <FoundationsHeader
+        aside={<DensityKey />}
         current={pages.density}
         title="Density"
         lead="Generous spacing is how a dense product quietly becomes a sparse one, so the cap is the design: no component spacing above 32px, no control above 36px, every corner square."

@@ -3,6 +3,7 @@ import { tabsListVariants, tabVariants } from 'tabular-ui';
 import { pages } from '../content';
 import { cn } from '../lib/cn';
 import { Rail, Section } from './layout';
+import { KeyedHead } from './page-key';
 
 const foundationPages = [pages.color, pages.typography, pages.density];
 
@@ -24,11 +25,42 @@ export function FoundationsHeader({
   current,
   title,
   lead,
+  aside,
 }: {
   current: (typeof foundationPages)[number];
   title: string;
   lead: string;
+  /**
+   * PROTOTYPE (docs/reviews/inner-page-heads-2026-11-05.md, the frontispiece):
+   * a plate in the right seven columns, the hero's 5/7 split, holding the
+   * page's key. Not decided.
+   */
+  aside?: React.ReactNode;
 }) {
+  const nav = (
+    <nav aria-label="Foundations">
+      <ul role="list" className={cn(tabsListVariants({ variant: 'bordered' }), 'flex-wrap')}>
+        {foundationPages.map((page) => (
+          <li key={page.href}>
+            <a
+              href={page.href}
+              aria-current={page === current ? 'page' : undefined}
+              className={cn(tabVariants({ size: 'lg' }))}
+            >
+              {page.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+  const intro = (
+    <>
+      <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">{title}</h1>
+      <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">{lead}</p>
+    </>
+  );
+  if (aside) return <KeyedHead above={nav} intro={intro} keyPlate={aside} />;
   return (
     <Section rule={false}>
       <Rail className="flex flex-col gap-[var(--site-gap)]">
