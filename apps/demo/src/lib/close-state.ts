@@ -277,13 +277,13 @@ export function isUnread(state: CloseState, channel: ChannelId): boolean {
   return repliesIn(state, channel) > (state.seen[channel] ?? 0);
 }
 
-/** A channel holds a contradiction still open: its dot. In step with the Tasks count. */
+/** A channel holds a finding still open: its dot. In step with the Tasks count. */
 export function holdsOpen(state: CloseState, channel: ChannelId): boolean {
   return exceptions.some((e) => e.channel === channel && state.exceptions[e.id].status === 'open');
 }
 
 /**
- * The Tasks count: contradictions still open (pages spec, D4). `waiting` isn't
+ * The Tasks count: findings still open (pages spec, D4). `waiting` isn't
  * counted, because nobody here can settle it, so the count runs down to 0.
  */
 export function openCount(state: CloseState): number {

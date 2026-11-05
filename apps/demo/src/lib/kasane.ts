@@ -5,7 +5,6 @@
 import checksData from '../../data/checks.json' with { type: 'json' };
 import closeData from '../../data/close.json' with { type: 'json' };
 import company from '../../data/company.json' with { type: 'json' };
-import findingsData from '../../data/findings.json' with { type: 'json' };
 import pack from '../../data/pack.json' with { type: 'json' };
 import peopleData from '../../data/people.json' with { type: 'json' };
 import sourcesData from '../../data/sources.json' with { type: 'json' };
@@ -39,7 +38,7 @@ export const channels = close.channels as (Channel & { id: ChannelId })[];
 
 export type Exception = Omit<(typeof close.exceptions)[number], 'channel'> & { channel: ChannelId };
 
-/** The contradictions, the hero first. Each is a task, raised by one agent, and sits in one channel. */
+/** The findings, the hero first. Each is a task, raised by one agent, and sits in one channel. */
 export const exceptions = close.exceptions as Exception[];
 
 /** The task Tasks' panel shows. Nothing chosen, or a task that doesn't exist: the hero, which is first. */
@@ -93,10 +92,10 @@ export type BinderSource = {
   excerpt: TableExcerpt | TextExcerpt | null;
 };
 
-/** The binder: every file a finding, gap or question cites, or an agent reads (`sources.json`). */
+/** The binder: every file a finding cites or an agent reads (`sources.json`). */
 export const binder = sourcesData as BinderSource[];
 
-/** The findings that cite a file, for its exhibit's way back. A gap or question names files too, but isn't a finding. */
+/** The findings that cite a file, for its exhibit's way back. */
 export const citedBy = (name: string): Exception[] => exceptions.filter((e) => e.sources.includes(name));
 
 /** A file's exhibit ID: "S-17". The export puts every cited file in the binder, so one that isn't is a bug. */
@@ -105,12 +104,6 @@ export function exhibitOf(name: string): string {
   if (!source) throw new Error(`${name} isn't in sources.json`);
   return source.id;
 }
-
-export const findings: {
-  contradictions: { id: string; claim: string; evidence: string; sources: string[] }[];
-  gaps: { id: string; text: string; sources: string[] }[];
-  followUps: { id: string; text: string; sources: string[] }[];
-} = findingsData;
 
 const MONTHS = [
   'January',

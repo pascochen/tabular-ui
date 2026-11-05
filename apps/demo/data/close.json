@@ -15,12 +15,7 @@
       "name": "Cut-off AI",
       "checks": "Revenue lands in the month of delivery.",
       "finding": "revenue-cut-off",
-      "reads": [
-        "sales_invoices_2026-09.csv",
-        "close_calendar.md",
-        "accounting_policies.md",
-        "03_interview_controller_2026-10-13.txt"
-      ],
+      "reads": ["sales_invoices_2026-09.csv", "close_calendar.md", "accounting_policies.md"],
       "ask": "Ask about the September cut-off.",
       "starters": [
         {
@@ -28,7 +23,7 @@
           "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
           "sources": ["sales_invoices_2026-09.csv"],
           "notChecked": [
-            "Delivery dates against logistics: the material has no delivery confirmations, only each invoice’s delivery date."
+            "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
           ]
         },
         {
@@ -44,7 +39,7 @@
       "name": "Payments AI",
       "checks": "Nothing is paid twice.",
       "finding": "duplicate-payment",
-      "reads": ["supplier_invoices_fy2026_h1.csv", "05_interview_ar_ap_2026-10-14.txt"],
+      "reads": ["supplier_invoices_fy2026_h1.csv", "supplier_payments_fy2026_h1.csv"],
       "ask": "Ask about supplier invoices in FY2026 H1.",
       "starters": [
         {
@@ -68,7 +63,7 @@
       "name": "Approvals AI",
       "checks": "Every manual entry has a different approver.",
       "finding": "self-approved-entry",
-      "reads": ["manual_journal_entries_fy2026_h1.csv", "03_interview_controller_2026-10-13.txt"],
+      "reads": ["manual_journal_entries_fy2026_h1.csv", "finance_team.md"],
       "ask": "Ask about manual entries in FY2026 H1.",
       "starters": [
         {
@@ -81,7 +76,7 @@
           "question": "Who created and approved it?",
           "answer": "E3003 did both, on 31 Aug 2026. The entry moves £18,400 from advertising (6100) to prepaid expenses (1300).",
           "sources": ["manual_journal_entries_fy2026_h1.csv"],
-          "notChecked": ["The approver’s limit: the employee master isn’t in this material."]
+          "notChecked": ["The approver’s limit: the employee master isn’t in these files."]
         }
       ]
     },
@@ -90,12 +85,12 @@
       "name": "Credit AI",
       "checks": "Customers stay within their credit limit.",
       "finding": "credit-limit",
-      "reads": ["ar_aging_monthly.csv", "05_interview_ar_ap_2026-10-14.txt"],
+      "reads": ["ar_aging_monthly.csv", "close_memo_2026-09.md"],
       "ask": "Ask about Great Lakes Duplicating Supply’s balance.",
       "starters": [
         {
-          "question": "Which months before August were over the limit?",
-          "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026, 7 months in all. The limit is $600,000.",
+          "question": "Which month-ends before the credit hold were over the limit?",
+          "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026, 8 month-ends in all. The limit is $600,000.",
           "sources": ["ar_aging_monthly.csv"],
           "notChecked": ["Months before Apr 2025: the aging file starts there."]
         },
@@ -114,48 +109,42 @@
       "name": "close",
       "topic": "The close and controls",
       "owner": "visitor",
-      "members": ["visitor", "glAccountant", "fpaHead", "approvals-ai"],
-      "gaps": []
+      "members": ["visitor", "glAccountant", "fpaHead", "approvals-ai"]
     },
     {
       "id": "cash",
       "name": "cash",
       "topic": "Cash, FX and debt",
       "owner": "treasury",
-      "members": ["visitor", "treasury", "fpaHead"],
-      "gaps": ["cash-forecast"]
+      "members": ["visitor", "treasury", "fpaHead"]
     },
     {
       "id": "receivables",
       "name": "receivables",
       "topic": "Receivables, credit and aging",
       "owner": "arLead",
-      "members": ["visitor", "arLead", "usCredit", "credit-ai"],
-      "gaps": []
+      "members": ["visitor", "arLead", "usCredit", "credit-ai"]
     },
     {
       "id": "payables",
       "name": "payables",
       "topic": "Payables and supplier spend",
       "owner": "apLead",
-      "members": ["visitor", "apLead", "payments-ai"],
-      "gaps": []
+      "members": ["visitor", "apLead", "payments-ai"]
     },
     {
       "id": "revenue",
       "name": "revenue",
       "topic": "Sales and margin by product, region and customer",
       "owner": "fpaAnalyst",
-      "members": ["visitor", "glAccountant", "fpaAnalyst", "fpaHead", "cutoff-ai"],
-      "gaps": []
+      "members": ["visitor", "glAccountant", "fpaAnalyst", "fpaHead", "cutoff-ai"]
     },
     {
       "id": "intercompany",
       "name": "intercompany",
       "topic": "Intercompany sales and transfer prices",
       "owner": "visitor",
-      "members": ["visitor", "fpaHead"],
-      "gaps": ["transfer-price-policy"]
+      "members": ["visitor", "fpaHead"]
     }
   ],
   "directMessages": ["fpaHead", "apLead"],
@@ -181,25 +170,25 @@
         "by": "visitor",
         "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
       },
-      "notChecked": [
-        "The delivery note: the material has no delivery confirmations, only the invoice’s delivery date."
-      ],
+      "notChecked": ["The delivery note: the files have no delivery confirmations, only the invoice’s delivery date."],
       "scope": "KJP, Sep 2026",
-      "claim": "You said the September 2026 cut-off was clean, in the controller interview on 13 Oct.",
+      "rule": "Revenue belongs to the month of delivery.",
       "evidence": "INV-KJP-2609-00363 (¥42.7m net) is dated 30 Sep 2026 but delivered 2 Oct 2026. Revenue belongs to the next month.",
-      "sources": ["03_interview_controller_2026-10-13.txt", "sales_invoices_2026-09.csv"],
+      "sources": ["accounting_policies.md", "sales_invoices_2026-09.csv"],
       "citations": [
         {
-          "source": "03_interview_controller_2026-10-13.txt",
-          "exhibit": "S-3",
-          "record": "L39-43",
-          "locator": "S-3, lines 39 to 43"
+          "source": "accounting_policies.md",
+          "exhibit": "S-1",
+          "record": "L26",
+          "locator": "S-1, line 26",
+          "backs": "rule"
         },
         {
           "source": "sales_invoices_2026-09.csv",
-          "exhibit": "S-17",
+          "exhibit": "S-7",
           "record": "INV-KJP-2609-00363",
-          "locator": "S-17, INV-KJP-2609-00363"
+          "locator": "S-7, INV-KJP-2609-00363",
+          "backs": "evidence"
         }
       ]
     },
@@ -229,21 +218,23 @@
       },
       "notChecked": [],
       "scope": "KUS, Jul 2026",
-      "claim": "AP says the system blocks a duplicate supplier invoice number, in every entity.",
+      "rule": "A supplier invoice number is entered and paid once.",
       "evidence": "KUS entered supplier invoice MFL-58821 twice (API-KUS-2607-00007 and API-KUS-2607-00011), $48,216.40 each, and paid both.",
-      "sources": ["05_interview_ar_ap_2026-10-14.txt", "supplier_invoices_fy2026_h1.csv"],
+      "sources": ["supplier_invoices_fy2026_h1.csv", "supplier_payments_fy2026_h1.csv"],
       "citations": [
         {
-          "source": "05_interview_ar_ap_2026-10-14.txt",
-          "exhibit": "S-5",
-          "record": "L45-49",
-          "locator": "S-5, lines 45 to 49"
+          "source": "supplier_invoices_fy2026_h1.csv",
+          "exhibit": "S-8",
+          "record": "API-KUS-2607-00007",
+          "locator": "S-8, API-KUS-2607-00007 and API-KUS-2607-00011",
+          "backs": "evidence"
         },
         {
-          "source": "supplier_invoices_fy2026_h1.csv",
-          "exhibit": "S-18",
-          "record": "API-KUS-2607-00007",
-          "locator": "S-18, API-KUS-2607-00007 and API-KUS-2607-00011"
+          "source": "supplier_payments_fy2026_h1.csv",
+          "exhibit": "S-9",
+          "record": "PAY-KUS-2608-0002",
+          "locator": "S-9, PAY-KUS-2608-0002 and PAY-KUS-2608-0003",
+          "backs": "evidence"
         }
       ]
     },
@@ -266,23 +257,19 @@
         "delayMs": 8000,
         "log": "Self-approved entry: JE-KUK-2608-00055 reversed; self-approval now blocked in KUK."
       },
-      "notChecked": ["The approver’s limit: the employee master isn’t in this material."],
+      "notChecked": ["The approver’s limit: the employee master isn’t in these files."],
       "scope": "KUK, Aug 2026",
-      "claim": "You said every manual journal has a different approver, enforced group-wide.",
-      "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in this material.",
-      "sources": ["03_interview_controller_2026-10-13.txt", "manual_journal_entries_fy2026_h1.csv"],
+      "rule": "One person creates a manual journal entry, and another approves it.",
+      "evidence": "JE-KUK-2608-00055 (KUK, 31 Aug 2026) moves £18,400 from advertising to prepaid expenses. The same person, E3003, created and approved it. Whether it was over their limit needs the employee master, which isn’t in these files.",
+      "sources": ["finance_team.md", "manual_journal_entries_fy2026_h1.csv"],
       "citations": [
-        {
-          "source": "03_interview_controller_2026-10-13.txt",
-          "exhibit": "S-3",
-          "record": "L23-27",
-          "locator": "S-3, lines 23 to 27"
-        },
+        { "source": "finance_team.md", "exhibit": "S-4", "record": "L68", "locator": "S-4, line 68", "backs": "rule" },
         {
           "source": "manual_journal_entries_fy2026_h1.csv",
-          "exhibit": "S-16",
+          "exhibit": "S-6",
           "record": "JE-KUK-2608-00055",
-          "locator": "S-16, JE-KUK-2608-00055"
+          "locator": "S-6, JE-KUK-2608-00055",
+          "backs": "evidence"
         }
       ]
     },
@@ -291,24 +278,36 @@
       "title": "Credit limit",
       "agent": "credit-ai",
       "channel": "receivables",
-      "summary": "US credit says Great Lakes Duplicating Supply was within its limit until August. It was over $600,000 in 7 earlier months.",
+      "summary": "Great Lakes Duplicating Supply was over its $600,000 credit limit at 8 month-ends before the credit hold on 10 Sep 2026.",
       "postedAt": "09:04",
       "replies": [
         {
           "author": "usCredit",
           "delayMs": 14000,
-          "text": "Agreed on the history. Legal decides on recovery by 30 Oct, and nothing changes until then."
+          "text": "Legal decides on recovery by 30 Oct, and nothing changes until then."
         }
       ],
-      "waiting": { "on": "Legal decision by 30 Oct", "followUp": "great-lakes-decision" },
+      "waiting": { "on": "Legal decision by 30 Oct" },
       "notChecked": ["Whether legal will pursue recovery: the decision is due 30 Oct."],
       "scope": "KUS, up to Sep 2026",
-      "claim": "US credit says Great Lakes Duplicating Supply was within its credit limit until August.",
-      "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Jul 2026. The last payment arrived 21 Jul 2026.",
-      "sources": ["05_interview_ar_ap_2026-10-14.txt", "ar_aging_monthly.csv"],
+      "rule": "A customer’s balance stays within its credit limit.",
+      "evidence": "Its balance was over the $600,000 limit in Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026. The account went on credit hold on 10 Sep 2026, and the last payment arrived 21 Jul 2026.",
+      "sources": ["close_memo_2026-09.md", "ar_aging_monthly.csv"],
       "citations": [
-        { "source": "05_interview_ar_ap_2026-10-14.txt", "exhibit": "S-5", "record": "L21", "locator": "S-5, line 21" },
-        { "source": "ar_aging_monthly.csv", "exhibit": "S-12", "record": "C-KUS-0001", "locator": "S-12, C-KUS-0001" }
+        {
+          "source": "close_memo_2026-09.md",
+          "exhibit": "S-3",
+          "record": "L37-39",
+          "locator": "S-3, lines 37 to 39",
+          "backs": "rule"
+        },
+        {
+          "source": "ar_aging_monthly.csv",
+          "exhibit": "S-5",
+          "record": "C-KUS-0001",
+          "locator": "S-5, C-KUS-0001",
+          "backs": "evidence"
+        }
       ]
     }
   ],

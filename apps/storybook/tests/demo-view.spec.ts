@@ -104,9 +104,8 @@ test('?at=end opens the end state with any view', () => {
 test('a source says which findings cite it, and only findings', () => {
   const ids = (name: string) => citedBy(name).map((e) => e.id);
   expect(ids('sales_invoices_2026-09.csv')).toEqual(['revenue-cut-off']);
-  // Two findings rest on what the controller said.
-  expect(ids('03_interview_controller_2026-10-13.txt')).toEqual(['revenue-cut-off', 'self-approved-entry']);
-  // Only a gap and a question cite the bank export and the chart of accounts.
-  expect(ids('bank_export_kjp_2026-09.csv')).toEqual([]);
-  expect(ids('chart_of_accounts.csv')).toEqual([]);
+  // The duplicate rests on both the invoice file and the payment file.
+  expect(ids('supplier_payments_fy2026_h1.csv')).toEqual(['duplicate-payment']);
+  // An agent reads the close calendar, and no finding cites it.
+  expect(ids('close_calendar.md')).toEqual([]);
 });

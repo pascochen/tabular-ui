@@ -23,8 +23,8 @@ export type ExceptionCardProps = {
 };
 
 /**
- * One close exception, as the agent that raised it posted it: what was said,
- * what the data shows, and the files that show it. A message by an agent, so
+ * One close exception, as the agent that raised it posted it: what the data
+ * shows, and the files that show it. A message by an agent, so
  * its body is an `AgentBlock` (ChannelMessage does that). Its status is a
  * `StatusBadge`, so a resolved exception says so in words and icon, not only
  * colour. Replies follow inline.

@@ -97,8 +97,7 @@ function useRecordInView(source: string, record?: string) {
 }
 
 const KINDS = [
-  { label: 'Transcripts', kinds: ['transcript'] },
-  { label: 'Documents', kinds: ['document', 'image'] },
+  { label: 'Documents', kinds: ['document'] },
   { label: 'Data', kinds: ['csv'] },
 ];
 

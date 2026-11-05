@@ -38,13 +38,14 @@ export const h1Gap = {
 };
 
 /**
- * The closing band's specifics (docs/site.md D7): the demo's agent count as a
- * word, and the visitor's role, the title's last word in lowercase ("Group
+ * The closing band's specifics (docs/site.md D7): the demo's agent and finding
+ * counts as words, and the visitor's role, the title's last word in lowercase ("Group
  * Controller" reads "controller"). tests/pages.spec.ts asserts the sentence, so
  * a title that doesn't read this way fails there.
  */
 export const closingBand = {
   agents: numberWord(kasane.agents, { capitalize: true }),
+  findings: numberWord(kasane.findings),
   role: kasane.company.visitor.title.split(' ').at(-1)?.toLowerCase(),
 };
 
