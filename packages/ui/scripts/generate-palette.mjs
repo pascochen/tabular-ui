@@ -55,7 +55,8 @@ const SOURCE = {
   urls: ['https://www.npmjs.com/package/riso-colors', 'https://www.stencil.wiki/colors'],
 };
 const INKS = {
-  midnight: { ink: 'Midnight', hex: '#435060', pantone: '296 U' },
+  // Listed as "RisoFederal Blue" in riso-colors 1.0.1.
+  federalBlue: { ink: 'Federal Blue', hex: '#3d5588', pantone: '288 U' },
   green: { ink: 'Green', hex: '#00a95c', pantone: '354 U' },
   crimson: { ink: 'Crimson', hex: '#e45d50', pantone: '485 U' },
   sunflower: { ink: 'Sunflower', hex: '#ffb511', pantone: '116 U' },
@@ -74,18 +75,23 @@ for (const ink of Object.values(INKS)) {
 // The neutral runs warm at the light end (paper) and cool at the dark end (ink),
 // with chroma dipping to almost zero in the middle so the hue change never shows
 // as a muddy grey-green. Paper is not an ink: its 85° hue comes from the portfolio paper.
+//
+// The ink end, 2026-11-06: RISO Federal Blue (264.1°) replaces Midnight (253.8°), so the
+// ledger is Federal Blue ink on paper, and the ink sits 0.9° from the paper's complement
+// (85° + 180°). Only the hue comes from the ink: chroma stays capped at 0.018, so the
+// dark steps stay a blue-black, not a blue. The hue still switches at step 600.
 const PAPER_HUE = 85;
 const LEDGER_CHROMA = [0.012, 0.014, 0.015, 0.014, 0.008, 0.003, 0.005, 0.01, 0.014, 0.017, 0.018];
-const LEDGER_HUE = STEPS.map((_, i) => (i <= 5 ? PAPER_HUE : INKS.midnight.h));
+const LEDGER_HUE = STEPS.map((_, i) => (i <= 5 ? PAPER_HUE : INKS.federalBlue.h));
 
 const RAMPS = [
   {
     name: 'ledger',
     role: 'Neutral: surfaces, borders, text',
     replaces: 'olive',
-    anchor: INKS.midnight,
+    anchor: INKS.federalBlue,
     neutral: true,
-    note: 'Warm paper (85°) at the light end, RISO Midnight at the dark end.',
+    note: 'Warm paper (85°) at the light end, RISO Federal Blue at the dark end.',
   },
   {
     name: 'ivy',
