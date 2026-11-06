@@ -16,17 +16,17 @@
  * The Riso Ledger ramps (2026-10-16), generated into src/styles/palette.css
  * by scripts/generate-palette.mjs. The only colour scales that exist.
  */
-export const RAMPS = ['ledger', 'ivy', 'vermilion', 'ochre', 'federal', 'orchid', 'teal'];
+export const RAMPS = ['ledger', 'ivy', 'vermilion', 'ochre', 'lake', 'orchid', 'teal'];
 
 /**
  * Old ramp names and what replaced them. Each stays as a deprecated alias in
  * theme.css (§9), so it still paints, and stays banned below: without that, a
  * new `bg-sage-500` would pass every gate.
  */
-export const DEPRECATED_RAMPS = { sage: 'ivy' };
+export const DEPRECATED_RAMPS = { sage: 'ivy', federal: 'lake' };
 
 /** The five hues the UI uses (CLAUDE.md, §1). */
-export const UI_HUES = ['ivy', 'vermilion', 'ochre', 'federal', 'orchid'];
+export const UI_HUES = ['ivy', 'vermilion', 'ochre', 'lake', 'orchid'];
 
 /** The one neutral ramp. */
 export const NEUTRAL = 'ledger';

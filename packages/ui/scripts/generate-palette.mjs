@@ -54,14 +54,58 @@ const SOURCE = {
   name: 'riso-colors (npm) by Matt DesLauriers, compiled from stencil.wiki/colors',
   urls: ['https://www.npmjs.com/package/riso-colors', 'https://www.stencil.wiki/colors'],
 };
+// Each ink also carries what its stencil.wiki page gives today (read 2026-11-06, from the
+// "Color coordinates" box), so the doc can say where the two lists agree. The pages cite no
+// source for their values. Where they differ, the generator keeps riso-colors: it is the
+// list the palette was built and measured on, and 1.0.1 is a fixed release; a wiki can change.
+const WIKI = 'https://stencil.wiki/wiki/';
 const INKS = {
-  midnight: { ink: 'Midnight', hex: '#435060', pantone: '296 U' },
-  green: { ink: 'Green', hex: '#00a95c', pantone: '354 U' },
-  crimson: { ink: 'Crimson', hex: '#e45d50', pantone: '485 U' },
-  sunflower: { ink: 'Sunflower', hex: '#ffb511', pantone: '116 U' },
-  mediumBlue: { ink: 'Medium Blue', hex: '#3255a4', pantone: '286 U' },
-  orchid: { ink: 'Orchid', hex: '#aa60bf', pantone: '2592 U' },
-  lightTeal: { ink: 'Light Teal', hex: '#009da5', pantone: '320 U' },
+  // Listed as "RisoFederal Blue" in riso-colors 1.0.1, "Riso-Federal Blue" on stencil.wiki.
+  federalBlue: {
+    ink: 'Federal Blue',
+    hex: '#3d5588',
+    pantone: '288 U',
+    wiki: { page: 'Riso-Federal_Blue', hex: '#3d5588', pantone: '281 U' },
+  },
+  green: {
+    ink: 'Green',
+    hex: '#00a95c',
+    pantone: '354 U',
+    wiki: { page: 'Green', hex: '#00a95c', pantone: '354 U' },
+  },
+  crimson: {
+    ink: 'Crimson',
+    hex: '#e45d50',
+    pantone: '485 U',
+    wiki: { page: 'Crimson', hex: '#e45d50', pantone: '485 U' },
+  },
+  sunflower: {
+    ink: 'Sunflower',
+    hex: '#ffb511',
+    pantone: '116 U',
+    wiki: { page: 'Sunflower', hex: '#ffb511', pantone: '116 U' },
+  },
+  lake: {
+    ink: 'Lake',
+    hex: '#235ba8',
+    pantone: '293 U',
+    wiki: { page: 'Lake', hex: '#235ba8', pantone: '293 U' },
+  },
+  // stencil.wiki's #bb76cf has the same hue (318.4°) but is lighter and 8% less chromatic
+  // (L 67.2, C 0.146 against L 61.0, C 0.158). The ramp takes only hue and chroma from its
+  // ink, so the wiki value would lower every orchid step's chroma by about 8% and move no hue.
+  orchid: {
+    ink: 'Orchid',
+    hex: '#aa60bf',
+    pantone: '2592 U',
+    wiki: { page: 'Orchid', hex: '#bb76cf', pantone: '2582 U' },
+  },
+  lightTeal: {
+    ink: 'Light Teal',
+    hex: '#009da5',
+    pantone: '320 U',
+    wiki: { page: 'Light_Teal', hex: '#009da5', pantone: '320 U' },
+  },
 };
 for (const ink of Object.values(INKS)) {
   const o = toOklch(ink.hex);
@@ -74,18 +118,30 @@ for (const ink of Object.values(INKS)) {
 // The neutral runs warm at the light end (paper) and cool at the dark end (ink),
 // with chroma dipping to almost zero in the middle so the hue change never shows
 // as a muddy grey-green. Paper is not an ink: its 85° hue comes from the portfolio paper.
+//
+// Cream paper, 2026-11-06: steps 50–400 at half their first chroma (0.012, 0.014, 0.015,
+// 0.014, 0.008), so the light end keeps its shape. At 0.012 the paper pulled every role
+// tint off its hue (orchid's 10% tint measured 42° from the same tint on white) and left
+// the info tint at chroma 0.002, grey. Halving only step 50 would leave the borders
+// (200, 300) yellower than the paper under them. 0.0075 is written 0.008, because
+// palette.css rounds chroma to three decimals. Measured by scripts/check-harmony.mjs.
+//
+// The ink end, 2026-11-06: RISO Federal Blue (264.1°) replaces Midnight (253.8°), so the
+// ledger is Federal Blue ink on paper, and the ink sits 0.9° from the paper's complement
+// (85° + 180°). Only the hue comes from the ink: chroma stays capped at 0.018, so the
+// dark steps stay a blue-black, not a blue. The hue still switches at step 600.
 const PAPER_HUE = 85;
-const LEDGER_CHROMA = [0.012, 0.014, 0.015, 0.014, 0.008, 0.003, 0.005, 0.01, 0.014, 0.017, 0.018];
-const LEDGER_HUE = STEPS.map((_, i) => (i <= 5 ? PAPER_HUE : INKS.midnight.h));
+const LEDGER_CHROMA = [0.006, 0.007, 0.008, 0.007, 0.004, 0.003, 0.005, 0.01, 0.014, 0.017, 0.018];
+const LEDGER_HUE = STEPS.map((_, i) => (i <= 5 ? PAPER_HUE : INKS.federalBlue.h));
 
 const RAMPS = [
   {
     name: 'ledger',
     role: 'Neutral: surfaces, borders, text',
     replaces: 'olive',
-    anchor: INKS.midnight,
+    anchor: INKS.federalBlue,
     neutral: true,
-    note: 'Warm paper (85°) at the light end, RISO Midnight at the dark end.',
+    note: 'Cream paper (85°, chroma 0.006) at the light end, RISO Federal Blue at the dark end.',
   },
   {
     name: 'ivy',
@@ -112,12 +168,12 @@ const RAMPS = [
     note: 'Dark steps turn ochre and brown: a yellow cannot stay vivid when dark.',
   },
   {
-    name: 'federal',
+    name: 'lake',
     role: 'Info',
     replaces: 'sky',
-    anchor: INKS.mediumBlue,
+    anchor: INKS.lake,
     shape: 'mid',
-    note: 'Hue of RISO Federal Blue (264°); chroma from RISO Medium Blue, same hue, because Federal Blue (0.089) reads greyed-out.',
+    note: 'Hue and chroma from RISO Lake (257.4°). Named `federal` until 2026-11-06, when it took Lake in place of RISO Medium Blue (264.0°): Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart.',
   },
   {
     name: 'orchid',
@@ -149,6 +205,16 @@ function maxSrgbChroma(lPercent, h) {
   return lo;
 }
 
+// palette.css writes chroma to three decimals and hue to one. A clipped chroma just inside the
+// edge can round up across it (Lake's 50 step: 0.0116 → 0.012, 2026-11-06), so where the rounded
+// value would leave sRGB, round down instead. Every other step keeps its value.
+function shippable(lPercent, c, h) {
+  const rounded = Number(c.toFixed(3));
+  return displayable({ mode: 'oklch', l: lPercent / 100, c: rounded, h: Number(h.toFixed(1)) })
+    ? c
+    : Math.floor(c * 1000) / 1000;
+}
+
 // APCA-W3 0.0.98G. Returns |Lc|: 90+ preferred body text, 75 minimum body, 60 large text.
 function apcaLc(textHex, bgHex) {
   const Y = (hex) => {
@@ -173,8 +239,8 @@ const ramps = RAMPS.map((ramp) => {
     const h = ramp.neutral ? LEDGER_HUE[i] : ramp.anchor.h;
     const wanted = ramp.neutral ? LEDGER_CHROMA[i] : ramp.anchor.c * SHAPES[ramp.shape][i];
     const limit = maxSrgbChroma(l, h) * GAMUT_MARGIN;
-    const c = Math.min(wanted, limit);
-    if (wanted > limit) clipped.push({ token: `${ramp.name}-${step}`, wanted, allowed: limit });
+    const c = shippable(l, Math.min(wanted, limit), h);
+    if (wanted > limit) clipped.push({ token: `${ramp.name}-${step}`, wanted, allowed: c });
     return { step, l, c, h };
   });
   return { ...ramp, steps };
@@ -196,15 +262,20 @@ const ledger = ramps.find((r) => r.name === 'ledger');
   ledger.steps.splice(ledger.steps.indexOf(s950), 0, { step: 925, l, c: Math.min(wanted, limit), h });
 }
 
-const hexOf = (s) => formatHex({ mode: 'oklch', l: s.l / 100, c: s.c, h: s.h });
+// One decimal of lightness, two only where a step needs them (ledger-925, L 25.75).
+const oklchOf = (s) => `oklch(${s.l.toFixed(Number.isInteger(s.l * 10) ? 1 : 2)}% ${s.c.toFixed(3)} ${s.h.toFixed(1)})`;
+// The hex is what a browser paints from the rounded oklch() that palette.css ships. Until
+// 2026-11-06 it came from the unrounded value, and 21 colours listed a hex one 8-bit step off
+// the painted one (ivy-700 #066a38, painted #056a38), so a ratio read from palette.json could
+// differ from the shipped colour's in the second decimal.
+const hexOf = (s) => formatHex(oklchOf(s));
 const PAPER_50 = hexOf(ledger.steps.find((s) => s.step === 50));
 const INK_950 = hexOf(ledger.steps.find((s) => s.step === 950));
 
 for (const ramp of ramps) {
   for (const s of ramp.steps) {
+    s.oklch = oklchOf(s);
     s.hex = hexOf(s);
-    // One decimal of lightness, two only where a step needs them (ledger-925, L 25.75).
-    s.oklch = `oklch(${s.l.toFixed(Number.isInteger(s.l * 10) ? 1 : 2)}% ${s.c.toFixed(3)} ${s.h.toFixed(1)})`;
     // palette.css ships the rounded oklch() string, not the hex, so that is what must be in sRGB.
     s.inSrgb = displayable(s.oklch);
     s.wcagPaper = wcagContrast(s.hex, PAPER_50);
@@ -229,17 +300,34 @@ try {
 // ---------------------------------------------------------------------------
 const f2 = (n) => n.toFixed(2);
 const f1 = (n) => n.toFixed(1);
+// The origin story, in the owner's words (2026-11-06), with no link out: a short story, not a
+// citation. RISO's own history (riso.co.jp/70th/history.html, read 2026-11-06) dates the 1946
+// shop and the 1948 office in Kabutocho, Nihonbashi. It doesn't say who the shop printed for,
+// so that clause of the owner's draft is left out.
+const ORIGIN =
+  "In 1946, Noboru Hayama opened a mimeograph print shop in Tokyo. In 1948 he moved it to Nihonbashi, Japan's financial district, home of the Bank of Japan and the Tokyo Stock Exchange. That shop became Riso Kagaku, maker of the Risograph.";
+
 const lines = [];
 lines.push(
   '# Tabular UI palette: Riso Ledger',
   '',
   'Generated by `scripts/generate-palette.mjs`. Do not edit by hand: change the script and run it again.',
   '',
-  'The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.',
   'Every colour sits inside sRGB, so older and low-end screens show exactly what is specified.',
-  '',
   `Contrast is measured against **paper** (\`ledger-50\` ${PAPER_50}) and **ink** (\`ledger-950\` ${INK_950}).`,
   'APCA Lc is shown as an absolute value: about 90 is preferred for body text, 75 the minimum for body text, 60 for large text.',
+  '',
+  '## Origin',
+  '',
+  'The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.',
+  '',
+  ORIGIN,
+  '',
+  'The inks follow bookkeeping (decided 2026-11-06):',
+  '',
+  '- **Black** means "in the black": the ink of the record. `ledger` carries the text, the primary action and the focus ring, at the dark end RISO Federal Blue.',
+  '- **Red** means "in the red": danger is `vermilion`, from RISO Crimson, and red is reserved for negatives: failed runs, validation errors, destructive actions, negative variance and reconciliation mismatches.',
+  '- **Approval** is to be a stamped mark, after the hanko seal on a ringi-sho, the Japanese proposal that collects one seal per approver. Its shape carries the meaning, not a hue, and it is drawn in ledger ink, not in vermilion. This is direction only: no stamp component exists yet.',
   '',
   '## Contrast rules',
   '',
@@ -285,17 +373,27 @@ lines.push(
   '',
 );
 lines.push(
-  '| Ramp | RISO ink | Ink hex | Pantone | Ink OKLCH | Ramp hue | Peak chroma |',
-  '|---|---|---|---|---|---|---|',
+  '| Ramp | RISO ink | Ink hex | Pantone | Ink OKLCH | Ramp hue | Peak chroma | Source |',
+  '|---|---|---|---|---|---|---|---|',
 );
 for (const r of ramps) {
   const a = r.anchor;
   const hue = r.neutral ? `${PAPER_HUE}° → ${f1(a.h)}°` : `${f1(a.h)}°`;
   const peak = Math.max(...r.steps.map((s) => s.c)).toFixed(3);
+  const page = `[stencil.wiki](${WIKI}${a.wiki.page})`;
+  const differs = [
+    a.wiki.hex !== a.hex && `hex \`${a.wiki.hex}\``,
+    a.wiki.pantone !== a.pantone && `Pantone ${a.wiki.pantone}`,
+  ].filter(Boolean);
+  const source = differs.length ? `riso-colors; ${page} gives ${differs.join(' and ')}` : `riso-colors; ${page} agrees`;
   lines.push(
-    `| ${r.name} | ${a.ink} | \`${a.hex}\` | ${a.pantone} | \`oklch(${f1(a.l)}% ${a.c.toFixed(3)} ${f1(a.h)})\` | ${hue} | ${peak} |`,
+    `| ${r.name} | ${a.ink} | \`${a.hex}\` | ${a.pantone} | \`oklch(${f1(a.l)}% ${a.c.toFixed(3)} ${f1(a.h)})\` | ${hue} | ${peak} | ${source} |`,
   );
 }
+lines.push(
+  '',
+  "Where riso-colors and stencil.wiki differ, the generator uses riso-colors: the palette was built and measured on it, and riso-colors 1.0.1 is a fixed release, while a wiki page can be edited. stencil.wiki cites no source for its values (read 2026-11-06). Orchid is the one hex that differs: the wiki's `#bb76cf` has the same hue, 318.4°, but is lighter and less chromatic (C 0.146 against 0.158). The ramp takes only hue and chroma from its ink, so the wiki value would lower every orchid step's chroma by about 8% and move no hue.",
+);
 const accentHues = ramps
   .filter((r) => !r.neutral)
   .map((r) => [r.name, r.anchor.h])

@@ -63,6 +63,13 @@
    selection" (2026-11-02, user-approved after a side-by-side).
    The sage ramp renamed ivy from §1, with --color-sage-* kept as deprecated
    aliases from §9 (names only, no value changed, 2026-11-03, user-approved).
+   Contrast comments re-measured from §2–§4 and §6 after the cream paper,
+   Federal Blue ink and Lake changes to the generated ramps (comment only,
+   no token changed, 2026-11-06, user-approved). The light-mode text
+   comment had said 5.06:1 or more since 2026-10-16; it was 4.71:1.
+   The federal ramp renamed lake from §1, with --color-federal-* kept as
+   deprecated aliases from §9, and light --tui-bg-info 8% → 12% from §4
+   "Light info tint is 12%" (2026-11-06, user-approved).
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -78,7 +85,7 @@
 /* --------------------------------------------------------------------------
    1. Strip Tailwind's colour scales (§9). All of them, since the Riso Ledger
    palette (2026-10-16): colour comes only from the seven generated ramps in
-   palette.css — ledger (neutral), ivy, vermilion, ochre, federal, orchid and
+   palette.css — ledger (neutral), ivy, vermilion, ochre, lake, orchid and
    teal (charts only). palette.css is imported AFTER this file, so the teal
    strip below removes Tailwind's teal and not the Riso one.
    -------------------------------------------------------------------------- */
@@ -120,9 +127,10 @@
   --text-shadow-*: initial;
 }
 
-/* §9 — deprecated ramp names. sage became ivy on 2026-11-03 (§1). `static`, so
-   a copy installed from the registry that names the old ramp keeps resolving.
-   New code uses ivy, and lint rejects both. */
+/* §9 — deprecated ramp names. sage became ivy on 2026-11-03, and federal became
+   lake on 2026-11-06 (§1). `static`, so a copy installed from the registry that
+   names an old ramp keeps resolving. New code uses the new names, and lint
+   rejects old and new alike. */
 @theme static {
   --color-sage-50: var(--color-ivy-50);
   --color-sage-100: var(--color-ivy-100);
@@ -135,6 +143,17 @@
   --color-sage-800: var(--color-ivy-800);
   --color-sage-900: var(--color-ivy-900);
   --color-sage-950: var(--color-ivy-950);
+  --color-federal-50: var(--color-lake-50);
+  --color-federal-100: var(--color-lake-100);
+  --color-federal-200: var(--color-lake-200);
+  --color-federal-300: var(--color-lake-300);
+  --color-federal-400: var(--color-lake-400);
+  --color-federal-500: var(--color-lake-500);
+  --color-federal-600: var(--color-lake-600);
+  --color-federal-700: var(--color-lake-700);
+  --color-federal-800: var(--color-lake-800);
+  --color-federal-900: var(--color-lake-900);
+  --color-federal-950: var(--color-lake-950);
 }
 
 /* --------------------------------------------------------------------------
@@ -325,24 +344,24 @@
   --tui-surface-raised: var(--color-ledger-50);
   --tui-border: var(--color-ledger-200);
   --tui-border-strong: var(--color-ledger-300);
-  --tui-text-primary: var(--color-ledger-950);    /* 16.39:1 */
-  --tui-text-body: var(--color-ledger-900);       /* 12.38:1 */
-  --tui-text-secondary: var(--color-ledger-700);  /*  6.64:1 */
+  --tui-text-primary: var(--color-ledger-950);    /* 16.49:1 */
+  --tui-text-body: var(--color-ledger-900);       /* 12.44:1 */
+  --tui-text-secondary: var(--color-ledger-700);  /*  6.62:1 */
   --tui-text-tertiary: var(--color-ledger-600);   /*  4.89:1 — placeholders and non-text marks only */
 
   /* §4 — accent map, light. Step 700 for every role's text (§0 rule 4):
-     5.06:1 or more on every ground §4 lists, its own tint included. On
-     canvas: interactive and success 6.23, danger 7.15, warning 6.74, agent
-     7.13, info 6.75. Interactive and success share ivy by decision (§1). */
+     4.72:1 or more on every ground §4 lists, its own tint included. On
+     canvas: interactive and success 6.24, danger 7.15, warning 6.74, agent
+     7.14, info 6.68. Interactive and success share ivy by decision (§1). */
   --tui-text-interactive: var(--color-ivy-700);
   --tui-text-danger: var(--color-vermilion-700);
   --tui-text-warning: var(--color-ochre-700);
   --tui-text-success: var(--color-ivy-700);
   --tui-text-agent: var(--color-orchid-700);
-  --tui-text-info: var(--color-federal-700);
+  --tui-text-info: var(--color-lake-700);
 
-  /* §1 — the accent is ink: the primary fill is ledger-950, 16.39:1 on
-     paper. The focus ring is a step softer, ledger-800, 9.10:1 (§4,
+  /* §1 — the accent is ink: the primary fill is ledger-950, 16.49:1 on
+     paper. The focus ring is a step softer, ledger-800, 9.08:1 (§4,
      2026-10-22). Links and selection (text, bg, border above and below)
      stay ivy. */
   --tui-fill-interactive: var(--color-ledger-950);
@@ -351,29 +370,29 @@
   --tui-fill-warning: var(--color-ochre-500);     /* not -400: 2.26:1 on paper, under 3:1 (§4) */
   --tui-fill-success: var(--color-ivy-700);
   --tui-fill-agent: var(--color-orchid-700);
-  --tui-fill-info: var(--color-federal-700);
+  --tui-fill-info: var(--color-lake-700);
 
   /* Paper, not white (2026-10-16): no #fff remains in the theme. */
-  --tui-on-interactive: var(--color-ledger-50);   /* 16.39:1 on fill */
+  --tui-on-interactive: var(--color-ledger-50);   /* 16.49:1 on fill */
   --tui-on-danger: var(--color-ledger-50);        /* 7.15:1 */
-  --tui-on-warning: var(--color-ledger-950);      /* 4.89:1 — paper on ochre-500 is 3.35:1, fails */
-  --tui-on-success: var(--color-ledger-50);       /* 6.23:1 */
-  --tui-on-agent: var(--color-ledger-50);         /* 7.13:1 */
-  --tui-on-info: var(--color-ledger-50);          /* 6.75:1 */
+  --tui-on-warning: var(--color-ledger-950);      /* 4.91:1 — paper on ochre-500 is 3.36:1, fails */
+  --tui-on-success: var(--color-ledger-50);       /* 6.24:1 */
+  --tui-on-agent: var(--color-ledger-50);         /* 7.14:1 */
+  --tui-on-info: var(--color-ledger-50);          /* 6.68:1 */
 
   --tui-bg-interactive: --alpha(var(--color-ivy-500) / 8%);
   --tui-bg-danger: --alpha(var(--color-vermilion-500) / 8%);
   --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
   --tui-bg-success: --alpha(var(--color-ivy-500) / 8%);
   --tui-bg-agent: --alpha(var(--color-orchid-500) / 8%);
-  --tui-bg-info: --alpha(var(--color-federal-500) / 8%);
+  --tui-bg-info: --alpha(var(--color-lake-500) / 12%); /* §4: 8% read grey on the cream paper */
 
   --tui-border-interactive: --alpha(var(--color-ivy-500) / 20%);
   --tui-border-danger: --alpha(var(--color-vermilion-500) / 20%);
   --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
   --tui-border-success: --alpha(var(--color-ivy-500) / 20%);
   --tui-border-agent: --alpha(var(--color-orchid-500) / 20%);
-  --tui-border-info: --alpha(var(--color-federal-500) / 20%);
+  --tui-border-info: --alpha(var(--color-lake-500) / 20%);
 
   /* §4 interaction states — one neutral overlay, not per-role tokens.
      No --color-bg-selected: selection IS the interactive role. */
@@ -383,13 +402,13 @@
      ink on the ink primary button changes nothing. Paper moves it ΔE 4.19. */
   --tui-bg-hover-inverse: --alpha(var(--color-ledger-50) / 6%);
   --tui-bg-active-inverse: --alpha(var(--color-ledger-50) / 10%);
-  --tui-text-disabled: var(--color-ledger-400);   /* 2.22:1 — fails on purpose (WCAG 1.4.3 exempt) */
+  --tui-text-disabled: var(--color-ledger-400);   /* 2.23:1 — fails on purpose (WCAG 1.4.3 exempt) */
   /* §4 — selected text, not a selected row. The text steps to primary on it. */
   --tui-bg-selection: --alpha(var(--color-ivy-500) / 30%);
 
-  /* §6 — chart ramp, light: step 600 of each ramp, 4.59:1 or more on
+  /* §6 — chart ramp, light: step 600 of each ramp, 4.60:1 or more on
      paper. Vermilion and ivy, the polarity hues, come last (§6). */
-  --tui-chart-1: var(--color-federal-600);
+  --tui-chart-1: var(--color-lake-600);
   --tui-chart-2: var(--color-ochre-600);
   --tui-chart-3: var(--color-teal-600);
   --tui-chart-4: var(--color-orchid-600);
@@ -410,55 +429,55 @@
   --tui-surface-raised: var(--color-ledger-925);
   --tui-border: var(--color-ledger-800);
   --tui-border-strong: var(--color-ledger-700);
-  --tui-text-primary: var(--color-ledger-50);     /* 16.39:1 */
-  --tui-text-body: var(--color-ledger-100);       /* 15.01:1 */
-  --tui-text-secondary: var(--color-ledger-300);  /* 10.15:1 */
-  --tui-text-tertiary: var(--color-ledger-400);   /*  7.37:1 — placeholders and non-text marks only */
+  --tui-text-primary: var(--color-ledger-50);     /* 16.49:1 */
+  --tui-text-body: var(--color-ledger-100);       /* 15.08:1 */
+  --tui-text-secondary: var(--color-ledger-300);  /* 10.19:1 */
+  --tui-text-tertiary: var(--color-ledger-400);   /*  7.41:1 — placeholders and non-text marks only */
 
   /* §4 — accent map, dark. Step 400 for every role's text (§0 rule 4). On
-     canvas: interactive and success 7.84, danger 6.95, warning 7.24, agent
-     6.96, info 7.31. Lowest anywhere: agent on its own tint over a
-     highlighted menu row, 4.66:1 — why raised is ledger-925 (§3). */
+     canvas: interactive and success 7.89, danger 6.99, warning 7.28, agent
+     7.00, info 7.38. Lowest anywhere: agent on its own tint over a
+     highlighted menu row, 4.67:1 — why raised is ledger-925 (§3). */
   --tui-text-interactive: var(--color-ivy-400);
   --tui-text-danger: var(--color-vermilion-400);
   --tui-text-warning: var(--color-ochre-400);
   --tui-text-success: var(--color-ivy-400);
   --tui-text-agent: var(--color-orchid-400);
-  --tui-text-info: var(--color-federal-400);
+  --tui-text-info: var(--color-lake-400);
   /* §4 — the ring is a step softer than the paper accent: ledger-200,
-     12.68:1 on the canvas (2026-10-22). */
+     12.74:1 on the canvas (2026-10-22). */
   --tui-ring: var(--color-ledger-200);
 
   --tui-fill-interactive: var(--color-ledger-50);
   /* Role fills -600, not -700: the 700 fills are about 2.3–2.6:1 against
-     this canvas, under 3:1. Paper on a hovered 600 fill dips to 4.17–4.86:1
+     this canvas, under 3:1. Paper on a hovered 600 fill dips to 4.17–4.87:1
      (§4); no control hovers on one today. */
   --tui-fill-danger: var(--color-vermilion-600);
   --tui-fill-warning: var(--color-ochre-400);
   --tui-fill-success: var(--color-ivy-600);
   --tui-fill-agent: var(--color-orchid-600);
-  --tui-fill-info: var(--color-federal-600);
+  --tui-fill-info: var(--color-lake-600);
 
-  --tui-on-interactive: var(--color-ledger-950);  /* 16.39:1 */
+  --tui-on-interactive: var(--color-ledger-950);  /* 16.49:1 */
   --tui-on-danger: var(--color-ledger-50);        /* 5.36:1 */
-  --tui-on-warning: var(--color-ledger-950);      /* 7.24:1 */
-  --tui-on-success: var(--color-ledger-50);       /* 4.59:1 */
-  --tui-on-agent: var(--color-ledger-50);         /* 5.30:1 */
-  --tui-on-info: var(--color-ledger-50);          /* 4.97:1 */
+  --tui-on-warning: var(--color-ledger-950);      /* 7.28:1 */
+  --tui-on-success: var(--color-ledger-50);       /* 4.60:1 */
+  --tui-on-agent: var(--color-ledger-50);         /* 5.31:1 */
+  --tui-on-info: var(--color-ledger-50);          /* 4.94:1 */
 
   --tui-bg-interactive: --alpha(var(--color-ivy-500) / 10%);
   --tui-bg-danger: --alpha(var(--color-vermilion-500) / 10%);
   --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
   --tui-bg-success: --alpha(var(--color-ivy-500) / 10%);
   --tui-bg-agent: --alpha(var(--color-orchid-500) / 10%);
-  --tui-bg-info: --alpha(var(--color-federal-500) / 10%);
+  --tui-bg-info: --alpha(var(--color-lake-500) / 10%);
 
   --tui-border-interactive: --alpha(var(--color-ivy-500) / 25%);
   --tui-border-danger: --alpha(var(--color-vermilion-500) / 25%);
   --tui-border-warning: --alpha(var(--color-ochre-500) / 25%);
   --tui-border-success: --alpha(var(--color-ivy-500) / 25%);
   --tui-border-agent: --alpha(var(--color-orchid-500) / 25%);
-  --tui-border-info: --alpha(var(--color-federal-500) / 25%);
+  --tui-border-info: --alpha(var(--color-lake-500) / 25%);
 
   /* 6%/10%, not 4%/8%: at 4% the hover is invisible on a 28px row.
      Paper, not #fff, as the overlay colour. */
@@ -467,12 +486,12 @@
   /* §4 — ink over the paper primary button, ΔE 2.80. */
   --tui-bg-hover-inverse: --alpha(var(--color-ledger-950) / 6%);
   --tui-bg-active-inverse: --alpha(var(--color-ledger-950) / 10%);
-  --tui-text-disabled: var(--color-ledger-600);   /* 3.35:1 — exempt, dim on purpose */
+  --tui-text-disabled: var(--color-ledger-600);   /* 3.37:1 — exempt, dim on purpose */
   /* §4 — selected text, as in light. */
   --tui-bg-selection: --alpha(var(--color-ivy-500) / 30%);
 
   /* §6 — chart ramp, dark: step 400 of each ramp. Same order as light. */
-  --tui-chart-1: var(--color-federal-400);
+  --tui-chart-1: var(--color-lake-400);
   --tui-chart-2: var(--color-ochre-400);
   --tui-chart-3: var(--color-teal-400);
   --tui-chart-4: var(--color-orchid-400);
