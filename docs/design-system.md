@@ -17,7 +17,7 @@ These matter more than any individual token value. A generator that gets the val
 
 1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary and tertiary buttons, dividers, empty states: all neutral. A hue appears only when something is true about the data, the run, or the user's focus. In a dense interface every colored pixel that isn't communicating state is stealing attention from one that is.
 
-2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `ivy`, `vermilion`, `ochre`, `federal` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens only (§6) and never marks UI state.
+2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `ivy`, `vermilion`, `ochre`, `lake` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens only (§6) and never marks UI state.
 
 3. **Never use the 900 or 950 step of a chromatic scale as a background.** Under Tailwind's ramps those steps drifted in lightness by hue, so a `red-950` chip and a `blue-950` chip did not sit at the same visual depth. The Riso ramps share one lightness curve, but a dark chromatic slab still reads as a hole in the page. Use alpha over the canvas instead: `{hue}-500 / 10%`. This guarantees consistent depth and keeps the UI quiet. `ledger` is the neutral and exempt: its 900–950 steps are surfaces.
 
@@ -50,13 +50,15 @@ Five hues, six roles. The interactive role is split (decided 2026-10-16): its so
 | **Warning** | `ochre` | Sunflower, 116 U | Stale data, degraded run, needs review, unverified figure, approaching threshold |
 | **Success** | `ivy` | Green, 354 U | Passed test, verified figure, deployed, positive variance, numbers match |
 | **Agent** | `orchid` | Orchid, 2592 U | Agent-authored content, generated dbt code, agent questions, agent activity, pending human review |
-| **Info** | `federal` | Lake, 293 U | "Running" state, work in progress, informational notices |
+| **Info** | `lake` | Lake, 293 U | "Running" state, work in progress, informational notices |
 
 Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only (§6).
 
 **Palette change, 2026-10-16 (user decision): Riso Ledger.** The Tailwind ramps were replaced: `olive` → `ledger`, `emerald` → `sage`, `red` → `vermilion`, `amber` → `ochre`, `sky` → `federal`, `violet` → `orchid`. Two reasons. 30 of the 55 old accent colours sat outside sRGB, so an sRGB screen clipped them to something other than what was specified. And every Tailwind ramp had its own lightness curve, which is the problem §2's lightness bands existed to work around. The Riso ramps are generated in OKLCH from one shared lightness curve and a chroma curve per ramp, each anchored to a RISO spot ink and kept inside sRGB. A step number now means the same contrast in every hue. Values, anchors and the gamut report are in `docs/palette.md`. *(The previous change, 2026-10-08, moved the accent from `blue` to `emerald` and the neutral to `olive`, and brought `sky` back as info. Its reasoning is in Appendix A.)*
 
 **`sage` renamed `ivy` — decided 2026-11-03 (owner).** Names only: no value moved. The ramp's chroma is 0.115–0.156 at the steps the tokens use, which is leaf strength, not a sage's grey-green. RISO Ivy (347 U) is the next-closest ink to step 500 after Green. Green stays the anchor, so the ramp's name isn't its anchor's, as with `federal`. `--color-sage-*` stays as a deprecated alias (§9), and lint rejects it in new code. Text recording what happened under the old name keeps it. `fir` was considered and rejected: a fir is dark and muted, and 13 of the ramp's 18 token references are steps 400 and 500.
+
+**`federal` renamed `lake` — decided 2026-11-06 (owner).** Names only: no value moved in the rename. The ramp took RISO Lake's hue and chroma the same day, and Federal Blue became the ledger's ink (§3), so the old name pointed at the wrong ink. `--color-federal-*` stays as a deprecated alias (§9), and lint rejects it in new code. Text recording what happened under the old name keeps it.
 
 **`ledger` keeps its name — decided 2026-11-03 (owner).** It names both ends of the ramp, paper and ink: `ledger-50` is the most-used step, and 26 of the ramp's 46 references in `theme.css` are paper-hue steps. `lacquer` and `midnight` name only the dark end, and `riso` already names all seven ramps.
 
@@ -74,11 +76,11 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **`ochre` for warning.** Sunflower ink is vivid only when light, so the ramp's chroma peaks early and its dark steps turn ochre and brown. That is what makes it usable as light-mode text (`ochre-700`, 6.74:1 on paper).
 
-**`federal` for info.** RISO Lake's hue (257.4°) and chroma — decided 2026-11-06 (owner). Until then the ramp took Federal Blue's hue (264°) with Medium Blue's chroma, because Federal Blue's own chroma reads greyed-out on screen. Lake moves info 7° away from agent, and Federal Blue became the ledger's ink (§3). The name `federal` predates Lake: whether to rename the ramp is open.
+**`lake` for info.** RISO Lake's hue (257.4°) and chroma — decided 2026-11-06 (owner). Until then the ramp was `federal`, with Federal Blue's hue (264°) and Medium Blue's chroma, because Federal Blue's own chroma reads greyed-out on screen. Lake moves info 7° away from agent, and Federal Blue became the ledger's ink (§3).
 
 **`orchid` for agent.** Moved off violet so agent does not read as a second blue next to info: 61° apart on the hue wheel since 2026-11-06 (54° before Lake).
 
-**`teal` for charts only.** Hue 201°, filling the gap between `ivy` and `federal`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
+**`teal` for charts only.** Hue 201°, filling the gap between `ivy` and `lake`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
 
 ### Colour-vision limits of this palette
 
@@ -148,9 +150,9 @@ So one step serves every role: **400 in dark mode, 700 in light mode** (§0 rule
 | danger | `vermilion-400` | 6.99:1 | `vermilion-700` | 7.15:1 |
 | warning | `ochre-400` | 7.28:1 | `ochre-700` | 6.74:1 |
 | agent | `orchid-400` | 7.00:1 | `orchid-700` | 7.14:1 |
-| info | `federal-400` | 7.38:1 | `federal-700` | 6.68:1 |
+| info | `lake-400` | 7.38:1 | `lake-700` | 6.68:1 |
 
-The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:1 in dark mode before. What spread remains is chroma, not lightness: ivy and federal read slightly stronger than vermilion and orchid at the same L. **Dark warning is no longer an exception**: `amber-500` sat about 6 L above its band; `ochre-400` sits on the shared curve with the other four.
+The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:1 in dark mode before. What spread remains is chroma, not lightness: ivy and lake read slightly stronger than vermilion and orchid at the same L. **Dark warning is no longer an exception**: `amber-500` sat about 6 L above its band; `ochre-400` sits on the shared curve with the other four.
 
 **What each step guarantees** (from `docs/palette.md`, for every ramp):
 
@@ -264,7 +266,7 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 | warning | `ochre-400` | 7.28:1 | 6.45:1 | `ochre-400` | `ledger-950` | 7.28:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
 | success | `ivy-400` | 7.89:1 | 6.98:1 | `ivy-600` | `ledger-50` | 4.60:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
 | agent | `orchid-400` | 7.00:1 | 6.20:1 | `orchid-600` | `ledger-50` | 5.31:1 | `orchid-500 / 10%` | `orchid-500 / 25%` |
-| info | `federal-400` | 7.38:1 | 6.54:1 | `federal-600` | `ledger-50` | 4.94:1 | `federal-500 / 10%` | `federal-500 / 25%` |
+| info | `lake-400` | 7.38:1 | 6.54:1 | `lake-600` | `ledger-50` | 4.94:1 | `lake-500 / 10%` | `lake-500 / 25%` |
 
 **Solid-fill rule, dark.** The interactive fill is paper, `ledger-50`, with ink text (16.49:1): the accent is ink in light mode and its inverse here (§1). The role fills are step **600**, not 700. A 700 fill is 2.3–2.6:1 against the canvas, under the 3:1 a solid control needs to read as a shape; a 600 fill is 3.07–3.59:1 (2.72–3.18:1 on a raised surface), with paper text on it at 4.60–5.36:1. Ivy (success), the tightest, clears AA by 0.10. Warning is the only fill that takes ink: `ochre-400` under `ledger-950` measures 7.28:1, and paper on it fails. Text on every other fill is paper, `ledger-50`, never `#fff`.
 
@@ -279,9 +281,11 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 | warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.91:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
 | success | `ivy-700` | 6.24:1 | 4.72:1 | `ivy-700` | `ledger-50` | 6.24:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
 | agent | `orchid-700` | 7.14:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.14:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
-| info | `federal-700` | 6.68:1 | 5.06:1 | `federal-700` | `ledger-50` | 6.68:1 | `federal-500 / 8%` | `federal-500 / 20%` |
+| info | `lake-700` | 6.68:1 | 4.86:1 | `lake-700` | `ledger-50` | 6.68:1 | `lake-500 / 12%` | `lake-500 / 20%` |
 
 "Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`ivy-700`) are the tightest roles, at 6.24:1 on the canvas and 4.72:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
+
+**Light info tint is 12%, not 8% — decided 2026-11-06 (owner, for readability).** On the cream paper `lake-500` at 8% measured chroma 0.0046, which reads as grey. 12% is the least that clears chroma 0.008 (0.0092, composited in sRGB over the canvas). Info text on its own tint over a selected, hovered row falls from 5.06:1 to 4.86:1, still above 4.5:1; 14% would give 4.77:1 for little more colour. The cost: the info tint now sits 28% further from the paper than the median role tint, past the ±15% that `scripts/check-harmony.mjs` flags, so a running row is the strongest tinted row in light mode. Warning was already the other exception, at 10%. Dark mode is unchanged: every dark tint, info included, clears 0.008 at 10% except warning (0.0063), which is not changed here.
 
 **Light warning fill is `ochre-500`, not `-400` — decided 2026-10-16.** `ochre-400` takes ink at 7.28:1, but against paper the fill itself is 2.26:1, under the 3:1 a fill needs (`packages/ui/scripts/check-contrast.mjs` fails it). `ochre-500` is 3.36:1 against paper, with ink on it at 4.91:1. The cost is a browner, less sunny fill. Paper on `ochre-500` is 3.36:1 and fails, so warning takes ink in both modes. *(Tailwind's `amber-500` fill measured 2.06:1 against the olive canvas; nothing checked it.)*
 
@@ -320,7 +324,7 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 
 **The inverse overlay — added 2026-10-16, with the ink accent.** The overlay is ink in light mode and paper in dark, which is exactly the primary fill's colour in each mode, so on a primary button it changed nothing (ΔE 0.00; a sage fill had moved 1.78 light, 2.82 dark). `--color-bg-hover-inverse` and `--color-bg-active-inverse` are the other mode's overlay, at the same 6% and 10%: paper over the ink button in light mode, ink over the paper button in dark. The button moves ΔE 4.17 in light and 2.81 in dark (CIEDE2000), the same as a hovered row in the other mode, and its label stays at 12.6:1 or more when pressed. Only the primary ground uses them: `controlGrounds.default` points `--tui-bg-hover` and `--tui-bg-active` at the inverse values on the element, so the shared overlay utility picks them up (§9, contextual overrides target the `--tui-*` layer). It is not a per-role hover token: one pair, for a fill at the overlay's own end of the ramp.
 
-**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (ivy), 4.44:1 (federal), 4.75:1 (orchid) and 4.87:1 (vermilion), so ivy and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.49:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
+**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (ivy), 4.44:1 (lake), 4.75:1 (orchid) and 4.87:1 (vermilion), so ivy and lake fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.49:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
 
 ### Text selection — added 2026-11-02 (owner, after a side-by-side)
 
@@ -340,7 +344,7 @@ Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selec
 
 **Not `--color-bg-interactive`.** That tint is for a selected row, at 8% and 10%. Selecting text inside a row has to show on top of it, so this token is a separate one, not a duplicate of it: against a selected row it measures 1.27:1 in light and 1.37:1 in dark, and against the canvas 1.39:1 and 1.55:1.
 
-**The text steps to `--color-text-primary`.** Text that kept its own colour on this tint would fall to 3.63:1 in light and 3.26:1 in dark for role text, under AA. Primary measures 9.44:1 or more in light and 7.44:1 or more in dark, on every ground in this section, every role's tint included. So a status colour steps back while its text is selected and returns when the selection clears. The word beside it still says what it is (§11.1).
+**The text steps to `--color-text-primary`.** Text that kept its own colour on this tint would fall to 3.63:1 in light and 3.26:1 in dark for role text, under AA. Primary measures 9.31:1 or more in light and 7.44:1 or more in dark, on every ground in this section, every role's tint included. So a status colour steps back while its text is selected and returns when the selection clears. The word beside it still says what it is (§11.1).
 
 **Text on a solid fill isn't selectable.** Primary on a fill is the wrong pair: in dark mode it's paper on the paper button. Every filled control is already `select-none` through `controlBase` and `tabVariants`. Anything else with text on a `--color-fill-*` takes `select-none` as well, as the samples on the site's Color page do.
 
@@ -524,11 +528,11 @@ The block is otherwise neutral: a 1px `--color-border` box with no ground of its
 
 ## 6. Chart ramp
 
-Governed separately from UI state colour. Seven series, one step per mode: **600 in light, 400 in dark**, on the same shared lightness curve as the UI (§2). The tokens reference the generated ramps (`--tui-chart-1: var(--color-federal-600)`); lint keeps the ramp names out of components, so a chart reaches its colours only through `--color-chart-*`.
+Governed separately from UI state colour. Seven series, one step per mode: **600 in light, 400 in dark**, on the same shared lightness curve as the UI (§2). The tokens reference the generated ramps (`--tui-chart-1: var(--color-lake-600)`); lint keeps the ramp names out of components, so a chart reaches its colours only through `--color-chart-*`.
 
 | # | Ramp | Hue | Light, `-600` on paper | Dark, `-400` on canvas | Dark, on raised |
 |---|---|---|---|---|---|
-| 1 | `federal` | 257.4 | 4.94:1 | 7.38:1 | 6.54:1 |
+| 1 | `lake` | 257.4 | 4.94:1 | 7.38:1 | 6.54:1 |
 | 2 | `ochre` | 78.5 | 4.97:1 | 7.28:1 | 6.45:1 |
 | 3 | `teal` | 201.2 | 4.68:1 | 7.74:1 | 6.86:1 |
 | 4 | `orchid` | 318.4 | 5.31:1 | 7.00:1 | 6.20:1 |
@@ -544,11 +548,11 @@ Every series clears the 3:1 graphical minimum with room to spare, 4.60:1 at wors
 
 **Cautions:**
 
-- **One lightness for every series.** In grayscale or print the seven are indistinguishable, and so are series that converge under colour-vision deficiency. Under deuteranopia the closest pair among series 1–5 is 1 and 4 (`federal`, `orchid`): 3.4 in light, 3.2 in dark (OKLab ×100, §1's method). Use direct labels or distinct dash patterns, never hue alone.
+- **One lightness for every series.** In grayscale or print the seven are indistinguishable, and so are series that converge under colour-vision deficiency. Under deuteranopia the closest pair among series 1–5 is 1 and 4 (`lake`, `orchid`): 3.8 in light, 3.3 in dark (re-measured 2026-11-06) (OKLab ×100, §1's method). Use direct labels or distinct dash patterns, never hue alone.
 - Series 5 is the neutral. It reads as "other" or a baseline; do not give it the series the chart is about.
 - Ochre and orchid double as warning and agent. Acceptable inside a plot frame because the context is unambiguous, but avoid ochre as series 2 on a chart that also renders threshold-breach markers.
 
-**Sequential and diverging ramps** for heatmaps and variance matrices: build from a single ramp's own steps (`federal-100` → `federal-900`), or `vermilion` ↔ `ivy` through `ledger` at matching steps. Never build a sequential ramp by walking the categorical list.
+**Sequential and diverging ramps** for heatmaps and variance matrices: build from a single ramp's own steps (`lake-100` → `lake-900`), or `vermilion` ↔ `ivy` through `ledger` at matching steps. Never build a sequential ramp by walking the categorical list.
 
 ---
 
@@ -1066,10 +1070,12 @@ Every Tailwind colour scale is stripped since the Riso Ledger palette (2026-10-1
 @theme static {
   --color-sage-50: var(--color-ivy-50);
   /* ... one alias per ivy step, 50 to 950 ... */
+  --color-federal-50: var(--color-lake-50);
+  /* ... one alias per lake step, 50 to 950 ... */
 }
 ```
 
-`sage` became `ivy` on 2026-11-03 (§1). The aliases are `static` so they exist at runtime whatever an app's source names: a copy installed from the registry that names the old ramp keeps resolving. They hold references, not values, so they can't drift from the ramp. Lint rejects `sage` as it rejects every ramp name, and `apps/storybook/tests/palette.spec.ts` fails if an alias is missing.
+`sage` became `ivy` on 2026-11-03, and `federal` became `lake` on 2026-11-06 (§1). The aliases are `static` so they exist at runtime whatever an app's source names: a copy installed from the registry that names the old ramp keeps resolving. They hold references, not values, so they can't drift from the ramp. Lint rejects `sage` and `federal` as it rejects every ramp name, and `apps/storybook/tests/palette.spec.ts` fails if an alias is missing.
 
 ### Stock shadows are stripped too
 
@@ -1149,7 +1155,7 @@ Self-hosting is preferable for an internal tool — three variable families subs
 
 ### Naming
 
-Semantic names only in component code — `bg-bg-danger`, `text-text-interactive`, `border-border-agent` (§4 explains the doubled word). A component should never reference `federal-400` directly; if it does, the mode switch and any future hue change break silently.
+Semantic names only in component code — `bg-bg-danger`, `text-text-interactive`, `border-border-agent` (§4 explains the doubled word). A component should never reference `lake-400` directly; if it does, the mode switch and any future hue change break silently.
 
 See §4 for the full naming pattern and the rejected alternatives.
 
@@ -1341,7 +1347,7 @@ Two things override that principle, and both are optical rather than aesthetic. 
 
 **Where it ships.** The `ChatThread` turn before its first token, `AgentReasoning` while it streams, `AgentPlan` while it drafts a step, `StatusBadge` `running` and `AI working`, and `apps/demo`'s `StageTracker`. It takes the colour of its label (§11.1) and the size of the icon it replaces (§11.3): `1em` inline, 10px as a badge mark, `--size-icon-xs` in the plan's number column.
 
-**`running` and `AI working` share the mark (owner decision, 2026-10-20).** Until then `agent-working` spun Phosphor's robot, which tumbled: a rotating glyph that is not radially symmetric reads as falling, not working. Every working state now moves the same way. The cost, accepted: in a badge, the two differ only by hue and label. In dark mode a deuteranope sees federal and orchid at about 3 (§1), so the label ("running", "AI working") is what tells them apart. In a row, the agent rail still carries it (§5).
+**`running` and `AI working` share the mark (owner decision, 2026-10-20).** Until then `agent-working` spun Phosphor's robot, which tumbled: a rotating glyph that is not radially symmetric reads as falling, not working. Every working state now moves the same way. The cost, accepted: in a badge, the two differ only by hue and label. In dark mode a deuteranope sees lake and orchid at about 3 (§1), so the label ("running", "AI working") is what tells them apart. In a row, the agent rail still carries it (§5).
 
 **Decorative by default.** The mark is `aria-hidden`; the label beside it says what is happening. A `Spinner` given an `aria-label` becomes `role="status"`, for the rare place with no visible label.
 

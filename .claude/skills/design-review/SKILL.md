@@ -32,10 +32,10 @@ Then grep for what lint may not yet cover. **Keep the `--include` globs quoted.*
 
 ```bash
 # raw scale names (Tailwind's and the Riso ramps) outside theme.css and palette.css
-grep -rnE '\b(blue|red|amber|emerald|violet|teal|pink|lime|cyan|fuchsia|sky|indigo|orange|yellow|green|purple|rose|olive|neutral|slate|gray|zinc|stone|mauve|mist|taupe|ledger|ivy|sage|vermilion|ochre|federal|orchid)-[0-9]{2,3}\b' packages/ui/src --include='*.tsx' | grep -v 'styles/theme.css'
+grep -rnE '\b(blue|red|amber|emerald|violet|teal|pink|lime|cyan|fuchsia|sky|indigo|orange|yellow|green|purple|rose|olive|neutral|slate|gray|zinc|stone|mauve|mist|taupe|ledger|ivy|sage|vermilion|ochre|lake|federal|orchid)-[0-9]{2,3}\b' packages/ui/src --include='*.tsx' | grep -v 'styles/theme.css'
 
 # chromatic 900/950 used as background
-grep -rnE 'bg-(ivy|sage|vermilion|ochre|federal|orchid|teal)-(900|925|950)' packages/ui/src
+grep -rnE 'bg-(ivy|sage|vermilion|ochre|lake|federal|orchid|teal)-(900|925|950)' packages/ui/src
 
 # font weights above 600
 grep -rnE 'font-(bold|extrabold|black)|font-\[?[7-9]00' packages/ui/src
@@ -104,7 +104,7 @@ These cannot be automated. **List them as outstanding; do not report them as pas
 - Light mode: do cards and popups separate from the page by border alone, paper on paper (§3, 2026-10-16)?
 - Dark mode: does a menu on `ledger-925` lift off the `ledger-950` page (§3, §4 Elevation)?
 - Grayscale test: is every state still distinguishable by icon, label, or position?
-- Deuteranopia: do chart series 1 and 4 (federal, orchid), the closest pair, stay separable?
+- Deuteranopia: do chart series 1 and 4 (lake, orchid), the closest pair, stay separable?
 - Sustained reading: does text bloom at the edges after 30 minutes on the dark table view?
 
 ## Report format

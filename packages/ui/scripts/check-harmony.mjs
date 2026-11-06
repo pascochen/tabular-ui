@@ -21,6 +21,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEPRECATED_RAMPS } from '../../../lint/palette.mjs';
 import { converter, differenceEuclidean, displayable, filterDeficiencyDeuter, formatHex } from 'culori';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,9 +34,9 @@ const distance = differenceEuclidean('oklab');
 const deutan = filterDeficiencyDeuter(1);
 
 const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-const CHROMATIC = ['ivy', 'vermilion', 'ochre', 'federal', 'orchid', 'teal'];
+const CHROMATIC = ['ivy', 'vermilion', 'ochre', 'lake', 'orchid', 'teal'];
 // The five role hues, and the ramp each role's colour comes from. Interactive marks share ivy with success.
-const ROLES = { danger: 'vermilion', warning: 'ochre', success: 'ivy', info: 'federal', agent: 'orchid' };
+const ROLES = { danger: 'vermilion', warning: 'ochre', success: 'ivy', info: 'lake', agent: 'orchid' };
 const TINT_ALPHA = 0.1;
 const GREY_CHROMA = 0.008;
 
@@ -52,6 +53,10 @@ function load(ref) {
     const o = toOklch(m[3]);
     ramps.set(`${m[1]}-${m[2]}`, { oklch: m[3], l: o.l * 100, c: o.c, h: o.h ?? 0, hex: formatHex(m[3]) });
   }
+  // A ref from before a rename names the ramp by its old name (federal until 2026-11-06).
+  for (const [old, current] of Object.entries(DEPRECATED_RAMPS))
+    for (const [name, value] of [...ramps])
+      if (name.startsWith(`${old}-`)) ramps.set(name.replace(old, current), value);
   const theme = read('src/styles/theme.css');
   const block = (selector) => {
     const decls = new Map();
@@ -218,8 +223,8 @@ table(
     ['Gaps', spread(before), spread(after)],
     [
       'Ledger ink hue (outside the rule)',
-      `${f(before.inkHue)}°, ${f(hueGap(before.inkHue, before.h2.find((g) => g.from === 'federal').fromH))}° from info`,
-      `${f(after.inkHue)}°, ${f(hueGap(after.inkHue, after.h2.find((g) => g.from === 'federal').fromH))}° from info`,
+      `${f(before.inkHue)}°, ${f(hueGap(before.inkHue, before.h2.find((g) => g.from === 'lake').fromH))}° from info`,
+      `${f(after.inkHue)}°, ${f(hueGap(after.inkHue, after.h2.find((g) => g.from === 'lake').fromH))}° from info`,
     ],
   ],
 );
@@ -268,7 +273,14 @@ for (const mode of ['light', 'dark']) {
       ['Role', ...(which === 'shipped' ? ['Alpha'] : []), 'Before', 'After'],
       before.tints[mode].map((x, i) => [
         x.role,
-        ...(which === 'shipped' ? [`${Math.round(after.tints[mode][i].shippedAlpha * 100)}%`] : []),
+        ...(which === 'shipped'
+          ? [
+              [x.shippedAlpha, after.tints[mode][i].shippedAlpha]
+                .map((a) => `${Math.round(a * 100)}%`)
+                .filter((a, j, all) => j === 0 || a !== all[0])
+                .join(' → '),
+            ]
+          : []),
         cb[i],
         ca[i],
       ]),

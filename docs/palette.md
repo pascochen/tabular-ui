@@ -117,9 +117,9 @@ Warning. Replaces `amber`. Dark steps turn ochre and brown: a yellow cannot stay
 
 ◆ chroma limited by sRGB at this step (see Gamut report).
 
-## federal
+## lake
 
-Info. Replaces `sky`. Hue and chroma from RISO Lake (257.4°). Until 2026-11-06 the ramp took RISO Medium Blue (264.0°); Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart. The name `federal` predates Lake.
+Info. Replaces `sky`. Hue and chroma from RISO Lake (257.4°). Named `federal` until 2026-11-06, when it took Lake in place of RISO Medium Blue (264.0°): Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart.
 
 | Step | oklch() | Hex | WCAG vs paper | WCAG vs ink | APCA Lc vs paper | APCA Lc vs ink |
 |---|---|---|---|---|---|---|
@@ -187,7 +187,7 @@ Source: riso-colors (npm) by Matt DesLauriers, compiled from stencil.wiki/colors
 | ivy | Green | `#00a95c` | 354 U | `oklch(64.5% 0.164 153.6)` | 153.6° | 0.156 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Green) agrees |
 | vermilion | Crimson | `#e45d50` | 485 U | `oklch(64.9% 0.171 28.2)` | 28.2° | 0.171 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Crimson) agrees |
 | ochre | Sunflower | `#ffb511` | 116 U | `oklch(82.2% 0.169 78.5)` | 78.5° | 0.152 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Sunflower) agrees |
-| federal | Lake | `#235ba8` | 293 U | `oklch(47.7% 0.137 257.4)` | 257.4° | 0.137 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Lake) agrees |
+| lake | Lake | `#235ba8` | 293 U | `oklch(47.7% 0.137 257.4)` | 257.4° | 0.137 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Lake) agrees |
 | orchid | Orchid | `#aa60bf` | 2592 U | `oklch(61.0% 0.158 318.4)` | 318.4° | 0.158 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Orchid) gives hex `#bb76cf` and Pantone 2582 U |
 | teal | Light Teal | `#009da5` | 320 U | `oklch(63.3% 0.108 201.2)` | 201.2° | 0.104 | riso-colors; [stencil.wiki](https://stencil.wiki/wiki/Light_Teal) agrees |
 
@@ -198,8 +198,8 @@ Accent hues around the OKLCH wheel, with the gap to the next one:
 - vermilion 28.2° → ochre 78.5°: 50°
 - ochre 78.5° → ivy 153.6°: 75°
 - ivy 153.6° → teal 201.2°: 48°
-- teal 201.2° → federal 257.4°: 56°
-- federal 257.4° → orchid 318.4°: 61°
+- teal 201.2° → lake 257.4°: 56°
+- lake 257.4° → orchid 318.4°: 61°
 - orchid 318.4° → vermilion 28.2°: 70°
 
 ## Gamut report
@@ -225,10 +225,10 @@ Accent hues around the OKLCH wheel, with the gap to the next one:
 | ochre-800 | 0.110 | 0.079 |
 | ochre-900 | 0.093 | 0.062 |
 | ochre-950 | 0.076 | 0.043 |
-| federal-50 | 0.014 | 0.011 |
-| federal-100 | 0.027 | 0.026 |
-| federal-200 | 0.055 | 0.053 |
-| federal-300 | 0.089 | 0.089 |
+| lake-50 | 0.014 | 0.011 |
+| lake-100 | 0.027 | 0.026 |
+| lake-200 | 0.055 | 0.053 |
+| lake-300 | 0.089 | 0.089 |
 | teal-500 | 0.108 | 0.104 |
 | teal-600 | 0.108 | 0.088 |
 | teal-700 | 0.097 | 0.077 |
@@ -315,7 +315,7 @@ red: 5 of 11 outside sRGB. vermilion: 0 of 11.
 
 amber: 7 of 11 outside sRGB. ochre: 0 of 11.
 
-### sky → federal
+### sky → lake
 
 | Step | Old oklch() | Old hex | New oklch() | New hex | ΔL |
 |---|---|---|---|---|---|
@@ -331,7 +331,7 @@ amber: 7 of 11 outside sRGB. ochre: 0 of 11.
 | 900 | `oklch(39.1% 0.09 240.876)` | `#024a70` | `oklch(30.5% 0.082 257.4)` | `#112e57` | -8.6 |
 | 950 | `oklch(29.3% 0.066 243.157)` | `#052f4a` | `oklch(21.0% 0.062 257.4)` | `#041834` | -8.3 |
 
-sky: 7 of 11 outside sRGB. federal: 0 of 11.
+sky: 7 of 11 outside sRGB. lake: 0 of 11.
 
 ### violet → orchid
 

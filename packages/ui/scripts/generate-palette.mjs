@@ -168,12 +168,12 @@ const RAMPS = [
     note: 'Dark steps turn ochre and brown: a yellow cannot stay vivid when dark.',
   },
   {
-    name: 'federal',
+    name: 'lake',
     role: 'Info',
     replaces: 'sky',
     anchor: INKS.lake,
     shape: 'mid',
-    note: 'Hue and chroma from RISO Lake (257.4°). Until 2026-11-06 the ramp took RISO Medium Blue (264.0°); Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart. The name `federal` predates Lake.',
+    note: 'Hue and chroma from RISO Lake (257.4°). Named `federal` until 2026-11-06, when it took Lake in place of RISO Medium Blue (264.0°): Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart.',
   },
   {
     name: 'orchid',

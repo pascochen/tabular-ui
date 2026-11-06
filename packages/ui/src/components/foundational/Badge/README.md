@@ -41,7 +41,7 @@ Until 2026-10-09 the prop was `role`. That is also the HTML attribute that tells
 
 Each is a `--color-bg-{role}` tint with the matching `--color-text-{role}` foreground. The tint is `{hue}-500` at 8–10%, never a 900/950 step — those drift in lightness by hue and would not sit at equal visual depth across the roles (§0 rule 3).
 
-**Running is `info`, not `interactive`.** Interactive is ivy, the same hue as success (§1), so a running badge on `interactive` reads as passed. `info` (federal) exists for in-progress work. `interactive` stays for a badge marking the user's selection or focus.
+**Running is `info`, not `interactive`.** Interactive is ivy, the same hue as success (§1), so a running badge on `interactive` reads as passed. `info` (lake) exists for in-progress work. `interactive` stays for a badge marking the user's selection or focus.
 
 **The hue must be true of the thing the badge marks** (§0 rule 1). A badge is not decoration and never signals importance.
 
