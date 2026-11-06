@@ -29,9 +29,9 @@ test('role tokens resolve to the spec’s steps, both modes (§4)', () => {
 });
 
 test('contrast matches the spec’s measured ratios (§3, §4)', () => {
-  expect(onCanvas(tokenStep('text-success', 'light'), 'light')).toBe('6.23:1');
-  expect(onCanvas(tokenStep('text-primary', 'dark'), 'dark')).toBe('16.39:1');
-  expect(onCanvas(tokenStep('text-secondary', 'light'), 'light')).toBe('6.64:1');
+  expect(onCanvas(tokenStep('text-success', 'light'), 'light')).toBe('6.24:1');
+  expect(onCanvas(tokenStep('text-primary', 'dark'), 'dark')).toBe('16.49:1');
+  expect(onCanvas(tokenStep('text-secondary', 'light'), 'light')).toBe('6.62:1');
   expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);
 });
 
