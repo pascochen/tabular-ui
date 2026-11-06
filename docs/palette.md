@@ -107,21 +107,21 @@ Warning. Replaces `amber`. Dark steps turn ochre and brown: a yellow cannot stay
 
 ## federal
 
-Info. Replaces `sky`. Hue of RISO Federal Blue (264°); chroma from RISO Medium Blue, same hue, because Federal Blue (0.089) reads greyed-out.
+Info. Replaces `sky`. Hue and chroma from RISO Lake (257.4°). Until 2026-11-06 the ramp took RISO Medium Blue (264.0°); Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart. The name `federal` predates Lake.
 
 | Step | oklch() | Hex | WCAG vs paper | WCAG vs ink | APCA Lc vs paper | APCA Lc vs ink |
 |---|---|---|---|---|---|---|
-| 50 ◆ | `oklch(97.5% 0.011 264.0)` | `#f3f7ff` | 1.00 | 16.45 | 0.0 | 101.3 |
-| 100 ◆ | `oklch(94.5% 0.026 264.0)` | `#e4edff` | 1.09 | 15.02 | 0.0 | 94.6 |
-| 200 ◆ | `oklch(89.0% 0.052 264.0)` | `#c9dbfe` | 1.29 | 12.66 | 14.0 | 83.1 |
-| 300 | `oklch(82.0% 0.087 264.0)` | `#a8c4fd` | 1.63 | 10.08 | 26.8 | 69.5 |
-| 400 | `oklch(73.0% 0.118 264.0)` | `#82a6f2` | 2.24 | 7.31 | 42.3 | 53.3 |
-| 500 | `oklch(62.5% 0.134 264.0)` | `#5e85d8` | 3.35 | 4.90 | 58.3 | 37.0 |
-| 600 | `oklch(53.0% 0.134 264.0)` | `#4368b9` | 4.97 | 3.30 | 71.2 | 24.1 |
-| 700 | `oklch(46.0% 0.120 264.0)` | `#34549b` | 6.75 | 2.43 | 79.8 | 15.8 |
-| 800 | `oklch(38.5% 0.100 264.0)` | `#274179` | 9.20 | 1.78 | 87.6 | 8.5 |
-| 900 | `oklch(30.5% 0.080 264.0)` | `#1a2d57` | 12.51 | 1.31 | 94.6 | 0.0 |
-| 950 | `oklch(21.0% 0.060 264.0)` | `#0a1634` | 16.55 | 1.01 | 99.3 | 0.0 |
+| 50 ◆ | `oklch(97.5% 0.011 257.4)` | `#f2f7fe` | 1.00 | 16.41 | 0.0 | 101.1 |
+| 100 ◆ | `oklch(94.5% 0.026 257.4)` | `#e2eeff` | 1.09 | 15.06 | 0.0 | 94.8 |
+| 200 ◆ | `oklch(89.0% 0.053 257.4)` | `#c5ddfe` | 1.29 | 12.74 | 13.6 | 83.5 |
+| 300 ◆ | `oklch(82.0% 0.089 257.4)` | `#a0c6fe` | 1.62 | 10.10 | 26.7 | 69.7 |
+| 400 | `oklch(73.0% 0.120 257.4)` | `#76a9f3` | 2.23 | 7.35 | 42.0 | 53.6 |
+| 500 | `oklch(62.5% 0.137 257.4)` | `#4f88d9` | 3.33 | 4.93 | 58.0 | 37.3 |
+| 600 | `oklch(53.0% 0.137 257.4)` | `#336bb9` | 4.94 | 3.32 | 71.0 | 24.4 |
+| 700 | `oklch(46.0% 0.123 257.4)` | `#26579b` | 6.67 | 2.46 | 79.4 | 16.2 |
+| 800 | `oklch(38.5% 0.103 257.4)` | `#1c4379` | 9.15 | 1.79 | 87.4 | 8.7 |
+| 900 | `oklch(30.5% 0.082 257.4)` | `#112e57` | 12.55 | 1.31 | 94.6 | 0.0 |
+| 950 | `oklch(21.0% 0.062 257.4)` | `#041834` | 16.43 | 1.00 | 99.1 | 0.0 |
 
 ◆ chroma limited by sRGB at this step (see Gamut report).
 
@@ -175,7 +175,7 @@ Source: riso-colors (npm) by Matt DesLauriers, compiled from stencil.wiki/colors
 | ivy | Green | `#00a95c` | 354 U | `oklch(64.5% 0.164 153.6)` | 153.6° | 0.156 |
 | vermilion | Crimson | `#e45d50` | 485 U | `oklch(64.9% 0.171 28.2)` | 28.2° | 0.171 |
 | ochre | Sunflower | `#ffb511` | 116 U | `oklch(82.2% 0.169 78.5)` | 78.5° | 0.152 |
-| federal | Medium Blue | `#3255a4` | 286 U | `oklch(46.7% 0.134 264.0)` | 264.0° | 0.134 |
+| federal | Lake | `#235ba8` | 293 U | `oklch(47.7% 0.137 257.4)` | 257.4° | 0.137 |
 | orchid | Orchid | `#aa60bf` | 2592 U | `oklch(61.0% 0.158 318.4)` | 318.4° | 0.158 |
 | teal | Light Teal | `#009da5` | 320 U | `oklch(63.3% 0.108 201.2)` | 201.2° | 0.104 |
 
@@ -184,13 +184,13 @@ Accent hues around the OKLCH wheel, with the gap to the next one:
 - vermilion 28.2° → ochre 78.5°: 50°
 - ochre 78.5° → ivy 153.6°: 75°
 - ivy 153.6° → teal 201.2°: 48°
-- teal 201.2° → federal 264.0°: 63°
-- federal 264.0° → orchid 318.4°: 54°
+- teal 201.2° → federal 257.4°: 56°
+- federal 257.4° → orchid 318.4°: 61°
 - orchid 318.4° → vermilion 28.2°: 70°
 
 ## Gamut report
 
-26 steps wanted more chroma than sRGB allows at their lightness and hue; each was set just inside sRGB (98% of the maximum).
+27 steps wanted more chroma than sRGB allows at their lightness and hue; each was set just inside sRGB (98% of the maximum).
 
 | Token | Wanted chroma | Used (sRGB limit) |
 |---|---|---|
@@ -211,9 +211,10 @@ Accent hues around the OKLCH wheel, with the gap to the next one:
 | ochre-800 | 0.110 | 0.079 |
 | ochre-900 | 0.093 | 0.062 |
 | ochre-950 | 0.076 | 0.043 |
-| federal-50 | 0.013 | 0.011 |
+| federal-50 | 0.014 | 0.011 |
 | federal-100 | 0.027 | 0.026 |
-| federal-200 | 0.054 | 0.052 |
+| federal-200 | 0.055 | 0.053 |
+| federal-300 | 0.089 | 0.089 |
 | teal-500 | 0.108 | 0.104 |
 | teal-600 | 0.108 | 0.088 |
 | teal-700 | 0.097 | 0.077 |
@@ -304,17 +305,17 @@ amber: 7 of 11 outside sRGB. ochre: 0 of 11.
 
 | Step | Old oklch() | Old hex | New oklch() | New hex | ΔL |
 |---|---|---|---|---|---|
-| 50 | `oklch(97.7% 0.013 236.62)` ✕ | `#f0f9ff` | `oklch(97.5% 0.011 264.0)` | `#f3f7ff` | -0.2 |
-| 100 | `oklch(95.1% 0.026 236.824)` | `#dff2fe` | `oklch(94.5% 0.026 264.0)` | `#e4edff` | -0.6 |
-| 200 | `oklch(90.1% 0.058 230.902)` | `#b8e6fe` | `oklch(89.0% 0.052 264.0)` | `#c9dbfe` | -1.1 |
-| 300 | `oklch(82.8% 0.111 230.318)` ✕ | `#74d4ff` | `oklch(82.0% 0.087 264.0)` | `#a8c4fd` | -0.8 |
-| 400 | `oklch(74.6% 0.16 232.661)` ✕ | `#00bcff` | `oklch(73.0% 0.118 264.0)` | `#82a6f2` | -1.6 |
-| 500 | `oklch(68.5% 0.169 237.323)` ✕ | `#00a6f4` | `oklch(62.5% 0.134 264.0)` | `#5e85d8` | -6.0 |
-| 600 | `oklch(58.8% 0.158 241.966)` ✕ | `#0084d1` | `oklch(53.0% 0.134 264.0)` | `#4368b9` | -5.8 |
-| 700 | `oklch(50% 0.134 242.749)` ✕ | `#0069a8` | `oklch(46.0% 0.120 264.0)` | `#34549b` | -4.0 |
-| 800 | `oklch(44.3% 0.11 240.79)` ✕ | `#00598a` | `oklch(38.5% 0.100 264.0)` | `#274179` | -5.8 |
-| 900 | `oklch(39.1% 0.09 240.876)` | `#024a70` | `oklch(30.5% 0.080 264.0)` | `#1a2d57` | -8.6 |
-| 950 | `oklch(29.3% 0.066 243.157)` | `#052f4a` | `oklch(21.0% 0.060 264.0)` | `#0a1634` | -8.3 |
+| 50 | `oklch(97.7% 0.013 236.62)` ✕ | `#f0f9ff` | `oklch(97.5% 0.011 257.4)` | `#f2f7fe` | -0.2 |
+| 100 | `oklch(95.1% 0.026 236.824)` | `#dff2fe` | `oklch(94.5% 0.026 257.4)` | `#e2eeff` | -0.6 |
+| 200 | `oklch(90.1% 0.058 230.902)` | `#b8e6fe` | `oklch(89.0% 0.053 257.4)` | `#c5ddfe` | -1.1 |
+| 300 | `oklch(82.8% 0.111 230.318)` ✕ | `#74d4ff` | `oklch(82.0% 0.089 257.4)` | `#a0c6fe` | -0.8 |
+| 400 | `oklch(74.6% 0.16 232.661)` ✕ | `#00bcff` | `oklch(73.0% 0.120 257.4)` | `#76a9f3` | -1.6 |
+| 500 | `oklch(68.5% 0.169 237.323)` ✕ | `#00a6f4` | `oklch(62.5% 0.137 257.4)` | `#4f88d9` | -6.0 |
+| 600 | `oklch(58.8% 0.158 241.966)` ✕ | `#0084d1` | `oklch(53.0% 0.137 257.4)` | `#336bb9` | -5.8 |
+| 700 | `oklch(50% 0.134 242.749)` ✕ | `#0069a8` | `oklch(46.0% 0.123 257.4)` | `#26579b` | -4.0 |
+| 800 | `oklch(44.3% 0.11 240.79)` ✕ | `#00598a` | `oklch(38.5% 0.103 257.4)` | `#1c4379` | -5.8 |
+| 900 | `oklch(39.1% 0.09 240.876)` | `#024a70` | `oklch(30.5% 0.082 257.4)` | `#112e57` | -8.6 |
+| 950 | `oklch(29.3% 0.066 243.157)` | `#052f4a` | `oklch(21.0% 0.062 257.4)` | `#041834` | -8.3 |
 
 sky: 7 of 11 outside sRGB. federal: 0 of 11.
 

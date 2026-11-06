@@ -57,17 +57,17 @@
   --color-ochre-900: oklch(30.5% 0.062 78.5);
   --color-ochre-950: oklch(21.0% 0.043 78.5);
 
-  --color-federal-50: oklch(97.5% 0.011 264.0);
-  --color-federal-100: oklch(94.5% 0.026 264.0);
-  --color-federal-200: oklch(89.0% 0.052 264.0);
-  --color-federal-300: oklch(82.0% 0.087 264.0);
-  --color-federal-400: oklch(73.0% 0.118 264.0);
-  --color-federal-500: oklch(62.5% 0.134 264.0);
-  --color-federal-600: oklch(53.0% 0.134 264.0);
-  --color-federal-700: oklch(46.0% 0.120 264.0);
-  --color-federal-800: oklch(38.5% 0.100 264.0);
-  --color-federal-900: oklch(30.5% 0.080 264.0);
-  --color-federal-950: oklch(21.0% 0.060 264.0);
+  --color-federal-50: oklch(97.5% 0.011 257.4);
+  --color-federal-100: oklch(94.5% 0.026 257.4);
+  --color-federal-200: oklch(89.0% 0.053 257.4);
+  --color-federal-300: oklch(82.0% 0.089 257.4);
+  --color-federal-400: oklch(73.0% 0.120 257.4);
+  --color-federal-500: oklch(62.5% 0.137 257.4);
+  --color-federal-600: oklch(53.0% 0.137 257.4);
+  --color-federal-700: oklch(46.0% 0.123 257.4);
+  --color-federal-800: oklch(38.5% 0.103 257.4);
+  --color-federal-900: oklch(30.5% 0.082 257.4);
+  --color-federal-950: oklch(21.0% 0.062 257.4);
 
   --color-orchid-50: oklch(97.5% 0.016 318.4);
   --color-orchid-100: oklch(94.5% 0.032 318.4);

@@ -59,7 +59,7 @@ const INKS = {
   green: { ink: 'Green', hex: '#00a95c', pantone: '354 U' },
   crimson: { ink: 'Crimson', hex: '#e45d50', pantone: '485 U' },
   sunflower: { ink: 'Sunflower', hex: '#ffb511', pantone: '116 U' },
-  mediumBlue: { ink: 'Medium Blue', hex: '#3255a4', pantone: '286 U' },
+  lake: { ink: 'Lake', hex: '#235ba8', pantone: '293 U' },
   orchid: { ink: 'Orchid', hex: '#aa60bf', pantone: '2592 U' },
   lightTeal: { ink: 'Light Teal', hex: '#009da5', pantone: '320 U' },
 };
@@ -115,9 +115,9 @@ const RAMPS = [
     name: 'federal',
     role: 'Info',
     replaces: 'sky',
-    anchor: INKS.mediumBlue,
+    anchor: INKS.lake,
     shape: 'mid',
-    note: 'Hue of RISO Federal Blue (264°); chroma from RISO Medium Blue, same hue, because Federal Blue (0.089) reads greyed-out.',
+    note: 'Hue and chroma from RISO Lake (257.4°). Until 2026-11-06 the ramp took RISO Medium Blue (264.0°); Lake sits 61° from orchid where Medium Blue sat 54°, so info and agent are further apart. The name `federal` predates Lake.',
   },
   {
     name: 'orchid',
@@ -149,6 +149,16 @@ function maxSrgbChroma(lPercent, h) {
   return lo;
 }
 
+// palette.css writes chroma to three decimals and hue to one. A clipped chroma just inside the
+// edge can round up across it (Lake's 50 step: 0.0116 → 0.012, 2026-11-06), so where the rounded
+// value would leave sRGB, round down instead. Every other step keeps its value.
+function shippable(lPercent, c, h) {
+  const rounded = Number(c.toFixed(3));
+  return displayable({ mode: 'oklch', l: lPercent / 100, c: rounded, h: Number(h.toFixed(1)) })
+    ? c
+    : Math.floor(c * 1000) / 1000;
+}
+
 // APCA-W3 0.0.98G. Returns |Lc|: 90+ preferred body text, 75 minimum body, 60 large text.
 function apcaLc(textHex, bgHex) {
   const Y = (hex) => {
@@ -173,8 +183,8 @@ const ramps = RAMPS.map((ramp) => {
     const h = ramp.neutral ? LEDGER_HUE[i] : ramp.anchor.h;
     const wanted = ramp.neutral ? LEDGER_CHROMA[i] : ramp.anchor.c * SHAPES[ramp.shape][i];
     const limit = maxSrgbChroma(l, h) * GAMUT_MARGIN;
-    const c = Math.min(wanted, limit);
-    if (wanted > limit) clipped.push({ token: `${ramp.name}-${step}`, wanted, allowed: limit });
+    const c = shippable(l, Math.min(wanted, limit), h);
+    if (wanted > limit) clipped.push({ token: `${ramp.name}-${step}`, wanted, allowed: c });
     return { step, l, c, h };
   });
   return { ...ramp, steps };
