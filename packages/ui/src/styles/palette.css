@@ -14,12 +14,12 @@
   --color-ledger-300: oklch(82.0% 0.007 85.0);
   --color-ledger-400: oklch(73.0% 0.004 85.0);
   --color-ledger-500: oklch(62.5% 0.003 85.0);
-  --color-ledger-600: oklch(53.0% 0.005 253.8);
-  --color-ledger-700: oklch(46.0% 0.010 253.8);
-  --color-ledger-800: oklch(38.5% 0.014 253.8);
-  --color-ledger-900: oklch(30.5% 0.017 253.8);
-  --color-ledger-925: oklch(25.75% 0.018 253.8);
-  --color-ledger-950: oklch(21.0% 0.018 253.8);
+  --color-ledger-600: oklch(53.0% 0.005 264.1);
+  --color-ledger-700: oklch(46.0% 0.010 264.1);
+  --color-ledger-800: oklch(38.5% 0.014 264.1);
+  --color-ledger-900: oklch(30.5% 0.017 264.1);
+  --color-ledger-925: oklch(25.75% 0.018 264.1);
+  --color-ledger-950: oklch(21.0% 0.018 264.1);
 
   --color-ivy-50: oklch(97.5% 0.013 153.6);
   --color-ivy-100: oklch(94.5% 0.025 153.6);
