@@ -300,16 +300,12 @@ try {
 // ---------------------------------------------------------------------------
 const f2 = (n) => n.toFixed(2);
 const f1 = (n) => n.toFixed(1);
-// The origin story: Riso Kagaku's beginnings as a print shop. Only what RISO's own history
-// page states goes in (read 2026-11-06, in Japanese). It doesn't say Nihonbashi is Japan's
-// financial district or who the shop printed for, so neither is here.
-const ORIGIN_SOURCE = {
-  title: 'RISO KAGAKU, 歩み (history, in Japanese)',
-  url: 'https://www.riso.co.jp/70th/history.html',
-  sentences: [
-    'In September 1946, Noboru Hayama started a mimeograph printing business, Riso-sha, at his home in Setagaya, Tokyo. In September 1948 he moved its office to Kabutocho in Nihonbashi, Tokyo, and renamed it Riso Insatsusha. That shop is the forerunner of RISO KAGAKU, whose main product today is the Risograph.',
-  ],
-};
+// The origin story, in the owner's words (2026-11-06), with no link out: a short story, not a
+// citation. RISO's own history (riso.co.jp/70th/history.html, read 2026-11-06) dates the 1946
+// shop and the 1948 office in Kabutocho, Nihonbashi. It doesn't say who the shop printed for,
+// so that clause of the owner's draft is left out.
+const ORIGIN =
+  "In 1946, Noboru Hayama opened a mimeograph print shop in Tokyo. In 1948 he moved it to Nihonbashi, Japan's financial district, home of the Bank of Japan and the Tokyo Stock Exchange. That shop became Riso Kagaku, maker of the Risograph.";
 
 const lines = [];
 lines.push(
@@ -325,9 +321,7 @@ lines.push(
   '',
   'The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.',
   '',
-  ...ORIGIN_SOURCE.sentences,
-  '',
-  `Source: [${ORIGIN_SOURCE.title}](${ORIGIN_SOURCE.url}).`,
+  ORIGIN,
   '',
   'The inks follow bookkeeping (decided 2026-11-06):',
   '',

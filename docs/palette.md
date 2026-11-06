@@ -10,9 +10,7 @@ APCA Lc is shown as an absolute value: about 90 is preferred for body text, 75 t
 
 The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.
 
-In September 1946, Noboru Hayama started a mimeograph printing business, Riso-sha, at his home in Setagaya, Tokyo. In September 1948 he moved its office to Kabutocho in Nihonbashi, Tokyo, and renamed it Riso Insatsusha. That shop is the forerunner of RISO KAGAKU, whose main product today is the Risograph.
-
-Source: [RISO KAGAKU, 歩み (history, in Japanese)](https://www.riso.co.jp/70th/history.html).
+In 1946, Noboru Hayama opened a mimeograph print shop in Tokyo. In 1948 he moved it to Nihonbashi, Japan's financial district, home of the Bank of Japan and the Tokyo Stock Exchange. That shop became Riso Kagaku, maker of the Risograph.
 
 The inks follow bookkeeping (decided 2026-11-06):
 
