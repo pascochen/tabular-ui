@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { RobotIcon } from '@phosphor-icons/react';
 
+import { Button } from '../Button';
 import { Badge } from './index';
 import { badgeVariants } from './variants';
 
@@ -26,6 +27,22 @@ export const Roles: Story = {
       <Badge tone="success">passed</Badge>
       <Badge tone="danger">failed</Badge>
       <Badge tone="warning">stale</Badge>
+      <Badge tone="agent">proposed</Badge>
+    </div>
+  ),
+};
+
+/**
+ * The primary action beside an info badge. Both are blues since the ledger ink took RISO
+ * Federal Blue's hue (264.1°) and info took Lake's (257.4°), 7° apart. They differ in
+ * lightness and chroma, not hue, so this is where to judge whether they still read as two
+ * things: ink on paper, and paper on ink.
+ */
+export const BesidePrimaryButton: Story = {
+  render: () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--gap-inline)' }}>
+      <Button>Run model</Button>
+      <Badge tone="info">running</Badge>
       <Badge tone="agent">proposed</Badge>
     </div>
   ),
