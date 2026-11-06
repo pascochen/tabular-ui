@@ -262,15 +262,20 @@ const ledger = ramps.find((r) => r.name === 'ledger');
   ledger.steps.splice(ledger.steps.indexOf(s950), 0, { step: 925, l, c: Math.min(wanted, limit), h });
 }
 
-const hexOf = (s) => formatHex({ mode: 'oklch', l: s.l / 100, c: s.c, h: s.h });
+// One decimal of lightness, two only where a step needs them (ledger-925, L 25.75).
+const oklchOf = (s) => `oklch(${s.l.toFixed(Number.isInteger(s.l * 10) ? 1 : 2)}% ${s.c.toFixed(3)} ${s.h.toFixed(1)})`;
+// The hex is what a browser paints from the rounded oklch() that palette.css ships. Until
+// 2026-11-06 it came from the unrounded value, and 21 colours listed a hex one 8-bit step off
+// the painted one (ivy-700 #066a38, painted #056a38), so a ratio read from palette.json could
+// differ from the shipped colour's in the second decimal.
+const hexOf = (s) => formatHex(oklchOf(s));
 const PAPER_50 = hexOf(ledger.steps.find((s) => s.step === 50));
 const INK_950 = hexOf(ledger.steps.find((s) => s.step === 950));
 
 for (const ramp of ramps) {
   for (const s of ramp.steps) {
+    s.oklch = oklchOf(s);
     s.hex = hexOf(s);
-    // One decimal of lightness, two only where a step needs them (ledger-925, L 25.75).
-    s.oklch = `oklch(${s.l.toFixed(Number.isInteger(s.l * 10) ? 1 : 2)}% ${s.c.toFixed(3)} ${s.h.toFixed(1)})`;
     // palette.css ships the rounded oklch() string, not the hex, so that is what must be in sRGB.
     s.inSrgb = displayable(s.oklch);
     s.wcagPaper = wcagContrast(s.hex, PAPER_50);
