@@ -45,12 +45,12 @@ Five hues, six roles. The interactive role is split (decided 2026-10-16): its so
 
 | Role | Ramp | RISO anchor | Applies to |
 |---|---|---|---|
-| **Interactive** | `ledger` (fill, ring) · `ivy` (text, tint) | Midnight, 296 U · Green, 354 U | Primary action, focus ring, checked controls, active tab · links, selected row in a single-selection list |
+| **Interactive** | `ledger` (fill, ring) · `ivy` (text, tint) | Federal Blue, 288 U · Green, 354 U | Primary action, focus ring, checked controls, active tab · links, selected row in a single-selection list |
 | **Danger** | `vermilion` | Crimson, 485 U | Failed run, validation error, destructive action, negative variance, reconciliation mismatch |
 | **Warning** | `ochre` | Sunflower, 116 U | Stale data, degraded run, needs review, unverified figure, approaching threshold |
 | **Success** | `ivy` | Green, 354 U | Passed test, verified figure, deployed, positive variance, numbers match |
 | **Agent** | `orchid` | Orchid, 2592 U | Agent-authored content, generated dbt code, agent questions, agent activity, pending human review |
-| **Info** | `federal` | Federal Blue's hue, Medium Blue's chroma | "Running" state, work in progress, informational notices |
+| **Info** | `federal` | Lake, 293 U | "Running" state, work in progress, informational notices |
 
 Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only (§6).
 
@@ -62,7 +62,7 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 ### Why these ramps
 
-**The accent is ink — decided 2026-10-16, after review in Storybook.** The primary action, the focus ring, checked controls and the active-tab indicator are `ledger`: ink on paper in light mode, paper on ink in dark (16.39:1 either way), as a riso print puts its strongest ink on the one thing to press. The focus ring is a step softer, `ledger-800` / `ledger-200`, since 2026-10-22 (§4). They were `sage` until the same day; the owner preferred the ink accent of the `experiment/riso` art direction. A primary button and a success badge no longer share a hue.
+**The accent is ink — decided 2026-10-16, after review in Storybook.** The primary action, the focus ring, checked controls and the active-tab indicator are `ledger`: ink on paper in light mode, paper on ink in dark (16.49:1 either way), as a riso print puts its strongest ink on the one thing to press. The focus ring is a step softer, `ledger-800` / `ledger-200`, since 2026-10-22 (§4). They were `sage` until the same day; the owner preferred the ink accent of the `experiment/riso` art direction. A primary button and a success badge no longer share a hue.
 
 **Links and selection stay `ivy`, shared with success.** `--color-text-interactive`, `--color-bg-interactive` and `--color-border-interactive` keep the green. A ledger link would be the body-text colour, and a ledger selection tint measured 1.04:1 against the hover tint, so a selected row would look hovered. Interactive and success stay separate tokens; today only the text, tint and border values coincide. Where success and selection meet, **shape carries the difference**: a selected row is a full-width tint, a success state is an 18px badge with an icon.
 
@@ -74,31 +74,33 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **`ochre` for warning.** Sunflower ink is vivid only when light, so the ramp's chroma peaks early and its dark steps turn ochre and brown. That is what makes it usable as light-mode text (`ochre-700`, 6.74:1 on paper).
 
-**`federal` for info.** RISO Federal Blue's hue (264°) with Medium Blue's chroma, because Federal Blue's own chroma reads greyed-out on screen.
+**`federal` for info.** RISO Lake's hue (257.4°) and chroma — decided 2026-11-06 (owner). Until then the ramp took Federal Blue's hue (264°) with Medium Blue's chroma, because Federal Blue's own chroma reads greyed-out on screen. Lake moves info 7° away from agent, and Federal Blue became the ledger's ink (§3). The name `federal` predates Lake: whether to rename the ramp is open.
 
-**`orchid` for agent.** Moved off violet so agent does not read as a second blue next to info: 54° apart on the hue wheel.
+**`orchid` for agent.** Moved off violet so agent does not read as a second blue next to info: 61° apart on the hue wheel since 2026-11-06 (54° before Lake).
 
 **`teal` for charts only.** Hue 201°, filling the gap between `ivy` and `federal`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
 
 ### Colour-vision limits of this palette
 
-Measured as OKLab distance ×100 after Machado (2009) simulation at full severity, with culori 4.0.1 (`filterDeficiency*`), old and new pairs by the same method. Below ~10 is hard to tell apart. *(Appendix A's table used a different tool; its figures are not comparable with these.)*
+Measured as OKLab distance ×100 after Machado (2009) simulation at full severity, with culori (`filterDeficiency*`), old and new pairs by the same method. The Riso column was re-measured on 2026-11-06 with culori 4.0.2, after the cream paper, Federal Blue ink and Lake changes; pairs those changes did not touch moved by 0.2 at most. Below ~10 is hard to tell apart. *(Appendix A's table used a different tool; its figures are not comparable with these.)*
 
-| Pair | Old: typical / protan / deutan / tritan | Riso: typical / protan / deutan / tritan |
+| Pair | Old: typical / protan / deutan / tritan | Riso (2026-11-06): typical / protan / deutan / tritan |
 |---|---|---|
-| danger vs success, dark text | 34.0 / 12.3 / 12.0 / 42.1 | 25.7 / 11.7 / **2.4** / 30.6 |
-| danger vs success, light text | 30.1 / 28.8 / 10.1 / 38.0 | 24.0 / 14.3 / **3.5** / 27.6 |
-| danger vs success, dark fills | 31.1 / 36.0 / 14.6 / 38.4 | 27.0 / 15.3 / **3.7** / 31.0 |
-| danger vs warning, light text | 9.9 / 25.1 / 16.1 / 10.8 | 11.9 / 12.1 / **7.3** / **9.8** |
-| danger vs warning, dark text | 16.7 / 20.7 / 17.5 / **6.7** | 12.7 / 11.1 / **8.9** / **4.8** |
-| warning vs success, light text | 20.7 / **8.2** / 13.7 / 28.5 | 12.8 / **4.8** / **8.6** / 18.3 |
-| warning vs success, dark text | 26.9 / 13.6 / 29.5 / 42.1 | 17.6 / **9.4** / 11.1 / 26.3 |
-| info vs success, light text | 12.4 / 12.1 / 11.7 / **2.5** | 19.3 / 17.1 / 15.4 / **4.7** |
-| info vs success, dark text | 20.6 / 19.8 / 19.0 / **3.9** | 21.1 / 18.5 / 16.5 / **5.3** |
-| info vs agent, light text | 22.5 / 18.9 / 14.1 / 23.0 | 12.1 / **5.6** / **3.0** / 14.6 |
-| info vs agent, dark text | 16.7 / **2.7** / 11.8 / 20.7 | 11.9 / **5.0** / **3.2** / 14.7 |
+| danger vs success, dark text | 34.0 / 12.3 / 12.0 / 42.1 | 25.8 / 11.8 / **2.4** / 30.7 |
+| danger vs success, light text | 30.1 / 28.8 / 10.1 / 38.0 | 24.0 / 14.4 / **3.5** / 27.7 |
+| danger vs success, dark fills | 31.1 / 36.0 / 14.6 / 38.4 | 27.0 / 15.5 / **3.7** / 31.0 |
+| danger vs warning, light text | 9.9 / 25.1 / 16.1 / 10.8 | 11.8 / 12.0 / **7.2** / **9.9** |
+| danger vs warning, dark text | 16.7 / 20.7 / 17.5 / **6.7** | 12.7 / 11.0 / **8.8** / **4.8** |
+| warning vs success, light text | 20.7 / **8.2** / 13.7 / 28.5 | 12.9 / **4.9** / **8.4** / 18.4 |
+| warning vs success, dark text | 26.9 / 13.6 / 29.5 / 42.1 | 17.7 / **9.5** / 11.1 / 26.5 |
+| info vs success, light text | 12.4 / 12.1 / 11.7 / **2.5** | 18.7 / 17.1 / 15.8 / **3.9** |
+| info vs success, dark text | 20.6 / 19.8 / 19.0 / **3.9** | 20.4 / 18.3 / 16.8 / **4.4** |
+| info vs agent, light text | 22.5 / 18.9 / 14.1 / 23.0 | 13.6 / **5.8** / **3.3** / 15.7 |
+| info vs agent, dark text | 16.7 / **2.7** / 11.8 / 20.7 | 13.2 / **5.2** / **3.3** / 16.1 |
 
 **This is the palette's main cost (measured 2026-10-16).** For deuteranopes, danger and success become nearly the same colour in every pairing, 2.4–3.7 where Tailwind's measured 10–15, and info and agent fall to about 3. Gain and loss, destructive and primary, converge. Info versus success improves, and so does tritan separation for the blues. **Every hue-coded state carries an icon or label as well**, which is what §10's grayscale check enforces; with this palette it is the only thing a deuteranope reads for gain versus loss. Separating the pair again means changing the generator (lightness or hue), not a token.
+
+**What Lake changed (measured 2026-11-06).** Info moved away from agent (deutan 3.0 to 3.3 light, typical 12.1 to 13.6) and toward success: 0.6–0.7 closer for typical vision, and for tritanopes from 4.8 to 3.9 in light text and from 5.4 to 4.4 in dark (both re-measured on the palette before the change). Info and success were already under 10 for tritanopes, so the icon-or-label rule above is what separates them either way.
 
 ### Why Agent earns a hue
 
@@ -142,11 +144,11 @@ So one step serves every role: **400 in dark mode, 700 in light mode** (§0 rule
 
 | Role | Dark text | On `ledger-950` | Light text | On `ledger-50` |
 |---|---|---|---|---|
-| interactive (text), success | `ivy-400` | 7.84:1 | `ivy-700` | 6.23:1 |
-| danger | `vermilion-400` | 6.95:1 | `vermilion-700` | 7.15:1 |
-| warning | `ochre-400` | 7.24:1 | `ochre-700` | 6.74:1 |
-| agent | `orchid-400` | 6.96:1 | `orchid-700` | 7.13:1 |
-| info | `federal-400` | 7.31:1 | `federal-700` | 6.75:1 |
+| interactive (text), success | `ivy-400` | 7.89:1 | `ivy-700` | 6.24:1 |
+| danger | `vermilion-400` | 6.99:1 | `vermilion-700` | 7.15:1 |
+| warning | `ochre-400` | 7.28:1 | `ochre-700` | 6.74:1 |
+| agent | `orchid-400` | 7.00:1 | `orchid-700` | 7.14:1 |
+| info | `federal-400` | 7.38:1 | `federal-700` | 6.68:1 |
 
 The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:1 in dark mode before. What spread remains is chroma, not lightness: ivy and federal read slightly stronger than vermilion and orchid at the same L. **Dark warning is no longer an exception**: `amber-500` sat about 6 L above its band; `ochre-400` sits on the shared curve with the other four.
 
@@ -159,13 +161,15 @@ The five sit within about 0.9:1 of each other in each mode, against 6.77–9.17:
 | 600 | at least 4.5:1 | | Chart series in light mode; dark-mode fills |
 | 700 | at least 6:1 | | Light-mode text and fills |
 
-Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would sit nearer it, but measures 4.58–5.33:1 on the canvas and 3.52–4.06:1 on a role's tint over a hovered row; 400 holds 4.66:1 or more on every ground §4 lists.
+Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would sit nearer it, but measures 4.60–5.35:1 on the canvas and 3.54–4.05:1 on a role's tint over a hovered row; 400 holds 4.67:1 or more on every ground §4 lists.
 
 ---
 
 ## 3. Neutral foundation
 
-**The neutral ramp is `ledger`** (adopted 2026-10-16, replacing Tailwind `olive`). It runs warm at the light end (paper, hue 85°) and cool at the dark end (RISO Midnight ink, hue 254°), with chroma near zero in the middle so the hue change never shows as a muddy grey-green. It is low-chroma enough to stay neutral in role: §0 rule 1 treats every ledger token as "no hue". Values are in `docs/palette.md`; every ratio below is measured from them.
+**The neutral ramp is `ledger`** (adopted 2026-10-16, replacing Tailwind `olive`). It runs warm at the light end (cream paper, hue 85°, chroma 0.006) and cool at the dark end (RISO Federal Blue ink, hue 264°), with chroma near zero in the middle so the hue change never shows as a muddy grey-green. It is low-chroma enough to stay neutral in role: §0 rule 1 treats every ledger token as "no hue". Values are in `docs/palette.md`; every ratio below is measured from them, last on 2026-11-06.
+
+**Cream paper and Federal Blue ink — decided 2026-11-06 (owner).** The paper halved its chroma, 0.012 to 0.006 at step 50 and steps 100–400 in proportion, because the warmer paper pulled every role tint off its hue (orchid's 10% tint by 42° against the same tint on white, now 25°). The ink end took RISO Federal Blue's hue (264.1°) in place of Midnight's (253.8°), 0.9° from the paper's complement; its chroma stays capped at 0.018. `scripts/check-harmony.mjs` measures both.
 
 ### Dark mode (canonical)
 
@@ -174,16 +178,16 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-canvas` | `ledger-950` | — | |
 | `--color-surface` | `ledger-950` | 1.00:1, the canvas | |
 | `--color-surface-raised` | `ledger-925` | 1.13:1 | — |
-| `--color-border` | `ledger-800` | 1.80:1 | 1.60:1 |
-| `--color-border-strong` | `ledger-700` | 2.47:1 | 2.19:1 |
-| `--color-text-primary` | `ledger-50` | **16.39:1** | 14.53:1 |
-| `--color-text-body` | `ledger-100` | **15.01:1** | 13.31:1 |
-| `--color-text-secondary` | `ledger-300` | **10.15:1** | 8.99:1 |
-| `--color-text-tertiary` | `ledger-400` | **7.37:1** | 6.53:1 |
+| `--color-border` | `ledger-800` | 1.82:1 | 1.61:1 |
+| `--color-border-strong` | `ledger-700` | 2.49:1 | 2.21:1 |
+| `--color-text-primary` | `ledger-50` | **16.49:1** | 14.60:1 |
+| `--color-text-body` | `ledger-100` | **15.08:1** | 13.36:1 |
+| `--color-text-secondary` | `ledger-300` | **10.19:1** | 9.03:1 |
+| `--color-text-tertiary` | `ledger-400` | **7.41:1** | 6.56:1 |
 
 **Canvas and surface share `ledger-950`.** The shared curve has no step between 950 (L 21) and 900 (L 30.5) for a surface, so panels, the sidebar and cards sit on the page itself and separate by `--color-border`, like the ruled pages of a ledger.
 
-**Raised layers sit on `ledger-925`, the ramp's one extra step — decided 2026-10-16.** The draft put them on `ledger-900`. There, role text on its own tint over a highlighted menu row measured 3.97–4.45:1 (agent lowest), under AA, and `Select` lists put a `StatusBadge` in exactly that place. A raised surface flat on 950 would have passed but left menus no lift over the content they cover, and shadows barely register on a dark canvas. The generator makes 925 the midpoint of 900 and 950 in lightness and chroma; on it the same case measures 4.66:1 or more.
+**Raised layers sit on `ledger-925`, the ramp's one extra step — decided 2026-10-16.** The draft put them on `ledger-900`. There, role text on its own tint over a highlighted menu row measured 3.97–4.45:1 (agent lowest), under AA, and `Select` lists put a `StatusBadge` in exactly that place. A raised surface flat on 950 would have passed but left menus no lift over the content they cover, and shadows barely register on a dark canvas. The generator makes 925 the midpoint of 900 and 950 in lightness and chroma; on it the same case measures 4.67:1 or more.
 
 ### Light mode
 
@@ -194,12 +198,12 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-surface-raised` | `ledger-50` | the canvas |
 | `--color-border` | `ledger-200` | 1.29:1 |
 | `--color-border-strong` | `ledger-300` | 1.62:1 |
-| `--color-text-primary` | `ledger-950` | **16.39:1** |
-| `--color-text-body` | `ledger-900` | **12.38:1** |
-| `--color-text-secondary` | `ledger-700` | **6.64:1** |
+| `--color-text-primary` | `ledger-950` | **16.49:1** |
+| `--color-text-body` | `ledger-900` | **12.44:1** |
+| `--color-text-secondary` | `ledger-700` | **6.62:1** |
 | `--color-text-tertiary` | `ledger-600` | **4.89:1** |
 
-**Paper on paper — decided 2026-10-16.** Canvas, surface and raised are all `ledger-50`. A card or a popup separates from the page by its border, not by a white fill or a shadow. *(Overlays add the sheet, §4.)* No `#fff` remains in the theme: text on a fill is paper too (§4). So there is one column of ratios, measured on paper, and measuring on white instead overstates them by about 8% (`ivy-700` is 6.72:1 on white, 6.23:1 on paper).
+**Paper on paper — decided 2026-10-16.** Canvas, surface and raised are all `ledger-50`. A card or a popup separates from the page by its border, not by a white fill or a shadow. *(Overlays add the sheet, §4.)* No `#fff` remains in the theme: text on a fill is paper too (§4). So there is one column of ratios, measured on paper, and measuring on white instead overstates them by about 8% (`ivy-700` is 6.72:1 on white, 6.24:1 on paper).
 
 **Secondary and tertiary moved a step darker than olive's.** On the shared curve, step 500 is 3.3:1 on paper, too low for text, so tertiary is `ledger-600` and secondary `ledger-700`. Primary and body take the ink end of the ramp, `ledger-950` and `ledger-900`.
 
@@ -207,7 +211,7 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 
 `--color-text-tertiary` is restricted, absolutely, to **placeholder text, disabled labels, and non-text marks** (icons, which need 3:1 under WCAG 1.4.11; `aria-hidden` line numbers). Never text the user reads. Metadata is read: timestamps, durations, captions, help text, shortcut hints, group labels and empty-state messages are all `--color-text-secondary` (decided 2026-10-08; see §10). Tertiary now clears 4.5:1 on the canvas in both modes, but in light mode it falls to 3.97:1 on a selected, hovered row, which is why the restriction stands.
 
-`ledger-400` is 2.22:1 on paper. In light mode it is decorative only (dividers, icon outlines, disabled text) and never text.
+`ledger-400` is 2.23:1 on paper. In light mode it is decorative only (dividers, icon outlines, disabled text) and never text.
 
 ---
 
@@ -255,14 +259,14 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | on raised | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `ivy-400` | 7.84:1 | 6.95:1 | `ledger-50` | `ledger-950` | 16.39:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
-| danger | `vermilion-400` | 6.95:1 | 6.16:1 | `vermilion-600` | `ledger-50` | 5.36:1 | `vermilion-500 / 10%` | `vermilion-500 / 25%` |
-| warning | `ochre-400` | 7.24:1 | 6.42:1 | `ochre-400` | `ledger-950` | 7.24:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
-| success | `ivy-400` | 7.84:1 | 6.95:1 | `ivy-600` | `ledger-50` | 4.59:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
-| agent | `orchid-400` | 6.96:1 | 6.17:1 | `orchid-600` | `ledger-50` | 5.30:1 | `orchid-500 / 10%` | `orchid-500 / 25%` |
-| info | `federal-400` | 7.31:1 | 6.48:1 | `federal-600` | `ledger-50` | 4.97:1 | `federal-500 / 10%` | `federal-500 / 25%` |
+| interactive | `ivy-400` | 7.89:1 | 6.98:1 | `ledger-50` | `ledger-950` | 16.49:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
+| danger | `vermilion-400` | 6.99:1 | 6.19:1 | `vermilion-600` | `ledger-50` | 5.36:1 | `vermilion-500 / 10%` | `vermilion-500 / 25%` |
+| warning | `ochre-400` | 7.28:1 | 6.45:1 | `ochre-400` | `ledger-950` | 7.28:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
+| success | `ivy-400` | 7.89:1 | 6.98:1 | `ivy-600` | `ledger-50` | 4.60:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
+| agent | `orchid-400` | 7.00:1 | 6.20:1 | `orchid-600` | `ledger-50` | 5.31:1 | `orchid-500 / 10%` | `orchid-500 / 25%` |
+| info | `federal-400` | 7.38:1 | 6.54:1 | `federal-600` | `ledger-50` | 4.94:1 | `federal-500 / 10%` | `federal-500 / 25%` |
 
-**Solid-fill rule, dark.** The interactive fill is paper, `ledger-50`, with ink text (16.39:1): the accent is ink in light mode and its inverse here (§1). The role fills are step **600**, not 700. A 700 fill is 2.3–2.6:1 against the canvas, under the 3:1 a solid control needs to read as a shape; a 600 fill is 3.06–3.57:1 (2.71–3.16:1 on a raised surface), with paper text on it at 4.59–5.36:1. Ivy (success), the tightest, clears AA by 0.09. Warning is the only fill that takes ink: `ochre-400` under `ledger-950` measures 7.24:1, and paper on it fails. Text on every other fill is paper, `ledger-50`, never `#fff`.
+**Solid-fill rule, dark.** The interactive fill is paper, `ledger-50`, with ink text (16.49:1): the accent is ink in light mode and its inverse here (§1). The role fills are step **600**, not 700. A 700 fill is 2.3–2.6:1 against the canvas, under the 3:1 a solid control needs to read as a shape; a 600 fill is 3.07–3.59:1 (2.72–3.18:1 on a raised surface), with paper text on it at 4.60–5.36:1. Ivy (success), the tightest, clears AA by 0.10. Warning is the only fill that takes ink: `ochre-400` under `ledger-950` measures 7.28:1, and paper on it fails. Text on every other fill is paper, `ledger-50`, never `#fff`.
 
 ### Light mode
 
@@ -270,18 +274,18 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | worst ground | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `ivy-700` | 6.23:1 | 4.71:1 | `ledger-950` | `ledger-50` | 16.39:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
-| danger | `vermilion-700` | 7.15:1 | 5.35:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
-| warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.89:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
-| success | `ivy-700` | 6.23:1 | 4.71:1 | `ivy-700` | `ledger-50` | 6.23:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
-| agent | `orchid-700` | 7.13:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.13:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
-| info | `federal-700` | 6.75:1 | 5.12:1 | `federal-700` | `ledger-50` | 6.75:1 | `federal-500 / 8%` | `federal-500 / 20%` |
+| interactive | `ivy-700` | 6.24:1 | 4.72:1 | `ledger-950` | `ledger-50` | 16.49:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
+| danger | `vermilion-700` | 7.15:1 | 5.34:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
+| warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.91:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
+| success | `ivy-700` | 6.24:1 | 4.72:1 | `ivy-700` | `ledger-50` | 6.24:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
+| agent | `orchid-700` | 7.14:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.14:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
+| info | `federal-700` | 6.68:1 | 5.06:1 | `federal-700` | `ledger-50` | 6.68:1 | `federal-500 / 8%` | `federal-500 / 20%` |
 
-"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`ivy-700`) are the tightest roles, at 6.23:1 on the canvas and 4.71:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.39:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.23:1, and the 600 steps (4.59–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
+"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`ivy-700`) are the tightest roles, at 6.24:1 on the canvas and 4.72:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
 
-**Light warning fill is `ochre-500`, not `-400` — decided 2026-10-16.** `ochre-400` takes ink at 7.24:1, but against paper the fill itself is 2.26:1, under the 3:1 a fill needs (`packages/ui/scripts/check-contrast.mjs` fails it). `ochre-500` is 3.35:1 against paper, with ink on it at 4.89:1. The cost is a browner, less sunny fill. Paper on `ochre-500` is 3.35:1 and fails, so warning takes ink in both modes. *(Tailwind's `amber-500` fill measured 2.06:1 against the olive canvas; nothing checked it.)*
+**Light warning fill is `ochre-500`, not `-400` — decided 2026-10-16.** `ochre-400` takes ink at 7.28:1, but against paper the fill itself is 2.26:1, under the 3:1 a fill needs (`packages/ui/scripts/check-contrast.mjs` fails it). `ochre-500` is 3.36:1 against paper, with ink on it at 4.91:1. The cost is a browner, less sunny fill. Paper on `ochre-500` is 3.36:1 and fails, so warning takes ink in both modes. *(Tailwind's `amber-500` fill measured 2.06:1 against the olive canvas; nothing checked it.)*
 
-**Canvas is the best case.** Role text also sits on its own tint (every `StatusBadge`), on hovered rows, on a selected row, on `--color-surface`, on `--color-surface-raised`, and on a highlighted popup row. `apps/storybook/tests/contrast.spec.ts` measures all six roles on each of those grounds in a browser, in both modes, and `packages/ui/scripts/check-contrast.mjs` measures every text and on-colour token on all of them. The lowest pair anywhere is dark agent text on its tint over a highlighted popup row, 4.66:1. Pairs measured under 4.5:1 and not yet decided would be listed in the test as known shortfalls; there are none. See §10.
+**Canvas is the best case.** Role text also sits on its own tint (every `StatusBadge`), on hovered rows, on a selected row, on `--color-surface`, on `--color-surface-raised`, and on a highlighted popup row. `apps/storybook/tests/contrast.spec.ts` measures all six roles on each of those grounds in a browser, in both modes, and `packages/ui/scripts/check-contrast.mjs` measures every text and on-colour token on all of them. The lowest pair anywhere is dark agent text on its tint over a highlighted popup row, 4.67:1. Pairs measured under 4.5:1 and not yet decided would be listed in the test as known shortfalls; there are none. See §10.
 
 **Superseded decisions.** The light-mode notes that stood here (warning `amber-800`, danger `red-700`, emerald text at 800, decided 2026-10-08 and 2026-10-09) are in Appendix A, verbatim.
 
@@ -298,11 +302,11 @@ Hover, press and disabled are **not** role-specific. A per-role hover token (`--
 --color-text-disabled         ledger-600           ledger-400
 ```
 
-Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`, light hover 1.12:1 against paper. Both sit just above the canvas, which is what a hover should do: register without reading as a new elevation layer. *(Under olive both were 1.13:1. The overlay colours are paper and ink now, not `#fff` and `olive-950`.)*
+Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`, light hover 1.13:1 against paper. Both sit just above the canvas, which is what a hover should do: register without reading as a new elevation layer. *(Under olive both were 1.13:1. The overlay colours are paper and ink now, not `#fff` and `olive-950`.)*
 
-6% and 10% rather than 4% and 8%: at 4% the dark-mode hover is 1.07:1 against canvas and effectively invisible on a 28px row seen in peripheral vision. **Verified 2026-08-02 on 28px rows over canvas, over `--color-surface`, and over a solid `--color-fill-interactive` button: the 6% overlay is visible in all three.** Locked — this was flagged as the value most likely to need adjustment in situ, and it did not. Re-checking it on the Riso palette is outstanding (§10).
+6% and 10% rather than 4% and 8%: at 4% the dark-mode hover is 1.10:1 against canvas and effectively invisible on a 28px row seen in peripheral vision. **Verified 2026-08-02 on 28px rows over canvas, over `--color-surface`, and over a solid `--color-fill-interactive` button: the 6% overlay is visible in all three.** Locked — this was flagged as the value most likely to need adjustment in situ, and it did not. Re-checking it on the Riso palette is outstanding (§10).
 
-**Disabled text is dim on purpose** — `ledger-600` is 3.35:1 on dark, `ledger-400` is 2.22:1 on light. WCAG 1.4.3 exempts inactive controls, and a disabled control that reads at full strength is a worse defect than a low-contrast one. Dark disabled text now clears 3:1, but it still reads inactive beside tertiary at 7.37:1 and secondary at 10.15:1. Never use `--color-text-disabled` for anything the user is expected to read.
+**Disabled text is dim on purpose** — `ledger-600` is 3.37:1 on dark, `ledger-400` is 2.23:1 on light. WCAG 1.4.3 exempts inactive controls, and a disabled control that reads at full strength is a worse defect than a low-contrast one. Dark disabled text now clears 3:1, but it still reads inactive beside tertiary at 7.41:1 and secondary at 10.19:1. Never use `--color-text-disabled` for anything the user is expected to read.
 
 **Three states deliberately have no new token:**
 
@@ -314,9 +318,9 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 
 **Hover on a solid fill composites, it does not swap.** A filled control does not move to another step on hover; it takes the overlay on top. One mechanism for every role, and it stays correct if a hue is ever changed.
 
-**The inverse overlay — added 2026-10-16, with the ink accent.** The overlay is ink in light mode and paper in dark, which is exactly the primary fill's colour in each mode, so on a primary button it changed nothing (ΔE 0.00; a sage fill had moved 1.78 light, 2.82 dark). `--color-bg-hover-inverse` and `--color-bg-active-inverse` are the other mode's overlay, at the same 6% and 10%: paper over the ink button in light mode, ink over the paper button in dark. The button moves ΔE 4.19 in light and 2.80 in dark, the same as a hovered row in the other mode, and its label stays at 12.5:1 or more when pressed. Only the primary ground uses them: `controlGrounds.default` points `--tui-bg-hover` and `--tui-bg-active` at the inverse values on the element, so the shared overlay utility picks them up (§9, contextual overrides target the `--tui-*` layer). It is not a per-role hover token: one pair, for a fill at the overlay's own end of the ramp.
+**The inverse overlay — added 2026-10-16, with the ink accent.** The overlay is ink in light mode and paper in dark, which is exactly the primary fill's colour in each mode, so on a primary button it changed nothing (ΔE 0.00; a sage fill had moved 1.78 light, 2.82 dark). `--color-bg-hover-inverse` and `--color-bg-active-inverse` are the other mode's overlay, at the same 6% and 10%: paper over the ink button in light mode, ink over the paper button in dark. The button moves ΔE 4.17 in light and 2.81 in dark (CIEDE2000), the same as a hovered row in the other mode, and its label stays at 12.6:1 or more when pressed. Only the primary ground uses them: `controlGrounds.default` points `--tui-bg-hover` and `--tui-bg-active` at the inverse values on the element, so the shared overlay utility picks them up (§9, contextual overrides target the `--tui-*` layer). It is not a per-role hover token: one pair, for a fill at the overlay's own end of the ramp.
 
-**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (ivy), 4.42:1 (federal), 4.76:1 (orchid) and 4.86:1 (vermilion), so ivy and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.47:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
+**Accepted: a dark role fill's text dips under AA on hover — decided 2026-10-16.** The overlay sits above the label as well as the fill, and in dark mode it lightens the fill under paper text. Paper on a hovered 600 fill measures 4.17:1 (ivy), 4.44:1 (federal), 4.75:1 (orchid) and 4.87:1 (vermilion), so ivy and federal fall under 4.5:1. No control hovers on those fills today (the primary button is ink, above); if one ever does, the resting pair clears and a hover is a passing state, and the alternative, a 700 fill, fails 3:1 against the canvas. In light mode the ink overlay darkens fills, which raises paper text; ink on a hovered `ochre-500` fill dips to 4.49:1, but nothing hovers on the warning fill today (only `ProgressBar` uses it). `packages/ui/scripts/check-contrast.mjs` reports these figures and does not gate them.
 
 ### Text selection — added 2026-11-02 (owner, after a side-by-side)
 
@@ -334,9 +338,9 @@ Measured, composited over the canvas: dark hover is 1.16:1 against `ledger-950`,
 
 Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selection is already `ivy` (§1). Until now the browser painted its own blue, off-palette.
 
-**Not `--color-bg-interactive`.** That tint is for a selected row, at 8% and 10%. Selecting text inside a row has to show on top of it, so this token is a separate one, not a duplicate of it: against a selected row it measures 1.27:1 in light and 1.37:1 in dark, and against the canvas 1.39:1 and 1.56:1.
+**Not `--color-bg-interactive`.** That tint is for a selected row, at 8% and 10%. Selecting text inside a row has to show on top of it, so this token is a separate one, not a duplicate of it: against a selected row it measures 1.27:1 in light and 1.37:1 in dark, and against the canvas 1.39:1 and 1.55:1.
 
-**The text steps to `--color-text-primary`.** Text that kept its own colour on this tint would fall to 3.63:1 in light and 3.22:1 in dark for role text, under AA. Primary measures 9.39:1 or more in light and 7.35:1 or more in dark, on every ground in this section, every role's tint included. So a status colour steps back while its text is selected and returns when the selection clears. The word beside it still says what it is (§11.1).
+**The text steps to `--color-text-primary`.** Text that kept its own colour on this tint would fall to 3.63:1 in light and 3.26:1 in dark for role text, under AA. Primary measures 9.44:1 or more in light and 7.44:1 or more in dark, on every ground in this section, every role's tint included. So a status colour steps back while its text is selected and returns when the selection clears. The word beside it still says what it is (§11.1).
 
 **Text on a solid fill isn't selectable.** Primary on a fill is the wrong pair: in dark mode it's paper on the paper button. Every filled control is already `select-none` through `controlBase` and `tabVariants`. Anything else with text on a `--color-fill-*` takes `select-none` as well, as the samples on the site's Color page do.
 
@@ -352,11 +356,11 @@ Selected text is the user's focus, so it may carry a hue (§0 rule 1), and selec
 --color-ring: var(--tui-ring);   /* ledger-200 dark / ledger-800 light */
 ```
 
-**The ring has its own token per mode** (decided 2026-10-14, after review in Storybook). **Since 2026-10-22 it is a step softer than the accent: `ledger-800` in light, 9.10:1 on paper, and `ledger-200` in dark, 12.68:1 on the canvas and 11.24:1 on a raised surface**, against the 3:1 a focus indicator needs. Decided by the owner after a side-by-side in Storybook of four steps per mode (light 950, 800, 700, 600; dark 50, 200, 300, 400), both modes, on a primary, an outline and a ghost button, checkboxes and an input. The §10 human check had found full-strength ink heavy in both modes, though the 2px width read right; the gentlest step was chosen, so the ring stays in the ink family.
+**The ring has its own token per mode** (decided 2026-10-14, after review in Storybook). **Since 2026-10-22 it is a step softer than the accent: `ledger-800` in light, 9.08:1 on paper, and `ledger-200` in dark, 12.74:1 on the canvas and 11.28:1 on a raised surface**, against the 3:1 a focus indicator needs. Decided by the owner after a side-by-side in Storybook of four steps per mode (light 950, 800, 700, 600; dark 50, 200, 300, 400), both modes, on a primary, an outline and a ghost button, checkboxes and an input. The §10 human check had found full-strength ink heavy in both modes, though the 2px width read right; the gentlest step was chosen, so the ring stays in the ink family.
 
 *History:* from 2026-10-16 the ring was the accent itself, `ledger-950` / `ledger-50` (16.39:1). It was `sage-700` / `sage-400` that morning, and `emerald-700` / `emerald-500` before. Under emerald, `emerald-800` also read heavy as a 2px line.
 
-**A gain: the ring now parts from the primary button.** At full ink, ring and fill were one colour (1.00:1), separated only by the 1px `--ring-offset` gap. The softer step sits 1.80:1 against the ink fill in light mode and 1.29:1 against the paper fill in dark, so a focused primary button reads as a button with a ring, not a heavier button.
+**A gain: the ring now parts from the primary button.** At full ink, ring and fill were one colour (1.00:1), separated only by the 1px `--ring-offset` gap. The softer step sits 1.82:1 against the ink fill in light mode and 1.29:1 against the paper fill in dark, so a focused primary button reads as a button with a ring, not a heavier button.
 
 Use `outline` with `outline-offset`, not `box-shadow`.
 
@@ -369,7 +373,7 @@ Two things actually protect it, and a control needs at least one:
 
 **Any control sitting within ~3px of a scroll container's edge needs an inset ring**, regardless of which mechanism draws it. `DataTable`'s sticky sort buttons, `RunLogRow` and `LineageTree` all use `outline-offset: -2px` for exactly this reason.
 
-**An inset ring on a solid ink fill takes `--color-on-interactive`.** It sits on the fill, where `--color-ring` measures 1.80:1 in light and 1.29:1 in dark, under 3:1. `Tabs`' `bordered` variant is the one case: its selected item is the only ink fill with an inset ring (owner, 2026-11-02).
+**An inset ring on a solid ink fill takes `--color-on-interactive`.** It sits on the fill, where `--color-ring` measures 1.82:1 in light and 1.29:1 in dark, under 3:1. `Tabs`' `bordered` variant is the one case: its selected item is the only ink fill with an inset ring (owner, 2026-11-02).
 
 ### Elevation
 
@@ -393,7 +397,7 @@ No blur, no black, no new colour. The overlay reads as the top sheet of a small 
 
 **Why 4px, not 2px.** 2px is this system's *bonded* step, for two things that read as one (§7.4), and §7.3 floors the gap between two distinct objects at 4px. An overlay and the page under it are two objects. At 2px a solid offset fuses with the 1px border into a 3px edge on two sides: it reads as a heavier border, a bevel like an old raised button, not as a sheet. What makes an offset read as a sheet is the step it leaves at the top-right and bottom-left corners, and at 2px that step is nearly invisible. That is worse on a 1x monitor, where 2px is two device pixels. 2px is also the weight §7.8 reserves for the agent rail, the focus ring and the active tab, so a 2px edge would read as one of those.
 
-**Why a ruled sheet, not a solid offset.** Every line in this system is a 1px rule. A solid 4px offset in `--color-border-strong` makes a 5px band with the border, which on the sidebar peek (240 × 835px at 1440 × 900) is a 2.47:1 stripe down the full height in dark mode: the heaviest permanent line on the screen. The ruled sheet keeps the 4px separation, and every line stays 1px. Measured on canvas, which is what the sheet's rule sits on: the rule is 2.47:1 in dark mode and 1.62:1 in light, the same as the overlay's own border, so neither line outweighs the other. The sheet's paper is `ledger-925` in dark mode, 1.13:1, the raised step itself. In light it is paper on paper and does not show; the rule alone draws it.
+**Why a ruled sheet, not a solid offset.** Every line in this system is a 1px rule. A solid 4px offset in `--color-border-strong` makes a 5px band with the border, which on the sidebar peek (240 × 835px at 1440 × 900) is a 2.49:1 stripe down the full height in dark mode: the heaviest permanent line on the screen. The ruled sheet keeps the 4px separation, and every line stays 1px. Measured on canvas, which is what the sheet's rule sits on: the rule is 2.49:1 in dark mode and 1.62:1 in light, the same as the overlay's own border, so neither line outweighs the other. The sheet's paper is `ledger-925` in dark mode, 1.13:1, the raised step itself. In light it is paper on paper and does not show; the rule alone draws it.
 
 **What it depends on.**
 
@@ -473,7 +477,7 @@ An unsettled item takes its status from who can act on it:
 
 - `open` and `queued` share a tone, so only the icon and the word separate what can be settled from what can't. Those are what §10's grayscale check asks for.
 - `open` and `needs-review` share Eye, as `running` and `agent-working` share `Spinner`: the same kind of state, told apart by the label. In light mode their text is the same lightness (L 46), so in grayscale the label is all that separates them. In colour they are 10.4 apart in light mode, the edge of §1's "hard to tell apart", and 16.2 in dark. Under deuteranopia: 10.4 and 15.5.
-- In dark mode `open` is brighter than `needs-review` (10.15:1 against 7.24:1 on the canvas). Hue carries the order, not lightness.
+- In dark mode `open` is brighter than `needs-review` (10.19:1 against 7.28:1 on the canvas). Hue carries the order, not lightness.
 
 *The sidebar dot: solid for `needs-review`, hollow for `open` — decided 2026-11-03 (owner, after a side-by-side of solid and hollow, in the same views).* Both are 6px (§7.7).
 
@@ -483,7 +487,7 @@ An unsettled item takes its status from who can act on it:
 | Only `open` items | Hollow: a `--border-width` ring in `--color-text-secondary`, no fill | ", open finding" |
 | Neither | None | None |
 
-*Why hollow.* A solid neutral dot differed from the ochre one by colour alone, against §11.1, and shape now carries the difference: in grayscale the channel that needs the viewer holds the only solid dot. It also sets the order. The ochre dot has the lower contrast in both modes (3.35:1 against 6.64:1 light, 7.24:1 against 10.15:1 dark), and a solid neutral dot beside it read first. The ring has about 55% of a solid dot's area, and in the side-by-side the ochre dot read first in both modes.
+*Why hollow.* A solid neutral dot differed from the ochre one by colour alone, against §11.1, and shape now carries the difference: in grayscale the channel that needs the viewer holds the only solid dot. It also sets the order. The ochre dot has the lower contrast in both modes (3.36:1 against 6.62:1 light, 7.28:1 against 10.19:1 dark), and a solid neutral dot beside it read first. The ring has about 55% of a solid dot's area, and in the side-by-side the ochre dot read first in both modes.
 
 *Costs, accepted.* The ring is the system's only hollow status mark, and it could read as "empty" or "done with" rather than "open". It was checked on a 2x display only, so at 1x it may render rougher. Neither has been tested with users.
 
@@ -508,11 +512,11 @@ Combine hue with a non-color signal so the distinction survives color-blind user
 - 2px left rail on the block, in solid `--color-text-agent`
 - Explicit text label in `--color-text-agent` — "Generated by AI" / "AI · Awaiting review"
 
-The block is otherwise neutral: a 1px `--color-border` box with no ground of its own, so orchid covers the rail and the label and nothing else. The rail is solid because it now carries the hue alone: the `--color-border-agent` tint it used before measured 1.3:1 against the surface in both modes once the ground was gone, under WCAG 1.4.11's 3:1 for a required graphical signal. `--color-text-agent` measures 6.96:1 on the dark surface (which is the canvas step since 2026-10-16) and 7.13:1 in light mode. `--color-fill-agent` was the other candidate; it failed on the dark surface under violet (2.87:1) and clears only barely as `orchid-600` (3.09:1).
+The block is otherwise neutral: a 1px `--color-border` box with no ground of its own, so orchid covers the rail and the label and nothing else. The rail is solid because it now carries the hue alone: the `--color-border-agent` tint it used before measured 1.3:1 against the surface in both modes once the ground was gone, under WCAG 1.4.11's 3:1 for a required graphical signal. `--color-text-agent` measures 7.00:1 on the dark surface (which is the canvas step since 2026-10-16) and 7.14:1 in light mode. `--color-fill-agent` was the other candidate; it failed on the dark surface under violet (2.87:1) and clears only barely as `orchid-600` (3.11:1).
 
 **Changed 2026-10-14.** The treatment had two more parts, a `--color-bg-agent` ground and a `--color-text-agent` icon in the header. Next to the emerald accent, a violet field behind every agent turn read as decoration rather than a signal. Moving the agent role to emerald was rejected for the reason in §1, "Why Agent earns a hue": the interactive hue is everywhere, so focus rings, success and primary actions would all read as agent activity. The hue stays; its area shrinks. The rail and the label carry the distinction on their own in grayscale and under deuteranopia. The icon repeated what the label says. `--color-bg-agent` stays in use for agent badges and the agent-proposed row tint above, where a mark is small enough that a tint is still a signal.
 
-**Agent-proposed rows take the same rail — decided 2026-10-21 (owner), after a side-by-side in Storybook.** Until then the run-state table above gave them a `--color-border-agent` rail, the tint this section had already rejected for the block: 1.39:1 against the tinted row in dark mode and 1.24:1 in light. Solid `--color-text-agent` measures 6.21:1 dark and 6.52:1 light on the tinted row, and 5.23:1 at worst when the row is hovered, so "agent" reads the same on a row as on a block. The rail is 2px of the row's own width, so the row gives up 2px of left padding and its content stays in line with its neighbours. In a table the first cell draws it: a separated-borders table paints no border on a `<tr>`, which is why `DataTable` had shown no rail at all. Both live in `runStatusRowTreatment`.
+**Agent-proposed rows take the same rail — decided 2026-10-21 (owner), after a side-by-side in Storybook.** Until then the run-state table above gave them a `--color-border-agent` rail, the tint this section had already rejected for the block: 1.39:1 against the tinted row in dark mode and 1.24:1 in light. Solid `--color-text-agent` measures 6.24:1 dark and 6.52:1 light on the tinted row, and 5.26:1 at worst when the row is hovered, so "agent" reads the same on a row as on a block. The rail is 2px of the row's own width, so the row gives up 2px of left padding and its content stays in line with its neighbours. In a table the first cell draws it: a separated-borders table paints no border on a `<tr>`, which is why `DataTable` had shown no rail at all. Both live in `runStatusRowTreatment`.
 
 **Rows in forced colours — decided 2026-10-29 (owner).** Forced colours (Windows high contrast) replace backgrounds with the system's, so a row whose state is shown by its tint alone loses that state there. Such a row draws a 1px outline instead, inside itself (negative offset), so its content keeps its x. It is an outline, not a border, because a border is geometry. Today the only such state is `failed`. An open `RunLogRow` draws the outline round the row and its detail together, so the error sits inside its row's edge. An agent-proposed row draws nothing extra: its rail is a border, and forced colours keep borders. Lives in `runStatusRowTreatment`.
 
@@ -524,15 +528,15 @@ Governed separately from UI state colour. Seven series, one step per mode: **600
 
 | # | Ramp | Hue | Light, `-600` on paper | Dark, `-400` on canvas | Dark, on raised |
 |---|---|---|---|---|---|
-| 1 | `federal` | 264.0 | 4.97:1 | 7.31:1 | 6.48:1 |
-| 2 | `ochre` | 78.5 | 4.97:1 | 7.24:1 | 6.42:1 |
-| 3 | `teal` | 201.2 | 4.68:1 | 7.70:1 | 6.83:1 |
-| 4 | `orchid` | 318.4 | 5.30:1 | 6.96:1 | 6.17:1 |
-| 5 | `ledger` | neutral | 4.89:1 | 7.37:1 | 6.53:1 |
-| 6 | `vermilion` | 28.2 | 5.36:1 | 6.95:1 | 6.16:1 |
-| 7 | `ivy` | 153.6 | 4.59:1 | 7.84:1 | 6.95:1 |
+| 1 | `federal` | 257.4 | 4.94:1 | 7.38:1 | 6.54:1 |
+| 2 | `ochre` | 78.5 | 4.97:1 | 7.28:1 | 6.45:1 |
+| 3 | `teal` | 201.2 | 4.68:1 | 7.74:1 | 6.86:1 |
+| 4 | `orchid` | 318.4 | 5.31:1 | 7.00:1 | 6.20:1 |
+| 5 | `ledger` | neutral | 4.89:1 | 7.41:1 | 6.56:1 |
+| 6 | `vermilion` | 28.2 | 5.36:1 | 6.99:1 | 6.19:1 |
+| 7 | `ivy` | 153.6 | 4.60:1 | 7.89:1 | 6.98:1 |
 
-Every series clears the 3:1 graphical minimum with room to spare, 4.59:1 at worst; the old ramp's most fragile series was 3.09:1.
+Every series clears the 3:1 graphical minimum with room to spare, 4.60:1 at worst; the old ramp's most fragile series was 3.09:1.
 
 **Polarity guard — decided 2026-10-16.** Series 6 and 7 are `vermilion` and `ivy`, the danger and success hues. **A chart that shows gain and loss, or sits beside figures that do, uses series 1–5 only.** Most charts carry two or three series and never reach 6. Until 2026-10-16 the ramp excluded red and emerald outright (Appendix A); with seven Riso ramps, a seven-series cap needs them, so they go last. shadcn's chart aliases cover series 1–5 only.
 
@@ -1163,7 +1167,7 @@ Before the token set is considered done:
 - [x] All five `--color-text-{role}` tokens sit within OKLCH L 66–71 in dark mode — verified side by side on the Tokens story 2026-08-02: none dominates. *(Tailwind ramps. Since 2026-10-16 every role is one step per mode, §2; see the re-verification item above.)*
 - [x] *(Tailwind ramps; for ochre see the re-verification item above.)* Dark warning reads as warning, not as decorative orange. `amber-600` verified 2026-08-02; reopened 2026-10-09 for contrast on row states and replaced by `amber-500` after a side-by-side, accepting that it reads ~6 L brighter than the other roles (§2).
 - [x] Every `--color-on-{role}` / `--color-fill-{role}` pair clears 4.5:1, all six roles, both modes — asserted in `apps/storybook/tests/contrast.spec.ts` and `packages/ui/scripts/check-contrast.mjs`. Every fill clears 3:1 against the canvas (`check-contrast` gates it since 2026-10-16).
-- [x] `--color-text-tertiary` appears nowhere as text the user reads — `ledger-400`, 7.37:1 on the dark canvas, and `ledger-600`, 4.89:1 on the light canvas, since 2026-10-16 (it was `olive-500`, 4.60 / 4.12, and `neutral-500`, 4.18 / 4.53, before that).
+- [x] `--color-text-tertiary` appears nowhere as text the user reads — `ledger-400`, 7.41:1 on the dark canvas, and `ledger-600`, 4.89:1 on the light canvas, since 2026-10-16 (it was `olive-500`, 4.60 / 4.12, and `neutral-500`, 4.18 / 4.53, before that).
 
   **Resolved 2026-10-08: every read use moved to `--color-text-secondary`.** The readiness review switched axe to failing the build, and 25 stories failed on tertiary text: timestamps (`AgentBlock`, `AttachmentRow`, `RunLogRow` durations), `MetricTile` captions, `LineageTree` meta, `Field` help and its required marker, `FilterChip`'s field label, `DataTable`'s and `ComboboxEmpty`'s empty messages, `popupSurface` group labels and `MenuShortcut` hints. All four questionable uses in the table below went the way it recommended, and so did the uses the 2026-08-03 audit had permitted (timestamps, shortcut hints, the marker), because axe measured them under AA on the grounds they actually sit on. What stays tertiary: placeholders (`Input`, `Select`, `Combobox`), icons (carets, the `EmptyState` glyph), and `CodeView`'s `aria-hidden` gutter. The cost is one step of text hierarchy: meta now matches labels, and is told apart by size and position. Placeholders were under AA in light mode (4.12:1 on `olive-50`), an accepted exception; on `ledger-600` since 2026-10-16 they measure 4.89:1 on paper and clear it.
 
