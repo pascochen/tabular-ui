@@ -128,6 +128,8 @@ What keeps the exception from leaking into the UI:
 
 The source files are kept outside the repo, in the owner's art direction folder, and the demo carries the favicon set in `apps/demo/public/`.
 
+**The marks' paper moved with the palette — decided 2026-11-06 (owner), for consistency.** The dark-mode favicon's ground and the demo's `site.webmanifest` theme and background colours went from the old `ledger-50`, `#FAF6EE`, to the cream one, `#F9F6F2`. Nothing else in the marks changed: the PNG and ICO favicons draw the three stripes with no paper, and their orchid, dark teal and green are as drawn. The copies in the owner's art direction folder outside the repo still carry the old paper.
+
 ---
 
 ## 2. One lightness curve — read this before choosing accent tokens
