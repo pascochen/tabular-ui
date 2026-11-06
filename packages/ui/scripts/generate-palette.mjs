@@ -300,10 +300,16 @@ try {
 // ---------------------------------------------------------------------------
 const f2 = (n) => n.toFixed(2);
 const f1 = (n) => n.toFixed(1);
-// The origin story: Riso Kagaku's beginnings as a print shop. It goes into palette.md only with
-// a source to cite, and only the sentences that source supports. Until there is one, the
-// section carries the bookkeeping meanings alone.
-const ORIGIN_SOURCE = null; // { url, title, sentences: [...] }
+// The origin story: Riso Kagaku's beginnings as a print shop. Only what RISO's own history
+// page states goes in (read 2026-11-06, in Japanese). It doesn't say Nihonbashi is Japan's
+// financial district or who the shop printed for, so neither is here.
+const ORIGIN_SOURCE = {
+  title: 'RISO KAGAKU, 歩み (history, in Japanese)',
+  url: 'https://www.riso.co.jp/70th/history.html',
+  sentences: [
+    'In September 1946, Noboru Hayama started a mimeograph printing business, Riso-sha, at his home in Setagaya, Tokyo. In September 1948 he moved its office to Kabutocho in Nihonbashi, Tokyo, and renamed it Riso Insatsusha. That shop is the forerunner of RISO KAGAKU, whose main product today is the Risograph.',
+  ],
+};
 
 const lines = [];
 lines.push(
@@ -319,11 +325,14 @@ lines.push(
   '',
   'The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.',
   '',
-  ...(ORIGIN_SOURCE ? [...ORIGIN_SOURCE.sentences, `Source: [${ORIGIN_SOURCE.title}](${ORIGIN_SOURCE.url}).`, ''] : []),
+  ...ORIGIN_SOURCE.sentences,
+  '',
+  `Source: [${ORIGIN_SOURCE.title}](${ORIGIN_SOURCE.url}).`,
+  '',
   'The inks follow bookkeeping (decided 2026-11-06):',
   '',
   '- **Black** means "in the black": the ink of the record. `ledger` carries the text, the primary action and the focus ring, at the dark end RISO Federal Blue.',
-  '- **Red** means "in the red": the ink of loss and error. Danger is `vermilion`, from RISO Crimson, for failed runs, validation errors, destructive actions, negative variance and reconciliation mismatches.',
+  '- **Red** means "in the red": danger is `vermilion`, from RISO Crimson, and red is reserved for negatives: failed runs, validation errors, destructive actions, negative variance and reconciliation mismatches.',
   '- **Approval** is to be a stamped mark, after the hanko seal on a ringi-sho, the Japanese proposal that collects one seal per approver. Its shape carries the meaning, not a hue, and it is drawn in ledger ink, not in vermilion. This is direction only: no stamp component exists yet.',
   '',
   '## Contrast rules',

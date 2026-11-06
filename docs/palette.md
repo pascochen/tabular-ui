@@ -10,10 +10,14 @@ APCA Lc is shown as an absolute value: about 90 is preferred for body text, 75 t
 
 The art direction is a 1980s Japanese ledger book printed in RISO spot inks: warm paper and blue-black ink.
 
+In September 1946, Noboru Hayama started a mimeograph printing business, Riso-sha, at his home in Setagaya, Tokyo. In September 1948 he moved its office to Kabutocho in Nihonbashi, Tokyo, and renamed it Riso Insatsusha. That shop is the forerunner of RISO KAGAKU, whose main product today is the Risograph.
+
+Source: [RISO KAGAKU, 歩み (history, in Japanese)](https://www.riso.co.jp/70th/history.html).
+
 The inks follow bookkeeping (decided 2026-11-06):
 
 - **Black** means "in the black": the ink of the record. `ledger` carries the text, the primary action and the focus ring, at the dark end RISO Federal Blue.
-- **Red** means "in the red": the ink of loss and error. Danger is `vermilion`, from RISO Crimson, for failed runs, validation errors, destructive actions, negative variance and reconciliation mismatches.
+- **Red** means "in the red": danger is `vermilion`, from RISO Crimson, and red is reserved for negatives: failed runs, validation errors, destructive actions, negative variance and reconciliation mismatches.
 - **Approval** is to be a stamped mark, after the hanko seal on a ringi-sho, the Japanese proposal that collects one seal per approver. Its shape carries the meaning, not a hue, and it is drawn in ledger ink, not in vermilion. This is direction only: no stamp component exists yet.
 
 ## Contrast rules
