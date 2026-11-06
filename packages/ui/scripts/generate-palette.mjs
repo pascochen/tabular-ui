@@ -74,8 +74,15 @@ for (const ink of Object.values(INKS)) {
 // The neutral runs warm at the light end (paper) and cool at the dark end (ink),
 // with chroma dipping to almost zero in the middle so the hue change never shows
 // as a muddy grey-green. Paper is not an ink: its 85° hue comes from the portfolio paper.
+//
+// Cream paper, 2026-11-06: steps 50–400 at half their first chroma (0.012, 0.014, 0.015,
+// 0.014, 0.008), so the light end keeps its shape. At 0.012 the paper pulled every role
+// tint off its hue (orchid's 10% tint measured 42° from the same tint on white) and left
+// the info tint at chroma 0.002, grey. Halving only step 50 would leave the borders
+// (200, 300) yellower than the paper under them. 0.0075 is written 0.008, because
+// palette.css rounds chroma to three decimals. Measured by scripts/check-harmony.mjs.
 const PAPER_HUE = 85;
-const LEDGER_CHROMA = [0.012, 0.014, 0.015, 0.014, 0.008, 0.003, 0.005, 0.01, 0.014, 0.017, 0.018];
+const LEDGER_CHROMA = [0.006, 0.007, 0.008, 0.007, 0.004, 0.003, 0.005, 0.01, 0.014, 0.017, 0.018];
 const LEDGER_HUE = STEPS.map((_, i) => (i <= 5 ? PAPER_HUE : INKS.midnight.h));
 
 const RAMPS = [
@@ -85,7 +92,7 @@ const RAMPS = [
     replaces: 'olive',
     anchor: INKS.midnight,
     neutral: true,
-    note: 'Warm paper (85°) at the light end, RISO Midnight at the dark end.',
+    note: 'Cream paper (85°, chroma 0.006) at the light end, RISO Midnight at the dark end.',
   },
   {
     name: 'ivy',

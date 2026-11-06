@@ -1,28 +1,28 @@
 {
   "generatedBy": "scripts/generate-palette.mjs",
-  "paper50": "#faf6ee",
+  "paper50": "#f9f6f2",
   "ink950": "#131921",
   "ramps": {
     "ledger": {
       "50": {
-        "oklch": "oklch(97.5% 0.012 85.0)",
-        "hex": "#faf6ee"
+        "oklch": "oklch(97.5% 0.006 85.0)",
+        "hex": "#f9f6f2"
       },
       "100": {
-        "oklch": "oklch(94.5% 0.014 85.0)",
-        "hex": "#f1ece3"
+        "oklch": "oklch(94.5% 0.007 85.0)",
+        "hex": "#efece8"
       },
       "200": {
-        "oklch": "oklch(89.0% 0.015 85.0)",
-        "hex": "#dfdad0"
+        "oklch": "oklch(89.0% 0.008 85.0)",
+        "hex": "#dddad5"
       },
       "300": {
-        "oklch": "oklch(82.0% 0.014 85.0)",
-        "hex": "#c8c4ba"
+        "oklch": "oklch(82.0% 0.007 85.0)",
+        "hex": "#c6c4bf"
       },
       "400": {
-        "oklch": "oklch(73.0% 0.008 85.0)",
-        "hex": "#aaa7a2"
+        "oklch": "oklch(73.0% 0.004 85.0)",
+        "hex": "#a9a7a5"
       },
       "500": {
         "oklch": "oklch(62.5% 0.003 85.0)",
