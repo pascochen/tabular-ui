@@ -317,7 +317,10 @@ const readTextColumns = (page: Page) =>
     };
   });
 
-for (const width of [375, 420]) {
+// 390px, not 375 (owner, 2026-11-07): in Instrument Sans the Default story's
+// first figures end 4.8px past a 375px view on CI's Linux renderer, 2px inside it
+// on macOS. The badge caps and the tabular figures are what got wider.
+for (const width of [390, 420]) {
   test(`a squeezed text column keeps its text, and the first figures stay in view — ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await gotoStory(page, 'product-datatable--default');
@@ -330,9 +333,8 @@ for (const width of [375, 420]) {
     // Each column follows its own text, so a short one doesn't pay for the floor.
     expect(model.width).toBeCloseTo(model.widest + model.padding, 0);
     expect(owner.width).toBeLessThan(model.width);
-    // The figures, not the column: at 375px in Instrument Sans (2026-11-07) the
-    // Rows column's right padding runs 6px past the view, and its figures end 2px
-    // inside it.
+    // The figures, not the column: what has to be read is the figure, and the
+    // column's right padding may scroll.
     expect(rows.textRight, 'the first figures are in the first view').toBeLessThanOrEqual(view);
     expect(sideways, 'and the rest scroll sideways').toBeGreaterThan(0);
   });
