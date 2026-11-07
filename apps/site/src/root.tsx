@@ -17,7 +17,7 @@ import './index.css';
 // path because the fonts are `packages/ui`'s dependency, not the site's; the
 // serif is the site's trimmed 600 (index.css). Vite gives each the same hashed
 // URL in both places, and tests/quality.spec.ts checks they match.
-import sansUrl from '../../../packages/ui/node_modules/@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+import sansUrl from '../../../packages/ui/node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url';
 import serifUrl from './fonts/tabular-serif-600.woff2?url';
 
 export const links: Route.LinksFunction = () =>

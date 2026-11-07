@@ -14,7 +14,7 @@ import type { Route } from './+types/typography';
 export const meta: Route.MetaFunction = () =>
   pageMeta({
     title: 'Typography · Tabular UI',
-    description: 'A 13px scale for dense tools, one superfamily, and tabular figures everywhere, prose included.',
+    description: 'A 13px scale for dense tools, three families, and tabular figures everywhere, prose included.',
     path: '/foundations/typography',
   });
 
@@ -88,7 +88,7 @@ export default function Typography() {
         aside={<TypographyKey figure={money(bridge.actual)} />}
         current={pages.typography}
         title="Typography"
-        lead="A 13px base for dense tools, sized in rem. One superfamily: sans for reading, serif for headings and the single figure a tile exists to show, mono for identifiers."
+        lead="A 13px base for dense tools, sized in rem. Three families: sans for reading, serif for headings and the single figure a tile exists to show, mono for identifiers."
       />
 
       <Section labelledBy="scale-title">
@@ -126,7 +126,7 @@ export default function Typography() {
           <SectionHeader
             id="families-title"
             title="Families"
-            lead="Drawn to share proportions. The serif applies by element: every heading, and the metric tier. Text that isn’t a heading never goes serif."
+            lead="The serif applies by element: every heading, and the metric tier. Text that isn’t a heading never goes serif."
           />
           <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
             <li className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]">

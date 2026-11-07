@@ -60,8 +60,7 @@ export function SiteNav() {
         {/* A plain link, not a ghost button: the button's hover overlay laid a grey
             wash over the brand mark (owner, 2026-10-26). No hover effect at all;
             the pointer is the cue, and keyboard focus keeps the ring. The mark
-            keeps its phone size until lg: at 28px the bar needed 728px of
-            content at 768px, where it has 703px. */}
+            keeps its phone size until lg, where the links appear. */}
         <a href="/" className={cn('shrink-0', focusRing)}>
           <img
             src="/tabular-wordmark.svg"
@@ -73,14 +72,14 @@ export function SiteNav() {
         </a>
 
         {system.length > 0 ? (
-          <ul role="list" className="hidden items-center md:flex">
+          <ul role="list" className="hidden items-center lg:flex">
             {system.map((page) => (
               <li key={page.href}>{pageLink(page)}</li>
             ))}
           </ul>
         ) : null}
 
-        <ul role="list" className="ml-auto hidden items-center gap-[var(--gap-inline)] md:flex">
+        <ul role="list" className="ml-auto hidden items-center gap-[var(--gap-inline)] lg:flex">
           {elsewhere.map((link) => (
             <li key={link.href}>
               <a href={link.href} {...newTab} className={buttonVariants({ variant: 'ghost' })}>
@@ -94,9 +93,11 @@ export function SiteNav() {
           ))}
         </ul>
 
-        {/* Below md the links fold into the library's Menu (D8), composed here:
-            AppBar has no responsive collapse yet. */}
-        <div className="ml-auto md:hidden">
+        {/* Below lg the links fold into the library's Menu (D8), composed here:
+            AppBar has no responsive collapse yet. From md until 2026-11-07, when
+            Instrument Sans's wider labels needed 731px at 768px, where the bar has
+            702px. */}
+        <div className="ml-auto lg:hidden">
           <Menu>
             <MenuTrigger render={<Button variant="outline">Menu</Button>} />
             <MenuContent align="end">

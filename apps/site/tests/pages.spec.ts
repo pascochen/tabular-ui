@@ -328,11 +328,11 @@ test.describe('Components in the nav', () => {
     });
   });
 
-  // At 768px, where the bar first shows its links, everything sits inside its
-  // border: with the demo button it needed 849px, and without it a 28px wordmark
-  // still ran 25px over.
-  test('fits the page at 768px', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 800 });
+  // At 1024px, where the bar first shows its links, everything sits inside its
+  // border. At 768px, where they first showed until 2026-11-07, Instrument Sans's
+  // labels ran 30px over, so the Menu holds them until 1024px.
+  test('fits the page at 1024px', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
     const nav = page.getByRole('navigation', { name: 'Main' });
@@ -342,7 +342,15 @@ test.describe('Components in the nav', () => {
     );
     // Inside the 1px border and the 16px padding, not just the page.
     expect(right).toBeLessThanOrEqual(box.x + box.width - 17);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(768);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(1024);
+  });
+
+  test('at 768px, the links are in the Menu', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 800 });
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await expect(nav.getByRole('button', { name: 'Menu' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Foundations' })).toBeHidden();
   });
 });
 

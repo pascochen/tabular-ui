@@ -61,7 +61,7 @@ function EmptyState({ title, description, icon: IconComponent, action, size = 'd
 
       <div className="flex flex-col gap-[var(--gap-bonded)]">
         <span className={cn('font-medium text-text-primary', size === 'sm' ? 'text-sm' : 'text-md')}>{title}</span>
-        {description ? <span className="max-w-[46ch] text-sm text-text-secondary">{description}</span> : null}
+        {description ? <span className="max-w-[37ch] text-sm text-text-secondary">{description}</span> : null}
       </div>
 
       {action ? <div className="flex items-center gap-[var(--gap-inline)]">{action}</div> : null}

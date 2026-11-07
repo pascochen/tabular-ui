@@ -31,7 +31,7 @@ Add the tokens after Tailwind in the app's main stylesheet:
 - **The `:root`, `.dark`, `@theme inline` and `@custom-variant dark` blocks**, so there is one definition of each.
 - **The `@layer base` block.** Its `* { @apply border-border outline-ring/50 }` halves the focus ring's alpha on every control. `tokens.css` sets the same rule at full strength, along with the page's ground and font.
 - **`@import 'shadcn/tailwind.css'`.** Its Base UI state variants are already in `tokens.css`, and Tabular UI left out the rest of that stylesheet on purpose: it accounted for 26 of the 44 findings in the repository's 2026-10-09 audit.
-- **The init's font import** (`@fontsource-variable/geist` with the nova preset). Nothing uses it: `tokens.css` loads Source Sans 3, Source Serif 4 and Source Code Pro.
+- **The init's font import** (`@fontsource-variable/geist` with the nova preset). Nothing uses it: `tokens.css` loads Instrument Sans, Source Serif 4 and IBM Plex Mono.
 - **Its `@import 'tw-animate-css'`.** `tokens.css` already imports it.
 
 The init installed the `shadcn` and Geist packages only for those imports, so remove them too. Keep `tw-animate-css`, which `tokens.css` uses:

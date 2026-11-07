@@ -199,8 +199,8 @@ test('in a squeezed table, labels sit on their figures and a sort resizes no col
  */
 const readCells = (page: Page) =>
   page.evaluate(async () => {
-    await document.fonts.load('400 13px "Source Sans 3 Variable"', '0');
-    await document.fonts.load('500 10px "Source Sans 3 Variable"', 'A');
+    await document.fonts.load('400 13px "Instrument Sans Variable"', '0');
+    await document.fonts.load('500 10px "Instrument Sans Variable"', 'A');
     await document.fonts.ready;
     const table = document.querySelector('#storybook-root table')!;
     const scroller = table.parentElement!;
@@ -264,14 +264,16 @@ test('text gives way first, and past that the table scrolls sideways', async ({ 
 /**
  * A text column's floor (owner, 2026-11-03). `max-w-0` let a column fall to its
  * header's width, so at 420 every row read `fct_g…` and scrolling sideways didn't
- * help. A cap lets text count toward its column up to 28ch: it follows the text
+ * help. A cap lets text count toward its column up to about 168px: 21ch in a
+ * sans cell, 28ch in a mono one, since `ch` is each cell's own zero (§8.3). It
+ * follows the text
  * below that, and stops there. The figures must stay in the first view, which is
  * what a floor taken from `size` gave up: at 375 it showed no figure at all.
  */
 const readTextColumns = (page: Page) =>
   page.evaluate(async () => {
-    await document.fonts.load('400 11px "Source Code Pro Variable"', '0');
-    await document.fonts.load('400 13px "Source Sans 3 Variable"', '0');
+    await document.fonts.load('400 11px "IBM Plex Mono"', '0');
+    await document.fonts.load('400 13px "Instrument Sans Variable"', '0');
     await document.fonts.ready;
     const table = document.querySelector('#storybook-root table')!;
     const scroller = table.parentElement!;
@@ -296,7 +298,16 @@ const readTextColumns = (page: Page) =>
           name: th.textContent ?? '',
           width: th.getBoundingClientRect().width,
           right: th.getBoundingClientRect().right,
-          floor: 28 * zero.measureText('0').width,
+          // Where the column's text ends, its padding aside.
+          textRight: Math.max(
+            ...cells.map((td) => {
+              const range = document.createRange();
+              range.selectNodeContents(td);
+              return range.getBoundingClientRect().right;
+            }),
+          ),
+          // 28ch in a mono cell, 21ch in the sans: about 168px of text either way (§8.3).
+          floor: (cells[0].classList.contains('font-mono') ? 28 : 21) * zero.measureText('0').width,
           padding: parseFloat(style.paddingLeft) + parseFloat(style.paddingRight),
           widest,
           cut: cells.filter((td) => td.scrollWidth > td.clientWidth).length,
@@ -306,7 +317,10 @@ const readTextColumns = (page: Page) =>
     };
   });
 
-for (const width of [375, 420]) {
+// 390px, not 375 (owner, 2026-11-07): in Instrument Sans the Default story's
+// first figures end 4.8px past a 375px view on CI's Linux renderer, 2px inside it
+// on macOS. The badge caps and the tabular figures are what got wider.
+for (const width of [390, 420]) {
   test(`a squeezed text column keeps its text, and the first figures stay in view — ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await gotoStory(page, 'product-datatable--default');
@@ -319,12 +333,14 @@ for (const width of [375, 420]) {
     // Each column follows its own text, so a short one doesn't pay for the floor.
     expect(model.width).toBeCloseTo(model.widest + model.padding, 0);
     expect(owner.width).toBeLessThan(model.width);
-    expect(rows.right, 'the first figure column is in the first view').toBeLessThanOrEqual(view);
+    // The figures, not the column: what has to be read is the figure, and the
+    // column's right padding may scroll.
+    expect(rows.textRight, 'the first figures are in the first view').toBeLessThanOrEqual(view);
     expect(sideways, 'and the rest scroll sideways').toBeGreaterThan(0);
   });
 }
 
-test('a text column stops at 28ch when squeezed, and a size wins where there is room', async ({ page }) => {
+test('a text column stops at its floor when squeezed, and a size wins where there is room', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 800 });
   await gotoStory(page, 'product-datatable--long-text');
   const squeezed = await readTextColumns(page);
@@ -547,7 +563,7 @@ test('a focused cut cell passes the rules axe skips unless asked', async ({ page
 
 /**
  * A cell with a control takes no stop: its control is already the way in, and the
- * cut lives on the control. Seeded, because at 28ch nothing in the story is cut.
+ * cut lives on the control. Seeded, so it doesn't depend on what the floor cuts.
  */
 test('a control in a cell opens the tooltip when focused, and adds no stop', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 800 });
@@ -615,45 +631,60 @@ test('the serif appears only at the metric tier and in headings', async ({ page 
 });
 
 /**
- * §8.3 / §8.4 — every family loads under its `Variable` name, roman and
- * italic, and Source Serif 4's files carry the opsz axis. Two silent
- * failures this guards: a stack naming only the plain family falls back to
- * the system face, and the package's default entry point ships wght-only
- * files, which leaves font-optical-sizing with nothing to drive. Both render
- * without an error.
+ * §8.3 / §8.4 — every family loads under its registered name, roman and
+ * italic, IBM Plex Mono at each of §8.5's three weights, and Source Serif 4's
+ * files carry the opsz axis. Three silent failures this guards: a stack
+ * naming only the plain form of a variable family falls back to the system
+ * face; a static weight with no file is synthesized; and the package's default
+ * entry point ships wght-only files, which leaves font-optical-sizing with
+ * nothing to drive. All three render without an error.
  */
-test('fonts load under their Variable names, and the serif carries opsz', async ({ page }) => {
+const VARIABLE_FAMILIES = ['Instrument Sans Variable', 'Source Serif 4 Variable'];
+const MONO_FACES = ['400', '500', '600'].flatMap((w) => [`${w} normal`, `${w} italic`]);
+
+test('fonts load under their registered names, and the serif carries opsz', async ({ page }) => {
   await gotoStory(page, 'product-metrictile--sizes');
-  const result = await page.evaluate(async () => {
-    const families = ['Source Sans 3 Variable', 'Source Serif 4 Variable', 'Source Code Pro Variable'];
-    for (const f of families) {
-      await document.fonts.load(`16px "${f}"`, 'a');
-      await document.fonts.load(`italic 16px "${f}"`, 'a');
-    }
-    const loaded = Array.from(document.fonts)
-      .filter((f) => f.status === 'loaded')
-      .map((f) => `${f.family.replace(/"/g, '')} ${f.style}`);
-    const width = (opsz: number) => {
-      const s = document.createElement('span');
-      s.textContent = 'Hamburgefonstiv';
-      s.style.cssText = `position:absolute;white-space:pre;font:600 32px "Source Serif 4 Variable";font-variation-settings:'opsz' ${opsz}`;
-      document.body.appendChild(s);
-      const w = s.getBoundingClientRect().width;
-      s.remove();
-      return w;
-    };
-    return {
-      loaded: [...new Set(loaded)],
-      body: getComputedStyle(document.body).fontFamily,
-      opszSmall: width(8),
-      opszLarge: width(60),
-    };
-  });
-  for (const f of ['Source Sans 3 Variable', 'Source Serif 4 Variable', 'Source Code Pro Variable']) {
+  const result = await page.evaluate(
+    async ({ families, monoFaces }) => {
+      for (const f of families) {
+        await document.fonts.load(`16px "${f}"`, 'a');
+        await document.fonts.load(`italic 16px "${f}"`, 'a');
+      }
+      for (const face of monoFaces) {
+        const [weight, style] = face.split(' ');
+        await document.fonts.load(`${style === 'italic' ? 'italic ' : ''}${weight} 16px "IBM Plex Mono"`, 'a');
+      }
+      const loaded = Array.from(document.fonts)
+        .filter((f) => f.status === 'loaded')
+        .map((f) => `${f.family.replace(/"/g, '')} ${f.style}`);
+      const mono = Array.from(document.fonts)
+        .filter((f) => f.status === 'loaded' && f.family.replace(/"/g, '') === 'IBM Plex Mono')
+        .map((f) => `${f.weight} ${f.style}`);
+      const width = (opsz: number) => {
+        const s = document.createElement('span');
+        s.textContent = 'Hamburgefonstiv';
+        s.style.cssText = `position:absolute;white-space:pre;font:600 32px "Source Serif 4 Variable";font-variation-settings:'opsz' ${opsz}`;
+        document.body.appendChild(s);
+        const w = s.getBoundingClientRect().width;
+        s.remove();
+        return w;
+      };
+      return {
+        loaded: [...new Set(loaded)],
+        mono: [...new Set(mono)],
+        body: getComputedStyle(document.body).fontFamily,
+        opszSmall: width(8),
+        opszLarge: width(60),
+      };
+    },
+    { families: VARIABLE_FAMILIES, monoFaces: MONO_FACES },
+  );
+  for (const f of VARIABLE_FAMILIES) {
     expect(result.loaded, `${f} roman`).toContain(`${f} normal`);
     expect(result.loaded, `${f} italic`).toContain(`${f} italic`);
   }
-  expect(result.body.startsWith('"Source Sans 3 Variable"'), result.body).toBe(true);
+  for (const face of MONO_FACES) expect(result.mono, `IBM Plex Mono ${face}`).toContain(face);
+  expect(result.body.startsWith('"Instrument Sans Variable"'), result.body).toBe(true);
   // 288 against 232px when the axis is present; equal when it is not.
   expect(result.opszSmall - result.opszLarge, 'opsz 8 and 60 render the same width').toBeGreaterThan(20);
 });
