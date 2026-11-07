@@ -805,17 +805,19 @@ export function CitationSpecimen() {
 /**
  * Chat thread: the question asked, "Working…", and the answer grown in the same
  * place. Its scroller needs a bounded parent; the aspect ratio bounds it without
- * a height. The minimum is the card's 284px floor less its frame, plate and
+ * a height. The minimum is the card's 310px floor less its frame, plate and
  * Replay: it fills the floor, and a narrow card doesn't cut the answer off behind
- * "Scroll to latest". `w-full` stops the ratio turning that minimum into a 396px
- * minimum width, which scrolled the page sideways on a phone.
+ * "Scroll to latest". `w-full` stops the ratio turning that minimum into a 448px
+ * minimum width, which scrolled the page sideways on a phone. (The floor was
+ * 284px until Instrument Sans, 2026-11-07: its wider lines wrapped the answer
+ * one line more at 1024px and cut it by 22px.)
  */
 export function ThreadSpecimen() {
   const answer = `Yes. ${duplicatePayment.entity} paid supplier invoice ${duplicatePayment.supplierInvoice} twice, ${duplicatePayment.amountLabel} each.`;
   return (
     <Specimen title="Chat thread" frames={2}>
       {(f) => (
-        <div className="flex aspect-[2/1] min-h-[198px] w-full flex-col">
+        <div className="flex aspect-[2/1] min-h-[224px] w-full flex-col">
           <ChatThread
             turns={[
               { id: 'q', role: 'user', text: question },

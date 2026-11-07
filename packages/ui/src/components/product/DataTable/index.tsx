@@ -508,9 +508,12 @@ function DataTable<TData>({
                         flexRender(header.column.columnDef.header, header.getContext())
                       )}
                       {reserved ? (
-                        // In the cells' own type, so `ch` is one of their digits. No
-                        // figure is wider than this many digits: a comma is narrower,
-                        // and a minus is a digit's width (§8.6).
+                        // In the cells' own type. `ch` is the advance of a proportional
+                        // zero: in the mono that is a digit, and in Instrument Sans it is
+                        // 0.666em against a tabular digit's 0.600em, so a sans column
+                        // errs about 11% wide (§8.3). No figure is wider than this many
+                        // `ch`: a comma and a minus are narrower than a digit, and `¥`
+                        // and `$`, a little wider than one, still fit in a `ch`.
                         <span
                           aria-hidden="true"
                           className={cn('block h-0', headerMeta?.content === 'mono' ? 'font-mono text-xs' : 'text-sm')}
@@ -518,15 +521,18 @@ function DataTable<TData>({
                         />
                       ) : null}
                       {textReserved ? (
-                        // The floor, as the cells' cap sets it elsewhere: `28ch` holds
-                        // the padding there and not here. A letter is at most about
-                        // a digit's width, so this errs wide, and only up to the floor.
-                        // The cells' weight too: a sans digit is wider at the header's.
+                        // The floor, as the cells' cap sets it elsewhere: `21ch` or
+                        // `28ch` holds the padding there and not here. A letter is at
+                        // most about a digit's width, so this errs wide, and only up
+                        // to the floor. The cells' weight too: a sans digit is wider
+                        // at the header's.
                         <span
                           aria-hidden="true"
                           className={cn(
-                            'block h-0 max-w-[calc(28ch-2*var(--pad-cell-x))] font-normal',
-                            headerMeta?.content === 'mono' ? 'font-mono text-xs' : 'text-sm',
+                            'block h-0 font-normal',
+                            headerMeta?.content === 'mono'
+                              ? 'max-w-[calc(28ch-2*var(--pad-cell-x))] font-mono text-xs'
+                              : 'max-w-[calc(21ch-2*var(--pad-cell-x))] text-sm',
                           )}
                           style={{ width: `${textReserved}ch` }}
                         />
@@ -607,7 +613,9 @@ function DataTable<TData>({
                           // header's width, and every row read `fct_g…`. With a cap,
                           // text counts toward its column up to about 25 mono
                           // characters, so a short column keeps its own width and an
-                          // identifier stays readable. A `size` still wins where
+                          // identifier stays readable. A `ch` is the cell's own zero, so
+                          // the two fonts take two caps for about 168px of text: 21ch
+                          // of Instrument Sans, 28ch of Plex Mono at --text-xs (§8.3). A `size` still wins where
                           // there's room, because a cell fills its column whatever
                           // its max-width says. A windowed table can't follow its
                           // cells, so they count for nothing and the header holds
@@ -617,7 +625,11 @@ function DataTable<TData>({
                             : meta?.truncate !== false &&
                                 cn(
                                   'truncate has-[>[data-slot=badge]]:max-w-none',
-                                  shouldVirtualize ? 'max-w-0' : 'max-w-[28ch]',
+                                  shouldVirtualize
+                                    ? 'max-w-0'
+                                    : meta?.content === 'mono'
+                                      ? 'max-w-[28ch]'
+                                      : 'max-w-[21ch]',
                                 ),
                         )}
                       >

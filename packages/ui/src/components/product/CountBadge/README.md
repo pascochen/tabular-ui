@@ -49,7 +49,7 @@ second ground.
 
 **The label-to-figure gap is `gap-1` (4px), a documented §7.4 fallback.** No role
 token covers it. It has to exceed the font's word space — 2.00px at `--text-2xs`,
-scaling §7.4's measured 2.60px at `--text-base` (Source Sans 3) — or the figure binds to the label
+scaling §7.4's measured 2.60px at `--text-base` (Instrument Sans) — or the figure binds to the label
 more tightly than the words bind to each other, which is the inversion already in
 the failure log. Badge's own `--gap-icon-label` (2px) is for an icon and its label
 as one atomic mark; a figure with its own colour is a second object. If a second

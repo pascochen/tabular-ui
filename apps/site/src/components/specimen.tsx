@@ -51,7 +51,10 @@ export function SpecimenFrame({
  * Two rows of a subgrid, so the cards in a row share one frame height and one
  * caption height (owner, 2026-11-02). The parent's `<li>` is the other half of
  * it. The frame's height is a floor, never a cap: a card that opens grows its
- * whole row. See docs/site.md, "Components".
+ * whole row. The floor, 310px, is the tallest row at 1440px (Sources apart), so
+ * every moment's cards share one height there. It was 284px until the sans became
+ * Instrument Sans (2026-11-07), whose wider lines wrapped three cards' copy one
+ * line more. See docs/site.md, "Components".
  */
 export function ComponentCard({
   component,
@@ -64,7 +67,7 @@ export function ComponentCard({
 }) {
   return (
     <article className="row-span-2 grid grid-cols-1 grid-rows-subgrid gap-[var(--gap-group)]">
-      <SpecimenFrame ground={ground} placeholder={!component.built} className="min-h-[284px]">
+      <SpecimenFrame ground={ground} placeholder={!component.built} className="min-h-[310px]">
         {component.built ? (
           children
         ) : (

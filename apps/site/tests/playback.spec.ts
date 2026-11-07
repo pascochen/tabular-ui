@@ -338,7 +338,7 @@ test.describe('the cards in a row', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await open(page, '/');
     for (const name of ['chat-starter', 'agent-plan', 'lineage-tree', 'agent-block', 'chat-thread', 'run-log-row']) {
-      expect(await height(page, `#${name} article > :first-child`), name).toBe(284);
+      expect(await height(page, `#${name} article > :first-child`), name).toBe(310);
     }
   });
 
