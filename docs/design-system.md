@@ -126,9 +126,9 @@ What keeps the exception from leaking into the UI:
 - **Nothing is derived from them.** No token, state colour or UI surface takes a colour from the marks. The palette is the source; the marks are one use of it.
 - **The rules apply to everything around them.** A mark in the app bar does not license orchid or green elsewhere in that bar.
 
-The source files are kept outside the repo, in the owner's art direction folder, and the demo carries the favicon set in `apps/demo/public/`.
+The source files are in `brand/`: the wordmark, its dark and small variants, and the favicon. The site and the demo carry copies in their own `public/`, with the PNG and ICO favicons and the demo's `site.webmanifest`. A change to a mark goes into `brand/` and every copy at once. The owner's art direction folder, outside the repo, holds the working files. *Corrected 2026-11-07:* this line had said the source files were kept outside the repo, though `brand/` has been in it since the first public commit, so the paper change below missed it.
 
-**The marks' paper moved with the palette — decided 2026-11-06 (owner), for consistency.** The dark-mode favicon's ground and the demo's `site.webmanifest` theme and background colours went from the old `ledger-50`, `#FAF6EE`, to the cream one, `#F9F6F2`. Nothing else in the marks changed: the PNG and ICO favicons draw the three stripes with no paper, and their orchid, dark teal and green are as drawn. The copies in the owner's art direction folder outside the repo still carry the old paper.
+**The marks' paper moved with the palette — decided 2026-11-06 (owner), for consistency.** The dark-mode favicon's ground and the demo's `site.webmanifest` theme and background colours went from the old `ledger-50`, `#FAF6EE`, to the cream one, `#F9F6F2`. Nothing else in the marks changed: the PNG and ICO favicons draw the three stripes with no paper, and their orchid, dark teal and green are as drawn. `brand/` followed on 2026-11-07: the dark favicon's ground, and the dark wordmark's paper square and letters. The copies in the owner's art direction folder outside the repo still carry the old paper.
 
 ---
 
