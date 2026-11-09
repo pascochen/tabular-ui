@@ -335,7 +335,7 @@ Note: there is no `test:ui`. It was ambiguous between Vitest UI mode and "test t
 `.github/dependabot.yml` (added 2026-10-10) opens update PRs every Monday: npm (pnpm's lockfile) and GitHub Actions, at most 5 open at once. It waits **7 days** after a release before proposing it, because broken and compromised releases are usually pulled within days.
 
 - **Packages that must move together share a group**, so one PR updates all of them: Base UI, React, Storybook (with its addons and lint plugin), Vitest (with its browser and coverage helpers), Playwright, Tailwind, lint tooling, and everything else. The review found two Vitest helpers pinned apart from Vitest; a group keeps that from recurring.
-- **Groups take minor and patch updates only.** A major update arrives as its own PR and is reviewed alone.
+- **Groups take minor and patch updates only.** A major update arrives as its own PR and is reviewed alone. The exception is a set released in lockstep, which no single-package PR can move: Vitest 5 arrived on 2026-11-09 as four PRs (#144–#147), each leaving the other three helpers on 4.x, and each failed. Vitest's majors now have their own group, `vitest-major`, so they arrive as one PR, and its minors aren't held behind one. Storybook and Playwright are lockstep sets too, and have no major group yet: when either's next major arrives split, close the PRs and give it one the same way.
 - **The workspace moves together.** `packages/ui`, `apps/storybook` and `apps/demo` resolve through one lockfile, and their dependencies use `^` ranges. A major update to a package more than one of them lists needs each `package.json` raised in the same PR.
 
 Reviewing one:
