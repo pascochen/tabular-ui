@@ -16,6 +16,19 @@ updates:
     # compromised releases are usually caught and pulled within days.
     cooldown:
       default-days: 7
+    # Majors declined on purpose, each with its reason. Lift one by deleting
+    # it here, in the PR that does the work. See tools.md, "Dependency updates".
+    ignore:
+      # v9 rewrote the API (createCoreRowModel, TableFeatures, two-argument
+      # Row and Table), and DataTable does not compile against it. Declined
+      # 2026-11-09 (#141); moving to it is a DataTable migration of its own.
+      - dependency-name: '@tanstack/react-table'
+        versions: ['>=9']
+      # The types follow the Node the code runs on: CI is on 22 (.nvmrc) and
+      # Vercel on 24. Types for a newer Node type-check APIs neither has.
+      # Declined 2026-11-09 (#140).
+      - dependency-name: '@types/node'
+        versions: ['>=25']
     # Packages that must move together share a group, so one PR updates all
     # of them: a Vitest helper a version apart from Vitest breaks the story
     # tests, and Storybook's addons are released in lockstep with it.
