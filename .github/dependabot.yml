@@ -32,8 +32,10 @@ updates:
     # Packages that must move together share a group, so one PR updates all
     # of them: a Vitest helper a version apart from Vitest breaks the story
     # tests, and Storybook's addons are released in lockstep with it.
-    # Minor and patch only: a major update always arrives as its own PR, so
-    # it is reviewed alone. A package goes in the first group it matches.
+    # Minor and patch only: a major update arrives as its own PR, so it is
+    # reviewed alone. The exception is a set that cannot move one package at
+    # a time, which gets a second group for its majors (vitest-major). A
+    # package goes in the first group it matches.
     groups:
       base-ui:
         # The primitive layer. Its own PR, because every foundational
@@ -49,6 +51,13 @@ updates:
       vitest:
         patterns: [vitest, '@vitest/*']
         update-types: [minor, patch]
+      vitest-major:
+        # Vitest's helpers are released in lockstep with it, so a major
+        # proposed one package at a time cannot pass: Vitest 5 arrived as
+        # four PRs (#144-#147), each leaving the other three on 4.x, and
+        # failed. Its own group, so minor updates aren't held behind it.
+        patterns: [vitest, '@vitest/*']
+        update-types: [major]
       playwright:
         patterns: [playwright, '@playwright/test']
         update-types: [minor, patch]
