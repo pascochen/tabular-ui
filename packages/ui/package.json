@@ -72,7 +72,7 @@
   },
   "devDependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "@storybook/react-vite": "^10.6.4",
+    "@storybook/react-vite": "^10.6.5",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
@@ -81,7 +81,7 @@
     "culori": "4.0.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "storybook": "^10.6.4",
+    "storybook": "^10.6.5",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.5"
