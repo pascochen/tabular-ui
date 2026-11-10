@@ -326,12 +326,15 @@ function DataTable<TData>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     ...tableOptions,
+    // Merged, never replaced: a caller's `state` (row selection, visibility)
+    // would otherwise drop `sorting` while `onSortingChange` still wrote to
+    // ours, and every sort header went dead with no error.
+    state: { sorting, globalFilter, ...tableOptions?.state },
   });
 
   if (import.meta.env?.DEV) {

@@ -19,7 +19,10 @@ test('numeric cells render tabular figures, and the column aligns', async ({ pag
   const cells = await page.evaluate(() => {
     const out: { text: string; variant: string; align: string; right: number }[] = [];
     for (const td of Array.from(document.querySelectorAll('td'))) {
-      if (!td.className.includes('tabular-nums')) continue;
+      // Chosen by what the cell holds, never by the class under test: picking
+      // cells that carry `tabular-nums` let a column that lost it leave the
+      // sample instead of failing.
+      if (!/^[−+-]?[¥$]?\d[\d,]*(\.\d+)?[%s]?$/.test((td.textContent ?? '').trim())) continue;
       const s = getComputedStyle(td);
       out.push({
         text: td.textContent ?? '',

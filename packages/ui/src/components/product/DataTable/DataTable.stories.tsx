@@ -123,7 +123,9 @@ export const Default: Story = {
 export const SortedByFigure: Story = {
   render: () => (
     <div style={{ height: 240 }}>
-      <DataTable columns={columns} data={makeRows(8)} />
+      {/* A caller's own `state` rides along, and the table's sorting still
+          works: the two are merged. Replaced, this click sorted nothing. */}
+      <DataTable columns={columns} data={makeRows(8)} tableOptions={{ state: { columnVisibility: {} } }} />
     </div>
   ),
   play: async ({ canvasElement }) => {

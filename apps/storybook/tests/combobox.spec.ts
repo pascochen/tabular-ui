@@ -99,3 +99,22 @@ test('a list filtered down to fit shows no cue, and regains it when the filter c
   await expect(list(page).getByRole('option')).toHaveCount(9);
   await expect(list(page)).toHaveAttribute('data-overflow-y-end');
 });
+
+/**
+ * The multi-select's ring is drawn by the chips container, on `:focus-within`:
+ * the input inside it is `outline-none`. The container takes `outline-none` too,
+ * from inputVariants, so without `outline-solid` the ring had a width, a colour
+ * and no style, and a focused multi-select showed nothing (found 2026-11-09).
+ */
+for (const theme of ['dark', 'light'] as const) {
+  test(`a focused multi-select paints its ring (${theme})`, async ({ page }) => {
+    await gotoStory(page, 'foundational-combobox--multi-select', theme);
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[data-slot="combobox-chips-input"]')).toBeFocused();
+    const ring = await page.locator('[data-slot="combobox-chips"]').evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { style: s.outlineStyle, width: s.outlineWidth };
+    });
+    expect(ring).toEqual({ style: 'solid', width: await token(page, '--ring-width') });
+  });
+}

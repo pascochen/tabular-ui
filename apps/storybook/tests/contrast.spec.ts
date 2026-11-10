@@ -52,10 +52,12 @@ for (const [mode, expected] of [
     for (const [role, target] of Object.entries(expected)) {
       const fg = await token(page, `--color-text-${role}`);
       const ratio = await contrastRatio(page, fg, canvas);
+      // The difference itself: `toBeCloseTo(target, 0)`, which this was, passes
+      // anything within 0.5, wide enough for two roles to swap unnoticed.
       expect(
-        ratio,
+        Math.abs(ratio - target),
         `--color-text-${role} on canvas in ${mode}: expected ~${target}, got ${ratio.toFixed(2)}`,
-      ).toBeCloseTo(target, -Math.log10(TOLERANCE) - 1);
+      ).toBeLessThan(TOLERANCE);
       // §4 — all six clear AA for text.
       expect(ratio, `--color-text-${role} must clear 4.5:1`).toBeGreaterThanOrEqual(4.5);
     }
@@ -70,7 +72,10 @@ for (const mode of ['dark', 'light'] as const) {
     for (const [name, target] of Object.entries(NEUTRAL_TEXT[mode])) {
       const fg = await token(page, `--color-${name}`);
       const ratio = await contrastRatio(page, fg, canvas);
-      expect(ratio, `--color-${name} in ${mode}: expected ~${target}, got ${ratio.toFixed(2)}`).toBeCloseTo(target, 0);
+      expect(
+        Math.abs(ratio - target),
+        `--color-${name} in ${mode}: expected ~${target}, got ${ratio.toFixed(2)}`,
+      ).toBeLessThan(TOLERANCE);
     }
   });
 }

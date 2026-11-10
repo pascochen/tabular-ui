@@ -180,7 +180,14 @@ function Question({ title, options = [], text, onAnswer, outcome, className }: Q
           ) : null}
 
           {asSelect ? (
-            <Select value={picked} onValueChange={(value) => setPicked(value as string | null)} disabled={answered}>
+            // `items`: without it Base UI's Value prints the raw value, and the
+            // trigger showed an option's id where its label belonged.
+            <Select
+              items={options.map((o) => ({ value: o.id, label: o.label }))}
+              value={picked}
+              onValueChange={(value) => setPicked(value as string | null)}
+              disabled={answered}
+            >
               <SelectTrigger aria-labelledby={titleId} className="w-full">
                 <SelectValue placeholder="Choose an answer" />
               </SelectTrigger>

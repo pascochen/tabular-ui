@@ -289,7 +289,9 @@ function ComboboxChips({ className, ...props }: ComboboxPrimitive.Chips.Props) {
         inputVariants({ size: 'default' }),
         'flex h-auto min-h-[var(--h-control)] flex-wrap items-center',
         'gap-[var(--gap-chip)] py-[var(--pad-chip-y)]',
-        'focus-within:outline-ring focus-within:outline-[length:var(--ring-width)]',
+        // `outline-solid` is not optional: inputVariants carries `outline-none`,
+        // which sets the style the width utility reads back (failure log).
+        'focus-within:outline-ring focus-within:outline-solid focus-within:outline-[length:var(--ring-width)]',
         'focus-within:outline-offset-[length:var(--ring-offset)]',
         className,
       )}

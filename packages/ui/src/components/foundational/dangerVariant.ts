@@ -17,7 +17,8 @@ export function dangerVariant<V extends string | null | undefined>(
   variant: V,
 ): Exclude<V, 'destructive'> | 'danger' {
   if (variant !== 'destructive') return variant as Exclude<V, 'destructive'>;
-  if (import.meta.env.DEV && !warned.has(component)) {
+  // `?.`: outside Vite nothing defines import.meta.env (Badge, `totals.ts`).
+  if (import.meta.env?.DEV && !warned.has(component)) {
     warned.add(component);
     console.warn(
       `${component}: variant="destructive" is deprecated. Use variant="danger", the system's name for the red role (§1).`,
