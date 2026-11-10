@@ -42,19 +42,26 @@ jobs:
           # 2 brings its first parent, main, so the next step can diff the two.
           fetch-depth: 2
 
-      # A PR that changes only Markdown (READMEs, docs/, CLAUDE.md, tools.md)
-      # skips everything below and passes in about a minute, instead of ~20.
-      # No test, build or story reads a .md file (.mdx is Storybook's, so it
-      # does not count). Pushes to main always run in full, and so does any
-      # PR whose file list can't be read. Skipped, not cancelled: Verify still
-      # reports pass, so a required check is satisfied (2026-10-10, after the
-      # month's Actions minutes ran out).
+      # A PR that changes only Markdown nothing reads (docs/, CLAUDE.md,
+      # tools.md, most READMEs) skips everything below and passes in about a
+      # minute, instead of ~20. Pushes to main always run in full, and so does
+      # any PR whose file list can't be read. Skipped, not cancelled: Verify
+      # still reports pass, so a required check is satisfied (2026-10-10, after
+      # the month's Actions minutes ran out).
       #
-      # A PR that changes only apps/site (and Markdown) is site_only: it skips
-      # the library's story tests, design system specs and visual regression,
-      # which cover nothing it changed, and runs lint, type-check, the site
-      # build and the site tests (docs/site.md §10). Any change outside
-      # apps/site, the package included, runs everything plus the site.
+      # Some Markdown is read: the site builds from packages/ui/README.md and
+      # every product README, and a spec reads the design-review skill. Until
+      # 2026-11-10 this step skipped those too, on a comment saying no test or
+      # build read a .md file. The rule is .github/scripts/ci-scope.mjs now,
+      # and apps/storybook/tests/ci-scope.spec.ts checks its lists against the
+      # code, so a new reader of a .md file fails a test, not main.
+      #
+      # A PR that changes only apps/site, or Markdown the site reads, is
+      # site_only: it skips the library's story tests, design system specs and
+      # visual regression, which cover nothing it changed, and runs lint,
+      # type-check, the site build and the site tests (docs/site.md §10). Any
+      # change outside apps/site, the package included, runs everything plus
+      # the site.
       - name: Scope
         id: scope
         run: |
@@ -62,18 +69,21 @@ jobs:
           site_only=false
           if [ "${{ github.event_name }}" = "pull_request" ] && files=$(git diff --name-only HEAD^1 HEAD 2>/dev/null) && [ -n "$files" ]; then
             echo "Changed files:"; echo "$files"
-            if ! echo "$files" | grep -qvE '\.md$'; then
-              docs_only=true
-            elif ! echo "$files" | grep -qvE '(^apps/site/|\.md$)'; then
-              site_only=true
+            # The runner's own Node: this runs before setup-node. If the script
+            # fails, both stay false and the run is full.
+            if result=$(echo "$files" | node .github/scripts/ci-scope.mjs); then
+              [ "$(echo "$result" | sed -n 's/^docs_only=//p')" = true ] && docs_only=true
+              [ "$(echo "$result" | sed -n 's/^site_only=//p')" = true ] && site_only=true
+            else
+              echo "ci-scope.mjs failed; running in full."
             fi
           fi
           echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
           echo "site_only=$site_only" >> "$GITHUB_OUTPUT"
           if [ "$docs_only" = true ]; then
-            echo "Docs-only change: every changed file is Markdown, so install, lint, tests and builds are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Docs-only change: every changed file is Markdown that no build or test reads, so install, lint, tests and builds are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
           elif [ "$site_only" = true ]; then
-            echo "Site-only change: every changed file is in apps/site or Markdown, so the library's story tests, specs and screenshots are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Site-only change: every changed file is in apps/site or is Markdown, so the library's story tests, specs and screenshots are skipped." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "Full verification."
           fi
@@ -142,6 +152,19 @@ jobs:
         id: specs
         run: pnpm test:playwright
 
+      # The site's pages, prerendered, in a real browser: page structure and
+      # axe at WCAG 2.2 AA (docs/site.md §11). Runs whenever a build succeeded,
+      # even if the specs above failed, so one run shows both.
+      #
+      # Before the screenshots, not after (since 2026-11-10): the visual step
+      # decides whether this run's screenshots may be committed with a Verify
+      # ✓ of their own, and it can only count steps that have finished. Run
+      # last, a failed site test left that commit marked green.
+      - name: Site tests
+        id: site
+        if: ${{ !cancelled() && (steps.build.outcome == 'success' || steps.build-site.outcome == 'success') }}
+        run: pnpm test:site
+
       # Every story, dark and light, against the approved screenshots in
       # apps/storybook/tests/visual.spec.ts-snapshots/. A failure here means a component looks
       # different.
@@ -157,13 +180,18 @@ jobs:
       # that already needed review here can't be declared after the fact.
       - name: Visual regression (screenshots)
         id: visual
-        # Still runs when only the specs above failed, so one PR shows both.
-        if: ${{ steps.scope.outputs.docs_only != 'true' && steps.scope.outputs.site_only != 'true' && (success() || (failure() && steps.specs.outcome == 'failure')) }}
+        # Runs whenever the full build succeeded, so a PR whose specs or site
+        # tests failed still shows its screenshots. The build is skipped for a
+        # docs-only or site-only change, and never runs if lint, types or the
+        # story tests failed, so this step is skipped with it.
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           VISUAL_GATE: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]' && 'pr' || 'off' }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          OTHER_STEPS_OK: ${{ steps.specs.outcome == 'success' }}
+          # Every step that can fail after the build. Screenshots are accepted,
+          # and their commit marked Verify ✓, only if all of them passed.
+          OTHER_STEPS_OK: ${{ steps.specs.outcome == 'success' && steps.site.outcome == 'success' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -173,14 +201,6 @@ jobs:
             export PRIOR_COMMENT
           fi
           node apps/storybook/scripts/visual-gate.mjs
-
-      # The site's pages, prerendered, in a real browser: page structure and
-      # axe at WCAG 2.2 AA (docs/site.md §11). Runs whenever a build succeeded,
-      # even if the specs or screenshots above failed, so one run shows both.
-      - name: Site tests
-        id: site
-        if: ${{ !cancelled() && (steps.build.outcome == 'success' || steps.build-site.outcome == 'success') }}
-        run: pnpm test:site
 
       - name: Upload visual gate
         if: ${{ !cancelled() && steps.visual.outputs.gate == 'true' }}

@@ -115,7 +115,7 @@ Every PR runs one check, **Verify** (`.github/workflows/ci.yml`), in order:
 5. **Playwright specs**: what only a real browser can measure: focus-ring clipping, computed contrast, keyboard paths, layout geometry.
 6. **Visual regression**: every story screenshotted in dark and light at 1280×800, compared pixel for pixel with the approved screenshots.
 
-**A PR that changes only Markdown files** (`.md`: READMEs, `docs/`, `CLAUDE.md`, `tools.md`) skips it all and passes in about a minute, since nothing in the build reads a `.md` file. Anything else, and every merge to `main`, gets the full run, about 20 minutes. **Don't re-run a failed Verify to see if it goes away**: understand the failure first.
+**A PR that changes only Markdown files** (`.md`: READMEs, `docs/`, `CLAUDE.md`, `tools.md`) skips it all and passes in about a minute. The exceptions are the few Markdown files a build or test reads: `packages/ui/README.md` and a product component's `README.md` run the site's build and tests, and the design-review skill runs everything (`tools.md`, "Docs-only PRs"). Anything else, and every merge to `main`, gets the full run, about 20 minutes. **Don't re-run a failed Verify to see if it goes away**: understand the failure first.
 
 ## Visual changes
 
