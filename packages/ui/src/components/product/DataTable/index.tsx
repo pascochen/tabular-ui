@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
@@ -99,7 +99,34 @@ export type DataTableProps<TData> = {
   globalFilter?: string;
 };
 
-const ROW_HEIGHT = 28; // --h-row-sm. Virtualization needs a number, not a var.
+// --h-row-sm at the default text size. Virtualization needs a number, not a
+// var, and this is only where it starts: `useRowHeight` reads the real one.
+const ROW_HEIGHT = 28;
+
+/**
+ * `--h-row-sm` in px, as the page resolves it. The token yields to its text
+ * once a user's font size outgrows 28px (§7.6), so a literal here would be the
+ * failure-log entry on restating a token as a number: rows would be taller than
+ * the virtualizer's estimate and scroll position would drift. Measured on a
+ * probe that uses the token, because the custom property's own value is a
+ * formula. The observer catches a font-size change, which resizes nothing else.
+ */
+function useRowHeight(probe: RefObject<HTMLElement | null>) {
+  const [height, setHeight] = useState(ROW_HEIGHT);
+  useLayoutEffect(() => {
+    const el = probe.current;
+    if (!el) return;
+    const read = () => {
+      const measured = el.getBoundingClientRect().height;
+      if (measured > 0) setHeight(measured);
+    };
+    read();
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [probe]);
+  return height;
+}
 
 const ROW_CONTROLS =
   'a[href], button, input, select, textarea, label, [role="button"], [role="checkbox"], [role="switch"], [role="link"], [role="menuitem"]';
@@ -315,6 +342,8 @@ function DataTable<TData>({
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const rowProbe = useRef<HTMLDivElement>(null);
+  const rowHeight = useRowHeight(rowProbe);
   const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
   // React Compiler cannot memoize TanStack Table's API (its functions are
@@ -355,10 +384,14 @@ function DataTable<TData>({
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => ROW_HEIGHT,
+    estimateSize: () => rowHeight,
     overscan: 12,
     enabled: shouldVirtualize,
   });
+  // The virtualizer keeps the sizes it estimated: tell it when the row changed.
+  useEffect(() => {
+    virtualizer.measure();
+  }, [rowHeight, virtualizer]);
 
   const virtualRows = virtualizer.getVirtualItems();
   const paddingTop = shouldVirtualize && virtualRows.length ? virtualRows[0].start : 0;
@@ -407,11 +440,18 @@ function DataTable<TData>({
         // scroll container grows to the full table height, nothing actually
         // scrolls, and the virtualizer — seeing a viewport as tall as the
         // data — renders every row. The parent must have a bounded height.
-        'flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-border',
+        // `relative`: the row-height probe below is positioned in here.
+        'relative flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-border',
         'bg-canvas text-text-body',
         className,
       )}
     >
+      {/* Measures --h-row-sm for the virtualizer (useRowHeight). Paints nothing. */}
+      <div
+        ref={rowProbe}
+        aria-hidden="true"
+        className="pointer-events-none invisible absolute top-0 left-0 h-[var(--h-row-sm)] w-0"
+      />
       <div
         ref={scrollRef}
         className={cn(

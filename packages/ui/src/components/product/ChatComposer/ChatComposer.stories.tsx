@@ -28,6 +28,20 @@ const rect = (el: Element) => el.getBoundingClientRect();
 const px = (el: Element, property: string) => parseFloat(getComputedStyle(el).getPropertyValue(property));
 
 /**
+ * A height token in px. The `--h-*` tokens are formulas since 2026-11-10
+ * (`max(32px, 1.25rem + 4px)`, §7.6), so parsing one gives NaN: measure an
+ * element that uses it.
+ */
+function heightToken(name: string) {
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:absolute;visibility:hidden;width:0;height:var(${name})`;
+  document.body.append(probe);
+  const measured = probe.getBoundingClientRect().height;
+  probe.remove();
+  return measured;
+}
+
+/**
  * One box, two rows: the message on top, Send at the bottom right, inside the
  * box. Enter sends; Shift+Enter is a new line.
  */
@@ -47,7 +61,7 @@ export const Default: Story = {
     // Empty, the box is padding + one line + the row gap + Send + padding +
     // borders: 86px, derived from the tokens rather than restated.
     await expect(rect(box).height).toBe(
-      2 * px(box, '--pad-card') + px(field, 'line-height') + px(box, '--gap-field') + px(box, '--h-control') + 2,
+      2 * px(box, '--pad-card') + px(field, 'line-height') + px(box, '--gap-field') + heightToken('--h-control') + 2,
     );
     await expect(rect(box).height).toBe(86);
     await expect(rect(field).bottom).toBeLessThan(rect(send).top);

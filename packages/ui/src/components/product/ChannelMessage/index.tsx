@@ -127,7 +127,7 @@ function MessageRow({
           {author.name} <time dateTime={dateTime}>{time}</time>
         </span>
         {/* The avatar's width, so the body starts where the run's first body does. */}
-        <span aria-hidden="true" className={cn('shrink-0', reply ? 'w-6' : 'w-8')} />
+        <span aria-hidden="true" className={cn('shrink-0', reply ? 'w-[1.5rem]' : 'w-[2rem]')} />
         <div className="flex min-w-0 flex-1 flex-col gap-[var(--gap-bonded)]">
           {body}
           {after}
@@ -148,7 +148,10 @@ function MessageRow({
         */}
         <div
           data-slot="channel-message-header"
-          className={cn('flex flex-wrap items-center gap-x-[var(--gap-inline)]', reply ? 'min-h-6' : 'min-h-8')}
+          className={cn(
+            'flex flex-wrap items-center gap-x-[var(--gap-inline)]',
+            reply ? 'min-h-[1.5rem]' : 'min-h-[2rem]',
+          )}
         >
           <span className={cn('font-semibold text-text-primary', reply ? 'text-sm' : 'text-base')}>{author.name}</span>
           {author.badge}

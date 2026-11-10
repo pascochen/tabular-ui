@@ -211,6 +211,22 @@ export async function contrastRatio(page: Page, fg: string, bg: string): Promise
 }
 
 /** Reads a custom property off the document root. */
+/**
+ * A length token in px, as the page resolves it. The height tokens are
+ * formulas since 2026-11-10 (`max(28px, 1rem + 4px)`, §7.6), so
+ * `parseFloat(token(...))` on one is NaN. This measures an element that uses it.
+ */
+export async function tokenPx(page: Page, name: string): Promise<number> {
+  return page.evaluate((n) => {
+    const probe = document.createElement('div');
+    probe.style.cssText = `position:absolute;visibility:hidden;width:0;height:var(${n})`;
+    document.body.append(probe);
+    const height = probe.getBoundingClientRect().height;
+    probe.remove();
+    return height;
+  }, name);
+}
+
 export async function token(page: Page, name: string): Promise<string> {
   return page.evaluate((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), name);
 }

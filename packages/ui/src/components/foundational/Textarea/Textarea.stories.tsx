@@ -6,6 +6,20 @@ import { Input } from '../Input';
 import { Textarea } from './index';
 
 /**
+ * A height token in px. The `--h-*` tokens are formulas since 2026-11-10
+ * (`max(32px, 1.25rem + 4px)`, §7.6), so parsing one gives NaN: measure an
+ * element that uses it.
+ */
+function heightToken(name: string) {
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:absolute;visibility:hidden;width:0;height:var(${name})`;
+  document.body.append(probe);
+  const measured = probe.getBoundingClientRect().height;
+  probe.remove();
+  return measured;
+}
+
+/**
  * Mode is driven by the toolbar Theme control. Dark is canonical.
  */
 const meta = {
@@ -87,7 +101,7 @@ export const Growing: Story = {
     const lineHeight = parseFloat(getComputedStyle(field).lineHeight);
 
     // One line: the same box as Input, read from the token, not restated.
-    const control = parseFloat(getComputedStyle(field).getPropertyValue('--h-control'));
+    const control = heightToken('--h-control');
     await expect(height(field)).toBe(control);
     await expect(height(field)).toBe(height(input));
 

@@ -84,6 +84,11 @@
    side-by-side; docs/reviews/control-borders-2026-11-10.md). No token
    changed for the invalid edge decided with it: controls read
    --color-text-danger there, in place of --color-border-danger.
+   --h-row-xs, --h-row-sm, --h-control-sm, --h-control and --h-control-lg
+   each became max(<its px>, <its line-height in rem> + 4px), from §7.5 and
+   §7.6 (2026-11-10, user-approved; docs/reviews/type-scaling-2026-11-10.md).
+   The same px at the default root font size; a height yields once its
+   text no longer fits.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -195,12 +200,16 @@
   --radius-3xl: initial;
   --radius-4xl: initial;
 
-  /* §7.6 — control heights. px, deliberate (§7.5). Cap 36px. */
-  --h-row-xs: 24px;      /* dense table rows, log lines, activity feed */
-  --h-row-sm: 28px;      /* default table row */
-  --h-control-sm: 24px;  /* control inside a table row — 2px clearance in --h-row-sm */
-  --h-control: 32px;     /* default control — input, button, select */
-  --h-control-lg: 36px;  /* primary action, page-header control — cap */
+  /* §7.6 — control heights. px, deliberate (§7.5), cap 36px: at the default
+     text size. Each yields once its own line of text plus 4px is taller, so
+     a user who enlarges their font gets text that still fits (§7.5,
+     2026-11-10). A value read from one of these is the formula, not a
+     length: measure an element that uses the token. */
+  --h-row-xs: max(24px, 1rem + 4px);      /* dense table rows, log lines, activity feed */
+  --h-row-sm: max(28px, 1rem + 4px);      /* default table row */
+  --h-control-sm: max(24px, 1rem + 4px);  /* control inside a table row — 2px clearance in --h-row-sm */
+  --h-control: max(32px, 1.25rem + 4px);  /* default control — input, button, select */
+  --h-control-lg: max(36px, 1.25rem + 4px); /* primary action, page-header control — cap */
 
   /* §11.3 — standalone icon sizes, px per §7.5. Icons INLINE with text keep
      Phosphor's 1em default instead and scale with their type; these are for
