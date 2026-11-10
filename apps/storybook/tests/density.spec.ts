@@ -219,7 +219,15 @@ const readCells = (page: Page) =>
       whiteSpace: getComputedStyle(td).whiteSpace,
     });
     return {
-      rowHeight: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--h-row-sm')),
+      // Measured, not parsed: the token is a formula since 2026-11-10 (§7.6).
+      rowHeight: (() => {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;visibility:hidden;width:0;height:var(--h-row-sm)';
+        document.body.append(probe);
+        const height = probe.getBoundingClientRect().height;
+        probe.remove();
+        return height;
+      })(),
       rowHeights: [...new Set(rows.map((row) => row.getBoundingClientRect().height))],
       sideways: scroller.scrollWidth - scroller.clientWidth,
       figures: cells.filter(isFigure).map(read),

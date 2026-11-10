@@ -81,7 +81,15 @@ for (const route of Object.keys(keyed) as Route[]) {
         }));
       });
       const rowHeight = await page.evaluate(() =>
-        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--h-row-sm')),
+        // Measured, not parsed: the token is a formula since 2026-11-10 (design-system.md §7.6).
+        (() => {
+          const probe = document.createElement('div');
+          probe.style.cssText = 'position:absolute;visibility:hidden;width:0;height:var(--h-row-sm)';
+          document.body.append(probe);
+          const height = probe.getBoundingClientRect().height;
+          probe.remove();
+          return height;
+        })(),
       );
       for (const row of rows) {
         // The name's box ends at the list's edge, and its text is set to that edge.

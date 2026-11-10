@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { gotoStory, token } from './helpers';
+import { gotoStory, token, tokenPx } from './helpers';
 
 /**
  * The Combobox list's scroll cue. Base UI ships scroll arrows for Select only,
@@ -39,7 +39,7 @@ async function open(page: Page) {
 
 test('an overflowing list fades its bottom edge, then only its top once scrolled to the end', async ({ page }) => {
   await open(page);
-  const depth = parseFloat(await token(page, '--h-row-xs'));
+  const depth = await tokenPx(page, '--h-row-xs');
   const overflow = await list(page).evaluate((el) => el.scrollHeight - el.clientHeight);
   expect(overflow).toBeGreaterThan(0);
 
@@ -59,7 +59,7 @@ test('an overflowing list fades its bottom edge, then only its top once scrolled
 
 test('the keyboard-highlighted row is never parked under the fade', async ({ page }) => {
   await open(page);
-  const depth = parseFloat(await token(page, '--h-row-xs'));
+  const depth = await tokenPx(page, '--h-row-xs');
   // Step through every row; wherever an edge is faded, the row must stop clear of it.
   let checked = 0;
   for (let i = 0; i < 8; i++) {

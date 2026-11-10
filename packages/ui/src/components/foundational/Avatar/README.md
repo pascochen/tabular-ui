@@ -20,7 +20,7 @@ Kept: `Avatar`, `AvatarImage`, `AvatarFallback`. Dropped: `AvatarBadge`, `Avatar
 | `sm` | 24 | In a 28px row or beside a 32px control, such as the sidebar footer |
 | `default` | 32 | A menu header or a comment |
 
-Primitive scale (`size-6`, `size-8`): there are no avatar size tokens. If a third size or a third component needs one, that's the moment to ask for a token.
+In rem (`size-[1.5rem]`, `size-[2rem]`), 24px and 32px at the default text size: an avatar holds initials, so it grows with them (§7.5, since 2026-11-10; `size-6` and `size-8` until then). There are no avatar size tokens. If a third size or a third component needs one, that's the moment to ask for a token.
 
 ## Appearance
 

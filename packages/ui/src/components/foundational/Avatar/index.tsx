@@ -25,7 +25,10 @@ function Avatar({ className, size = 'default', ...props }: AvatarPrimitive.Root.
       data-size={size}
       className={cn(
         'group/avatar relative flex shrink-0 select-none rounded-full', // --radius-full: §7.7 lists avatar
-        size === 'sm' ? 'size-6' : 'size-8',
+        // rem, not the px scale: an avatar holds text, and a 24px circle
+        // around initials that have grown is a broken object (§7.5). 24px and
+        // 32px at the default text size, as before 2026-11-10.
+        size === 'sm' ? 'size-[1.5rem]' : 'size-[2rem]',
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:content-['']",
         'after:mix-blend-darken dark:after:mix-blend-lighten',
         className,

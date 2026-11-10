@@ -23,7 +23,7 @@ These matter more than any individual token value. A generator that gets the val
 
 4. **Dark and light are not mirrors.** Foregrounds are chosen by OKLCH lightness, never by inverting the other mode's step index. Every Riso ramp shares one lightness curve (§2), so the choice is one step per mode for every role: dark mode **step 400 (L 73)**, light mode **step 700 (L 46)**. Each was checked so every role's text clears 4.5:1 on its own tint over a hovered and a selected row, and over a highlighted popup row, not only on the canvas (§4). Solid fills are not foregrounds and sit at their own steps (§4). *(History: from 2026-10-09 to 2026-10-16 this rule set lightness bands, dark L 66–71 and light L 43–51, because Tailwind's ramps put a step at a different lightness in each hue; dark warning, `amber-500` at L 76.9, was the recorded exception. Before 2026-10-09 it read as step ranges.)*
 
-5. **No component spacing above 32px. No radius above 8px. No control height above 36px.** Generous spacing is how dense products silently become sparse. The cap is the design. The one exception is the **page frame**, the space around a page's content rather than between its parts. It has its own tier, `--pad-frame-*`, capped at 64px and used only by shell components. See §7.3 "Frame tier".
+5. **No component spacing above 32px. No radius above 8px. No control height above 36px** (at the default text size: §7.6)**.** Generous spacing is how dense products silently become sparse. The cap is the design. The one exception is the **page frame**, the space around a page's content rather than between its parts. It has its own tier, `--pad-frame-*`, capped at 64px and used only by shell components. See §7.3 "Frame tier".
 
 6. **All numeric output uses `tabular-nums`.** Non-negotiable in a financial tool. Columns of figures that don't align are a correctness hazard, not an aesthetic one.
 
@@ -767,6 +767,13 @@ A user who enlarges their browser font wants larger text. If spacing is also rem
 
 This is a deliberate minority position; the accessibility-orthodox default is rem everywhere. It is taken here because the product is a data grid, not a document. It also makes px-valued token names honest.
 
+**The grid holds until the type no longer fits in it, then a height yields — decided 2026-11-10 (owner; `docs/reviews/type-scaling-2026-11-10.md`).** Until then the rule had no limit, and it has one in practice. Measured on the demo with the root font size raised: nothing is clipped up to 140%, avatar initials are wider than their avatars from 150%, and near 200% a 32px control holds a 40px line, so nav rows collide and text is taller than its box in 40 places. Two things follow the type from that date, and nothing else does:
+
+- **A control or row height** keeps its px value until its own line of text plus 4px is taller (§7.6). Nothing changes at 100% or 125%.
+- **An avatar** is 1.5rem or 2rem, 24px and 32px at the default: it is a mark with text inside it, and a 24px circle around initials that have grown is a broken object, not a tight one.
+
+Spacing, radius, border widths and the shell's widths stay px, and so do standalone icons, which §11.3 sizes by the grid on purpose: scaling them was proposed in the same review and not taken. This is not a WCAG requirement. Browser zoom satisfies 1.4.4, and it scales px and rem together. It is what this section promised a user who raises their browser's font size.
+
 ### 7.6 Control heights — the real definition of density
 
 ```
@@ -777,7 +784,30 @@ This is a deliberate minority position; the accessibility-orthodox default is re
 --h-control-lg   36px    primary action, page-header control
 ```
 
-No control above 36px. No table row above 28px in default density.
+No control above 36px. No table row above 28px in default density. **Both are at the default text size:** see the next paragraph.
+
+**Each height yields to its own line of text — since 2026-11-10 (§7.5).** The token is `max(<the px above>, <its text's line-height in rem> + 4px)`:
+
+```css
+--h-row-xs:     max(24px, 1rem + 4px);    /* --text-sm's 16px line */
+--h-row-sm:     max(28px, 1rem + 4px);
+--h-control-sm: max(24px, 1rem + 4px);
+--h-control:    max(32px, 1.25rem + 4px); /* --text-base's 20px line */
+--h-control-lg: max(36px, 1.25rem + 4px);
+```
+
+| Root font size | `--h-row-xs`, `--h-control-sm` | `--h-row-sm` | `--h-control` | `--h-control-lg` |
+|---|---|---|---|---|
+| 100% | 24 | 28 | 32 | 36 |
+| 125% | 24 | 28 | 32 | 36 |
+| 150% | 28 | 28 | 34 | 36 |
+| 200% | 36 | 36 | 44 | 44 |
+
+*Why 4px, and not the padding a control has today.* A 32px control gives its 20px line 6px above and below. Keeping that (`1.25rem + 12px`) made every nav row taller at 150%, where nothing was clipped: rows the user had not lost, which is the cost §7.5 exists to avoid. 4px is §7.3's floor between two distinct objects, here a line of text and its control's edge.
+
+*What it costs.* Above about 125% the grid is no longer fixed. At 200% a user sees a fifth to a third fewer rows than before, where before they saw the same rows with the text spilling out of them.
+
+*What depends on it.* A value read from one of these tokens is no longer a plain length: `getPropertyValue('--h-row-sm')` returns the formula. Code that needs the number measures an element that uses the token. `DataTable`'s virtualizer does, where it had a literal 28, and `apps/storybook/tests/helpers.ts` has `tokenPx` for the specs. `tui/dimension-caps` still reads the px inside each `max()` and caps them at 36; it does not see the rem term.
 
 **`--h-control-sm` exists because a control has to fit inside a row.** A 32px button cannot sit in a 28px row, and the alternative — inlining a smaller styled `<button>` at the call site — is already in the failure log. 24px leaves 2px of clearance top and bottom in a `--h-row-sm` row and matches `--h-row-xs` exactly, so an in-row control and a dense row are the same height by construction. Added 2026-08-02 with the first `Button`.
 

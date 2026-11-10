@@ -42,7 +42,7 @@ Violating any of these fails review.
 5. **Reach for the semantic layer first.** `--pad-cell-x` before `p-2`. `--color-text-danger` before `text-vermilion-400`.
 6. **No component spacing above 32px, radius above 8px, control height above 36px.** The cap is the design. The page frame is the one exception: `--pad-frame-*`, capped at 64px, used only by `AppShell`, `EmptyState` and each workspace app's `App.tsx`. See `docs/design-system.md` §7.3 "Frame tier".
 7. **All numbers carry `tabular-nums`.** Misaligned figure columns in a financial tool are a correctness hazard.
-8. **Type in rem; spacing, radius and control heights in px.** Deliberate — see §7.5. Do not "fix" it to rem everywhere.
+8. **Type in rem; spacing, radius and control heights in px.** Deliberate — see §7.5. Do not "fix" it to rem everywhere. Since 2026-11-10 a control or row height yields once its own line of text no longer fits (`max(32px, 1.25rem + 4px)`, §7.6), and an avatar is sized in rem. Nothing else follows the type, and nothing changes at the default text size.
 9. **`ledger-950` as canvas, never `#000`.** Pure black causes halation over multi-hour sessions.
 10. **Never reference a raw hue in component code.** `lake-400` in a component breaks mode switching and any future hue change. Lint rejects every ramp name, Riso and Tailwind.
 
