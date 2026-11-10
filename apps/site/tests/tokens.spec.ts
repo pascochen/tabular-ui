@@ -19,9 +19,12 @@ const kasane = JSON.parse(read('../data/kasane.json')) as {
  * the wrong block fails here rather than on a page.
  */
 test('role tokens resolve to the spec’s steps, both modes (§4)', () => {
-  for (const role of roles) {
+  // Every role that takes a hue. Interactive text is ink since 2026-11-09 (§1).
+  for (const role of roles.filter((r) => r !== 'interactive')) {
     expect(tokenStep(`text-${role}`, 'dark').step).toBe('400');
   }
+  expect(stepLabel(tokenStep('text-interactive', 'dark'))).toBe('ledger-50');
+  expect(stepLabel(tokenStep('text-interactive', 'light'))).toBe('ledger-950');
   expect(stepLabel(tokenStep('text-success', 'light'))).toBe('ivy-700');
   expect(stepLabel(tokenStep('bg-warning', 'light'))).toBe('ochre-500 / 10%');
   expect(stepLabel(tokenStep('fill-warning', 'light'))).toBe('ochre-500');

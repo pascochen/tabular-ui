@@ -41,11 +41,11 @@ These matter more than any individual token value. A generator that gets the val
 
 ## 1. The Five
 
-Five hues, six roles. The interactive role is split (decided 2026-10-16): its solid parts, the primary action and the focus ring, are `ledger` ink, and its marks, links, selected text and the selection tint, are `ivy`, the same green as success.
+Five hues, six roles. The interactive role is split (decided 2026-10-16): its solid parts and its text, the primary action, the focus ring and links, are `ledger` ink, and its tints, a selected row and selected text, are `ivy`, the same green as success. *(Links were `ivy` too until 2026-11-09, below.)*
 
 | Role | Ramp | RISO anchor | Applies to |
 |---|---|---|---|
-| **Interactive** | `ledger` (fill, ring) · `ivy` (text, tint) | Federal Blue, 288 U · Green, 354 U | Primary action, focus ring, checked controls, active tab · links, selected row in a single-selection list |
+| **Interactive** | `ledger` (fill, ring, text) · `ivy` (tint) | Federal Blue, 288 U · Green, 354 U | Primary action, focus ring, checked controls, active tab, links · selected row in a single-selection list, selected text |
 | **Danger** | `vermilion` | Crimson, 485 U | Failed run, validation error, destructive action, negative variance, reconciliation mismatch |
 | **Warning** | `ochre` | Sunflower, 116 U | Stale data, degraded run, needs review, unverified figure, approaching threshold |
 | **Success** | `ivy` | Green, 354 U | Passed test, verified figure, deployed, positive variance, numbers match |
@@ -66,7 +66,13 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **The accent is ink — decided 2026-10-16, after review in Storybook.** The primary action, the focus ring, checked controls and the active-tab indicator are `ledger`: ink on paper in light mode, paper on ink in dark (16.49:1 either way), as a riso print puts its strongest ink on the one thing to press. The focus ring is a step softer, `ledger-800` / `ledger-200`, since 2026-10-22 (§4). They were `sage` until the same day; the owner preferred the ink accent of the `experiment/riso` art direction. A primary button and a success badge no longer share a hue.
 
-**Links and selection stay `ivy`, shared with success.** `--color-text-interactive`, `--color-bg-interactive` and `--color-border-interactive` keep the green. A ledger link would be the body-text colour, and a ledger selection tint measured 1.04:1 against the hover tint, so a selected row would look hovered. Interactive and success stay separate tokens; today only the text, tint and border values coincide. Where success and selection meet, **shape carries the difference**: a selected row is a full-width tint, a success state is an 18px badge with an icon.
+**Links are ink, underlined — decided 2026-11-09 (owner; `docs/reviews/links-and-success-2026-11-09.md`).** `--color-text-interactive` is `ledger-950` in light mode and `ledger-50` in dark, the ink of the primary action: 16.49:1 on the canvas in both modes, and 12.46:1 (light) and 10.93:1 (dark) on the worst ground §4 lists. A link is an affordance, not a state, so by §0 rule 1 it takes no hue. Until this date it was `ivy-700` / `ivy-400`, the same value as `--color-text-success`: in the demo, the titles of four open problems and nine filenames were set in the green that means "passed", and the one ochre mark that said "this is yours" was the smallest colour on the screen.
+
+- **The underline marks it.** 1px, offset 2px, at rest. Ink beside body text is no visible difference, so the line is the link's only mark, which is also what WCAG 1.4.1 asks for: as `ivy`, a link in a sentence differed from its text by colour alone, at 1.99:1 in light and 1.91:1 in dark against the 3:1 that needs, and showed its underline only on hover.
+- **A list whose every row is a link keeps the underline for hover and focus.** A file list of `AttachmentRow`s, `Sources`. The list's shape already says each row opens, and a column of underlined names reads as ruled paper. A link inside a sentence always carries it.
+- **What else reads the token goes to ink with it:** `DataTable`'s caret on a sorted column, a selected `Chip`'s text, and `Badge tone="interactive"`. None of them is a success.
+
+**Selection stays `ivy`, shared with success.** `--color-bg-interactive` and `--color-border-interactive` keep the green, and so does `--color-bg-selection` (§4). Selection is the user's focus, which rule 1 allows a hue. A ledger selection tint measured 1.04:1 against the hover tint, so a selected row would look hovered. Interactive and success stay separate tokens; today only the tint and border values coincide. Where success and selection meet, **shape carries the difference**: a selected row is a full-width tint, a success state is an 18px badge with an icon. *(A neutral tint with an ink edge was proposed with the link change and left open: it collides with the agent rail on an agent-proposed row. Same review.)*
 
 **The active nav item takes no hue — corrected 2026-10-22 (owner).** It is marked by weight and shape: its label steps up from `--color-text-secondary` to `--color-text-primary` at `--font-semibold`, its icon switches to Phosphor's `fill` weight (§11.2), and it carries `aria-current="page"`. That is how `AppShellNavItem` and `AppBarNavItem` have always drawn it. Until this date the table above listed "active nav item" under sage, which no component did. A sidebar is navigation, and colour means state (§0 rule 1): which page you are on is your place, not something true about the data.
 
@@ -144,11 +150,12 @@ Tailwind's 400 step was not perceptually equal across hues: on its darkest neutr
 
 `ledger` alone has a twelfth step, **925** (L 25.75%, the midpoint of 900 and 950), for dark-mode raised surfaces (§3).
 
-So one step serves every role: **400 in dark mode, 700 in light mode** (§0 rule 4).
+So one step serves every role that takes a hue: **400 in dark mode, 700 in light mode** (§0 rule 4). Interactive text takes none since 2026-11-09: a link is ink (§1).
 
 | Role | Dark text | On `ledger-950` | Light text | On `ledger-50` |
 |---|---|---|---|---|
-| interactive (text), success | `ivy-400` | 7.89:1 | `ivy-700` | 6.24:1 |
+| interactive (text) | `ledger-50` | 16.49:1 | `ledger-950` | 16.49:1 |
+| success | `ivy-400` | 7.89:1 | `ivy-700` | 6.24:1 |
 | danger | `vermilion-400` | 6.99:1 | `vermilion-700` | 7.15:1 |
 | warning | `ochre-400` | 7.28:1 | `ochre-700` | 6.74:1 |
 | agent | `orchid-400` | 7.00:1 | `orchid-700` | 7.14:1 |
@@ -263,7 +270,7 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | on raised | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `ivy-400` | 7.89:1 | 6.98:1 | `ledger-50` | `ledger-950` | 16.49:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
+| interactive | `ledger-50` | 16.49:1 | 14.60:1 | `ledger-50` | `ledger-950` | 16.49:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
 | danger | `vermilion-400` | 6.99:1 | 6.19:1 | `vermilion-600` | `ledger-50` | 5.36:1 | `vermilion-500 / 10%` | `vermilion-500 / 25%` |
 | warning | `ochre-400` | 7.28:1 | 6.45:1 | `ochre-400` | `ledger-950` | 7.28:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
 | success | `ivy-400` | 7.89:1 | 6.98:1 | `ivy-600` | `ledger-50` | 4.60:1 | `ivy-500 / 10%` | `ivy-500 / 25%` |
@@ -278,14 +285,14 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 | Role | `--color-text-` | on canvas | worst ground | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
 |---|---|---|---|---|---|---|---|---|
-| interactive | `ivy-700` | 6.24:1 | 4.72:1 | `ledger-950` | `ledger-50` | 16.49:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
+| interactive | `ledger-950` | 16.49:1 | 12.46:1 | `ledger-950` | `ledger-50` | 16.49:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
 | danger | `vermilion-700` | 7.15:1 | 5.34:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
 | warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.91:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
 | success | `ivy-700` | 6.24:1 | 4.72:1 | `ivy-700` | `ledger-50` | 6.24:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
 | agent | `orchid-700` | 7.14:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.14:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
 | info | `lake-700` | 6.68:1 | 4.86:1 | `lake-700` | `ledger-50` | 6.68:1 | `lake-500 / 12%` | `lake-500 / 20%` |
 
-"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Interactive and success (`ivy-700`) are the tightest roles, at 6.24:1 on the canvas and 4.72:1 at worst.** The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
+"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Success (`ivy-700`) is the tightest role, at 6.24:1 on the canvas and 4.72:1 at worst.** Interactive text is ink since 2026-11-09 (§1), 12.46:1 at worst. The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
 
 **Light info tint is 12%, not 8% — decided 2026-11-06 (owner, for readability).** On the cream paper `lake-500` at 8% measured chroma 0.0046, which reads as grey. 12% is the least that clears chroma 0.008 (0.0092, composited in sRGB over the canvas). Info text on its own tint over a selected, hovered row falls from 5.06:1 to 4.86:1, still above 4.5:1; 14% would give 4.77:1 for little more colour. The cost: the info tint now sits 28% further from the paper than the median role tint, past the ±15% that `scripts/check-harmony.mjs` flags, so a running row is the strongest tinted row in light mode. Warning was already the other exception, at 10%. Dark mode is unchanged: every dark tint, info included, clears 0.008 at 10% except warning (0.0063), which is not changed here.
 

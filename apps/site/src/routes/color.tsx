@@ -216,7 +216,7 @@ export default function Color() {
           <SectionHeader
             id="roles-title"
             title="Roles"
-            lead="Six roles from five hues: the interactive role’s fill and ring are ink, its text and tint the same green as success. Each shows its text on the canvas, its solid fill with the text that sits on it, and its tint."
+            lead="Six roles from five hues: the interactive role’s fill, ring and text are ink, its tint the same green as success. Each shows its text on the canvas, its solid fill with the text that sits on it, and its tint."
           />
           {roles.map((role) => (
             <RoleRow key={role} role={role} />

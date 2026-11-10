@@ -797,14 +797,19 @@ test.describe('the footer', () => {
 });
 
 test.describe('standalone links', () => {
-  // Owner, 2026-10-27: a link that stands alone (footer, card title, jump
-  // index, section header) is ink at rest and turns the ivy of a text link on
-  // hover, with no underline. A link inside a sentence stays ivy and
-  // underlined. The nav's links are ghost buttons, not standalone links.
-  test('are ink at rest, and ivy with no underline on hover', async ({ page }) => {
-    // Home has no link inside a sentence, so the ivy comes from Getting started.
+  // A link that stands alone (footer, card title, jump index, section header)
+  // has no underline at rest (owner, 2026-10-27) and takes one on hover, in the
+  // colour it already has. Until 2026-11-09 the hover turned it ivy instead: a
+  // link is ink now (design-system.md §1), so a colour change would say nothing.
+  // A link inside a sentence is ink and always underlined. The nav's links are
+  // ghost buttons, not standalone links.
+  test('have no underline at rest, and take one on hover without changing colour', async ({ page }) => {
     await page.goto('/getting-started');
-    const ivy = await page.locator('main p a[href*="storybook"]').evaluate((el) => getComputedStyle(el).color);
+    const inSentence = await page.locator('main p a[href*="storybook"]').evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { color: s.color, line: s.textDecorationLine };
+    });
+    expect(inSentence.line).toBe('underline');
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
     const links = [
@@ -821,10 +826,9 @@ test.describe('standalone links', () => {
         });
       await page.mouse.move(0, 0);
       const rest = await style();
-      expect(rest.color).not.toBe(ivy);
       expect(rest.line).toBe('none');
       await link.hover();
-      await expect.poll(style).toEqual({ color: ivy, line: 'none' });
+      await expect.poll(style).toEqual({ color: rest.color, line: 'underline' });
     }
   });
 
