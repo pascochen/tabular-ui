@@ -14,7 +14,7 @@ const meta = {
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'default'] } },
   render: (args) => (
     <Avatar {...args}>
-      <AvatarFallback>MT</AvatarFallback>
+      <AvatarFallback>JR</AvatarFallback>
     </Avatar>
   ),
 } satisfies Meta<typeof Avatar>;
@@ -29,10 +29,10 @@ export const Sizes: Story = {
   render: () => (
     <div className="flex items-center gap-[var(--gap-group)]">
       <Avatar size="sm">
-        <AvatarFallback>MT</AvatarFallback>
+        <AvatarFallback>JR</AvatarFallback>
       </Avatar>
       <Avatar>
-        <AvatarFallback>MT</AvatarFallback>
+        <AvatarFallback>JR</AvatarFallback>
       </Avatar>
     </div>
   ),
