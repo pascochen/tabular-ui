@@ -79,6 +79,11 @@
    ledger-50, from §1 "Links are ink, underlined" and §4 (2026-11-09,
    user-approved; docs/reviews/links-and-success-2026-11-09.md). The tint
    and border keep ivy.
+   --color-border-control added from §3 and §4 "Control edge", light
+   ledger-600, dark ledger-500 (2026-11-10, user-approved after a
+   side-by-side; docs/reviews/control-borders-2026-11-10.md). No token
+   changed for the invalid edge decided with it: controls read
+   --color-text-danger there, in place of --color-border-danger.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -356,6 +361,7 @@
   --tui-surface-raised: var(--color-ledger-50);
   --tui-border: var(--color-ledger-200);
   --tui-border-strong: var(--color-ledger-300);
+  --tui-border-control: var(--color-ledger-600); /* 4.89:1; 3.97 at worst — a form control's edge, 3:1 on every ground (§4) */
   --tui-text-primary: var(--color-ledger-950);    /* 16.49:1 */
   --tui-text-body: var(--color-ledger-900);       /* 12.44:1 */
   --tui-text-secondary: var(--color-ledger-700);  /*  6.62:1 */
@@ -441,6 +447,7 @@
   --tui-surface-raised: var(--color-ledger-925);
   --tui-border: var(--color-ledger-800);
   --tui-border-strong: var(--color-ledger-700);
+  --tui-border-control: var(--color-ledger-500); /* 4.95:1; 3.69 at worst (§4 Control edge) */
   --tui-text-primary: var(--color-ledger-50);     /* 16.49:1 */
   --tui-text-body: var(--color-ledger-100);       /* 15.08:1 */
   --tui-text-secondary: var(--color-ledger-300);  /* 10.19:1 */
@@ -527,6 +534,7 @@
   --color-surface-raised: var(--tui-surface-raised);
   --color-border: var(--tui-border);
   --color-border-strong: var(--tui-border-strong);
+  --color-border-control: var(--tui-border-control);
   --color-text-primary: var(--tui-text-primary);
   --color-text-body: var(--tui-text-body);
   --color-text-secondary: var(--tui-text-secondary);

@@ -27,7 +27,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from 't
 
 ## The trigger is a field, not a button
 
-It matches `Input` exactly — transparent ground, 1px `--color-border`, value left-aligned in the body weight, same heights, same `--pad-control-x`, same `--color-text-tertiary` placeholder — so a form of mixed controls lines up and reads as one system.
+It matches `Input` exactly — transparent ground, 1px `--color-border-control`, value left-aligned in the body weight, same heights, same `--pad-control-x`, same `--color-text-tertiary` placeholder — so a form of mixed controls lines up and reads as one system.
 
 But it *is* pressed, so it takes the hover and press overlay. That is why `controlOverlay` is a separate export from `pressableBase`: the Select trigger needs the overlay without `justify-center` or `font-medium`, which would centre its value and set it in a label weight.
 
@@ -54,5 +54,5 @@ Set it on **`Select`**, the root — not on the trigger. `SelectContent` and `Se
 - **Highlighted** item (pointer or keyboard) takes `--color-bg-hover`, the same neutral overlay every control uses.
 - **Selected** item takes `--color-bg-interactive`. §4 is explicit that selection *is* the interactive role and that no `--color-bg-selected` exists — inventing one would be a duplicate by another name.
 - **Group labels** use `--text-2xs` uppercase with `--tracking-wide`, §8.1's micro-label tier.
-- **Invalid** (`aria-invalid`) tints the border with `--color-border-danger`; pair it with a message in `--color-text-danger`, as a border alone does not survive grayscale.
+- **Invalid** (`aria-invalid`) draws the border in solid `--color-text-danger` (§4 Control edge); pair it with a message in `--color-text-danger`, as a border alone does not survive grayscale.
 - The caret and check are Phosphor at `--size-icon-sm` (14px), so `weight="bold"` per §11.2.

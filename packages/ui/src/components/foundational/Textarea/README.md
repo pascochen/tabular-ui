@@ -15,7 +15,7 @@ shadcn's Base UI textarea is a plain `<textarea>` carrying a `cn-textarea` class
 
 ## The same box as `Input`
 
-Transparent ground, 1px `--color-border`, `--radius-md`, `--pad-control-x`, `--text-base` in `--color-text-body`, `--color-text-tertiary` placeholder. Invalid tints the border with `--color-border-danger`, and disabled fades the field through `controlBase`, as in `Input`. A one-line textarea and an input set side by side are indistinguishable until you type a second line.
+Transparent ground, 1px `--color-border-control` (§4 Control edge), `--radius-md`, `--pad-control-x`, `--text-base` in `--color-text-body`, `--color-text-tertiary` placeholder. Invalid tints the border with `--color-border-danger`, and disabled fades the field through `controlBase`, as in `Input`. A one-line textarea and an input set side by side are indistinguishable until you type a second line.
 
 There is no `size` or `content` prop yet. Free text is the only use so far. Add `mono` when a screen needs SQL or identifiers in a multi-line field, and follow `Input`'s compound variants for the size step (§8.3).
 

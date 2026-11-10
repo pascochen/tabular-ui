@@ -144,13 +144,14 @@ for (const mode of ['dark', 'light'] as const) {
       expect(Math.abs(got - want), `scrim ${channel} is the canvas colour, not black`).toBeLessThanOrEqual(1);
     }
 
-    // A bordered field inside keeps its border: DialogContent redefines
-    // --tui-border to the strong step, or the field's border would be faint
-    // on the raised surface (1.60:1 dark, 1.29:1 light; under olive it
-    // matched the surface and vanished, §3).
+    // A bordered field inside keeps its border. Since 2026-11-10 that is the
+    // control edge, which clears 3:1 on the raised surface by itself (§4).
+    // Until then DialogContent's --tui-border override lent it the strong
+    // step, or it would have been 1.60:1 dark and 1.29:1 light; the override
+    // still serves dividers and outline buttons inside the dialog.
     const field = panel.getByRole('textbox', { name: 'Model name' });
     const fieldBorder = await field.evaluate((el) => getComputedStyle(el).borderTopColor);
-    expect(await rgba(page, fieldBorder)).toEqual(await rgba(page, await token(page, '--color-border-strong')));
+    expect(await rgba(page, fieldBorder)).toEqual(await rgba(page, await token(page, '--color-border-control')));
     expect(await rgba(page, fieldBorder)).not.toEqual(await rgba(page, style.bg));
   });
 }

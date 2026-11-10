@@ -215,7 +215,7 @@ function ChatComposer({
         'flex cursor-text flex-col gap-[var(--gap-field)]',
         // The box. Borders do the work, as on Input (§0 rule 7); --radius-lg,
         // the container tier (square since 2026-10-16, §7.7).
-        'rounded-lg border border-border bg-transparent p-[var(--pad-card)] transition-colors',
+        'rounded-lg border border-border-control bg-transparent p-[var(--pad-card)] transition-colors', // §4 Control edge: the box is the field's boundary
         // The field draws no ring of its own (Textarea `borderless`), so the box
         // draws it. Outline, never box-shadow (§4); outline-solid, or the
         // width and colour resolve against outline-style: none.

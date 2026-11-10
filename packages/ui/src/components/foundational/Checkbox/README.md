@@ -17,9 +17,9 @@ Foundational. Adopted from shadcn/ui (Base UI, `base-mira`) and retokenized.
 ## Appearance
 
 - **`--radius-xs`, square (0px) since 2026-10-16** (§7.7; 2px before, because at a 14–16px box even 4px read soft). §7.7 says explicitly *do not encode interactivity in radius*, so radius here is an optical choice, not a signal that the box is clickable, and it matches the status badge.
-- **Unchecked matches `Input`**: transparent with a 1px `--color-border`.
+- **Unchecked matches `Input`**: transparent with a 1px `--color-border-control`, which clears 3:1 on every ground: unchecked, the border is the whole control (§4 Control edge).
 - **Checked and indeterminate use `--color-fill-interactive`** with an `--color-on-interactive` mark. Selection is the interactive role (§1).
-- **Invalid** tints the border with `--color-border-danger`; pair with a message.
+- **Invalid** draws the border in solid `--color-text-danger` (§4 Control edge); pair with a message.
 
 ## Sizes
 

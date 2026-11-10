@@ -154,6 +154,47 @@ async function composite(page: import('@playwright/test').Page, colors: string[]
   }, colors);
 }
 
+/**
+ * §4 Control edge. An Input, a Select trigger and an unchecked Checkbox are
+ * drawn by their border alone, so it must clear 3:1 (WCAG 1.4.11) wherever one
+ * sits, a hovered or selected table row included. Until 2026-11-10 they took
+ * `--color-border`: 1.29:1 on paper, and no test measured a border at all.
+ */
+for (const mode of ['light', 'dark'] as const) {
+  test(`a control's edge clears 3:1 on every ground — ${mode}`, async ({ page }) => {
+    await gotoStory(page, 'foundational-checkbox--states', mode);
+    const edge = await token(page, '--color-border-control');
+    for (const [ground, layers] of Object.entries(BADGE_GROUNDS)) {
+      const colors = await Promise.all(layers.map((l) => token(page, l)));
+      const ratio = await contrastRatio(page, edge, await composite(page, colors));
+      expect.soft(ratio, `${mode} · ${ground}: ${ratio.toFixed(2)}`).toBeGreaterThanOrEqual(3);
+    }
+    // The token is only worth its gate if the control uses it.
+    const drawn = await page
+      .getByRole('checkbox', { name: 'Unchecked' })
+      .evaluate((el) => getComputedStyle(el).borderTopColor);
+    expect(await contrastRatio(page, drawn, edge)).toBeCloseTo(1, 2);
+  });
+}
+
+/**
+ * §4 Control edge: an invalid control's edge is solid `--color-text-danger`.
+ * Until 2026-11-10 it was the `--color-border-danger` tint, 1.27:1 on paper:
+ * the field in error had the faintest border on the form.
+ */
+for (const mode of ['light', 'dark'] as const) {
+  test(`an invalid field's edge is firmer than a valid one's — ${mode}`, async ({ page }) => {
+    await gotoStory(page, 'foundational-input--states', mode);
+    const canvas = await token(page, '--color-canvas');
+    const edgeOf = (name: string) =>
+      page.getByRole('textbox', { name }).evaluate((el) => getComputedStyle(el).borderTopColor);
+    const invalid = await contrastRatio(page, await edgeOf('Invalid'), canvas);
+    const valid = await contrastRatio(page, await edgeOf('With value'), canvas);
+    expect(invalid, `invalid ${invalid.toFixed(2)}, valid ${valid.toFixed(2)}`).toBeGreaterThan(valid);
+    expect(invalid).toBeGreaterThanOrEqual(3);
+  });
+}
+
 for (const mode of ['light', 'dark'] as const) {
   test(`role text clears 4.5:1 on its own tint, on every row state — ${mode}`, async ({ page }) => {
     await gotoStory(page, 'design-system-tokens--tokens', mode);

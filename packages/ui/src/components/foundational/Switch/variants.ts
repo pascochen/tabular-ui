@@ -34,7 +34,7 @@ export const switchVariants = cva(
     'data-unchecked:bg-border-strong',
     'data-checked:bg-fill-interactive',
 
-    'aria-invalid:border-border-danger',
+    'aria-invalid:border-text-danger', // §4 Control edge: solid, so invalid is firmer than valid, never fainter
     'data-disabled:cursor-not-allowed data-disabled:opacity-50',
 
     // Hit area: the track is 14–16px tall, under the 24px WCAG 2.5.8 target

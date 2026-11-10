@@ -36,10 +36,10 @@ It declares **what the field holds**, and the system applies the typography that
 
 ## Ground and states
 
-**Transparent with a 1px `--color-border`** — no fill. §0 rule 7: borders do the work. A field stays quiet on the canvas and on a surface alike, and reads consistently with the `outline` Button.
+**Transparent with a 1px `--color-border-control`** (3:1 on every ground, §4 Control edge; `--color-border` until 2026-11-10) — no fill. §0 rule 7: borders do the work. A field stays quiet on the canvas and on a surface alike, and reads consistently with the `outline` Button.
 
 - **Placeholder** is `--color-text-tertiary`, which §3 scopes to exactly this — placeholder text, disabled labels, non-text marks. Never a value the user must read.
-- **Invalid** (`aria-invalid`) tints the border with `--color-border-danger`. **Pair it with a message in `--color-text-danger`.** The border alone does not survive grayscale, and §5 pairs the border tint with a text signal for that reason.
+- **Invalid** (`aria-invalid`) draws the border in solid `--color-text-danger` (§4 Control edge; a tint until 2026-11-10, when it was the faintest edge on the form). **Pair it with a message in `--color-text-danger`.** The border alone does not survive grayscale, and §5 pairs the border tint with a text signal for that reason.
 - **Disabled** dims the whole field and sets `not-allowed`.
 
 ## Labels are the caller's job
