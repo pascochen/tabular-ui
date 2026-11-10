@@ -69,6 +69,7 @@ const surfaces = [
   { token: 'surface-raised', className: 'bg-surface-raised' },
   { token: 'border', className: 'bg-border' },
   { token: 'border-strong', className: 'bg-border-strong' },
+  { token: 'border-control', className: 'bg-border-control' },
   // A swatch, not a text sample: it is for disabled labels only, which WCAG exempts,
   // and as readable text on this page it would fail 1.4.3.
   { token: 'text-disabled', className: 'bg-text-disabled' },

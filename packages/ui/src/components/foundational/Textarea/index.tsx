@@ -100,7 +100,7 @@ function Textarea({
             ]
           : [
               // Same ground, border and states as Input (§0 rule 7, §3, §5).
-              'border border-border aria-invalid:border-border-danger',
+              'border border-border-control aria-invalid:border-text-danger', // §4 Control edge, and its solid invalid edge
               // One line plus this padding plus the 1px borders is --h-control.
               'px-[var(--pad-control-x)] py-[calc((var(--h-control)-1lh-2px)/2)]',
               'min-h-[calc(var(--h-control)+(var(--textarea-min-rows)-1)*1lh)]',

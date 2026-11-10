@@ -45,7 +45,7 @@ One `<form>` box, two rows, `--gap-field` (8px) between them.
 
 | Part | Treatment |
 |---|---|
-| Box | 1px `--color-border` on a transparent ground, as `Input` (§0 rule 7). `--radius-lg` (0px since 2026-10-16), `--pad-card` (12px). It draws the focus ring for the field inside: outline on `has-[textarea:focus-visible]`, never box-shadow (§4). Pressing its padding or the empty stretch of the bottom row puts the caret in the field. |
+| Box | 1px `--color-border-control` on a transparent ground, as `Input` (§0 rule 7). `--radius-lg` (0px since 2026-10-16), `--pad-card` (12px). It draws the focus ring for the field inside: outline on `has-[textarea:focus-visible]`, never box-shadow (§4). Pressing its padding or the empty stretch of the bottom row puts the caret in the field. |
 | Message | `Textarea` `variant="borderless"`, `minRows={1}`: 20px empty, growing a line at a time to `maxRows`, then scrolling. Hidden lines fade at the edge they hide behind (§4 *Scroll cue*). |
 | Attached files | Above the message, inside the box: one `AttachmentRow` per file (28px, neutral file-type glyph, name in mono, size, upload status or progress, remove). The list is pulled out by the rows' own `--pad-cell-x`, so each glyph lines up with the message text and the hover fill reaches into the box's padding. Added 2026-10-15 after a benchmark: Dropbox Dash, Langdock and ChatGPT all show attached files inside the box, above the text. |
 | Bottom row | The attach button (with `onAttach`), then `actions`, then Send or Stop at the right. |

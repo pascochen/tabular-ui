@@ -15,13 +15,13 @@ export const checkboxVariants = cva(
     // encodes interactivity (§7.7), so this is optical only.
 
     // Unchecked matches Input: transparent with a 1px border.
-    'border border-border bg-transparent',
+    'border border-border-control bg-transparent', // §4 Control edge: unchecked, the border is the whole control
 
     // Checked is the interactive role (§1) — selection is interactive.
     'data-checked:border-transparent data-checked:bg-fill-interactive data-checked:text-on-interactive',
     'data-indeterminate:border-transparent data-indeterminate:bg-fill-interactive data-indeterminate:text-on-interactive',
 
-    'aria-invalid:border-border-danger',
+    'aria-invalid:border-text-danger', // §4 Control edge: solid, so invalid is firmer than valid, never fainter
     'disabled:cursor-not-allowed',
 
     // Hit area, not decoration. The visual box is 14–16px, well under the 24px

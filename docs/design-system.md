@@ -191,6 +191,7 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-surface-raised` | `ledger-925` | 1.13:1 | — |
 | `--color-border` | `ledger-800` | 1.82:1 | 1.61:1 |
 | `--color-border-strong` | `ledger-700` | 2.49:1 | 2.21:1 |
+| `--color-border-control` | `ledger-500` | **4.95:1** | 4.39:1 |
 | `--color-text-primary` | `ledger-50` | **16.49:1** | 14.60:1 |
 | `--color-text-body` | `ledger-100` | **15.08:1** | 13.36:1 |
 | `--color-text-secondary` | `ledger-300` | **10.19:1** | 9.03:1 |
@@ -209,6 +210,7 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-surface-raised` | `ledger-50` | the canvas |
 | `--color-border` | `ledger-200` | 1.29:1 |
 | `--color-border-strong` | `ledger-300` | 1.62:1 |
+| `--color-border-control` | `ledger-600` | **4.89:1** |
 | `--color-text-primary` | `ledger-950` | **16.49:1** |
 | `--color-text-body` | `ledger-900` | **12.44:1** |
 | `--color-text-secondary` | `ledger-700` | **6.62:1** |
@@ -421,6 +423,36 @@ No blur, no black, no new colour. The overlay reads as the top sheet of a small 
 - *Forced colours.* Windows' forced-colours mode removes `box-shadow`. The 1px border stays, so an overlay keeps its edge and loses only the stack.
 
 **Never on a control.** In neo-brutalist UI an offset shadow means "pressable", and buttons sink into it on press. Here it means "this layer is above the page" and nothing else. One shadow exists: Tailwind's stock shadow scales are stripped (§9), and lint rejects every shadow utility except `shadow-overlay` and `shadow-none`.
+
+### Control edge — a form control's boundary clears 3:1
+
+```
+                              Dark                 Light
+--color-border-control        ledger-500           ledger-600
+```
+
+**Added 2026-11-10 (owner, after a side-by-side of three values in both modes; `docs/reviews/control-borders-2026-11-10.md`).** The edge of a control that is drawn by its border alone: `Input`, `Textarea`, `Select`'s trigger, `Combobox`'s input and chips container, an unchecked `Checkbox`, and `ChatComposer`'s box. WCAG 1.4.11 asks 3:1 for the visual information that identifies a control. Until this date these took `--color-border`, 1.29:1 on paper and 1.82:1 on the dark canvas, and an unchecked checkbox on a hovered table row measured 1.15:1: the whole control, with no label, fill or placeholder to fall back on.
+
+**It clears 3:1 on every ground a control sits on, which is why it is this step and not one lighter.** Composited in sRGB from `docs/palette.json`:
+
+| Ground | Light, `ledger-600` | Dark, `ledger-500` |
+|---|---|---|
+| Canvas, surface | 4.89:1 | 4.95:1 |
+| Raised | 4.89:1 (paper) | 4.39:1 |
+| Hovered row | 4.34:1 | 4.26:1 |
+| Selected row | 4.49:1 | 4.40:1 |
+| Selected, hovered row | 3.99:1 | 3.72:1 |
+| Highlighted popup row | 4.34:1 | 3.70:1 |
+
+A step lighter (`ledger-500` light, `ledger-600` dark) clears 3:1 on the canvas only: 2.71:1 on a selected, hovered row in light, and 2.99:1 on the dark raised surface. A checkbox sits on those rows by design. `packages/ui/scripts/check-contrast.mjs` gates the token at 3:1 on all of them, and reports 3.97:1 and 3.69:1 at worst: it composites from the OKLCH values, so its second decimal differs from this table's.
+
+**Not `--color-border`, and not `--color-border-strong`.** `--color-border` draws every divider, card edge and table rule (§0 rule 7), and a divider is not a control: raising it would turn the page's ruled quiet into a grid of dark lines. `--color-border-strong` is 1.62:1 in light and draws every popup's edge and the overlay sheet. Neither option's value is an existing border token's in either mode.
+
+**What stays on `--color-border`.** `Button variant="outline"` and `Chip`: each is identified by its text label, and its border is the "this is pressable" signal of §7.7, not its only mark. A firmer edge on every outline button would also compete with the one solid action (below, "Button groups"). `Switch` reads by its thumb. A disabled control is exempt and fades as a whole.
+
+**Costs, accepted.** In light mode the edge is `ledger-600`, the value of `--color-text-tertiary` and so of a placeholder: an empty field's border and its placeholder are one colour. In dark mode it is the brightest line on the screen after the focus ring, so forms read firmer than the tables beside them. A control inside a popup no longer depends on `popupSurface`'s `--tui-border` override.
+
+**An invalid control's edge is solid `--color-text-danger` — decided 2026-11-10 (owner, same review).** 7.15:1 on paper and 6.99:1 on the dark canvas. Until then `aria-invalid` took `--color-border-danger`, a tint that measures 1.27:1 on paper and 1.34:1 on the dark canvas: the field in error had the faintest border on the form, and beside the control edge it would have been fainter than every valid field. This is §5's reasoning for the agent rail, applied to a field: a tint under 3:1 cannot be the mark that carries a state. The order is now default, then invalid, each firmer than the last. The message under the field still carries the error in words (§11.1): the edge says which field. `Input`, `Textarea`, `Select`, `Checkbox` and `Switch` take it. `--color-border-danger` keeps its place in the role set, for the edge of a tinted container.
 
 ### Scroll cue — a popup list that hides rows must say so
 

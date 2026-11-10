@@ -17,13 +17,13 @@ export const selectTriggerVariants = cva(
     'gap-[var(--gap-control-icon)] whitespace-nowrap',
 
     // §0 rule 7 — border does the work. Matches Input exactly.
-    'border border-border bg-transparent text-text-body',
+    'border border-border-control bg-transparent text-text-body', // §4 Control edge
 
     // §3 — placeholder is what --color-text-tertiary is scoped to.
     'data-[placeholder]:text-text-tertiary',
 
     'disabled:cursor-not-allowed',
-    'aria-invalid:border-border-danger',
+    'aria-invalid:border-text-danger', // §4 Control edge: solid, so invalid is firmer than valid, never fainter
 
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
   ],

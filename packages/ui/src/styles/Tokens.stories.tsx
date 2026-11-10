@@ -115,6 +115,11 @@ const NEUTRAL_SURFACES: {
     step: { dark: { hue: 'ledger', step: 700 }, light: { hue: 'ledger', step: 300 } },
     ratio: { dark: '2.49:1', light: '1.62:1' },
   },
+  {
+    token: '--color-border-control',
+    step: { dark: { hue: 'ledger', step: 500 }, light: { hue: 'ledger', step: 600 } },
+    ratio: { dark: '4.95:1', light: '4.89:1' },
+  },
 ];
 
 const NEUTRAL_TEXT: {

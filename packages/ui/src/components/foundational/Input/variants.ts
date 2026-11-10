@@ -14,7 +14,7 @@ export const inputVariants = cva(
 
     // §0 rule 7 — the border does the work. No fill: a field stays quiet on
     // the canvas and on a surface alike, and reads like the outline Button.
-    'border border-border bg-transparent',
+    'border border-border-control bg-transparent', // §4 Control edge: 3:1 on every ground
     'text-text-body',
 
     // §3 — placeholder is exactly what --color-text-tertiary is scoped to
@@ -26,7 +26,7 @@ export const inputVariants = cva(
     // §5 — invalid pairs a border tint with a danger-coloured message beside
     // the field. The message is the non-colour half and is the caller's job;
     // a border alone does not survive grayscale.
-    'aria-invalid:border-border-danger',
+    'aria-invalid:border-text-danger', // §4 Control edge: solid, so invalid is firmer than valid, never fainter
 
     // The file-picker button, kept minimal and retokenized.
     'file:inline-flex file:border-0 file:bg-transparent file:font-medium file:text-text-body',

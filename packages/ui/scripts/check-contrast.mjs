@@ -18,6 +18,7 @@
 //   3:1 on row states, where it only marks icons (§3)
 // - the focus ring, solid fills and chart series 3:1
 // - --color-text-disabled is reported, never failed (WCAG 1.4.3 exempts it)
+// - --color-border-control 3:1 on every ground: it is a form control's whole boundary (§4)
 // - --color-border and --color-border-strong are reported, never failed (§3 publishes them)
 //
 // Every --tui-* colour is resolved, including the ones no threshold reads (the role borders,
@@ -172,6 +173,11 @@ for (const [mode, decls] of Object.entries(MODES)) {
     for (const ground of SURFACES)
       check(`chart-${i}`, series.ref, ground, wcagContrast(series.hex, composite(GROUNDS[ground])), 3);
   }
+  // §4 Control edge: the border that draws a form control, 3:1 on every ground one sits on
+  // (WCAG 1.4.11). An unchecked Checkbox on a hovered or selected row is the case that set it.
+  const edge = L('border-control');
+  for (const [ground, layers] of Object.entries(GROUNDS))
+    check('border-control', edge.ref, ground, wcagContrast(edge.hex, composite(layers)), 3);
   // Rules are reported, not gated: a 1px separator has no WCAG minimum.
   for (const token of ['border', 'border-strong']) {
     const rule = L(token);
