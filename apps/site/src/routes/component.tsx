@@ -16,9 +16,10 @@ import type { Route } from './+types/component';
 const built = components.filter((c) => c.built);
 
 // Previous and next follow the standalone-link rule (lib/styles), but the
-// hover colour goes to the title alone: the label stays secondary.
+// hover underline goes to the title alone: the label stays secondary.
 const neighbour = `group ${focusRing}`;
-const neighbourTitle = 'text-site-title font-semibold text-text-primary group-hover:text-text-interactive';
+const neighbourTitle =
+  'text-site-title font-semibold text-text-primary decoration-1 underline-offset-2 group-hover:underline';
 const find = (name?: string) => built.find((c) => c.name === name);
 
 /** A line of copy, with `code` in backticks set as code (mono, one step smaller, §8.3). */

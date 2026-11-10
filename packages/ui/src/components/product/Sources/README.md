@@ -39,7 +39,7 @@ Two labelled lists, `--gap-group` (12px) apart. Each label is `--text-xs`, mediu
 
 **The number is part of the row.** The hover ground moves from `AttachmentRow` to the list item, so the number and the file light together. Numbers are `tabular-nums`, right-aligned in two figures' width, so 9 and 10 line up.
 
-**Neutral throughout.** A source isn't a state, and neither is a gap in coverage (§0 rule 1). The one hue is the interactive role on a file name that links. A figure that is actually unverified is flagged in the answer, in the warning state (agent-voice.md, *Uncertainty*), not here.
+**Neutral throughout.** A source isn't a state, and neither is a gap in coverage (§0 rule 1). A file name that links is ink like the rest, and takes its underline on hover and focus: a list of links (§1, since 2026-11-09; it was the interactive green until then). A figure that is actually unverified is flagged in the answer, in the warning state (agent-voice.md, *Uncertainty*), not here.
 
 **Inside `AgentBlock` when the agent wrote it.** Like `AgentReasoning` and `AgentPlan`, it's a part of the turn's block and draws no rail of its own.
 

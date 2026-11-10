@@ -75,6 +75,10 @@
    after a side-by-side in Storybook). The --gap-control-icon comment
    names Instrument Sans, whose word space is the same 2.60px, from §7.4
    (comment only, no value changed, same day).
+   --tui-text-interactive light ivy-700 → ledger-950, dark ivy-400 →
+   ledger-50, from §1 "Links are ink, underlined" and §4 (2026-11-09,
+   user-approved; docs/reviews/links-and-success-2026-11-09.md). The tint
+   and border keep ivy.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -359,9 +363,9 @@
 
   /* §4 — accent map, light. Step 700 for every role's text (§0 rule 4):
      4.72:1 or more on every ground §4 lists, its own tint included. On
-     canvas: interactive and success 6.24, danger 7.15, warning 6.74, agent
-     7.14, info 6.68. Interactive and success share ivy by decision (§1). */
-  --tui-text-interactive: var(--color-ivy-700);
+     canvas: success 6.24, danger 7.15, warning 6.74, agent 7.14, info
+     6.68. Interactive text is ink, 16.49 (§1, 2026-11-09). */
+  --tui-text-interactive: var(--color-ledger-950); /* ink, with an underline: a link is not a state (§1) */
   --tui-text-danger: var(--color-vermilion-700);
   --tui-text-warning: var(--color-ochre-700);
   --tui-text-success: var(--color-ivy-700);
@@ -443,10 +447,10 @@
   --tui-text-tertiary: var(--color-ledger-400);   /*  7.41:1 — placeholders and non-text marks only */
 
   /* §4 — accent map, dark. Step 400 for every role's text (§0 rule 4). On
-     canvas: interactive and success 7.89, danger 6.99, warning 7.28, agent
-     7.00, info 7.38. Lowest anywhere: agent on its own tint over a
+     canvas: success 7.89, danger 6.99, warning 7.28, agent 7.00, info
+     7.38; interactive text is paper, 16.49 (§1, 2026-11-09). Lowest anywhere: agent on its own tint over a
      highlighted menu row, 4.67:1 — why raised is ledger-925 (§3). */
-  --tui-text-interactive: var(--color-ivy-400);
+  --tui-text-interactive: var(--color-ledger-50);  /* paper, with an underline (§1) */
   --tui-text-danger: var(--color-vermilion-400);
   --tui-text-warning: var(--color-ochre-400);
   --tui-text-success: var(--color-ivy-400);

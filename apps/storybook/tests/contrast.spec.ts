@@ -17,7 +17,7 @@ const TOLERANCE = 0.1;
 
 // §4 dark mode, measured on --color-canvas (ledger-950).
 const DARK_TEXT: Record<string, number> = {
-  interactive: 7.84,
+  interactive: 16.39,
   danger: 6.95,
   warning: 7.24,
   success: 7.84,
@@ -27,7 +27,7 @@ const DARK_TEXT: Record<string, number> = {
 
 // §4 light mode, measured on --color-canvas (ledger-50, paper) — NOT #fff.
 const LIGHT_TEXT: Record<string, number> = {
-  interactive: 6.23,
+  interactive: 16.39,
   danger: 7.15,
   warning: 6.74,
   success: 6.23,
@@ -79,13 +79,14 @@ for (const mode of ['dark', 'light'] as const) {
  * §10's explicit trap. Light-mode figures must be measured against the
  * ledger-50 paper canvas, not #fff — measuring against white overstates every
  * light ratio by roughly 8%. The tightest role fails first, so it is the
- * canary: interactive (ivy-700) since the Riso Ledger palette (2026-10-16).
- * Before that it was danger (red-700), and interactive, warning and danger
- * again before the lightness bands.
+ * canary: success (ivy-700) since links went to ink (2026-11-09). It was
+ * interactive, the same ivy-700, from the Riso Ledger palette (2026-10-16),
+ * danger (red-700) before that, and interactive, warning and danger again
+ * before the lightness bands.
  */
 test('light-mode tightest role is measured against the canvas, not #fff', async ({ page }) => {
   await gotoStory(page, 'design-system-tokens--tokens', 'light');
-  const fg = await token(page, '--color-text-interactive');
+  const fg = await token(page, '--color-text-success');
 
   const onCanvas = await contrastRatio(page, fg, await token(page, '--color-canvas'));
   const onWhite = await contrastRatio(page, fg, '#fff');

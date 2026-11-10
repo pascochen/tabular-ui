@@ -91,7 +91,11 @@ function AttachmentRow({
   // mono runs visually larger at equal px.
   const nameClassName = cn(
     'block min-w-0 truncate font-mono text-xs',
-    href || render ? 'text-text-interactive hover:underline' : 'text-text-body',
+    // A row in a list of links: ink, and the underline waits for hover and
+    // focus. The list's shape says each row opens (§1, the list exception).
+    href || render
+      ? 'text-text-interactive decoration-1 underline-offset-2 hover:underline focus-visible:underline'
+      : 'text-text-body',
     'rounded-xs outline-none focus-visible:outline-ring',
     'focus-visible:outline-solid focus-visible:outline-[length:var(--ring-width)]',
     // Inset: a list of these scrolls, and an offset ring would be clipped (§4).
