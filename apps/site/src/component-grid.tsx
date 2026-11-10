@@ -39,6 +39,12 @@ const specimens: Record<string, () => React.ReactNode> = {
   'status-badge': StatusSpecimen,
 };
 
+/**
+ * One section per moment, a rule between each. The first drops its rule, as the
+ * first section on a page does (owner, 2026-11-09): the jump index's own border
+ * already ends what is above it, and 24px under that border the rule read as
+ * the index's second edge, not the head of Asking.
+ */
 function MomentSections() {
   return moments.map((moment) => {
     return (
@@ -46,7 +52,7 @@ function MomentSections() {
         key={moment.id}
         id={moment.id}
         aria-labelledby={`${moment.id}-title`}
-        className="flex flex-col gap-[var(--site-gap)] border-t border-border pt-[var(--site-section-y)]"
+        className="flex flex-col gap-[var(--site-gap)] border-t border-border pt-[var(--site-section-y)] first:border-t-0 first:pt-0"
       >
         <div className="flex flex-col gap-[var(--gap-bonded)]">
           <h3 id={`${moment.id}-title`} className="text-site-heading-sm font-semibold text-text-primary">
@@ -81,50 +87,54 @@ function MomentSections() {
 export function ComponentsSection() {
   return (
     <Section id="components" labelledBy="components-title">
-      <Rail className="flex flex-col gap-[var(--site-gap)]">
-        <SectionHeader
-          id="components-title"
-          title={`${components.length} components`}
-          lead="Grouped by the moment of a run where each one appears. The data comes from Kasane, a fictional printer maker."
-          action={
-            <a href={external.storybook.href} {...newTab} className={`${standaloneLink} text-text-body`}>
-              All components in Storybook
-              <ExternalMark />
-            </a>
-          }
-        />
+      {/* The moments sit --site-section-y under the index, the space that follows
+          each moment's cards. */}
+      <Rail className="flex flex-col gap-[var(--site-section-y)]">
+        <div className="flex flex-col gap-[var(--site-gap)]">
+          <SectionHeader
+            id="components-title"
+            title={`${components.length} components`}
+            lead="Grouped by the moment of a run where each one appears. The data comes from Kasane, a fictional printer maker."
+            action={
+              <a href={external.storybook.href} {...newTab} className={`${standaloneLink} text-text-body`}>
+                All components in Storybook
+                <ExternalMark />
+              </a>
+            }
+          />
 
-        <nav aria-label="Components by moment" className="border border-border p-[var(--site-gap-tight)]">
-          <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
-            {moments.map((moment) => (
-              <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">
-                {/* A label, not a link (owner, 2026-10-27), styled as the footer's column
+          <nav aria-label="Components by moment" className="border border-border p-[var(--site-gap-tight)]">
+            <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
+              {moments.map((moment) => (
+                <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">
+                  {/* A label, not a link (owner, 2026-10-27), styled as the footer's column
                     titles: it names the group, and the components under it are the links. */}
-                <p id={`jump-${moment.id}`} className="text-site-small font-semibold text-text-secondary">
-                  {moment.title}
-                </p>
-                {/* 6px apart, so each 20px link keeps a 24px target circle (WCAG 2.5.8). */}
-                <ul
-                  role="list"
-                  aria-labelledby={`jump-${moment.id}`}
-                  className="flex flex-col gap-[var(--gap-control-icon)]"
-                >
-                  {moment.components.map((c) => (
-                    <li key={c.name} className="text-site-small">
-                      {c.built ? (
-                        <a href={`#${c.name}`} className={`${standaloneLink} text-text-body`}>
-                          {c.title}
-                        </a>
-                      ) : (
-                        <span className="text-text-secondary">{c.title} (to build)</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </nav>
+                  <p id={`jump-${moment.id}`} className="text-site-small font-semibold text-text-secondary">
+                    {moment.title}
+                  </p>
+                  {/* 6px apart, so each 20px link keeps a 24px target circle (WCAG 2.5.8). */}
+                  <ul
+                    role="list"
+                    aria-labelledby={`jump-${moment.id}`}
+                    className="flex flex-col gap-[var(--gap-control-icon)]"
+                  >
+                    {moment.components.map((c) => (
+                      <li key={c.name} className="text-site-small">
+                        {c.built ? (
+                          <a href={`#${c.name}`} className={`${standaloneLink} text-text-body`}>
+                            {c.title}
+                          </a>
+                        ) : (
+                          <span className="text-text-secondary">{c.title} (to build)</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
 
         {/* No All / Built / To build filter (owner, 2026-10-27): the to-build
             components are days from shipping, so it would soon have nothing to sort. */}
