@@ -1,6 +1,6 @@
 # Links and success share one green: proposal, 2026-11-09
 
-**Status, 2026-11-09:** the owner approved decision 1 the same day, and it is applied: `docs/design-system.md` §1, §2 and §4, the two `--tui-text-interactive` values in `theme.css`, and the link call sites. Decision 2 is still open. The text below is the proposal as written, so "today" in it means before the change.
+**Status, 2026-11-09:** the owner approved decision 1 the same day, and it is applied: `docs/design-system.md` §1, §2 and §4, the two `--tui-text-interactive` values in `theme.css`, and the link call sites. Decision 2 was declined on 2026-11-10, after the side-by-side it asked for: the selected row keeps its green tint. See "Decision 2, as decided" at the end. The text below is the proposal as written, so "today" in it means before the change.
 
 **Asked of the owner:** two decisions, which can be taken apart.
 
@@ -131,3 +131,22 @@ In this order, and decision 1 only unless decision 2 is approved as well.
 3. Add the underline at rest to `InlineCitation` and the demo's `link.ts`, the list exception to `AttachmentRow` and `Sources`, and a hover underline to the site's two hover-only links.
 4. Update `contrast.spec.ts`'s expected ratios for the interactive role, and `CLAUDE.md`'s summary line.
 5. Run §10's checklist. Every story that draws a link, a selected chip or a sorted column changes its screenshot: declare `AttachmentRow`, `Sources`, `InlineCitation`, `Chip`, `Badge` and `DataTable` before the first push.
+
+## Decision 2, as decided
+
+**Declined, 2026-11-10.** A selected row keeps `--color-bg-interactive` at its `ivy` value. Nothing in the spec or `theme.css` changes.
+
+The side-by-side, from the Storybook stories with injected CSS. Left is today, right is the neutral tint with a 2px ink edge. The bottom strip is a selected, agent-proposed row in three treatments.
+
+![Light mode](links-and-success-2026-11-09/selected-row-light.png)
+
+![Dark mode](links-and-success-2026-11-09/selected-row-dark.png)
+
+What it showed:
+
+- **The neutral tint is the hover tint.** A hovered row and a selected row share one ground, so only the 2px edge and the checkbox tell them apart. This is what §1 measured when it rejected a neutral tint.
+- **`Select` has no edge to fall back on.** A highlighted option and the selected one differ only by the check mark.
+- **The collision with the agent rail has no good answer.** Both marks make a 4px two-colour stripe. If the ink edge replaces the rail, a proposed row loses its rail while selected. If the rail wins, a selected proposed row looks hovered.
+- **Today's green has none of these.** Selected, hovered and proposed rows are three distinct grounds. Since decision 1, green on a row means selection or a success badge, and the badge has its own shape.
+
+**Not shown:** a hovered selected row, and the demo's Tasks and Sources screens.
