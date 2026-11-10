@@ -43,11 +43,15 @@ export type LineageTreeProps = {
  * decide what a failed model looks like.
  */
 function LineageTree({ nodes, defaultExpanded, selectedId, onSelect, className }: LineageTreeProps) {
-  const allIds = collectIds(nodes);
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultExpanded ?? allIds));
+  // The default is a rule, not a list of the ids present at mount: a node that
+  // loads later follows it too. Listing every id up front left late arrivals
+  // collapsed in a tree that had opened expanded.
+  const [initial] = useState(() => (defaultExpanded ? new Set(defaultExpanded) : null));
+  const [toggled, setToggled] = useState<Set<string>>(() => new Set());
+  const expanded = new Set(collectIds(nodes).filter((id) => (initial ? initial.has(id) : true) !== toggled.has(id)));
 
   const toggle = (id: string) =>
-    setExpanded((prev) => {
+    setToggled((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);

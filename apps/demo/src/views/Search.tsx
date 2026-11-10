@@ -15,9 +15,12 @@ import { hrefFor, onViewLinkClick, replaceView, type View } from '../lib/view';
  */
 export function SearchView({ q = '' }: { q?: string }) {
   const { state } = useClose();
-  const [group, setGroup] = useState<SearchGroup | null>(null);
+  const [chosen, setGroup] = useState<SearchGroup | null>(null);
   const results = search(state, q);
   const countOf = (g: SearchGroup) => results.filter((r) => r.group === g).length;
+  // A chosen group holds only while it has results. Kept through a new query
+  // it hid every result, behind a chip that was disabled and couldn't be unset.
+  const group = chosen !== null && countOf(chosen) > 0 ? chosen : null;
   const setQuery = (next: string) => replaceView({ kind: 'search', q: next || undefined });
   return (
     <div className="flex flex-col gap-[var(--gap-group)]">

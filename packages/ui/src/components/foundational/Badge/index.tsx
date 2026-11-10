@@ -44,7 +44,9 @@ const warned = new Set<string>();
  */
 function Badge({ className, tone, role, shape = 'status', render, ...props }: BadgeProps) {
   const legacyTone = isTone(role) ? role : undefined;
-  if (import.meta.env.DEV && legacyTone && !warned.has(legacyTone)) {
+  // `?.`: the registry copies this file into apps no Vite compiles, where
+  // nothing defines import.meta.env and a bare read throws on every render.
+  if (import.meta.env?.DEV && legacyTone && !warned.has(legacyTone)) {
     warned.add(legacyTone);
     console.warn(`Badge: role="${legacyTone}" is deprecated. Use tone="${legacyTone}"; role is the ARIA attribute.`);
   }

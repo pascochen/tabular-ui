@@ -1,4 +1,13 @@
-import { Children, cloneElement, isValidElement, useId, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useId,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { CaretRightIcon } from '@phosphor-icons/react';
 
 import { Button } from '../../foundational/Button';
@@ -158,6 +167,22 @@ function MessageRow({
 const repliesLabel = (n: number) => (n === 1 ? '1 reply' : `${n} replies`);
 
 /**
+ * How many replies there are. `Children.toArray` leaves a fragment whole, so
+ * replies passed as `<>…</>` counted as one and the label read "1 reply" over
+ * several. The count is a figure people read: look inside fragments.
+ */
+function countReplies(replies: ReactNode): number {
+  return Children.toArray(replies).reduce<number>(
+    (sum, child) =>
+      sum +
+      (isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+        ? countReplies(child.props.children)
+        : 1),
+    0,
+  );
+}
+
+/**
  * ChannelMessage — product. One member's message in a channel of several
  * people, with its replies inline beneath it.
  *
@@ -182,7 +207,7 @@ function ChannelMessage({
   const [uncontrolled, setUncontrolled] = useState(defaultRepliesOpen);
   const isOpen = repliesOpen ?? uncontrolled;
   const repliesId = useId();
-  const count = Children.toArray(replies).length;
+  const count = countReplies(replies);
 
   const setOpen = (next: boolean) => {
     if (repliesOpen === undefined) setUncontrolled(next);

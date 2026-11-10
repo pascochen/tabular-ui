@@ -1,5 +1,15 @@
 import { SidebarSimpleIcon } from '@phosphor-icons/react';
-import { cloneElement, isValidElement, useContext, useEffect, useId, useRef, useState, type ReactElement } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactElement,
+} from 'react';
 
 import { cn } from '../../../lib/utils';
 import { buttonVariants } from '../../foundational/Button/variants';
@@ -15,7 +25,12 @@ import { AppShellContext, type AppShellContentWidth, type AppShellContextValue }
  */
 const WIDE_QUERY = '(min-width: 80rem)';
 
-const matchesWide = () => (typeof window === 'undefined' ? true : window.matchMedia(WIDE_QUERY).matches);
+const matchesWide = () => window.matchMedia(WIDE_QUERY).matches;
+const subscribeWide = (onChange: () => void) => {
+  const mql = window.matchMedia(WIDE_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+};
 
 /**
  * How long the peek survives the pointer leaving it. Long enough to cross
@@ -197,7 +212,10 @@ function AppShell({
   className,
   ...props
 }: AppShellProps) {
-  const [wide, setWide] = useState(matchesWide);
+  // An external store, not `useState(matchesWide)`: on a server-rendered page
+  // the first client render must repeat the server's answer (wide), or a
+  // window below the floor hydrates against markup for a pinned sidebar.
+  const wide = useSyncExternalStore(subscribeWide, matchesWide, () => true);
   // Pinned state is kept per width class: a user who collapses the sidebar
   // on a wide screen gets it back collapsed after a trip below the floor,
   // and a pin made below the floor does not outlive the narrow window.
@@ -209,7 +227,6 @@ function AppShell({
   useEffect(() => {
     const mql = window.matchMedia(WIDE_QUERY);
     const onChange = () => {
-      setWide(mql.matches);
       setPinnedNarrow(false);
       setPeeking(false);
     };

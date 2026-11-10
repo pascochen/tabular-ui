@@ -40,7 +40,10 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   return (
     <SelectPrimitive.Value
       data-slot="select-value"
-      className={cn('flex flex-1 truncate text-left', className)}
+      // Not `flex`: `text-overflow` applies to block containers only, so a flex
+      // value was cut with no ellipsis (failure log). The trigger is the flex
+      // container, which already makes this a block-level item.
+      className={cn('block min-w-0 flex-1 truncate text-left', className)}
       {...props}
     />
   );
@@ -132,7 +135,7 @@ function SelectItem({
       className={cn(selectItemVariants({ content: content ?? inherited }), className)}
       {...props}
     >
-      <SelectPrimitive.ItemText className="flex flex-1 shrink-0 truncate">{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText className="block min-w-0 flex-1 truncate">{children}</SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator render={<span className="pointer-events-none flex items-center justify-center" />}>
         <CheckIcon weight="bold" aria-hidden="true" />
       </SelectPrimitive.ItemIndicator>

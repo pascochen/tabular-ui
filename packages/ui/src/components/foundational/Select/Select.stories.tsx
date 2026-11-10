@@ -191,13 +191,15 @@ export const States: Story = {
 export const Truncation: Story = {
   render: () => (
     <Field label="Model">
-      <Select defaultValue="long" content="mono">
+      <Select defaultValue="fct_gl_entries_reconciliation_daily_partitioned_v2" content="mono">
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="long">fct_gl_entries_reconciliation_daily_partitioned_v2</SelectItem>
-          <SelectItem value="short">dim_accounts</SelectItem>
+          <SelectItem value="fct_gl_entries_reconciliation_daily_partitioned_v2">
+            fct_gl_entries_reconciliation_daily_partitioned_v2
+          </SelectItem>
+          <SelectItem value="dim_accounts">dim_accounts</SelectItem>
         </SelectContent>
       </Select>
     </Field>

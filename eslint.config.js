@@ -51,23 +51,23 @@ const designGate = [
   },
   {
     selector:
-      'Literal[value=/\\b(p|px|py|ps|pe|pt|pb|pl|pr|m|mx|my|ms|me|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y)-(9|[1-9][0-9])\\b/]',
+      'Literal[value=/\\b(p|px|py|ps|pe|pt|pb|pl|pr|m|mx|my|ms|me|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y)-(8\\.5|9|[1-9]\\d+)\\b/]',
     message:
       "Spacing utility above the 32px ceiling (multiplier 9+). Generous spacing is how dense products silently become sparse — the cap is the design. Page-frame air above 32px goes through a --pad-frame-* token in a shell (AppShell, EmptyState, an app's App.tsx), never a utility multiplier. See docs/design-system.md §0 rule 5 and §7.3.",
   },
   {
     selector:
-      'TemplateElement[value.raw=/\\b(p|px|py|ps|pe|pt|pb|pl|pr|m|mx|my|ms|me|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y)-(9|[1-9][0-9])\\b/]',
+      'TemplateElement[value.raw=/\\b(p|px|py|ps|pe|pt|pb|pl|pr|m|mx|my|ms|me|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y)-(8\\.5|9|[1-9]\\d+)\\b/]',
     message:
       "Spacing utility above the 32px ceiling (multiplier 9+). Generous spacing is how dense products silently become sparse — the cap is the design. Page-frame air above 32px goes through a --pad-frame-* token in a shell (AppShell, EmptyState, an app's App.tsx), never a utility multiplier. See docs/design-system.md §0 rule 5 and §7.3.",
   },
   {
-    selector: 'Literal[value=/\\b(h|size)-(10|1[1-9]|[2-9][0-9])\\b/]',
+    selector: 'Literal[value=/\\b(h|size)-(9\\.5|[1-9]\\d+)\\b/]',
     message:
       'Height utility above the 36px control ceiling (h-9 = 36px is the cap). Controls take --h-control (32px) or --h-control-lg (36px); rows take --h-row-*. See docs/design-system.md §7.6.',
   },
   {
-    selector: 'TemplateElement[value.raw=/\\b(h|size)-(10|1[1-9]|[2-9][0-9])\\b/]',
+    selector: 'TemplateElement[value.raw=/\\b(h|size)-(9\\.5|[1-9]\\d+)\\b/]',
     message:
       'Height utility above the 36px control ceiling (h-9 = 36px is the cap). Controls take --h-control (32px) or --h-control-lg (36px); rows take --h-row-*. See docs/design-system.md §7.6.',
   },
@@ -113,6 +113,8 @@ const designGate = [
 // template chunks, like the gate above.
 const softCornerMessage =
   'Softened corner. Every rectangle is square since 2026-10-16, and a 2–8px corner reads as a defect, not a choice. Name the tier token (rounded-xs, -sm, -md, -lg, all 0px) so re-rounding stays a one-line change in theme.css, or rounded-full for a dot, avatar, count badge, switch or track. See docs/design-system.md §7.7.';
+const systemColors =
+  'Canvas|CanvasText|LinkText|VisitedText|ActiveText|ButtonFace|ButtonText|ButtonBorder|Field|FieldText|Highlight|HighlightText|SelectedItem|SelectedItemText|Mark|MarkText|GrayText|AccentColor|AccentColorText';
 const bracketMessage = (what) =>
   `Bracketed ${what} bypasses the cap the named utilities enforce. Use the token (px-[var(--pad-cell-x)], h-[var(--h-control)], rounded-sm), or go through the spec if a new step is genuinely needed. See docs/design-system.md §7 and CLAUDE.md rule 6.`;
 const colorUtility =
@@ -139,7 +141,7 @@ const arbitraryValueGate = [
   ...bothForms('\\brounded(-[a-z]{1,2})?-\\[(?!var\\(--radius-|inherit\\]|0(px)?\\])[^\\]]+\\]', softCornerMessage),
   ...bothForms('(?<![-\\w\\[])rounded(-(ss|se|ee|es|tl|tr|br|bl|s|e|t|r|b|l))?(?![-\\w\\[])', softCornerMessage),
   ...bothForms(
-    '\\bfont-\\[[7-9]00\\]',
+    '\\bfont-\\[(6(0[1-9]|[1-9]\\d)|[7-9]\\d\\d|1000|bold|bolder)\\]',
     'Font weight above 600: at 13px on a dark canvas, bold weights bloom and reduce legibility. The scale caps at font-semibold. See docs/design-system.md §8.5.',
   ),
   // §4 Elevation: the system has one shadow, `shadow-overlay`, and
@@ -160,6 +162,29 @@ const arbitraryValueGate = [
   ...bothForms(
     `\\b${colorUtility}-\\[[^\\]]*\\b(rgba?|hsla?|oklch|oklab|lch|lab|color)\\(`,
     'Raw colour function in a utility bypasses the token layer: it cannot mode-switch and its contrast was never measured. Use the --color-* semantic utilities. See docs/design-system.md §9 and CLAUDE.md rule 10.',
+  ),
+  // A named colour in brackets (`bg-[red]`) is the same bypass with no function.
+  // System colours stay legal: forced-colours mode has no tokens (StatusDot).
+  ...bothForms(
+    `\\b${colorUtility}-\\[(?!(inherit|transparent|currentcolor|${systemColors})\\])[a-zA-Z]+\\]`,
+    'Named colour in a utility bypasses the token layer. Use the --color-* semantic utilities. See docs/design-system.md §9 and CLAUDE.md rule 10.',
+  ),
+  // The caps in rem: 32px is 2rem and 36px is 2.25rem at the 16px root (§7.5
+  // keeps spacing in px, so a rem here is already off-system).
+  ...bothForms(
+    '\\b-?(p|px|py|ps|pe|pt|pb|pl|pr|m|mx|my|ms|me|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y)-\\[(2\\.\\d*[1-9]\\d*|[3-9](\\.\\d+)?|\\d{2,}(\\.\\d+)?)rem\\]',
+    bracketMessage('spacing above 32px'),
+  ),
+  ...bothForms(
+    '(?<![-a-z])(h|size)-\\[(2\\.(2[6-9]|[3-9])\\d*|[3-9](\\.\\d+)?|\\d{2,}(\\.\\d+)?)rem\\]',
+    bracketMessage('height above 36px'),
+  ),
+  // An arbitrary property (`[padding:40px]`, `[color:red]`) sets a gated value
+  // with no utility name for the rules above to read. Custom properties
+  // (`[--tui-border:…]`) and ungated properties stay legal.
+  ...bothForms(
+    '\\[(padding|margin|gap|height|border-radius|color|background|font-weight)[a-z-]*:',
+    'Arbitrary property for a gated value (spacing, height, radius, colour, weight) walks past every cap. Use the token utility. See docs/design-system.md §0.',
   ),
   ...bothForms(
     `\\b${colorUtility}-(white|black)\\b`,
