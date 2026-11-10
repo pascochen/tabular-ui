@@ -243,7 +243,9 @@ export const InTableRow: Story = {
                 r.status === 'failed'
                   ? 'text-text-danger'
                   : r.status === 'running'
-                    ? 'text-text-interactive'
+                    ? // §5: running is info. This read `text-text-interactive`,
+                      // which was the success green until links went to ink.
+                      'text-text-info'
                     : 'text-text-success'
               }
               style={{ width: 60 }}
