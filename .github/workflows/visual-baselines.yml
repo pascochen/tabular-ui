@@ -62,7 +62,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter tabular-ui-storybook exec playwright install --with-deps chromium
+      # As ci.yml installs it: the script survives the runner failing to resolve apt's mirrors.
+      - run: bash .github/scripts/install-chromium.sh
 
       # Delete, then regenerate all: a renamed or removed story leaves no
       # orphaned screenshot behind. Unchanged stories re-encode to identical
