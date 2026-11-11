@@ -1,3 +1,4 @@
+import { WarningIcon } from '@phosphor-icons/react';
 import { useId } from 'react';
 
 import { cn } from '../../../lib/utils';
@@ -75,8 +76,24 @@ function Field({ label, children, help, error, required, className }: FieldProps
       })}
 
       {message ? (
-        <span id={messageId} className={cn('text-sm', error ? 'text-text-danger' : 'text-text-secondary')}>
-          {message}
+        <span
+          id={messageId}
+          className={cn(
+            'flex gap-[var(--gap-control-icon)] text-sm',
+            error ? 'text-text-danger' : 'text-text-secondary',
+          )}
+        >
+          {/* §11.2: an error is marked by shape as well as colour. The danger
+              step has the lightness of the neutral text it replaces, so
+              without the icon an error and help text are one grey in
+              grayscale. The icon sits in a box one line tall, so it stays on
+              the first line of a message that wraps. Help text takes none. */}
+          {error ? (
+            <span className="flex h-[var(--text-sm--line-height)] shrink-0 items-center">
+              <WarningIcon weight="bold" aria-hidden="true" className="size-[var(--size-icon-xs)]" />
+            </span>
+          ) : null}
+          <span>{message}</span>
         </span>
       ) : null}
     </div>

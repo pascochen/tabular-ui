@@ -23,6 +23,11 @@ export const Default: Story = {
       </Field>
     </div>
   ),
+  // Help text takes no icon: the icon is what marks an error (§11.2).
+  play: async ({ canvasElement }) => {
+    const help = within(canvasElement).getByText('Lowercase, underscore-separated.');
+    await expect(help.closest('[id]')?.querySelector('svg')).toBeNull();
+  },
 };
 
 /** Error replaces help rather than stacking — two messages is a reading-order problem. */
@@ -46,6 +51,13 @@ export const WithError: Story = {
     await expect(input).toBeRequired();
     await expect(input).toBeInvalid();
     await expect(input).toHaveAccessibleDescription('A model named fct_gl_entries already exists.');
+    // The error is marked by shape as well as colour, and the mark is not read out.
+    const icon = within(canvasElement)
+      .getByText('A model named fct_gl_entries already exists.')
+      .closest('[id]')
+      ?.querySelector('svg');
+    await expect(icon).toBeVisible();
+    await expect(icon).toHaveAttribute('aria-hidden', 'true');
   },
 };
 
