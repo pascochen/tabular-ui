@@ -32,7 +32,7 @@ export type InlineCitationProps = {
  * to that record when it has a `locatorHref`).
  *
  * **A Popover, never a Tooltip.** Base UI's tooltip is visual only, so a
- * source shown there would reach no screen reader (CLAUDE.md, failure log).
+ * source shown there would reach no screen reader (docs/failure-log.md).
  * The popover's content is real DOM, focusable, and its link can be followed.
  *
  * **A `Chip`, because it is an interactive marker** (§7.7): border, transparent

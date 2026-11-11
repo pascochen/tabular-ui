@@ -5,7 +5,7 @@
  * Before this, each rule held its own copy, and so did theme.css's strip
  * list. When Tailwind 4.2 added mauve, mist and taupe, none of the copies
  * named them: the scales shipped as live utilities, and `bg-mauve-400` in a
- * component passed every gate (CLAUDE.md failure log). theme.css is CSS and
+ * component passed every gate (docs/failure-log.md). theme.css is CSS and
  * can't import this, so tests/palette.spec.ts checks that this list matches
  * Tailwind's own palette, that theme.css strips all of it, and that
  * palette.css defines exactly the Riso ramps below.

@@ -31,7 +31,7 @@ Two labelled lists, `--gap-group` (12px) apart. Each label is `--text-xs`, mediu
 
 ## Mechanisms worth knowing
 
-**`notChecked` is required.** agent-voice.md's principle 4 is "Say what was not checked": confidence comes from scope, not adjectives. A rule the component can enforce belongs in the component (CLAUDE.md, failure log: `Button`'s icon weight), so an answer can't list its sources and stay silent about where they stop. `[]` is a claim as well, and the component writes it out: "Nothing. Every part of the question was checked." Pass it only when that's true.
+**`notChecked` is required.** agent-voice.md's principle 4 is "Say what was not checked": confidence comes from scope, not adjectives. A rule the component can enforce belongs in the component (docs/failure-log.md: `Button`'s icon weight), so an answer can't list its sources and stay silent about where they stop. `[]` is a claim as well, and the component writes it out: "Nothing. Every part of the question was checked." Pass it only when that's true.
 
 **Not-checked lines wrap; source names truncate.** A file name is an identifier, and `AttachmentRow` truncates it in mono. A not-checked line is a sentence, and a cut sentence says less than the agent meant.
 

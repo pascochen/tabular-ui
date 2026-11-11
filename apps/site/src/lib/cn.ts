@@ -7,7 +7,7 @@ import { extendTailwindMerge } from 'tailwind-merge';
  * tailwind-merge only knows the sizes it is told about, and reads any other
  * `text-*` as a colour. With the library's cn(), `cn('text-text-primary',
  * 'text-site-heading')` keeps only the size, and the heading renders in an
- * inherited colour with no error (CLAUDE.md failure log, `text-metric`).
+ * inherited colour with no error (docs/failure-log.md, `text-metric`).
  * The library's scale is listed too, so both work in one call.
  */
 const twMerge = extendTailwindMerge({

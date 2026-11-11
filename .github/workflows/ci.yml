@@ -310,7 +310,7 @@ jobs:
           files=$(jq -r '[.accepted[].key | split("/") | last] | join(", ")' "$gate/result.json")
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Never put a skip-CI token in this message (CLAUDE.md, failure log).
+          # Never put a skip-CI token in this message (docs/failure-log.md).
           git commit -q -m "Accept declared visual changes" \
             -m "Screenshots of $files, declared in the PR description. Rendered by CI run $GITHUB_RUN_ID, which verified $HEAD_SHA."
           # The claim the check below makes: nothing but screenshots changed.
