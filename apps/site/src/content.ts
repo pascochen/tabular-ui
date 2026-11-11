@@ -93,11 +93,12 @@ export const moments = (
   [
     // Each line says what the moment holds, not what its title already says (owner, 2026-10-27).
     // Thinking's names Tool's reads since 2026-10-29 (owner); not "actions": the agent changes nothing.
-    { id: 'asking', title: 'Asking', line: 'Suggestions to start from, and the box you type in.' },
-    { id: 'thinking', title: 'Thinking', line: 'The agent’s reasoning, plan and reads, shown while it works.' },
-    { id: 'showing', title: 'Showing', line: 'The figures, files and sources behind an answer.' },
-    { id: 'waiting', title: 'Waiting', line: 'Where the run stops until a person answers or approves.' },
-    { id: 'recording', title: 'Recording', line: 'What the run leaves on record, and its state.' },
+    // Reworded 2026-11-11 (owner, from a microcopy pass): each line borrows its components' own words.
+    { id: 'asking', title: 'Asking', line: 'Suggested questions, the box you type in, and the conversation.' },
+    { id: 'thinking', title: 'Thinking', line: 'The agent’s plan and reads, as it works.' },
+    { id: 'showing', title: 'Showing', line: 'What an answer rests on, down to the entry.' },
+    { id: 'waiting', title: 'Waiting', line: 'Where the run stops until you answer or approve.' },
+    { id: 'recording', title: 'Recording', line: 'The run’s log and where it stands.' },
   ] as const
 ).map((moment) => ({ ...moment, components: components.filter((c) => c.moment === moment.id) }));
 

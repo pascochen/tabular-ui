@@ -268,13 +268,13 @@ test.describe('the cards', () => {
       for (const name of [
         'chat-starter',
         'chat-composer',
+        'chat-thread',
         'agent-reasoning',
         'agent-plan',
         'lineage-tree',
         'attachment-row',
         'inline-citation',
         'sources',
-        'chat-thread',
         'run-log-row',
         'status-badge',
       ]) {
@@ -337,7 +337,7 @@ test.describe('the cards in a row', () => {
   test('share one height across the moments at the widest cards, Sources apart', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await open(page, '/');
-    for (const name of ['chat-starter', 'agent-plan', 'lineage-tree', 'agent-block', 'chat-thread', 'run-log-row']) {
+    for (const name of ['chat-starter', 'chat-thread', 'agent-plan', 'lineage-tree', 'agent-block', 'run-log-row']) {
       expect(await height(page, `#${name} article > :first-child`), name).toBe(310);
     }
   });
