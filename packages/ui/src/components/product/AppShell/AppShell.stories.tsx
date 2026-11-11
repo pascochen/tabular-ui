@@ -4,10 +4,14 @@ import {
   BracketsCurlyIcon,
   CaretUpDownIcon,
   ChatsIcon,
+  CurrencyCircleDollarIcon,
+  DotsThreeIcon,
   DotsThreeVerticalIcon,
   HashIcon,
   HouseIcon,
   LightningIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
   PulseIcon,
   QuestionIcon,
   RobotIcon,
@@ -580,6 +584,135 @@ export const PeopleAndCounts: Story = {
         </AppShellNavGroup>
       </AppShellNav>
     ),
+  },
+};
+
+/* ------------------------------------------------- accountant workspace */
+/*
+  The sidebar from the 2026-11-10 pivot: the product is for an SMB finance
+  team's accountants. Top to bottom: the company, then New chat (questions on
+  the files they imported), Workflow (skills an accountant or auditor runs),
+  Search, the accounting agents, channels, direct messages, and the account.
+*/
+
+const daisuke = {
+  name: people.controller.name,
+  shortName: people.controller.shortName,
+  email: people.controller.email,
+  initials: people.controller.initials,
+};
+
+/** Kasane is the only company: the switcher shows its name and the chevron, nothing else. */
+function AccountantOrgSwitcher() {
+  const companies = kasaneOrgs.slice(0, 1).map(({ id, name }) => ({ id, name }));
+  return (
+    <OrgSwitcher
+      orgs={companies}
+      currentOrgId={companies[0].id}
+      onSwitch={() => {}}
+      // TODO: hook into the create-workspace flow — none exists yet.
+      onCreateOrg={() => {}}
+    />
+  );
+}
+
+/**
+ * One trigger, as `AccountMenu` documents: the avatar and the name open the
+ * menu, settings included, so the row draws no separate settings button.
+ */
+function AccountantAccountFooter() {
+  const [initial] = useState<'dark' | 'light'>(() =>
+    document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
+  );
+  const { preference, setPreference } = useTheme({ defaultPreference: initial, storageKey: null });
+  return (
+    <AccountMenu
+      user={daisuke}
+      theme={preference}
+      onThemeChange={setPreference}
+      // TODO: none of these pages exist yet.
+      onOpenProfile={() => {}}
+      onOpenWorkspaceSettings={() => {}}
+      onOpenBilling={() => {}}
+      onOpenHomepage={() => {}}
+      onSignOut={() => {}}
+    />
+  );
+}
+
+/**
+ * Agents are named role word + "AI" (`docs/agent-voice.md` rule 1), so each
+ * name says it's an agent and no `agent` badge is needed beside it.
+ */
+const accountingAgents = ['Ledger AI', 'Margin AI', 'Till AI', 'Lever AI'];
+const accountingChannels = ['close', 'payables'];
+/** Colleagues only: the signed-in user (Daisuke) never appears as a direct message. */
+const colleagues = [people.fpa, people.payables];
+
+function AccountantSidebar() {
+  return (
+    <AppShellNav aria-label="Workspace">
+      <AppShellNavGroup>
+        <AppShellNavItem href="#" icon={<PlusIcon />} active>
+          New chat
+        </AppShellNavItem>
+        <AppShellNavItem href="#" icon={<LightningIcon />}>
+          Workflow
+        </AppShellNavItem>
+        <AppShellNavItem href="#" icon={<MagnifyingGlassIcon />}>
+          Search
+        </AppShellNavItem>
+      </AppShellNavGroup>
+      <AppShellNavGroup label="Agents">
+        {accountingAgents.map((name) => (
+          <AppShellNavItem key={name} href="#" icon={<CurrencyCircleDollarIcon />}>
+            {name}
+          </AppShellNavItem>
+        ))}
+        {/* TODO: open the add-an-agent flow — none exists yet. */}
+        <AppShellNavItem href="#" icon={<DotsThreeIcon />}>
+          More
+        </AppShellNavItem>
+      </AppShellNavGroup>
+      <AppShellNavGroup label="Channels">
+        {accountingChannels.map((name) => (
+          <AppShellNavItem key={name} href="#" icon={<HashIcon />}>
+            {name}
+          </AppShellNavItem>
+        ))}
+      </AppShellNavGroup>
+      <AppShellNavGroup label="Direct messages">
+        {colleagues.map((p) => (
+          <AppShellNavItem
+            key={p.id}
+            href="#"
+            avatar={
+              <Avatar size="sm" aria-hidden="true">
+                <AvatarFallback>{p.initials}</AvatarFallback>
+              </Avatar>
+            }
+          >
+            {p.name}
+          </AppShellNavItem>
+        ))}
+      </AppShellNavGroup>
+    </AppShellNav>
+  );
+}
+
+/**
+ * The accountant workspace's sidebar, on New chat. Pinned, the sidebar
+ * header holds the toggle, so the top nav shows only while it's collapsed,
+ * as in the Kasane demo. Main is left empty: New chat's view isn't designed yet.
+ */
+export const AccountantWorkspace: Story = {
+  args: {
+    topNav: <AppBar brand={<AppShellSidebarToggle />} className="in-data-[sidebar=pinned]:hidden" />,
+    sidebarHeader: <AccountantOrgSwitcher />,
+    sidebar: <AccountantSidebar />,
+    sidebarFooter: <AccountantAccountFooter />,
+    pageHeader: <AppShellPageHeader title="New chat" />,
+    children: null,
   },
 };
 
