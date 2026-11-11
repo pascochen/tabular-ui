@@ -20,7 +20,8 @@ export const meta: Route.MetaFunction = () =>
 
 /** The library's scale (§8.1), written out so Tailwind generates each class. */
 const scale = [
-  { token: '--text-2xs', className: 'text-2xs' },
+  // 10px is capitals only (§8.1, "The floor"), so its specimen is set as it is used.
+  { token: '--text-2xs', className: 'text-2xs uppercase tracking-[var(--tracking-wide)]' },
   { token: '--text-xs', className: 'text-xs' },
   { token: '--text-sm', className: 'text-sm' },
   { token: '--text-base', className: 'text-base' },

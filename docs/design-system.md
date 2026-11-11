@@ -916,8 +916,8 @@ Values are rem (assuming a 16px root); px equivalents shown for reading.
 
 ```
 --text-2xs        0.625rem  10px / 14px   uppercase column headers, micro-labels
---text-xs         0.6875rem 11px / 16px   timestamps, secondary metadata, help text
---text-sm         0.75rem   12px / 16px   table cells, dense form labels
+--text-xs         0.6875rem 11px / 16px   timestamps, secondary metadata
+--text-sm         0.75rem   12px / 16px   table cells, dense form labels, help text, error messages, tooltips
 --text-base       0.8125rem 13px / 20px   body, default UI text
 --text-md         0.875rem  14px / 20px   section headings, emphasis
 --text-lg         1rem      16px / 24px   page title
@@ -942,6 +942,23 @@ Values are rem (assuming a 16px root); px equivalents shown for reading.
 ```
 
 Line heights are in rem because they scale with their type — this is the one geometry value that must not be px, and it is not an exception to §7.5 but a consequence of it. Every value is a whole multiple of 4px at a 16px root, so text still lands on the grid.
+
+**The floor: a sentence is never under 12px, and 10px is capitals only (decided 2026-11-10).** The size of type is not the height of its letters. Measured from the loaded fonts, Instrument Sans has a cap height of 0.720em and an x-height of 0.510em, and IBM Plex Mono an x-height of 0.516em:
+
+| Setting | Where | Height of the letters |
+|---|---|---|
+| `--text-2xs` uppercase | Badges, column headers, section labels | 7.2px |
+| `--text-base` lowercase | Body | 6.6px |
+| `--text-sm` lowercase | Table cells, form labels, help text | 6.1px |
+| `--text-xs` lowercase mono | Identifiers in a `--text-sm` row | 5.7px |
+| `--text-xs` lowercase | Timestamps, metadata | 5.6px |
+
+So the smallest letters on a screen are `--text-xs` lowercase, not the 10px labels. Two rules follow:
+
+- **A sentence is `--text-sm` or larger.** Help text, an error message and a tooltip are read as sentences, and an error has nothing larger beside it that says the same thing. `Field`'s message and `Tooltip` were `--text-xs` until 2026-11-10. The two sizes share a 16px line, so nothing got taller. `--text-xs` is for metadata set beside the larger text it describes: a timestamp, a file size, a duration, a count, a name.
+- **`--text-2xs` is uppercase.** In capitals it is the tallest of the small sizes. In lowercase it would be 5.1px, under everything above. Lint rejects a class string with `text-2xs` and no `uppercase`. Figures are the one exception, and they carry `tabular-nums` as §8.6 asks, which is what the rule looks for.
+
+Raising `--text-2xs` to 11px was compared in both modes and declined: every badge and header would be about 10% wider (`NEEDS REVIEW` 80px to 88px of text) for height the labels do not need. The 11px mono identifier is close to the floor and stays, on §8.3's side-by-side of 2026-11-07. See `docs/reviews/type-floor-2026-11-10.md`.
 
 13px base, not 14 or 16. The two metric sizes exist because a financial dashboard cannot work without them — a KPI tile rendering `¥34.4bn` at 20px is undersized for the one number the screen exists to show. Nothing above 32px.
 
@@ -1099,6 +1116,8 @@ Until then the feature was `--font-mono-features`, a reference variable outside 
 --tracking-tight    -0.01em    --text-lg, --text-xl
 --tracking-display   0         --text-metric-sm, --text-metric
 ```
+
+**`--text-2xs` is uppercase only, and since 2026-11-10 lint holds it** (§8.1, "The floor").
 
 **Display tracking is 0, and that is not an oversight.** "Tighter as it gets larger" is the correct instinct when one family serves all sizes. From 24px the display tier renders in Source Serif 4's display optical size (§8.3, §8.4), which is already drawn tighter, so the font has done that work. Applying `--tracking-tight` on top double-counts. The value was set when Archivo narrowed with `"wdth" 90` and is unchanged (2026-10-16). If display text needs adjustment, it goes *positive*, not negative.
 

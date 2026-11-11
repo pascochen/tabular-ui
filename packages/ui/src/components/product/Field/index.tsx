@@ -75,7 +75,7 @@ function Field({ label, children, help, error, required, className }: FieldProps
       })}
 
       {message ? (
-        <span id={messageId} className={cn('text-xs', error ? 'text-text-danger' : 'text-text-secondary')}>
+        <span id={messageId} className={cn('text-sm', error ? 'text-text-danger' : 'text-text-secondary')}>
           {message}
         </span>
       ) : null}

@@ -38,7 +38,7 @@ Mount it once at the app root. Storybook mounts it in `apps/storybook/.storybook
 **A raised surface, not an inverted ground.** shadcn ships `bg-foreground text-background` — the conventional dark-on-light tooltip. §4's elevation table names tooltip explicitly under *Raised → `--color-surface-raised` + `--color-border-strong`*, and the spec wins on rules. No shadow: shadows barely register on a `ledger-950` canvas, which is why the system expresses depth with a background step plus a 1px border.
 
 - Radius `--radius-md` (0px since 2026-10-16) — §7.7 groups tooltip with dropdown and popover
-- Text `--text-xs` (11px/16px) — §8.1's help-text tier
+- Text `--text-sm` (12px/16px). A tooltip is read as a sentence, and §8.1 sets no sentence under 12px (`--text-xs` until 2026-11-10)
 - Padding `--pad-popover` (8px) horizontal; **4px vertical from the primitive scale**, an explicit fallback since no vertical popover token exists. Measured height is 26px — 16px line-height, 8px padding, 2px border.
 
 **No arrow.** The vendored source shipped one; in dense UI it is ~10px of noise per tooltip, and the directional slide-in already indicates the anchor. The per-side arrow positioning block was removed with it.
