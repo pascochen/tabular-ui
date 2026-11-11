@@ -114,9 +114,10 @@ jobs:
       # --with-deps because ubuntu-latest is missing some of the shared
       # libraries Chromium needs; the repo's own `pretest` hook omits them
       # because it assumes a developer machine that already has them.
+      # The script survives the runner's apt mirror going away (2026-11-11).
       - name: Install Chromium
         if: steps.scope.outputs.docs_only != 'true'
-        run: pnpm --filter tabular-ui-storybook exec playwright install --with-deps chromium
+        run: bash .github/scripts/install-chromium.sh
 
       # The library, the Storybook app (its specs and configs) and the demo.
       # The stories are type-checked with the library, where they live.
