@@ -26,6 +26,48 @@ test('a change to Markdown nothing reads skips everything', () => {
   expect(scope(['packages/ui/src/components/foundational/Button/README.md']).docs_only).toBe(true);
 });
 
+test('a proposal and its pictures skip everything', () => {
+  const sheet = 'docs/reviews/tabular-prose-2026-11-11/tabular-prose-light.png';
+  expect(scope(['docs/reviews/tabular-prose-2026-11-11.md', sheet, 'docs/design-system.md'])).toEqual({
+    docs_only: true,
+    site_only: false,
+  });
+  // Only pictures, and only in docs/reviews: a baseline or an app's asset is not docs.
+  expect(scope(['docs/reviews/notes.svg']).docs_only).toBe(false);
+  expect(scope(['apps/demo/public/og.png']).docs_only).toBe(false);
+  expect(scope(['apps/storybook/tests/visual.spec.ts-snapshots/button.png']).docs_only).toBe(false);
+  // Beside a site change, a sheet does not widen the run.
+  expect(scope([sheet, 'apps/site/src/root.tsx'])).toEqual({ docs_only: false, site_only: true });
+});
+
+/**
+ * The skip above holds only while nothing loads from docs/reviews. This reads
+ * the apps' source, tests and scripts for a path into it on any line that
+ * loads a file. Prose that cites a review is fine: a comment loads nothing.
+ */
+test('no code loads a file from docs/reviews', () => {
+  const dirs = [
+    'apps/site/src',
+    'apps/site/tests',
+    'apps/demo/src',
+    'apps/storybook/tests',
+    'apps/storybook/.storybook',
+  ];
+  const loads = /\?raw|import\.meta\.glob|readFileSync|readFile\(|\bread\(|new URL\(|\bimport\b|\bsrc=|\bfrom\s+['"]/;
+  const found: string[] = [];
+  for (const dir of dirs) {
+    for (const file of readdirSync(path.join(root, dir), { recursive: true, encoding: 'utf8' })) {
+      if (!/\.(ts|tsx|mjs)$/.test(file) || file.endsWith('ci-scope.spec.ts')) continue;
+      for (const line of readFileSync(path.join(root, dir, file), 'utf8').split('\n')) {
+        if (/^\s*(\/\/|\*|\/\*)/.test(line)) continue;
+        if (loads.test(line) && /docs\/reviews\/[^'"`\s]+\.(png|jpe?g|webp|gif)/.test(line))
+          found.push(`${dir}/${file}: ${line.trim()}`);
+      }
+    }
+  }
+  expect(found).toEqual([]);
+});
+
 test('Markdown the site reads runs the site build and its tests', () => {
   for (const file of ['packages/ui/README.md', 'packages/ui/src/components/product/RunLogRow/README.md']) {
     expect(scope([file]), file).toEqual({ docs_only: false, site_only: true });

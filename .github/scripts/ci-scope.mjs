@@ -22,14 +22,21 @@ export const READ_BY_SPECS = [
   /^\.claude\/skills\/design-review\/SKILL\.md$/, // apps/storybook/tests/palette.spec.ts
 ];
 
+/**
+ * Pictures in a review. A proposal's comparison sheets sit beside its Markdown
+ * in docs/reviews, and nothing builds, tests or serves that folder. Until
+ * 2026-11-11 a proposal with one sheet ran the full pipeline for it.
+ */
+export const REVIEW_IMAGES = /^docs\/reviews\/.+\.(png|jpe?g|webp|gif)$/;
+
 const isMarkdown = (file) => /\.md$/.test(file);
 const any = (patterns, file) => patterns.some((pattern) => pattern.test(file));
 
 /**
  * @param {string[]} files Paths changed by the PR, from the repo root.
  * @returns {{ docs_only: boolean, site_only: boolean }}
- *   `docs_only`: every file is Markdown that nothing builds or tests, so
- *   Verify skips everything. `site_only`: every file is in apps/site or is
+ *   `docs_only`: every file is Markdown that nothing builds or tests, or a
+ *   picture in docs/reviews, so Verify skips everything. `site_only`: every file is in apps/site or is
  *   Markdown the library's specs don't read, so Verify runs lint, type-check,
  *   the site build and the site tests. Neither: the full run. An empty list is
  *   the full run, because a diff that can't be read proves nothing.
@@ -37,11 +44,15 @@ const any = (patterns, file) => patterns.some((pattern) => pattern.test(file));
 export function scope(files) {
   const changed = files.map((file) => file.trim()).filter(Boolean);
   if (changed.length === 0) return { docs_only: false, site_only: false };
-  const inert = (file) => isMarkdown(file) && !any(READ_BY_SITE, file) && !any(READ_BY_SPECS, file);
+  const inert = (file) =>
+    REVIEW_IMAGES.test(file) || (isMarkdown(file) && !any(READ_BY_SITE, file) && !any(READ_BY_SPECS, file));
   const docs_only = changed.every(inert);
   const site_only =
     !docs_only &&
-    changed.every((file) => file.startsWith('apps/site/') || (isMarkdown(file) && !any(READ_BY_SPECS, file)));
+    changed.every(
+      (file) =>
+        file.startsWith('apps/site/') || REVIEW_IMAGES.test(file) || (isMarkdown(file) && !any(READ_BY_SPECS, file)),
+    );
   return { docs_only, site_only };
 }
 
