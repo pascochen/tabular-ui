@@ -51,10 +51,12 @@ function TooltipContent({
             // §4 names tooltip under "Raised" and the spec wins on rules.
             'inline-flex w-fit max-w-xs items-center',
             // §7.4 --pad-popover for x. No vertical popover token exists, so
-            // the primitive step is used explicitly: 11px/16px text at 4px
+            // the primitive step is used explicitly: 12px/16px text at 4px
             // plus the 1px border renders 26px tall.
             'px-[var(--pad-popover)] py-1',
-            'text-xs', // §8.1 --text-xs is help text
+            // §8.1 "The floor": a tooltip is read as a sentence, so it is
+            // --text-sm. It was --text-xs until 2026-11-10; the line is the same 16px.
+            'text-sm',
             'data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0',
             className,
           )}

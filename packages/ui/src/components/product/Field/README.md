@@ -14,6 +14,10 @@ The foundational controls deliberately do not render their own labels — that w
 
 A plain child would leave that to the call site, which is precisely where it gets forgotten. The render prop makes the correct thing the only convenient thing.
 
+## Type
+
+The label and the message are both `--text-sm`. The message was `--text-xs` until 2026-11-10: help and error text are sentences, and §8.1 sets no sentence under 12px. They share a 16px line, so the field's height did not change.
+
 ## Error replaces help
 
 They do not stack. Two messages under one control is a reading-order problem, and the error is always the one that matters. `aria-describedby` therefore always points at exactly one message.

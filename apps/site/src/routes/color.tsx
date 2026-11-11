@@ -156,7 +156,7 @@ function Swatch({ step, hex }: { step: string; hex: string }) {
         className="h-8 border border-border forced-color-adjust-none"
         style={{ background: hex }}
       />
-      <code className="text-2xs text-text-secondary">{step}</code>
+      <code className="text-2xs text-text-secondary tabular-nums">{step}</code>
     </li>
   );
 }

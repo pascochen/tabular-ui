@@ -20,6 +20,17 @@ const SCALE_STEPS = alternation(STEPS);
 // every other selector, or those files silently lose the rest of the gate.
 const designGate = [
   {
+    selector: 'Literal[value=/^(?![\\s\\S]*\\b(uppercase|tabular-nums)\\b)[\\s\\S]*(?<![\\w-])text-2xs(?![\\w-])/]',
+    message:
+      'text-2xs (10px) without uppercase. In capitals it is the tallest of the small sizes (7.2px letters); in lowercase it is 5.1px, under every other text on the screen. Add uppercase and tracking-[var(--tracking-wide)], or use text-xs. Figures are the exception and carry tabular-nums, which this rule accepts. See docs/design-system.md §8.1 "The floor".',
+  },
+  {
+    selector:
+      'TemplateElement[value.raw=/^(?![\\s\\S]*\\b(uppercase|tabular-nums)\\b)[\\s\\S]*(?<![\\w-])text-2xs(?![\\w-])/]',
+    message:
+      'text-2xs (10px) without uppercase. In capitals it is the tallest of the small sizes (7.2px letters); in lowercase it is 5.1px, under every other text on the screen. Add uppercase and tracking-[var(--tracking-wide)], or use text-xs. Figures are the exception and carry tabular-nums, which this rule accepts. See docs/design-system.md §8.1 "The floor".',
+  },
+  {
     selector: `Literal[value=/\\b(${SCALES})-(${SCALE_STEPS})\\b/]`,
     message:
       'Raw colour scale name (a Tailwind scale or a Riso ramp such as ivy-700) in component code breaks mode switching and any future hue change, silently. Use the semantic token utilities (text-text-danger, bg-bg-danger, border-border-agent). Ramp names are legal only in src/styles/theme.css and the generated palette.css. See docs/design-system.md §9 "Naming" and CLAUDE.md rule 10.',
