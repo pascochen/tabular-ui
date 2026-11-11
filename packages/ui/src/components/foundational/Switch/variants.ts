@@ -17,16 +17,18 @@ import { controlBase } from '../controlBase';
  * bottom (it overflowed the 10px content height), and 1px from the right
  * when on, because the travel assumed 2px (found 2026-10-20).
  *
- * Square since 2026-10-23 (owner's decision, after a side-by-side in
- * Storybook). The track is a control, so `--radius-md`; the thumb is a part
- * inset inside it, so `--radius-sm` (§7.7). Every control in the system is
- * square, and `--radius-full` is left to marks that are read, not operated.
+ * Round since 2026-11-10 (owner's decision, after a side-by-side in both
+ * modes): track and thumb are `--radius-full` (§7.7). It was square from
+ * 2026-10-23. Square, the thumb and its inset were exactly half the track,
+ * so off and on both read "dark on the left, light on the right". A circle
+ * in a pill is seen as an object, and its position reads in either state.
+ * The switch is the one control that is not square.
  */
 export const switchVariants = cva(
   [
     ...controlBase,
     'group/switch peer relative inline-flex shrink-0 items-center',
-    'rounded-md border border-transparent p-px',
+    'rounded-full border border-transparent p-px',
 
     // Off is neutral and must stay visible on the canvas; --color-border is
     // too close to the ground (1.29:1 light, 1.80:1 dark, §3), so the off track takes the stronger
@@ -62,7 +64,7 @@ export const switchThumbVariants = cva(
   [
     // The slide is movement; under reduced motion the thumb jumps (§4, as
     // Spinner and AgentReasoning's caret do).
-    'pointer-events-none block rounded-sm transition-transform motion-reduce:transition-none',
+    'pointer-events-none block rounded-full transition-transform motion-reduce:transition-none',
     'group-data-unchecked/switch:bg-text-primary',
     'group-data-checked/switch:bg-on-interactive',
   ],

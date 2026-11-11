@@ -23,15 +23,13 @@ The vendored source shipped `h-[16.6px] w-[28px]` — a fractional height that l
 
 The 2px inset is the track's 1px transparent border plus 1px of padding. The border stays because `aria-invalid` colours it, and it counts in the box: with 2px of padding on top of it, the thumb sat 3px from the left and 1px from the right when on. `apps/storybook/tests/switch.spec.ts` measures all four gaps, in both states and both sizes, and expects exactly 2px.
 
-## Why square
+## Why round
 
-Square since 2026-10-23, by the owner's decision after a side-by-side in Storybook. The track is a control, so it takes `--radius-md` with every other control. The thumb is a part inset inside it, so `--radius-sm`. Both are 0px (§7.7).
+Round since 2026-11-10, by the owner's decision after a side-by-side in both modes. Track and thumb take `--radius-full` (§7.7). The switch is the one control in the system that is not square.
 
-Until then it was a pill, on the argument that the thumb had to be circular to read as sliding. It doesn't: a switch reads by its wide track with the thumb parked at one end. Round, it was the only control in the system that wasn't square. `--radius-full` is now for marks that are read, not operated: the status dot, count badge, avatar and progress track.
+It was square from 2026-10-23 to 2026-11-10. Square, the thumb and its 2px inset are exactly half the track, and the thumb flips colour with the state. So off was an ink square on the left with a faint fill on the right, and on was an ink track on the left with a paper square on the right. Both read "dark on the left, light on the right", and in a settings list the one off switch was hard to pick out. A circle inside a pill is seen as an object, so its position reads in either state.
 
-The cost, accepted with it in view: an off thumb is a small solid square, as a checked `Checkbox` is, and the two share settings lists. The track around the thumb is what tells them apart.
-
-`Menu`'s switch indicator reuses these variants, so it is square too. `apps/storybook/tests/switch.spec.ts` asserts 0px on both.
+`Menu`'s switch indicator reuses these variants, so it is round too. `apps/storybook/tests/switch.spec.ts` asserts a fully round track and thumb on both. The comparison is in `docs/reviews/square-switch-2026-11-10.md`.
 
 ## Colour
 

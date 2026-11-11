@@ -71,28 +71,30 @@ test(`Menu switch indicator: thumb inset is ${INSET}px, off and on`, async ({ pa
 });
 
 /**
- * Square since 2026-10-23 (§7.7): track and thumb on their tier tokens, both
- * 0px. Until then they were `--radius-full`, and nothing measured it. Menu's
- * indicator shares the variants, so it is held to the same shape.
+ * Round since 2026-11-10 (§7.7): track and thumb are `--radius-full`. They
+ * were square, 0px, from 2026-10-23. Menu's indicator shares the variants, so
+ * it is held to the same shape.
+ *
+ * "Fully round" is measured, not read as a token: the corner radius is at
+ * least half the box's height, which is what makes the ends semicircles.
  */
-async function radii(track: Locator, thumb: Locator) {
-  return {
-    track: await track.evaluate((el) => getComputedStyle(el).borderRadius),
-    thumb: await thumb.evaluate((el) => getComputedStyle(el).borderRadius),
-  };
+async function round(track: Locator, thumb: Locator) {
+  const isRound = (el: Element) =>
+    parseFloat(getComputedStyle(el).borderTopLeftRadius) >= el.getBoundingClientRect().height / 2;
+  return { track: await track.evaluate(isRound), thumb: await thumb.evaluate(isRound) };
 }
 
-test('Switch: track and thumb are square, at both sizes', async ({ page }) => {
+test('Switch: track and thumb are fully round, at both sizes', async ({ page }) => {
   await gotoStory(page, 'foundational-switch--sizes');
   for (const label of ['Small, off', 'Default, on']) {
     const track = page.getByRole('switch', { name: label });
-    expect(await radii(track, track.locator('[data-slot="switch-thumb"]'))).toEqual({ track: '0px', thumb: '0px' });
+    expect(await round(track, track.locator('[data-slot="switch-thumb"]'))).toEqual({ track: true, thumb: true });
   }
 });
 
-test('Menu switch indicator: track and thumb are square', async ({ page }) => {
+test('Menu switch indicator: track and thumb are fully round', async ({ page }) => {
   await gotoStory(page, 'foundational-menu--switch-item');
   await page.getByRole('button', { name: 'Display' }).click();
   const track = page.getByRole('menuitemcheckbox', { name: 'Compact rows' }).locator(':scope > [aria-hidden="true"]');
-  expect(await radii(track, track.locator('span'))).toEqual({ track: '0px', thumb: '0px' });
+  expect(await round(track, track.locator('span'))).toEqual({ track: true, thumb: true });
 });
