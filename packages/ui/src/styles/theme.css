@@ -59,6 +59,10 @@
    The radius comments moved the switch from --radius-full to --radius-md
    (track) and --radius-sm (thumb), from §7.7 (comment only, no value
    changed, 2026-10-23, user-approved after a side-by-side in Storybook).
+   The radius comments moved the switch back to --radius-full, track and
+   thumb, from §7.7 (comment only, no value changed, 2026-11-10,
+   user-approved after a side-by-side;
+   docs/reviews/square-switch-2026-11-10.md).
    --color-bg-selection and the ::selection base rule from §4 "Text
    selection" (2026-11-02, user-approved after a side-by-side).
    The sage ramp renamed ivy from §1, with --color-sage-* kept as deprecated
@@ -191,10 +195,10 @@
      (2026-10-16); round shapes keep --radius-full. The four tiers are roles
      at one value. Hard ceiling 8px; steps above the ceiling are stripped. */
   --radius-xs: 0px;   /* status badge, cell focus outline, checkbox */
-  --radius-sm: 0px;   /* a part inset inside a control (segmented tab, switch thumb) */
-  --radius-md: 0px;   /* interactive — input, button, filter chip, tab, switch; card, panel, dropdown, popover */
+  --radius-sm: 0px;   /* a part inset inside a control (segmented tab) */
+  --radius-md: 0px;   /* interactive — input, button, filter chip, tab; card, panel, dropdown, popover */
   --radius-lg: 0px;   /* modal, drawer */
-  --radius-full: 9999px; /* status dot, count badge, avatar, progress track */
+  --radius-full: 9999px; /* status dot, count badge, avatar, progress track, switch */
   --radius-xl: initial;
   --radius-2xl: initial;
   --radius-3xl: initial;
