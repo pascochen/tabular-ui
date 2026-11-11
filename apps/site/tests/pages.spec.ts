@@ -736,6 +736,7 @@ test.describe('the jump index', () => {
     await expect(index.getByRole('list', { name: 'Asking', exact: true }).getByRole('link')).toHaveText([
       'Chat starter',
       'Chat composer',
+      'Chat thread',
     ]);
   });
 });
