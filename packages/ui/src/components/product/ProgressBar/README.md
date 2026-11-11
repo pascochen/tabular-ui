@@ -23,6 +23,10 @@ A bare bar announces nothing. `role="progressbar"` without an accessible name te
 
 Indeterminate bars animate under `motion-safe:` only. Under `prefers-reduced-motion` the bar holds still and the label carries the meaning.
 
+## A tone is never the only statement
+
+The fill colour is all a tone draws: a bar is 2px or 4px tall and has no room for a mark. Success, warning and danger are one olive to a red-green colour-blind user and one grey in grayscale (§1), so the `label`, or a `StatusBadge` beside the bar, must say what the colour means: "Storage quota nearly exhausted", not "Storage".
+
 ## `tone`, not `role`
 
 The colour prop is `tone` (`info` by default; `interactive` · `success` · `warning` · `danger` · `agent`). It was `role` until 2026-10-09, which is the ARIA attribute this component always sets to `progressbar` itself. `role` is still honoured as the deprecated spelling of `tone`; lint rejects it in new code.

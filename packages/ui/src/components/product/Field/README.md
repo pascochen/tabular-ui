@@ -22,6 +22,8 @@ The label and the message are both `--text-sm`. The message was `--text-xs` unti
 
 They do not stack. Two messages under one control is a reading-order problem, and the error is always the one that matters. `aria-describedby` therefore always points at exactly one message.
 
+**An error carries a warning icon (since 2026-11-11).** Phosphor's `Warning` at `bold`, 12px, before the message and in its colour, `aria-hidden`. Without it an error differed from help text by colour alone, and `--color-text-danger` has the lightness of the neutral text it replaces: in grayscale the two were the same, and for red-green colour-blind users nearly so (§11.2). Help text takes no icon.
+
 `required` renders a marker on the label but is `aria-hidden`, so the asterisk is not announced twice. The render prop carries `required` and `aria-required` to the control, and those are what assistive technology reads. Spread them onto a native control. A custom control whose root is not a form element takes `aria-required` only — `SelectTrigger` is a button, and `required` is invalid there:
 
 ```tsx
