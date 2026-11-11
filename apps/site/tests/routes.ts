@@ -5,6 +5,7 @@
 export const componentPages = [
   'chat-starter',
   'chat-composer',
+  'chat-thread',
   'agent-reasoning',
   'agent-plan',
   'tool',
@@ -15,7 +16,6 @@ export const componentPages = [
   'question',
   'confirmation',
   'agent-block',
-  'chat-thread',
   'run-log-row',
   'status-badge',
 ].map((name) => `/components/${name}`);

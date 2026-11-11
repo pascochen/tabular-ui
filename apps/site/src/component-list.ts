@@ -51,6 +51,20 @@ export const entries: ComponentEntry[] = [
     ],
   },
   {
+    name: 'chat-thread',
+    title: 'Chat thread',
+    moment: 'asking',
+    decision: 'The answer’s space appears when you ask, so it grows in place.',
+    useWhen: [
+      'It’s the conversation in the chat panel: questions, answers, and the agent at work.',
+      'Answers stream. The answer’s space appears as soon as the question is sent, so the thread doesn’t jump.',
+    ],
+    avoidWhen: [
+      'It would sit inside a scrolling panel body. It scrolls itself: put it between the panel’s header and footer.',
+      'You need a record of what ran. Use Run log row.',
+    ],
+  },
+  {
     name: 'agent-reasoning',
     title: 'Agent reasoning',
     moment: 'thinking',
@@ -188,20 +202,6 @@ export const entries: ComponentEntry[] = [
     avoidWhen: [
       'You’re reaching for a generic card. The rail and label are how people tell the agent’s work from a person’s.',
       'It would sit inside another Agent block. Use one per agent turn, with Agent reasoning and Agent plan inside it.',
-    ],
-  },
-  {
-    name: 'chat-thread',
-    title: 'Chat thread',
-    moment: 'waiting',
-    decision: 'The answer’s space appears when you ask, so it grows in place.',
-    useWhen: [
-      'It’s the conversation in the chat panel: questions, answers, and the agent at work.',
-      'Answers stream. The answer’s space appears as soon as the question is sent, so the thread doesn’t jump.',
-    ],
-    avoidWhen: [
-      'It would sit inside a scrolling panel body. It scrolls itself: put it between the panel’s header and footer.',
-      'You need a record of what ran. Use Run log row.',
     ],
   },
   {
