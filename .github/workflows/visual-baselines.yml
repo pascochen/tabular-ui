@@ -62,7 +62,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # As ci.yml installs it: the script survives the runner's apt mirror going away.
+      # As ci.yml installs it: the script survives the runner failing to resolve apt's mirrors.
       - run: bash .github/scripts/install-chromium.sh
 
       # Delete, then regenerate all: a renamed or removed story leaves no

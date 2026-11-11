@@ -114,7 +114,7 @@ jobs:
       # --with-deps because ubuntu-latest is missing some of the shared
       # libraries Chromium needs; the repo's own `pretest` hook omits them
       # because it assumes a developer machine that already has them.
-      # The script survives the runner's apt mirror going away (2026-11-11).
+      # The script survives the runner failing to resolve apt's mirrors (2026-11-11).
       - name: Install Chromium
         if: steps.scope.outputs.docs_only != 'true'
         run: bash .github/scripts/install-chromium.sh
