@@ -115,7 +115,7 @@ Report what you could not verify. Do not claim a check you did not run.
 
 ## Step 9 — Update the failure log if something went wrong
 
-If you hit a rule you nearly violated, or a spec ambiguity that could mislead the next person, add a line to the **Failure log** in `CLAUDE.md`.
+If you hit a rule you nearly violated, or a spec ambiguity that could mislead the next person, add an entry to `docs/failure-log.md` and its one-line rule to the **Failure log** digest in `CLAUDE.md`.
 
 ## Ask, don't guess
 
