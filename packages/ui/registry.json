@@ -862,6 +862,7 @@
       "description": "A label, help text and error, wired to one control.",
       "categories": ["product"],
       "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
       "registryDependencies": ["https://tabularui.com/r/tokens.json", "https://tabularui.com/r/utils.json"],
       "files": [
         {

@@ -7,7 +7,7 @@ Tabular UI is a design system: one token layer, 18 foundational components, 33 p
 - **`docs/design-system.md`**: the spec, with rules, measured values, and why. §0 is the ten rules that fail review. §10 is the checklist for UI changes.
 - **`docs/components.md`**: every component that exists. Check it before building anything: what you need may already be there.
 - **`tools.md`**: stack, commands, and how CI behaves.
-- **`CLAUDE.md`**: the failure log at the end is the fastest way to learn what has already gone wrong once.
+- **`CLAUDE.md`**: the failure log at the end is the fastest way to learn what has already gone wrong once, one line per mistake. The full story of each is in `docs/failure-log.md`.
 
 ## Set up
 
@@ -179,7 +179,7 @@ Dependabot opens grouped update PRs every Monday. They go through Verify like an
 
 ## When something goes wrong
 
-If a mistake ships, fix it and add one entry to the failure log at the end of `CLAUDE.md`: what happened, why nothing caught it, and the rule that stops it next time. That log is how this system gets better.
+If a mistake ships, fix it and add one entry to `docs/failure-log.md`: what happened, why nothing caught it, and the rule that stops it next time. Then add that rule as one line to the failure log's digest at the end of `CLAUDE.md`, or sharpen the line that already covers it. That log is how this system gets better.
 
 ## Writing product copy
 

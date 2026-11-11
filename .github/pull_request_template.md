@@ -36,4 +36,4 @@
 ## Docs
 
 - [ ] Component `README.md`, `docs/components.md` or the spec updated, if this changes them
-- [ ] If this fixes a mistake that shipped: an entry in `CLAUDE.md`'s failure log
+- [ ] If this fixes a mistake that shipped: an entry in `docs/failure-log.md`, and its line in `CLAUDE.md`'s failure log

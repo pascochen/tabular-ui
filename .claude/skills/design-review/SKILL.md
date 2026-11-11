@@ -133,4 +133,4 @@ Cite the spec section for every finding, and state **why it matters**, not just 
 
 ## After the review
 
-If a finding represents a mistake likely to recur, add a line to the **Failure log** in `CLAUDE.md`. That section is the only part of the system that improves over time — a review that finds a novel error and doesn't record it has done half the job.
+If a finding represents a mistake likely to recur, add an entry to `docs/failure-log.md` and its one-line rule to the **Failure log** digest in `CLAUDE.md`. That log is the only part of the system that improves over time — a review that finds a novel error and doesn't record it has done half the job.
