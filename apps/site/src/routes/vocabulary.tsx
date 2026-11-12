@@ -128,7 +128,7 @@ export default function Vocabulary() {
             {moments.map((m) => (
               <li
                 key={m.id}
-                className="flex flex-col gap-[var(--gap-bonded)] border border-border p-[var(--site-gap-tight)]"
+                className="flex flex-col gap-[var(--gap-bonded)] border border-border bg-canvas p-[var(--site-gap-tight)]"
               >
                 <h3 className="text-site-title-sm font-semibold text-text-primary">{m.title}</h3>
                 <p className="text-site-small text-text-body">{m.line}</p>
@@ -150,7 +150,7 @@ export default function Vocabulary() {
             {waits.map((w) => (
               <li
                 key={w.name}
-                className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap)]"
+                className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap)]"
               >
                 <h3 className="text-site-title font-semibold text-text-primary">{component(w.name).title}</h3>
                 {[
@@ -199,7 +199,7 @@ export default function Vocabulary() {
               <p className="text-site-small text-text-secondary">
                 What is happening now: a present participle, no subject, ending in an ellipsis.
               </p>
-              <AgentBlock authorship="AI">
+              <AgentBlock authorship="AI" className="bg-canvas">
                 <div className="flex flex-col gap-[var(--gap-group)]">
                   <AgentReasoning status="streaming" text="" />
                   <AgentPlan title="Explain the H1 gap" description="" status="streaming" steps={[]} />
@@ -215,7 +215,7 @@ export default function Vocabulary() {
               <ul role="list" className="flex flex-col gap-[var(--gap-inline)]">
                 {labels.map((l) => (
                   <li key={l.label}>
-                    <AgentBlock authorship={l.label}>
+                    <AgentBlock authorship={l.label} className="bg-canvas">
                       <p className="text-text-secondary">{l.use}</p>
                     </AgentBlock>
                   </li>
@@ -224,7 +224,7 @@ export default function Vocabulary() {
             </div>
           </div>
 
-          <table className="w-full border-collapse border border-border text-site-small">
+          <table className="w-full border-collapse border border-border bg-canvas text-site-small">
             <caption className="pb-[var(--gap-inline)] text-left text-site-small text-text-secondary">
               The words Tabular UI uses, and the ones it doesn’t.
             </caption>

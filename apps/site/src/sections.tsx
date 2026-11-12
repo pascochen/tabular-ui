@@ -11,7 +11,7 @@ import { HeroSpecimen } from './specimens';
 
 /**
  * The hero's one specimen sits on a paper plate on a sheet ruled like a
- * spreadsheet (D3, item 3). The rules are a decorative layer behind the
+ * spreadsheet (D3, item 3). The paper behind it is the page's (D3, item 4). The rules are a decorative layer behind the
  * content, styled in index.css: one empty element per column, whose border
  * is the column's line.
  */
@@ -51,7 +51,7 @@ export function HeroSection() {
             ) : null}
           </div>
         </div>
-        <SpecimenFrame className="bg-canvas lg:col-span-7">
+        <SpecimenFrame className="lg:col-span-7">
           <HeroSpecimen />
         </SpecimenFrame>
       </Rail>
@@ -62,8 +62,8 @@ export function HeroSection() {
 /**
  * The closing band (D7): Home only, and dark (D3, decided (c)): a section set to
  * data-theme="dark", so every token recomputes inside it, with its own ground
- * and text colour. It's ink on the hero's paper, so the sheet's tooth shows
- * through it (`site-ink`, D3). No new token.
+ * and text colour. It's ink on paper, so a sheet's tooth shows through it
+ * (`site-ink`, D3). No new token.
  */
 export function ClosingBand() {
   return (

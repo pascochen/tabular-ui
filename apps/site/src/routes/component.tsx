@@ -46,7 +46,7 @@ function RulesFollowed({ name }: { name: string }) {
   return (
     <section
       aria-labelledby="rules-title"
-      className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]"
+      className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]"
     >
       <h2 id="rules-title" className="text-site-title font-semibold text-text-primary">
         {followed.length === 1 ? 'The rule it follows' : 'The rules it follows'}

@@ -20,6 +20,9 @@ export type Ground = 'paper' | 'dark';
  *
  * A component that isn't built has a dashed frame, and says so in words: dashed
  * means placeholder (§7.8), and colour or shape is never the only signal.
+ *
+ * The frame states its ground, as every bordered panel on the site does, so the
+ * page's paper never shows inside it (D3, item 4; tests/paper.spec.ts).
  */
 export function SpecimenFrame({
   ground = 'paper',
@@ -33,7 +36,13 @@ export function SpecimenFrame({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn('flex flex-col border border-border-strong p-2', placeholder && 'border-dashed', className)}>
+    <div
+      className={cn(
+        'flex flex-col border border-border-strong bg-canvas p-2',
+        placeholder && 'border-dashed',
+        className,
+      )}
+    >
       <div
         data-theme={ground === 'dark' ? 'dark' : undefined}
         data-plate={ground}
@@ -144,7 +153,7 @@ export function Pair({
 }) {
   return (
     <figure className="flex flex-col gap-[var(--gap-group)]">
-      <div className="grid grid-cols-1 gap-2 border border-border-strong p-2 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 border border-border-strong bg-canvas p-2 md:grid-cols-2">
         {[before, after].map((state, i) => (
           <div
             key={i}

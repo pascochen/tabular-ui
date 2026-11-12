@@ -33,7 +33,7 @@ export default function Principles() {
                 {p.title}
               </h2>
               <p className="text-site-lead text-text-secondary">{p.why}</p>
-              <div className="flex flex-col gap-[var(--gap-bonded)] border border-border p-[var(--site-gap-tight)]">
+              <div className="flex flex-col gap-[var(--gap-bonded)] border border-border bg-canvas p-[var(--site-gap-tight)]">
                 <p className="text-site-small font-semibold text-text-secondary">Check</p>
                 <p className="text-site-body text-text-body">{p.check}</p>
               </div>

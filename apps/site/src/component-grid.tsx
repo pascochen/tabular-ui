@@ -103,7 +103,7 @@ export function ComponentsSection() {
             }
           />
 
-          <nav aria-label="Components by moment" className="border border-border p-[var(--site-gap-tight)]">
+          <nav aria-label="Components by moment" className="border border-border bg-canvas p-[var(--site-gap-tight)]">
             <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
               {moments.map((moment) => (
                 <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">

@@ -177,7 +177,7 @@ export default function Density() {
           <TokenRows
             tokens={[themeToken('--border-width'), themeToken('--border-width-2'), themeToken('--ring-width')]}
           />
-          <p className="max-w-[var(--site-w-prose)] border border-dashed border-border-strong p-[var(--pad-card)] text-text-secondary">
+          <p className="max-w-[var(--site-w-prose)] border border-dashed border-border-strong bg-canvas p-[var(--pad-card)] text-text-secondary">
             A dashed frame marks something still to come: a to-build component, a slot a row will fill.
           </p>
         </Rail>

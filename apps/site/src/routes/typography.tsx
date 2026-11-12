@@ -130,15 +130,15 @@ export default function Typography() {
             lead="The serif applies by element: every heading, and the metric tier. Text that isn’t a heading never goes serif."
           />
           <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]">
+            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
               <TokenLabel name="--font-sans" detail={firstFamily('--font-sans')} />
               <p className="text-site-lead text-text-primary">Body and interface text, at every size.</p>
             </li>
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]">
+            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
               <TokenLabel name="--font-heading" detail={firstFamily('--font-display')} />
               <h3 className="text-site-title font-semibold text-text-primary">Every heading, by element</h3>
             </li>
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border p-[var(--site-gap-tight)]">
+            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
               <TokenLabel name="--font-mono" detail={firstFamily('--font-mono')} />
               <p className="font-mono text-text-primary">
                 {kasane.duplicatePayment.entries[0]} {packFile('trial_balance_monthly.csv')}
