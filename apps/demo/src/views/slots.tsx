@@ -9,6 +9,7 @@ import { NoMessages, Profile } from './parts';
 import { AgentProfile, AgentView } from './AgentView';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
 import { ChannelView } from './Channel';
+import { NewChatView } from './NewChat';
 import { SearchView } from './Search';
 import { SourcesView } from './Sources';
 import { TaskPanel, TasksView } from './Tasks';
@@ -28,6 +29,9 @@ export type ViewSlots = {
 };
 
 export function slotsFor(view: View): ViewSlots {
+  if (view.kind === 'new-chat') {
+    return { title: 'New chat', body: <NewChatView /> };
+  }
   if (view.kind === 'tasks') {
     const task = selectedTask(view.task);
     return {

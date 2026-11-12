@@ -19,11 +19,15 @@ import {
  * Nothing here needs a browser.
  */
 
-test('`/` opens #revenue, and #revenue’s link is `/`', () => {
-  expect(parseView('')).toEqual({ kind: 'channel', channel: 'revenue' });
-  expect(DEFAULT_VIEW).toEqual({ kind: 'channel', channel: 'revenue' });
+test('`/` opens New chat, and New chat’s link is `/`', () => {
+  expect(parseView('')).toEqual({ kind: 'new-chat' });
+  expect(DEFAULT_VIEW).toEqual({ kind: 'new-chat' });
   expect(hrefFor(DEFAULT_VIEW)).toBe('/');
-  expect(parseView('?view=revenue')).toEqual(DEFAULT_VIEW);
+});
+
+test('#revenue, the landing page until 2026-11-12, keeps a URL of its own', () => {
+  expect(parseView('?view=revenue')).toEqual({ kind: 'channel', channel: 'revenue' });
+  expect(hrefFor({ kind: 'channel', channel: 'revenue' })).toBe('?view=revenue');
 });
 
 test('the six channels open by their URLs, in the sidebar’s order', () => {
@@ -48,7 +52,7 @@ test('old and unknown URLs open the default', () => {
 test('every built channel round-trips through its URL', () => {
   for (const channel of BUILT_CHANNELS) {
     const view = { kind: 'channel', channel } as const;
-    expect(sameView(parseView(hrefFor(view).replace('/', '')), view), channel).toBe(true);
+    expect(sameView(parseView(hrefFor(view)), view), channel).toBe(true);
   }
 });
 
@@ -91,6 +95,7 @@ test('a sidebar item stays active whatever its view has selected inside', () => 
   expect(placeOf({ kind: 'tasks', task: 'credit-limit' })).toBe(placeOf({ kind: 'tasks' }));
   expect(placeOf({ kind: 'sources', source: 'accounting-policies' })).toBe(placeOf({ kind: 'sources' }));
   expect(placeOf({ kind: 'dm', member: 'apLead' })).not.toBe(placeOf({ kind: 'dm', member: 'fpaHead' }));
+  expect(placeOf({ kind: 'new-chat' })).not.toBe(placeOf({ kind: 'channel', channel: 'revenue' }));
 });
 
 test('?at=end opens the end state with any view', () => {
