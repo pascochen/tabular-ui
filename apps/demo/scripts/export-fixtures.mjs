@@ -1190,7 +1190,7 @@ must(
 const closeChecks = [
   {
     id: 'revenue-cut-off',
-    label: 'Revenue cut-off',
+    label: 'Revenue timing',
     meaning: `${fmtPeriod(LAST_CLOSED)} revenue on invoices delivered after the month`,
     currency: 'JPY',
     before: cutoffBefore,
@@ -1208,21 +1208,75 @@ const closeChecks = [
 for (const c of closeChecks) must(c.before > 0, `the ${c.id} check has something to fix`);
 must(Number.isInteger(closeSource.typingMs) && closeSource.typingMs > 0, 'close-demo.json gives typingMs');
 
+const closeAgents = fillAll(closeSource.agents).map((a) => ({
+  ...a,
+  reads: a.reads.map(slugOf),
+  starters: a.starters.map((q) => ({ ...q, sources: q.sources.map(slugOf) })),
+}));
+
+// New chat: the questions that cross agents. Each answer is one agent's, and points at copy that
+// exists (its finding, or one of its suggested questions) or is written here for a question no file
+// answers. Resolved here, so the app matches a question and shows what it's given.
+must(
+  closeSource.newChat.questions.filter((q) => q.suggested !== false).length >= 4,
+  'New chat suggests four questions',
+);
+const newChat = {
+  description: curly(closeSource.newChat.description),
+  placeholder: closeSource.newChat.placeholder,
+  questions: closeSource.newChat.questions.map((q) => ({
+    question: fill(q.question),
+    suggested: q.suggested !== false,
+    answers: q.answers.map((a) => {
+      const agent = closeAgents.find((x) => x.key === a.agent);
+      must(agent, `${a.agent} ("${q.question}") is an agent in close-demo.json`);
+      if (a.finding) {
+        const e = closeExceptions.find((x) => x.id === agent.finding);
+        return {
+          agent: agent.key,
+          finding: e.id,
+          answer: e.summary,
+          sources: e.refs.map((r) => r.doc),
+          notChecked: e.notChecked,
+        };
+      }
+      if (a.starter) {
+        const starter = agent.starters.find((x) => x.question === fill(a.starter));
+        must(starter, `"${a.starter}" ("${q.question}") is one of ${agent.key}'s suggested questions`);
+        return { agent: agent.key, answer: starter.answer, sources: starter.sources, notChecked: starter.notChecked };
+      }
+      must(
+        a.answer && Array.isArray(a.notChecked),
+        `${a.agent}: "${q.question}" has an answer and says what wasn't checked`,
+      );
+      for (const f of a.sources) {
+        must(
+          closeSource.agents.find((x) => x.key === a.agent).reads.includes(f),
+          `${f} ("${q.question}") is in ${a.agent}'s reads`,
+        );
+      }
+      return {
+        agent: agent.key,
+        answer: fill(a.answer),
+        sources: a.sources.map(slugOf),
+        notChecked: fillAll(a.notChecked),
+      };
+    }),
+  })),
+};
+
 await writeJson('apps/demo/data/people.json', closePeople);
 await writeJson('apps/demo/data/documents.json', documents);
 await writeJson('apps/demo/data/close.json', {
   scene: closeSource.scene,
   period: fillAll(closeSource.period),
   agentRules: closeSource.agentRules,
-  agents: fillAll(closeSource.agents).map((a) => ({
-    ...a,
-    reads: a.reads.map(slugOf),
-    starters: a.starters.map((q) => ({ ...q, sources: q.sources.map(slugOf) })),
-  })),
+  agents: closeAgents,
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   typingMs: closeSource.typingMs,
   searchSuggestions: fillAll(closeSource.searchSuggestions),
+  newChat,
   exceptions: closeExceptions,
   hero: fillAll({
     ...closeSource.hero,

@@ -2,7 +2,7 @@ import { UserIcon } from '@phosphor-icons/react';
 import { AppShellPanelBody, EmptyState, buttonVariants } from 'tabular-ui';
 
 import { people } from '../lib/kasane';
-import { DEFAULT_VIEW, hrefFor, onViewLinkClick } from '../lib/view';
+import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 import { MemberAvatar } from '../shell/members';
 
 /**
@@ -10,6 +10,8 @@ import { MemberAvatar } from '../shell/members';
  * way back to where the close is happening. A real empty state, not a
  * placeholder, so the view is never a dead end.
  */
+const REVENUE: View = { kind: 'channel', channel: 'revenue' };
+
 export function NoMessages({ memberKey }: { memberKey: string }) {
   return (
     <EmptyState
@@ -20,8 +22,8 @@ export function NoMessages({ memberKey }: { memberKey: string }) {
       action={
         <a
           className={buttonVariants({ variant: 'outline' })}
-          href={hrefFor(DEFAULT_VIEW)}
-          onClick={onViewLinkClick(DEFAULT_VIEW)}
+          href={hrefFor(REVENUE)}
+          onClick={onViewLinkClick(REVENUE)}
         >
           Go to #revenue
         </a>

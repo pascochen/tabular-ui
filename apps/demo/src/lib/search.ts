@@ -13,6 +13,7 @@ import {
   type Ref,
   type SourceDocument,
 } from './kasane';
+import { NEW_CHAT } from './new-chat';
 import type { View } from './view';
 
 export type SearchGroup = 'Tasks' | 'Sources' | 'Messages' | 'People';
@@ -129,16 +130,22 @@ export function search(state: CloseState, query: string): SearchResult[] {
     });
   }
 
-  // What the visitor wrote, in a channel or to an agent.
+  // What the visitor wrote: in a channel, to an agent, or in New chat.
   state.posts.forEach((p, i) => {
     if (!matches(q, p.text)) return;
     const channel = channels.find((c) => c.id === p.where);
+    const inNewChat = p.where === NEW_CHAT;
+    const place = inNewChat ? 'New chat' : channel ? `#${channel.name}` : memberName(p.where);
     results.push({
       group: 'Messages',
       key: `post-${i}`,
-      title: `${memberName('visitor')} in ${channel ? `#${channel.name}` : memberName(p.where)}, ${p.at}`,
+      title: `${memberName('visitor')} in ${place}, ${p.at}`,
       detail: p.text,
-      view: channel ? { kind: 'channel', channel: channel.id } : { kind: 'dm', member: p.where },
+      view: inNewChat
+        ? { kind: 'new-chat' }
+        : channel
+          ? { kind: 'channel', channel: channel.id }
+          : { kind: 'dm', member: p.where },
     });
   });
 

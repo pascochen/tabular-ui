@@ -1,9 +1,9 @@
 # HeroThread
 
-The visitor's one decision, in the Revenue cut-off thread (`kasane-close-demo-plan.md` §2, 0:20 to 2:10). After Shun's reply, the thread holds, in order:
+The visitor's one decision, in the Revenue booked early thread (`kasane-close-demo-plan.md` §2, 0:20 to 2:10). After Shun's reply, the thread holds, in order:
 
-1. **The question** (`Question`, in an `AgentBlock` labelled "Cut-off AI · Awaiting your answer"): reopen September or keep it locked, with the line it rests on. The policy says revenue belongs to the month of delivery, and it doesn't say whether a locked month is reopened.
-2. **The proposal**, once answered (`AgentBlock` labelled "Cut-off AI · Awaiting confirmation"):
+1. **The question** (`Question`, in an `AgentBlock` labelled "Revenue AI · Awaiting your answer"): reopen September or keep it locked, with the line it rests on. The policy says revenue belongs to the month of delivery, and it doesn't say whether a locked month is reopened.
+2. **The proposal**, once answered (`AgentBlock` labelled "Revenue AI · Awaiting confirmation"):
    - a `Tool` line, "Reading the delivery date on…" then "Read…". It reads the invoice's delivery date, because the material holds no delivery note, and the finding's "not checked" list says so
    - the reason
    - for a reopen, the reversal's five lines in a `DataTable`
@@ -18,7 +18,7 @@ The state lives in `lib/close-state.ts` (`hero.rounds`), and the agent's timed s
 |---|---|---|---|
 | Reopen September | Proposal with the reversal; posting reruns the check (2s) | After the rerun | ¥0, "Tied out" |
 | Keep September locked | Proposal to list it for the auditors; no entry, no rerun | On posting | ¥42.7m, "Listed for the auditors' review" |
-| Choose for me | As Reopen, with "Chosen by Cut-off AI" and the reason, which says the choice is the agent's and not the policy's (`close-demo.json`, `hero.delegate`) | As Reopen | As Reopen |
+| Choose for me | As Reopen, with "Chosen by Revenue AI" and the reason, which says the choice is the agent's and not the policy's (`close-demo.json`, `hero.delegate`) | As Reopen | As Reopen |
 | Skip | Nothing; it stays open, and the run ends at 2 of 4 | — | Unchanged |
 | "Don't post it" on a proposal | The agent asks again, in a new round | — | Unchanged |
 

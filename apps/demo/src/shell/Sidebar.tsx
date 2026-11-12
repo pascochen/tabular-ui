@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { BooksIcon, HashIcon, MagnifyingGlassIcon, TrayIcon } from '@phosphor-icons/react';
+import { BooksIcon, HashIcon, MagnifyingGlassIcon, PlusIcon, TrayIcon } from '@phosphor-icons/react';
 import { AppShellNav, AppShellNavGroup, AppShellNavItem, Badge, StatusDot, TruncatedText } from 'tabular-ui';
 
 import { agents, channels, close, directMessages, kasaneCompany, memberName, visitor } from '../lib/kasane';
@@ -47,8 +47,9 @@ const PLACES = {
 } satisfies Record<(typeof BUILT_PLACES)[number], { label: string; icon: ReactElement; view: View }>;
 
 /**
- * The sidebar: one home for everything. The places, the channels, the agents
- * and the direct messages, in that order. Every item opens a built view
+ * The sidebar: one home for everything. New chat and the places, the agents,
+ * the channels and the direct messages, in that order (the Accountant
+ * Workspace story's, since 2026-11-12). Every item opens a built view
  * (`lib/view.ts`), because a dead link is where a three-minute visitor leaves,
  * so a section with nothing built isn't drawn.
  */
@@ -59,6 +60,9 @@ export function Sidebar() {
     <AppShellNav aria-label="Workspace">
       {BUILT_PLACES.length ? (
         <AppShellNavGroup>
+          <NavLink view={{ kind: 'new-chat' }} icon={<PlusIcon />}>
+            New chat
+          </NavLink>
           {BUILT_PLACES.map((place) => (
             <NavLink
               key={place}
@@ -78,6 +82,13 @@ export function Sidebar() {
           ))}
         </AppShellNavGroup>
       ) : null}
+      <AppShellNavGroup label="Agents">
+        {agents.map((a) => (
+          <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} avatar={<MemberAvatar memberKey={a.key} />}>
+            {a.name}
+          </NavLink>
+        ))}
+      </AppShellNavGroup>
       <AppShellNavGroup label="Channels">
         {BUILT_CHANNELS.map((id) => channels.find((c) => c.id === id)!).map((c) => {
           const mark = channelMark(state, c.id);
@@ -94,13 +105,6 @@ export function Sidebar() {
             </NavLink>
           );
         })}
-      </AppShellNavGroup>
-      <AppShellNavGroup label="Agents">
-        {agents.map((a) => (
-          <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} avatar={<MemberAvatar memberKey={a.key} />}>
-            {a.name}
-          </NavLink>
-        ))}
       </AppShellNavGroup>
       <AppShellNavGroup label="Direct messages">
         {directMessages.map((key) => (

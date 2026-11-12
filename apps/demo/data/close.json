@@ -12,15 +12,15 @@
   "agents": [
     {
       "key": "cutoff-ai",
-      "name": "Cut-off AI",
+      "name": "Revenue AI",
       "checks": "Revenue lands in the month of delivery.",
       "finding": "revenue-cut-off",
       "reads": ["sales-invoices", "close-calendar", "accounting-policies"],
-      "ask": "Ask about the September cut-off.",
+      "ask": "Ask about September’s revenue.",
       "starters": [
         {
-          "question": "Which other September invoices were delivered in October?",
-          "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+          "question": "Were any other September invoices delivered in October?",
+          "answer": "No. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
           "sources": ["sales-invoices"],
           "notChecked": [
             "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
@@ -28,7 +28,7 @@
         },
         {
           "question": "What does the policy say about the delivery date?",
-          "answer": "Revenue belongs to the period in which delivery occurs. The delivery date on each invoice is the control field.",
+          "answer": "Revenue belongs to the month of delivery. The delivery date on each invoice decides which month that is.",
           "sources": ["accounting-policies"],
           "notChecked": ["Whether a locked month is reopened: the policy doesn’t say."]
         }
@@ -149,11 +149,115 @@
   ],
   "directMessages": ["fpaHead", "apLead"],
   "typingMs": 1500,
-  "searchSuggestions": ["MFL-58821", "Great Lakes", "cut-off"],
+  "searchSuggestions": ["MFL-58821", "Great Lakes", "delivery"],
+  "newChat": {
+    "description": "Each agent checks one thing, answers from its own files and says what it didn’t check. Nothing here posts an entry or changes a locked period.",
+    "placeholder": "Ask about an invoice, a supplier or a customer",
+    "questions": [
+      {
+        "question": "Did we pay any invoice twice?",
+        "suggested": true,
+        "answers": [
+          {
+            "agent": "payments-ai",
+            "finding": "duplicate-payment",
+            "answer": "KUS entered supplier invoice MFL-58821 twice and paid $48,216.40 both times.",
+            "sources": ["supplier-invoices", "supplier-payments"],
+            "notChecked": []
+          }
+        ]
+      },
+      {
+        "question": "Who owes us more than their limit?",
+        "suggested": true,
+        "answers": [
+          {
+            "agent": "credit-ai",
+            "finding": "credit-limit",
+            "answer": "Great Lakes Duplicating Supply was over its $600,000 credit limit at 8 month-ends before the credit hold on 10 Sep 2026.",
+            "sources": ["close-memo", "ar-aging"],
+            "notChecked": ["Whether legal will pursue recovery: the decision is due 30 Oct."]
+          }
+        ]
+      },
+      {
+        "question": "Is September’s revenue in the right month?",
+        "suggested": true,
+        "answers": [
+          {
+            "agent": "cutoff-ai",
+            "finding": "revenue-cut-off",
+            "answer": "Invoice INV-KJP-2609-00363 is dated 30 Sep but was delivered 2 Oct, so ¥42.7m of revenue is in the wrong month.",
+            "sources": ["accounting-policies", "sales-invoices"],
+            "notChecked": [
+              "The delivery note: the files have no delivery confirmations, only the invoice’s delivery date."
+            ]
+          }
+        ]
+      },
+      {
+        "question": "Did it happen more than once?",
+        "suggested": true,
+        "answers": [
+          {
+            "agent": "cutoff-ai",
+            "answer": "No. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+            "sources": ["sales-invoices"],
+            "notChecked": [
+              "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
+            ]
+          },
+          {
+            "agent": "payments-ai",
+            "answer": "No. MFL-58821 is the only number entered twice by one supplier, across the 559 supplier invoices in FY2026 H1.",
+            "sources": ["supplier-invoices"],
+            "notChecked": ["Invoices with different numbers for the same amount: I compared numbers, not amounts."]
+          },
+          {
+            "agent": "approvals-ai",
+            "answer": "No. JE-KUK-2608-00055 is the only one of the 10 manual entries in FY2026 H1 with the same person as creator and approver.",
+            "sources": ["manual-journals"],
+            "notChecked": ["Entries outside FY2026 H1: the file covers those six months."]
+          },
+          {
+            "agent": "credit-ai",
+            "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026, 8 month-ends in all. The limit is $600,000.",
+            "sources": ["ar-aging"],
+            "notChecked": ["Months before Apr 2025: the aging file starts there."]
+          }
+        ]
+      },
+      {
+        "question": "Did anyone approve their own entry?",
+        "suggested": true,
+        "answers": [
+          {
+            "agent": "approvals-ai",
+            "finding": "self-approved-entry",
+            "answer": "JE-KUK-2608-00055 moved £18,400 from advertising to prepaid expenses. The same person created and approved it.",
+            "sources": ["finance-team", "manual-journals"],
+            "notChecked": ["The approver’s limit: the employee master isn’t in these files."]
+          }
+        ]
+      },
+      {
+        "question": "Where’s the cash?",
+        "suggested": false,
+        "answers": [
+          {
+            "agent": "credit-ai",
+            "answer": "I don’t read bank balances. Great Lakes owes $1.42m, against a limit of $600,000.",
+            "sources": ["ar-aging"],
+            "notChecked": ["Cash in the bank: these files hold no bank statement."]
+          }
+        ]
+      }
+    ]
+  },
   "exceptions": [
     {
       "id": "revenue-cut-off",
-      "title": "Revenue cut-off",
+      "title": "Revenue booked early",
       "agent": "cutoff-ai",
       "channel": "revenue",
       "summary": "Invoice INV-KJP-2609-00363 is dated 30 Sep but was delivered 2 Oct, so ¥42.7m of revenue is in the wrong month.",
@@ -163,12 +267,12 @@
         {
           "author": "glAccountant",
           "at": "13:48",
-          "text": "Logistics confirms it left Tsukuba on 1 Oct. The cut-off review missed it."
+          "text": "Logistics confirms it left Tsukuba on 1 Oct. The month-end review missed it."
         }
       ],
       "resolution": {
         "by": "visitor",
-        "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
+        "log": "Revenue booked early: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
       },
       "notChecked": ["The delivery note: the files have no delivery confirmations, only the invoice’s delivery date."],
       "scope": "KJP, Sep 2026",
@@ -294,7 +398,7 @@
       "reaches": "The KJP ledger and the H1 consolidation, which takes the new September figures.",
       "outcome": "Posted by you. INV-KJP-2609-00363 is reversed in September.",
       "stopped": "Not posted. Choose again, or leave it open.",
-      "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
+      "log": "Revenue booked early: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
       "entity": "KJP",
       "postingDate": "2026-09-30",
       "currency": "JPY",
@@ -315,14 +419,14 @@
       "reaches": "The auditors' interim review, 19–30 Oct.",
       "outcome": "Added by you. September stays as booked.",
       "stopped": "Not added. Choose again, or leave it open.",
-      "log": "Revenue cut-off: ¥42.7m listed for the auditors' review. September stays as booked."
+      "log": "Revenue booked early: ¥42.7m listed for the auditors' review. September stays as booked."
     },
-    "rerun": "Revenue cut-off check reran in 2s",
+    "rerun": "Revenue timing check reran in 2s",
     "askedAt": "13:49",
     "authorship": {
-      "asked": "Cut-off AI · Awaiting your answer",
-      "proposed": "Cut-off AI · Awaiting confirmation",
-      "done": "Cut-off AI"
+      "asked": "Revenue AI · Awaiting your answer",
+      "proposed": "Revenue AI · Awaiting confirmation",
+      "done": "Revenue AI"
     },
     "delegate": {
       "option": "reopen",

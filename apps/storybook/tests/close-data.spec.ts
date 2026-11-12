@@ -149,8 +149,8 @@ test('the decision comes first in the channel, so it opens above the fold', () =
 // ---------------------------------------------------------------------------
 
 test('D1: four agents, each a role word and "AI", and "AI" comes last', () => {
-  expect(close.agents.map((a) => a.name)).toEqual(['Cut-off AI', 'Payments AI', 'Approvals AI', 'Credit AI']);
-  expect(close.hero.authorship.asked).toBe('Cut-off AI · Awaiting your answer');
+  expect(close.agents.map((a) => a.name)).toEqual(['Revenue AI', 'Payments AI', 'Approvals AI', 'Credit AI']);
+  expect(close.hero.authorship.asked).toBe('Revenue AI · Awaiting your answer');
 });
 
 test('each agent raises one finding, and every finding has one agent', () => {
@@ -298,7 +298,7 @@ test('every Sources list in the demo leaves its numbers off, since no mark point
   const uses = walk(path.resolve(dataDir, '../src')).flatMap((file) =>
     [...readFileSync(file, 'utf8').matchAll(/<Sources\b[^>]*>/g)].map((m) => ({ file, tag: m[0] })),
   );
-  expect(uses).toHaveLength(3);
+  expect(uses).toHaveLength(4);
   for (const { file, tag } of uses) expect(tag, file).toContain('numbered={false}');
 });
 

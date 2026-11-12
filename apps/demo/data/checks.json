@@ -1,7 +1,7 @@
 [
   {
     "id": "revenue-cut-off",
-    "label": "Revenue cut-off",
+    "label": "Revenue timing",
     "meaning": "Sep 2026 revenue on invoices delivered after the month",
     "currency": "JPY",
     "before": 42720000,

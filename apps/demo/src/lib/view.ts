@@ -6,10 +6,11 @@ import { agents, directMessages, type ChannelId } from './kasane';
  * What the main area shows. Views live in the URL with no router, as Part 1's
  * steps did:
  *
- *   ?view=revenue (default, `/`) and the other channels
+ *   `/`: New chat, where the visitor lands
+ *   ?view=revenue and the other channels
  *   ?view=tasks · ?view=tasks&task=revenue-cut-off
  *   ?view=sources · ?view=sources&source=sales-invoices&item=revenue-cut-off
- *   ?view=search · ?view=search&q=cut-off
+ *   ?view=search · ?view=search&q=delivery
  *   ?dm=fpaHead · ?dm=apLead · ?dm=cutoff-ai
  *   ?at=end, with any of them: the end state, for screenshots and sharing
  *
@@ -21,6 +22,7 @@ import { agents, directMessages, type ChannelId } from './kasane';
  * (?view=sep-close, ?view=open-items, ?view=rev-check) open the default.
  */
 export type View =
+  | { kind: 'new-chat' }
   | { kind: 'channel'; channel: ChannelId }
   | { kind: 'dm'; member: string }
   | { kind: 'tasks'; task?: string }
@@ -40,8 +42,8 @@ export const BUILT_CHANNELS: readonly ChannelId[] = [
 /** The places above the channels that are built, in sidebar order. */
 export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['search', 'tasks', 'sources'];
 
-const DEFAULT_CHANNEL: ChannelId = 'revenue';
-export const DEFAULT_VIEW: View = { kind: 'channel', channel: DEFAULT_CHANNEL };
+/** Where the visitor lands, and where an old or unknown URL opens: New chat (owner, 2026-11-12; #revenue until then). */
+export const DEFAULT_VIEW: View = { kind: 'new-chat' };
 
 export function parseView(search: string): View {
   const params = new URLSearchParams(search);
@@ -83,7 +85,9 @@ export function hrefFor(view: View): string {
     case 'search':
       return query({ view: 'search', q: view.q });
     case 'channel':
-      return view.channel === DEFAULT_CHANNEL ? '/' : query({ view: view.channel });
+      return query({ view: view.channel });
+    case 'new-chat':
+      return '/';
   }
 }
 
@@ -96,6 +100,8 @@ export function placeOf(view: View): string {
   switch (view.kind) {
     case 'channel':
       return view.channel;
+    case 'new-chat':
+      return 'new-chat';
     case 'dm':
       return `dm:${view.member}`;
     default:
@@ -123,7 +129,9 @@ export function useView(): View {
 /** Goes to a view. `hash` lands on a message in it (`useExceptionLink`). */
 export function navigate(view: View, hash = '') {
   if (sameView(parseView(window.location.search), view) && !hash) return;
-  window.history.pushState(null, '', `${hrefFor(view)}${hash}`);
+  // `/` alone would keep the page's path; the pathname drops the query whatever the base is.
+  const href = hrefFor(view) === '/' ? window.location.pathname : hrefFor(view);
+  window.history.pushState(null, '', `${href}${hash}`);
   window.dispatchEvent(new Event(NAVIGATE));
 }
 
