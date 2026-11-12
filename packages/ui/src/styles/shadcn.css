@@ -39,7 +39,7 @@
    to provide that one stylesheet; it is a CLI (`pnpm dlx shadcn@latest add`)
    and is no longer installed. These definitions are not Tailwind's built-in
    `data-*` variant: each also matches Radix's data-state form and wraps the
-   selector in :where(), so it has zero specificity (CLAUDE.md failure log,
+   selector in :where(), so it has zero specificity (docs/failure-log.md,
    `data-active:`). Copying them keeps every component's compiled CSS
    identical; a shadcn upgrade can no longer change them underneath us.
 

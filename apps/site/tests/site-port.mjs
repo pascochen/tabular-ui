@@ -4,7 +4,7 @@
  * `SITE_PORT` wins when set. Otherwise the port is derived from the checkout's
  * absolute path, as apps/storybook/tests/storybook-port.mjs does for Storybook:
  * a fixed port let one worktree's run silently test another checkout's server
- * (CLAUDE.md failure log, 2026-10-08).
+ * (docs/failure-log.md, 2026-10-08).
  *
  * 8100–8999 stays clear of Storybook's 7100–7999 range and of every port
  * Chromium refuses to load.

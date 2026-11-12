@@ -22,7 +22,7 @@ export const popupSurface = [
   // Select in a form — takes the strong border. --color-border on the raised
   // surface is only 1.60:1 in dark mode (ledger-800 on ledger-925) and
   // 1.29:1 in light (paper on paper). Under olive the two were the SAME value
-  // in dark mode, and the border vanished outright (CLAUDE.md failure log).
+  // in dark mode, and the border vanished outright (docs/failure-log.md).
   //
   // Rather than every call site remembering, the popup redefines the token for
   // its own subtree: on this ground, the visible boundary IS border-strong.

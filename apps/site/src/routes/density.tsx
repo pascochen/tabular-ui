@@ -86,7 +86,7 @@ function DensityKey() {
               className={`block size-6 border border-border-strong bg-surface ${radiusClass['--radius-md']}`}
             />
           ),
-          meaning: 'Every corner, square',
+          meaning: 'Corners, square',
           name: '--radius-md',
         },
       ]}
@@ -105,7 +105,7 @@ export default function Density() {
         aside={<DensityKey />}
         current={pages.density}
         title="Density"
-        lead="Generous spacing is how a dense product quietly becomes a sparse one, so the cap is the design: no component spacing above 32px, no control above 36px, every corner square."
+        lead="Generous spacing is how a dense product quietly becomes a sparse one, so the cap is the design: no component spacing above 32px, no control above 36px, square corners."
       />
 
       <Section labelledBy="spacing-title">

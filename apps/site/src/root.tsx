@@ -70,7 +70,7 @@ export default function App() {
       {/* The first focusable element (§11). Parked above the viewport rather
           than sr-only, as AppShell's is: buttonVariants carries `relative`,
           which tailwind-merge doesn't resolve against sr-only's `absolute`,
-          but does against `fixed` (CLAUDE.md failure log). */}
+          but does against `fixed` (docs/failure-log.md). */}
       <a
         href="#main"
         onClick={(event) => {

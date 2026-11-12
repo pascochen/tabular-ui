@@ -34,7 +34,7 @@ The popover is `Popover`'s own: `--pad-popover`, as wide as its content up to `-
 
 ## Mechanisms worth knowing
 
-**A Popover, never a Tooltip.** Base UI's tooltip is visual only. A source shown in one would reach no screen reader, and its link couldn't be followed (CLAUDE.md, failure log). The popover's content is in the accessibility tree: its title names the file, its description is the locator, and Escape returns focus to the mark.
+**A Popover, never a Tooltip.** Base UI's tooltip is visual only. A source shown in one would reach no screen reader, and its link couldn't be followed (docs/failure-log.md). The popover's content is in the accessibility tree: its title names the file, its description is the locator, and Escape returns focus to the mark.
 
 **A Chip, because it's an interactive marker.** §7.7: border, transparent ground and a hover state mean "press this", and a tint with no border means "this is a label". A citation opens something, so it's the first kind. It's neutral, because a citation isn't a state (§0 rule 1).
 

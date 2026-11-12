@@ -45,7 +45,7 @@ export const WithError: Story = {
     </div>
   ),
   // The asterisk is aria-hidden, so the control's own attributes are the only
-  // place "required" reaches AT. This shipped missing once — see CLAUDE.md.
+  // place "required" reaches AT. This shipped missing once: docs/failure-log.md.
   play: async ({ canvasElement }) => {
     const input = within(canvasElement).getByRole('textbox', { name: 'Model name' });
     await expect(input).toBeRequired();

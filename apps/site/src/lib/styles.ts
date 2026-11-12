@@ -1,7 +1,7 @@
 /**
  * The library's focus ring, as controlBase draws it on every control (§4):
  * an outline, never a box-shadow, with outline-solid so `outline-none` can't
- * leave it unpainted (CLAUDE.md failure log).
+ * leave it unpainted (docs/failure-log.md).
  */
 export const focusRing = [
   'outline-none focus-visible:outline-ring focus-visible:outline-solid',
