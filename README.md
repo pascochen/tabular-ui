@@ -7,10 +7,6 @@
 
 React components for software where an AI agent does the work and a person signs it off: finance, data and operations tools. They show how the agent reasoned, what it proposes and what a person approved, and they come with the dense tables, run logs, metric tiles and lineage views those tools are made of.
 
-[![The demo's revenue channel. An agent's block, labelled "Cut-off AI · Awaiting your answer", asks where a ¥42.7m correction should go and offers two choices.](apps/demo/public/og.png)](https://demo.tabularui.com)
-
-The demo is a finance workspace at Kasane, a fictional company. Here an agent stops and asks before it posts a correction.
-
 **[Try the demo](https://demo.tabularui.com)** · **[Browse every component in Storybook](https://storybook.tabularui.com)** · **[Read the guide on tabularui.com](https://tabularui.com/getting-started)**
 
 ## Is it for you?
@@ -83,7 +79,7 @@ A personal project with one maintainer, changing often.
 
 ## License
 
-[MIT](https://github.com/pascochen/tabular-ui/blob/main/LICENSE) © Pascal Chenier
+[MIT](https://github.com/pascochen/tabular-ui/blob/main/LICENSE) © pascochen
 
 Use it in personal and commercial work, change it, ship it, sell what you build with it. Keep the copyright and license notice with any copy of the code. Provided as-is: no warranty, and no liability for the author.
 
