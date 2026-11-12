@@ -1,10 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { routes } from './routes';
+
 /**
- * The hero's paper and the closing band's ink (docs/site.md D3). A mask that fails
- * paints nothing and raises no error, and axe can't measure this hero: its contrast
- * rule reports the hero's text as incomplete, not passed. So these read pixels, with
- * the text and the rules hidden, on what a visitor's screen would show.
+ * The page's paper and the closing band's ink (docs/site.md D3). A tile or a mask
+ * that fails paints nothing and raises no error, and axe can't see a background
+ * image at all: it measures text against the body's colour. So these read pixels,
+ * with the text and the rules hidden, on what a visitor's screen would show. The
+ * hero stands for the page: it has no ground of its own, so what's behind its lead
+ * is the paper.
  */
 
 const hero = 'section[aria-labelledby="hero-title"]';
@@ -71,7 +75,7 @@ function groundIn(page: Page, png: Buffer, color: string) {
 }
 
 /**
- * The hero's marks, each against the mean of the 25px around it. A small mark over
+ * The paper's marks, each against the mean of the 25px around it. A small mark over
  * 1.05:1 is what made ink specks read as a dirty screen: they scored 1,561 per
  * 100,000 pixels here. Both directions count: paper's marks are darker than their
  * ground and ink's are lighter, so a ratio that looks only one way under-reads one
@@ -167,17 +171,19 @@ for (const { width, height, scale } of [
     test('the paper paints, and the lead keeps its contrast', async ({ page }) => {
       await page.goto('/');
       const { deviation, contrast } = await groundBehindLead(page);
-      expect(deviation, 'the ground varies, so the mask loaded').toBeGreaterThan(1);
-      expect(contrast, 'text-secondary on the paper').toBeGreaterThanOrEqual(6.4);
+      expect(deviation, 'the ground varies, so the tile loaded').toBeGreaterThan(1);
+      expect(contrast, 'text-secondary on the paper: 6.64:1 on the plain ground').toBeGreaterThanOrEqual(6.55);
     });
 
     // Under 20, not 0: a handful of marks just over the line can differ between
-    // machines, and nothing that reads as dirt comes near it (Stronger scored 279).
-    test('no mark reads as dirt, and none outweighs the rules', async ({ page }) => {
+    // machines, and nothing that reads as dirt comes near it (the same tile as a
+    // lossy WebP scored 70 to 120, from the encoder's own marks). 1.06 is the 1.05
+    // line with room for a machine's rounding: the tile measures 1.049 to 1.053.
+    test('no mark reads as dirt', async ({ page }) => {
       await page.goto('/');
       const { strongest, dotsPer100k } = await marks(page);
       expect(dotsPer100k, 'isolated dots per 100,000 pixels').toBeLessThan(20);
-      expect(strongest, 'the rules measure 1.137:1').toBeLessThan(1.137);
+      expect(strongest, 'the mark D3 calls dirt is over 1.05:1').toBeLessThan(1.06);
     });
   });
 }
@@ -209,14 +215,15 @@ for (const { width, height, scale } of [
       expect(contrast, 'text-secondary on the ink').toBeGreaterThanOrEqual(9.8);
     });
 
-    // 1.06: the hero's 1.05, with room for a machine's rounding. --tui-border-strong
+    // 1.06: 1.05, which the hero's paper measured until 2026-11-12, with room for a
+    // machine's rounding. --tui-border-strong
     // scored 1.08 and 1,654 dots at 1x. --color-border-strong, which stays at its
     // light value in this band, scored 1.25.
-    test('no mark reads as dirt, and none outweighs the hero', async ({ page }) => {
+    test('no mark reads as dirt, and none passes the strength it was chosen at', async ({ page }) => {
       const { png } = await theBand(page);
       const { strongest, dotsPer100k } = await marksIn(page, png);
       expect(dotsPer100k, 'isolated dots per 100,000 pixels').toBeLessThan(20);
-      expect(strongest, 'the hero measures 1.05:1').toBeLessThan(1.06);
+      expect(strongest, 'the band was chosen at 1.05:1').toBeLessThan(1.06);
     });
   });
 }
@@ -252,10 +259,87 @@ test('the hero itself has no ground, so the canvas token stays paper', async ({ 
   expect(ground).toEqual({ color: 'rgba(0, 0, 0, 0)', image: 'none' });
 });
 
-test('in forced colours, the paper drops with the sheet, and the ink with it', async ({ page }) => {
+test('in forced colours, the paper drops, and the sheet and the ink with it', async ({ page }) => {
   await page.goto('/');
   await page.emulateMedia({ forcedColors: 'active' });
   await expect(page.locator('.site-sheet')).toBeHidden();
   const ink = await page.locator(band).evaluate((el) => getComputedStyle(el, '::before').display);
   expect(ink).toBe('none');
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundImage)).toBe('none');
 });
+
+/**
+ * The tile is baked on the page ground by scripts/paper-tile.mjs, so its colour is
+ * a copy of the token's. If the palette's paper moves and the script isn't run, the
+ * tile keeps the old colour and every flat panel shows as a patch. Within 1 level
+ * in 255: WebP moves the mean by about 0.2.
+ */
+for (const scale of [1, 2]) {
+  test.describe(`the tile at ${scale}x`, () => {
+    test.use({ deviceScaleFactor: scale });
+
+    test('is the file for this density, on the page ground', async ({ page }) => {
+      const loaded = page.waitForResponse((response) => /paper-\dx[^/]*\.webp$/.test(response.url()));
+      await page.goto('/');
+      const response = await loaded;
+      expect(response.status()).toBe(200);
+      expect(response.url()).toContain(`paper-${scale}x`);
+
+      const { mean, ground, side } = await page.evaluate(async (url) => {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const context = canvas.getContext('2d', { willReadFrequently: true })!;
+        context.drawImage(image, 0, 0);
+        const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+        const sum = [0, 0, 0];
+        for (let i = 0; i < data.length; i += 4) for (const channel of [0, 1, 2]) sum[channel] += data[i + channel];
+        // The canvas resolves the computed colour, whatever colour space it's in.
+        context.fillStyle = getComputedStyle(document.body).backgroundColor;
+        context.fillRect(0, 0, 1, 1);
+        return {
+          mean: sum.map((total) => total / (data.length / 4)),
+          ground: [...context.getImageData(0, 0, 1, 1).data].slice(0, 3),
+          side: image.naturalWidth / parseFloat(getComputedStyle(document.body).backgroundSize),
+        };
+      }, response.url());
+      for (const channel of [0, 1, 2]) expect(Math.abs(mean[channel] - ground[channel])).toBeLessThan(1);
+      expect(side, 'one image pixel per device pixel').toBe(scale);
+    });
+  });
+}
+
+/**
+ * The paper is never behind data. A bordered box with no ground of its own would
+ * show it, and nothing would fail, so this looks for one on every route. Boxes
+ * over 40px tall: a control or a tag is shorter, and may sit on the paper. Dark
+ * plates and the closing band are checked through their own ground, which is
+ * opaque, so anything inside them is skipped.
+ */
+for (const route of routes) {
+  test(`${route}: every bordered panel states its ground`, async ({ page }) => {
+    await page.goto(route);
+    const bare = await page.evaluate(() => {
+      const found: string[] = [];
+      for (const el of document.querySelectorAll('header *, main *, footer *')) {
+        if (el.closest('[data-theme="dark"]')) continue;
+        const style = getComputedStyle(el);
+        const bordered = (['Top', 'Right', 'Bottom', 'Left'] as const).every(
+          (side) => parseFloat(style[`border${side}Width`]) > 0,
+        );
+        if (!bordered || el.getBoundingClientRect().height <= 40) continue;
+        let ground = 'rgba(0, 0, 0, 0)';
+        for (let node: Element | null = el; node && node !== document.body; node = node.parentElement) {
+          ground = getComputedStyle(node).backgroundColor;
+          if (ground !== 'rgba(0, 0, 0, 0)') break;
+        }
+        if (ground === 'rgba(0, 0, 0, 0)') found.push(`<${el.tagName.toLowerCase()} class="${el.className}">`);
+      }
+      return found;
+    });
+    expect(bare).toEqual([]);
+  });
+}

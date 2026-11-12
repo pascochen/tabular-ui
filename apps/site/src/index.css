@@ -95,7 +95,7 @@
 }
 
 /* The hero's ruled sheet (docs/site.md D3, item 3). The outer layer covers the
-   section, softens the rules to 1.137:1 on the paper and fades them toward its
+   section, softens the rules on the paper and fades them toward its
    edges. A mask reads only alpha, so `black` here is opacity, never a painted
    colour. */
 .site-sheet {
@@ -106,35 +106,34 @@
   mask-composite: intersect;
 }
 
-/* The paper (docs/site.md D3, item 3): 1980s machine-made stock, the Risograph's
-   own decade. A soft grain and mottling in the paper's own warm tone. Inside the
-   sheet, so it takes the sheet's fade, its aria-hidden and its forced-colours
-   drop. A mask reads only alpha, so the colour stays a token. The guard keeps a
-   browser with no mask support from painting a solid tone.
+/* The page's paper (docs/site.md D3, item 4): ledger bond, one seamless tile
+   behind every page. scripts/paper-tile.mjs draws it and bakes it on the page
+   ground, read from the palette, so the body's colour stays the token and
+   shows until the tile arrives. A file per pixel density, because a 3px mesh
+   scaled down from the 2× file would blur. The size is the tile's side in the
+   script. On the body, so it paints the whole canvas and scrolls with the
+   page; anything that holds data states its own ground and sits above it. */
+body {
+  background-image: image-set(url('./paper/paper-1x.webp') 1x, url('./paper/paper-2x.webp') 2x);
+  background-size: 426px 426px;
+}
 
-   The closing band's ink (D3) is the same tile: that sheet's tooth, showing
-   through a flood of ink. Its marks are lighter than its ground, so it needs the
-   band's `isolate` to sit above the ground and below the text. It reads --tui-*
-   because --color-* resolved at :root and stays at its light value inside
-   data-theme="dark", which would paint paper-coloured flecks with no error. The
-   sheet's 60% is not inherited here, so the band states its own strength. */
+/* The closing band's ink (D3): a paper's tooth showing through a flood of ink,
+   one 480px tile of two turbulence filters, which was the hero's own paper
+   until 2026-11-12. Its marks are lighter than its ground, so it needs the
+   band's `isolate` to sit above the ground and below the text. A mask reads
+   only alpha, so the colour stays a token. It reads --tui-* because --color-*
+   resolved at :root and stays at its light value inside data-theme="dark",
+   which would paint paper-coloured flecks with no error. The guard keeps a
+   browser with no mask support from painting a solid tone. */
 @supports (mask-image: linear-gradient(black, black)) {
-  .site-sheet::before {
-    background-color: var(--color-border-strong);
-    opacity: 0.5;
-  }
-
-  .site-ink::before {
-    z-index: -1;
-    background-color: var(--tui-border);
-    opacity: 0.3;
-  }
-
-  .site-sheet::before,
   .site-ink::before {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: -1;
+    background-color: var(--tui-border);
+    opacity: 0.3;
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.05' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.4 0 0 0 -.85'/%3E%3C/filter%3E%3Cfilter id='t' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.32 .2' numOctaves='3' seed='21' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 -1.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)' opacity='.2'/%3E%3Crect width='100%25' height='100%25' filter='url(%23t)' opacity='.4'/%3E%3C/svg%3E");
     mask-size: 480px 480px;
   }
@@ -178,10 +177,14 @@
 }
 
 /* Decoration only: forced colours keep the plate's frame and drop the rules,
-   and the closing band drops its ink. */
+   the closing band drops its ink, and the page drops its paper. */
 @media (forced-colors: active) {
   .site-sheet,
   .site-ink::before {
     display: none;
+  }
+
+  body {
+    background-image: none;
   }
 }
