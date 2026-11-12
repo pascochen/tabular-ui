@@ -10,7 +10,7 @@ import { agents, directMessages, type ChannelId } from './kasane';
  *   ?view=revenue and the other channels
  *   ?view=tasks · ?view=tasks&task=revenue-cut-off
  *   ?view=sources · ?view=sources&source=sales-invoices&item=revenue-cut-off
- *   ?view=search · ?view=search&q=cut-off
+ *   ?view=search · ?view=search&q=delivery
  *   ?dm=fpaHead · ?dm=apLead · ?dm=cutoff-ai
  *   ?at=end, with any of them: the end state, for screenshots and sharing
  *

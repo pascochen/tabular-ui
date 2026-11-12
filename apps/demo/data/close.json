@@ -16,11 +16,11 @@
       "checks": "Revenue lands in the month of delivery.",
       "finding": "revenue-cut-off",
       "reads": ["sales-invoices", "close-calendar", "accounting-policies"],
-      "ask": "Ask about the September cut-off.",
+      "ask": "Ask about September’s revenue.",
       "starters": [
         {
-          "question": "Which other September invoices were delivered in October?",
-          "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+          "question": "Were any other September invoices delivered in October?",
+          "answer": "No. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
           "sources": ["sales-invoices"],
           "notChecked": [
             "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
@@ -28,7 +28,7 @@
         },
         {
           "question": "What does the policy say about the delivery date?",
-          "answer": "Revenue belongs to the period in which delivery occurs. The delivery date on each invoice is the control field.",
+          "answer": "Revenue belongs to the month of delivery. The delivery date on each invoice decides which month that is.",
           "sources": ["accounting-policies"],
           "notChecked": ["Whether a locked month is reopened: the policy doesn’t say."]
         }
@@ -149,7 +149,7 @@
   ],
   "directMessages": ["fpaHead", "apLead"],
   "typingMs": 1500,
-  "searchSuggestions": ["MFL-58821", "Great Lakes", "cut-off"],
+  "searchSuggestions": ["MFL-58821", "Great Lakes", "delivery"],
   "newChat": {
     "description": "Each agent checks one thing, answers from its own files and says what it didn’t check. Nothing here posts an entry or changes a locked period.",
     "placeholder": "Ask about an invoice, a supplier or a customer",
@@ -201,7 +201,7 @@
         "answers": [
           {
             "agent": "cutoff-ai",
-            "answer": "None. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+            "answer": "No. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
             "sources": ["sales-invoices"],
             "notChecked": [
               "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
@@ -257,7 +257,7 @@
   "exceptions": [
     {
       "id": "revenue-cut-off",
-      "title": "Revenue cut-off",
+      "title": "Revenue booked early",
       "agent": "cutoff-ai",
       "channel": "revenue",
       "summary": "Invoice INV-KJP-2609-00363 is dated 30 Sep but was delivered 2 Oct, so ¥42.7m of revenue is in the wrong month.",
@@ -267,12 +267,12 @@
         {
           "author": "glAccountant",
           "at": "13:48",
-          "text": "Logistics confirms it left Tsukuba on 1 Oct. The cut-off review missed it."
+          "text": "Logistics confirms it left Tsukuba on 1 Oct. The month-end review missed it."
         }
       ],
       "resolution": {
         "by": "visitor",
-        "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
+        "log": "Revenue booked early: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m."
       },
       "notChecked": ["The delivery note: the files have no delivery confirmations, only the invoice’s delivery date."],
       "scope": "KJP, Sep 2026",
@@ -398,7 +398,7 @@
       "reaches": "The KJP ledger and the H1 consolidation, which takes the new September figures.",
       "outcome": "Posted by you. INV-KJP-2609-00363 is reversed in September.",
       "stopped": "Not posted. Choose again, or leave it open.",
-      "log": "Revenue cut-off: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
+      "log": "Revenue booked early: INV-KJP-2609-00363 moved to October. September revenue down ¥42.7m.",
       "entity": "KJP",
       "postingDate": "2026-09-30",
       "currency": "JPY",
@@ -419,9 +419,9 @@
       "reaches": "The auditors' interim review, 19–30 Oct.",
       "outcome": "Added by you. September stays as booked.",
       "stopped": "Not added. Choose again, or leave it open.",
-      "log": "Revenue cut-off: ¥42.7m listed for the auditors' review. September stays as booked."
+      "log": "Revenue booked early: ¥42.7m listed for the auditors' review. September stays as booked."
     },
-    "rerun": "Revenue cut-off check reran in 2s",
+    "rerun": "Revenue timing check reran in 2s",
     "askedAt": "13:49",
     "authorship": {
       "asked": "Revenue AI · Awaiting your answer",

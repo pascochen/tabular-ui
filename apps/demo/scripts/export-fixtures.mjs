@@ -1190,7 +1190,7 @@ must(
 const closeChecks = [
   {
     id: 'revenue-cut-off',
-    label: 'Revenue cut-off',
+    label: 'Revenue timing',
     meaning: `${fmtPeriod(LAST_CLOSED)} revenue on invoices delivered after the month`,
     currency: 'JPY',
     before: cutoffBefore,

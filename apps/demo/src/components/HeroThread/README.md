@@ -1,6 +1,6 @@
 # HeroThread
 
-The visitor's one decision, in the Revenue cut-off thread (`kasane-close-demo-plan.md` §2, 0:20 to 2:10). After Shun's reply, the thread holds, in order:
+The visitor's one decision, in the Revenue booked early thread (`kasane-close-demo-plan.md` §2, 0:20 to 2:10). After Shun's reply, the thread holds, in order:
 
 1. **The question** (`Question`, in an `AgentBlock` labelled "Revenue AI · Awaiting your answer"): reopen September or keep it locked, with the line it rests on. The policy says revenue belongs to the month of delivery, and it doesn't say whether a locked month is reopened.
 2. **The proposal**, once answered (`AgentBlock` labelled "Revenue AI · Awaiting confirmation"):
