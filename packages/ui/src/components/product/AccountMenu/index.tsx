@@ -25,8 +25,16 @@ export type AccountUser = {
   avatarSrc?: string;
   /** Animated version of the avatar; plays on row hover and in the menu header. */
   avatarAnimatedSrc?: string;
-  /** Shown until the image loads, or if there is none. */
+  /**
+   * Shown until the image loads, or if there is none: one letter, the first
+   * of the name (§1 "Identity colour"). The name is plural from when it was two.
+   */
   initials: string;
+  /**
+   * The user's position in the workspace's member list, from 1. It gives the
+   * fallback its identity ground; without it the fallback is neutral.
+   */
+  identity?: number;
 };
 
 export type AccountMenuProps = {
@@ -94,7 +102,7 @@ function AccountMenu({
       <Menu open={open} onOpenChange={setOpen}>
         <MenuTrigger
           // Starts with the visible text, so label-in-name (WCAG 2.5.3) holds.
-          // That's the initials too, whenever the fallback is showing them.
+          // That's the fallback's letter too, whenever it is showing.
           aria-label={`${imageLoaded ? '' : `${user.initials} `}${user.name}, account`}
           className={cn(
             'group/account flex h-[var(--h-control)] min-w-0 select-none items-center',
@@ -130,10 +138,10 @@ function AccountMenu({
                 animate={hovered && !open}
                 onLoadingStatusChange={(status) => setImageLoaded(status === 'loaded')}
               />
-              <AvatarFallback>{user.initials}</AvatarFallback>
+              <AvatarFallback identity={user.identity}>{user.initials}</AvatarFallback>
             </Avatar>
           </span>
-          {/* Paints nothing in a flex row. Without it, the initials and the name read as one word: "MTMei". */}{' '}
+          {/* Paints nothing in a flex row. Without it, the letter and the name read as one word: "MMei". */}{' '}
           <span className="min-w-0 truncate">{user.shortName ?? user.name}</span>
         </MenuTrigger>
         <MenuContent density="spaced" side="top" align="start" className="max-w-(--available-width)">
@@ -143,7 +151,7 @@ function AccountMenu({
           >
             <Avatar>
               <AvatarImage src={user.avatarSrc} alt="" animatedSrc={user.avatarAnimatedSrc} animate />
-              <AvatarFallback>{user.initials}</AvatarFallback>
+              <AvatarFallback identity={user.identity}>{user.initials}</AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-base font-medium text-text-primary">{user.name}</span>

@@ -25,6 +25,7 @@ const mei: AccountUser = {
   avatarSrc: avatarUrl,
   avatarAnimatedSrc: avatarAnimatedUrl,
   initials: people.fpa.initials,
+  identity: 2,
 };
 
 const handlers = {
@@ -64,7 +65,7 @@ export const Default: Story = {
   render: () => <Footer user={mei} />,
 };
 
-/** No image: initials on a neutral ground. */
+/** No image: one letter on the user's identity ground (§1). The story keeps its name: tests load it by id. */
 export const Initials: Story = {
   args: { user: { ...mei, avatarSrc: undefined, avatarAnimatedSrc: undefined }, theme: 'dark', ...handlers },
   render: () => <Footer user={{ ...mei, avatarSrc: undefined, avatarAnimatedSrc: undefined }} />,

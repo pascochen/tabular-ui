@@ -148,6 +148,7 @@ const mei = {
   avatarSrc: avatarUrl,
   avatarAnimatedSrc: avatarAnimatedUrl,
   initials: people.fpa.initials,
+  identity: 2,
 };
 
 /**
@@ -569,13 +570,13 @@ export const PeopleAndCounts: Story = {
           >
             Close agent
           </AppShellNavItem>
-          {[people.controller, people.payables, people.longName].map((p) => (
+          {[people.controller, people.payables, people.longName].map((p, i) => (
             <AppShellNavItem
               key={p.id}
               href="#"
               avatar={
                 <Avatar size="sm" aria-hidden="true">
-                  <AvatarFallback>{p.initials}</AvatarFallback>
+                  <AvatarFallback identity={i + 1}>{p.initials}</AvatarFallback>
                 </Avatar>
               }
             >
@@ -602,6 +603,7 @@ const daisuke = {
   shortName: people.controller.shortName,
   email: people.controller.email,
   initials: people.controller.initials,
+  identity: 1,
 };
 
 /** Kasane is the only company: the switcher shows its name and the chevron, nothing else. */
@@ -648,8 +650,15 @@ function AccountantAccountFooter() {
  */
 const accountingAgents = ['Revenue AI', 'Payments AI', 'Approvals AI', 'Credit AI'];
 const accountingChannels = ['close', 'payables'];
-/** Colleagues only: the signed-in user (Daisuke) never appears as a direct message. */
-const colleagues = [people.fpa, people.payables];
+/**
+ * Colleagues only: the signed-in user (Daisuke) never appears as a direct
+ * message. He is first in the member list, so they take the second and third
+ * identity grounds (§1 "Identity colour").
+ */
+const colleagues = [
+  { ...people.fpa, identity: 2 },
+  { ...people.payables, identity: 3 },
+];
 
 function AccountantSidebar() {
   return (
@@ -690,7 +699,7 @@ function AccountantSidebar() {
             href="#"
             avatar={
               <Avatar size="sm" aria-hidden="true">
-                <AvatarFallback>{p.initials}</AvatarFallback>
+                <AvatarFallback identity={p.identity}>{p.initials}</AvatarFallback>
               </Avatar>
             }
           >

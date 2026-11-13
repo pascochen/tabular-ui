@@ -15,9 +15,9 @@ This document is the source of truth. Every number in it was measured, not estim
 
 These matter more than any individual token value. A generator that gets the values right and these rules wrong produces a worse system than the reverse.
 
-1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary and tertiary buttons, dividers, empty states: all neutral. A hue appears only when something is true about the data, the run, or the user's focus. In a dense interface every colored pixel that isn't communicating state is stealing attention from one that is.
+1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary and tertiary buttons, dividers, empty states: all neutral. A hue appears only when something is true about the data, the run, or the user's focus. In a dense interface every colored pixel that isn't communicating state is stealing attention from one that is. One exception, since 2026-11-13 (owner): an avatar's fallback sits on a tint that says who the person is (§1 "Identity colour"). It goes no further than the avatar.
 
-2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `ivy`, `vermilion`, `ochre`, `lake` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens only (§6) and never marks UI state.
+2. **Five hues. No sixth.** Do not add a hue for a new feature. If a new state needs distinction, express it with the existing five plus shape, weight, iconography, or a neutral tint. The five are the Riso Ledger ramps `ivy`, `vermilion`, `ochre`, `lake` and `orchid` (§1). The palette's seventh ramp, `teal`, exists for the chart tokens (§6) and, since 2026-11-13, as one of an avatar's four identity grounds (§1). It never marks UI state.
 
 3. **Never use the 900 or 950 step of a chromatic scale as a background.** Under Tailwind's ramps those steps drifted in lightness by hue, so a `red-950` chip and a `blue-950` chip did not sit at the same visual depth. The Riso ramps share one lightness curve, but a dark chromatic slab still reads as a hole in the page. Use alpha over the canvas instead: `{hue}-500 / 10%`. This guarantees consistent depth and keeps the UI quiet. `ledger` is the neutral and exempt: its 900–950 steps are surfaces.
 
@@ -52,7 +52,7 @@ Five hues, six roles. The interactive role is split (decided 2026-10-16): its so
 | **Agent** | `orchid` | Orchid, 2592 U | Agent-authored content, generated dbt code, agent questions, agent activity, pending human review |
 | **Info** | `lake` | Lake, 293 U | "Running" state, work in progress, informational notices |
 
-Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only (§6).
+Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series (§6) and an avatar's identity ground (below).
 
 **Palette change, 2026-10-16 (user decision): Riso Ledger.** The Tailwind ramps were replaced: `olive` → `ledger`, `emerald` → `sage`, `red` → `vermilion`, `amber` → `ochre`, `sky` → `federal`, `violet` → `orchid`. Two reasons. 30 of the 55 old accent colours sat outside sRGB, so an sRGB screen clipped them to something other than what was specified. And every Tailwind ramp had its own lightness curve, which is the problem §2's lightness bands existed to work around. The Riso ramps are generated in OKLCH from one shared lightness curve and a chroma curve per ramp, each anchored to a RISO spot ink and kept inside sRGB. A step number now means the same contrast in every hue. Values, anchors and the gamut report are in `docs/palette.md`. *(The previous change, 2026-10-08, moved the accent from `blue` to `emerald` and the neutral to `olive`, and brought `sky` back as info. Its reasoning is in Appendix A.)*
 
@@ -86,7 +86,7 @@ Beside them: `ledger`, the one neutral (§3), and `teal`, for chart series only 
 
 **`orchid` for agent.** Moved off violet so agent does not read as a second blue next to info: 61° apart on the hue wheel since 2026-11-06 (54° before Lake).
 
-**`teal` for charts only.** Hue 201°, filling the gap between `ivy` and `lake`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code.
+**`teal` for charts, and for identity.** Hue 201°, filling the gap between `ivy` and `lake`. It is not a sixth UI hue (§0 rule 2), and lint rejects it, like every ramp name, in component code. Since 2026-11-13 it is also the third of an avatar's identity grounds ("Identity colour", below): who a person is, which is not a state.
 
 ### Colour-vision limits of this palette
 
@@ -118,9 +118,36 @@ Reusing the interactive hue for agent state fails because focus rings are everyw
 
 **Discipline required:** `orchid` marks *authorship and agent activity only*. It never means "good," "new," or "important." If orchid starts appearing on things the agent didn't produce, the system has failed.
 
+### Identity colour: avatars — decided 2026-11-13 (owner, after a side-by-side in both modes)
+
+An avatar's fallback is one letter, the first of the person's name, on a tinted ground. It is the one place a hue says who and not what state: the exception to §0 rule 1, and it goes no further than the avatar.
+
+**One letter, not two.** The product is for teams of fewer than four, where first letters rarely collide, and one letter has more room in a 24px circle. Two people who share a letter differ by ground alone, and under tritanopia lake, teal and ivy sit close together, so the name is always available beside the avatar or as its accessible name.
+
+**Four grounds, in this order: `lake`, `ochre`, `teal`, `ivy`.** `vermilion` and `orchid` are left out: a person is never drawn in the danger hue, and orchid marks agent authorship only (above). This is the first use of `teal` outside a chart (§6); it is still not a UI state.
+
+**A tint, never a solid fill.** The ground is the ramp's step 500 at the role tints' alpha, and the letter is the role text step: 400 in dark, 700 in light (§0 rule 4). A solid avatar is the loudest mark in a sidebar and is the same object as a role's fill.
+
+| # | Ramp | Light ground | Light letter | on canvas | on paper | Dark ground | Dark letter | on canvas | on raised |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | `lake` | `lake-500 / 12%` | `lake-700` | 6.16:1 | 5.90:1 | `lake-500 / 10%` | `lake-400` | 6.55:1 | 5.75:1 |
+| 2 | `ochre` | `ochre-500 / 10%` | `ochre-700` | 6.33:1 | 6.07:1 | `ochre-500 / 10%` | `ochre-400` | 6.51:1 | 5.71:1 |
+| 3 | `teal` | `teal-500 / 10%` | `teal-700` | 5.95:1 | 5.70:1 | `teal-500 / 10%` | `teal-400` | 6.86:1 | 6.04:1 |
+| 4 | `ivy` | `ivy-500 / 8%` | `ivy-700` | 6.01:1 | 5.71:1 | `ivy-500 / 10%` | `ivy-400` | 6.99:1 | 6.14:1 |
+
+Ratios are the letter on its own ground, composited over the surface named as `check-contrast.mjs` does it (sRGB, 8 bits; culori 4.0.2, 2026-11-13). The script gates all four at 4.5:1 on every ground an avatar can sit on, row states included. The lowest is 4.70:1, teal in light mode on a sidebar row that is selected and hovered; in dark it is 4.81:1, ochre on a hovered popup row.
+
+**Tokens.** `--color-bg-identity-1` to `-4` and `--color-text-identity-1` to `-4`, numbered like the chart ramp because the order carries no meaning. Only `Avatar` reads them.
+
+**Assignment.** By the person's position in the workspace's member list, in the order above, starting again at 1 after the fourth. It is stable: a person keeps their ground when someone else joins or leaves after them. No ground is chosen by hashing a name.
+
+**No person, no hue.** An agent's avatar, the system's, and a fallback with no known person stay neutral, as every avatar was until this decision.
+
+**Accepted cost.** Ochre is also "waits on you": a `StatusDot` beside an ochre avatar is the same hue in the same row. The dot is solid and 6px, the avatar a tinted circle with a letter, and shape carries the difference.
+
 ### Explicitly excluded from UI
 
-Every Tailwind colour scale, chromatic and grey, is stripped (§9). The only colour scales that exist are the seven Riso ramps in `palette.css`; of those, `teal` is chart-only (§6) and `ledger` is the only neutral. Component code names none of them: it reaches colour through the semantic tokens (§4), and lint rejects a ramp name in a component.
+Every Tailwind colour scale, chromatic and grey, is stripped (§9). The only colour scales that exist are the seven Riso ramps in `palette.css`; of those, `teal` is for charts (§6) and avatar identity only and `ledger` is the only neutral. Component code names none of them: it reaches colour through the semantic tokens (§4), and lint rejects a ramp name in a component.
 
 ### Brand assets are outside these rules — decided 2026-10-22 (owner)
 

@@ -100,6 +100,10 @@
    after a side-by-side in Storybook;
    docs/reviews/white-content-2026-11-12.md). Light-mode contrast comments
    re-measured on the new canvas. No dark value changed.
+   --color-bg-identity-1…4 and --color-text-identity-1…4 added from §1
+   "Identity colour: avatars" (2026-11-13, user-approved after a
+   side-by-side in Storybook): an avatar's tint ground and letter, in lake,
+   ochre, teal and ivy. Read by Avatar only.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -116,7 +120,7 @@
    1. Strip Tailwind's colour scales (§9). All of them, since the Riso Ledger
    palette (2026-10-16): colour comes only from the seven generated ramps in
    palette.css — ledger (neutral), ivy, vermilion, ochre, lake, orchid and
-   teal (charts only). palette.css is imported AFTER this file, so the teal
+   teal (charts and avatar identity only). palette.css is imported AFTER this file, so the teal
    strip below removes Tailwind's teal and not the Riso one.
    -------------------------------------------------------------------------- */
 @theme {
@@ -458,6 +462,17 @@
   --tui-chart-5: var(--color-ledger-600);
   --tui-chart-6: var(--color-vermilion-600);
   --tui-chart-7: var(--color-ivy-600);
+
+  /* §1 Identity colour — an avatar's ground and letter, light. The role
+     tints' alphas and the role text step, 700. Order carries no meaning. */
+  --tui-bg-identity-1: --alpha(var(--color-lake-500) / 12%);
+  --tui-bg-identity-2: --alpha(var(--color-ochre-500) / 10%);
+  --tui-bg-identity-3: --alpha(var(--color-teal-500) / 10%);
+  --tui-bg-identity-4: --alpha(var(--color-ivy-500) / 8%);
+  --tui-text-identity-1: var(--color-lake-700);
+  --tui-text-identity-2: var(--color-ochre-700);
+  --tui-text-identity-3: var(--color-teal-700);
+  --tui-text-identity-4: var(--color-ivy-700);
 }
 
 [data-theme='dark'] {
@@ -543,6 +558,16 @@
   --tui-chart-5: var(--color-ledger-400);
   --tui-chart-6: var(--color-vermilion-400);
   --tui-chart-7: var(--color-ivy-400);
+
+  /* §1 Identity colour, dark: 10% tints and the role text step, 400. */
+  --tui-bg-identity-1: --alpha(var(--color-lake-500) / 10%);
+  --tui-bg-identity-2: --alpha(var(--color-ochre-500) / 10%);
+  --tui-bg-identity-3: --alpha(var(--color-teal-500) / 10%);
+  --tui-bg-identity-4: --alpha(var(--color-ivy-500) / 10%);
+  --tui-text-identity-1: var(--color-lake-400);
+  --tui-text-identity-2: var(--color-ochre-400);
+  --tui-text-identity-3: var(--color-teal-400);
+  --tui-text-identity-4: var(--color-ivy-400);
 }
 
 /* --------------------------------------------------------------------------
@@ -631,6 +656,16 @@
   --color-chart-5: var(--tui-chart-5);
   --color-chart-6: var(--tui-chart-6);
   --color-chart-7: var(--tui-chart-7);
+
+  /* §1 Identity colour — Avatar only. Who, never what state. */
+  --color-bg-identity-1: var(--tui-bg-identity-1);
+  --color-bg-identity-2: var(--tui-bg-identity-2);
+  --color-bg-identity-3: var(--tui-bg-identity-3);
+  --color-bg-identity-4: var(--tui-bg-identity-4);
+  --color-text-identity-1: var(--tui-text-identity-1);
+  --color-text-identity-2: var(--tui-text-identity-2);
+  --color-text-identity-3: var(--tui-text-identity-3);
+  --color-text-identity-4: var(--tui-text-identity-4);
 }
 
 /* §8.4 — Source Serif 4 picks its optical size from the font size: the text
