@@ -25,20 +25,21 @@ const DARK_TEXT: Record<string, number> = {
   info: 7.31,
 };
 
-// §4 light mode, measured on --color-canvas (ledger-50, paper) — NOT #fff.
+// §4 light mode, measured on --color-canvas (ledger-25, a warm white since
+// 2026-11-12) — NOT #fff, and not the paper, where each is about 5% lower.
 const LIGHT_TEXT: Record<string, number> = {
-  interactive: 16.39,
-  danger: 7.15,
-  warning: 6.74,
-  success: 6.23,
-  agent: 7.13,
-  info: 6.75,
+  interactive: 17.31,
+  danger: 7.51,
+  warning: 7.08,
+  success: 6.55,
+  agent: 7.49,
+  info: 7.01,
 };
 
 // §3 neutral text, both modes.
 const NEUTRAL_TEXT: Record<'dark' | 'light', Record<string, number>> = {
   dark: { 'text-primary': 16.39, 'text-body': 15.01, 'text-secondary': 10.15, 'text-tertiary': 7.37 },
-  light: { 'text-primary': 16.39, 'text-body': 12.38, 'text-secondary': 6.64, 'text-tertiary': 4.89 },
+  light: { 'text-primary': 17.31, 'text-body': 13.07, 'text-secondary': 6.95, 'text-tertiary': 5.13 },
 };
 
 for (const [mode, expected] of [
@@ -81,26 +82,49 @@ for (const mode of ['dark', 'light'] as const) {
 }
 
 /**
- * §10's explicit trap. Light-mode figures must be measured against the
- * ledger-50 paper canvas, not #fff — measuring against white overstates every
- * light ratio by roughly 8%. The tightest role fails first, so it is the
- * canary: success (ivy-700) since links went to ink (2026-11-09). It was
- * interactive, the same ivy-700, from the Riso Ledger palette (2026-10-16),
- * danger (red-700) before that, and interactive, warning and danger again
- * before the lightness bands.
+ * §10's explicit trap, in two parts since 2026-11-12. Light mode has two
+ * grounds: the canvas, ledger-25, a warm white, and the sunken surface,
+ * ledger-50, the paper under AppShell's sidebar (§3). Neither is #fff:
+ * measuring on white overstates the canvas figures by about 3% and the paper
+ * figures by about 8%. And they are not each other: if the canvas drifts back
+ * to the paper the frame is gone, with no error anywhere.
+ *
+ * The tightest role fails first, so it is the canary: success (ivy-700) since
+ * links went to ink (2026-11-09). It was interactive, the same ivy-700, from
+ * the Riso Ledger palette (2026-10-16), danger (red-700) before that, and
+ * interactive, warning and danger again before the lightness bands. Until
+ * 2026-11-12 there was one ground, the paper, and this pinned 6.23 on it.
  */
-test('light-mode tightest role is measured against the canvas, not #fff', async ({ page }) => {
+test('light-mode tightest role is measured on the canvas and the paper, not #fff', async ({ page }) => {
   await gotoStory(page, 'design-system-tokens--tokens', 'light');
   const fg = await token(page, '--color-text-success');
 
   const onCanvas = await contrastRatio(page, fg, await token(page, '--color-canvas'));
+  const onSunken = await contrastRatio(page, fg, await token(page, '--color-surface-sunken'));
   const onWhite = await contrastRatio(page, fg, '#fff');
 
-  expect(onCanvas, 'must be the 6.23 canvas figure').toBeCloseTo(6.23, 1);
-  expect(onCanvas, 'still clears AA').toBeGreaterThanOrEqual(4.5);
+  expect(Math.abs(onCanvas - 6.55), `the canvas figure is 6.55, got ${onCanvas.toFixed(2)}`).toBeLessThan(0.05);
+  expect(Math.abs(onSunken - 6.24), `the paper figure is 6.24, got ${onSunken.toFixed(2)}`).toBeLessThan(0.05);
+  expect(onSunken, 'still clears AA on the lower ground').toBeGreaterThanOrEqual(4.5);
   // If these ever coincide, the canvas has drifted to white and every
   // light-mode ratio in the spec is now optimistic.
   expect(onWhite - onCanvas, 'canvas must not be #fff').toBeGreaterThan(0.1);
+  // And if these do, the page is the paper again and the sidebar is no frame.
+  expect(onCanvas - onSunken, 'canvas must not be the paper').toBeGreaterThan(0.1);
+});
+
+/**
+ * §3, "The page and the frame": dark mode has no frame. No step sits under
+ * the canvas, so the sunken surface is the canvas there.
+ */
+test('the sunken surface is the canvas in dark mode', async ({ page }) => {
+  await gotoStory(page, 'design-system-tokens--tokens', 'dark');
+  const ratio = await contrastRatio(
+    page,
+    await token(page, '--color-surface-sunken'),
+    await token(page, '--color-canvas'),
+  );
+  expect(ratio).toBeCloseTo(1, 2);
 });
 
 /**
@@ -121,6 +145,12 @@ test('light-mode tightest role is measured against the canvas, not #fff', async 
  */
 const BADGE_GROUNDS: Record<string, string[]> = {
   canvas: ['--color-canvas'],
+  // §3, 2026-11-12: the frame beside the page, AppShell's pinned sidebar. In
+  // light mode it is the paper, a step under the page, so every ratio is
+  // lowest on it. Its row states too: anything can be put in a sidebar.
+  sunken: ['--color-surface-sunken'],
+  'sunken row hover': ['--color-surface-sunken', '--color-bg-hover'],
+  'sunken row selected + hover': ['--color-surface-sunken', '--color-bg-interactive', '--color-bg-hover'],
   surface: ['--color-surface'],
   'row hover': ['--color-canvas', '--color-bg-hover'],
   'row selected': ['--color-canvas', '--color-bg-interactive'],

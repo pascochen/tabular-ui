@@ -93,6 +93,13 @@
    §7.6 (2026-11-10, user-approved; docs/reviews/type-scaling-2026-11-10.md).
    The same px at the default root font size; a height yields once its
    text no longer fits.
+   Light --tui-canvas, --tui-surface and --tui-surface-raised ledger-50 →
+   ledger-25, the warm white the generator added the same day, and
+   --color-surface-sunken added, light ledger-50, dark ledger-950, from §3
+   "The page and the frame" and §4 "Elevation" (2026-11-12, user-approved
+   after a side-by-side in Storybook;
+   docs/reviews/white-content-2026-11-12.md). Light-mode contrast comments
+   re-measured on the new canvas. No dark value changed.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -366,24 +373,28 @@
      wrong in the canonical mode. Not a token: a property of the mode itself. */
   color-scheme: light;
 
-  /* §3 — neutral foundation, light. Paper on paper (2026-10-16): canvas,
-     surface and raised are all ledger-50, and a card or popup separates by
-     its border, not by a white fill. Ratios on ledger-50. */
-  --tui-canvas: var(--color-ledger-50);
-  --tui-surface: var(--color-ledger-50);
-  --tui-surface-raised: var(--color-ledger-50);
+  /* §3 — neutral foundation, light. The page and the frame (2026-11-12):
+     canvas, surface and raised are all ledger-25, a warm white, so a card or
+     popup still separates by its border. The paper, ledger-50, is the sunken
+     surface: the frame beside the page, AppShell's pinned sidebar. Ratios on
+     ledger-25; on the paper each is about 5% lower. */
+  --tui-canvas: var(--color-ledger-25);
+  --tui-surface: var(--color-ledger-25);
+  --tui-surface-raised: var(--color-ledger-25);
+  --tui-surface-sunken: var(--color-ledger-50);
   --tui-border: var(--color-ledger-200);
   --tui-border-strong: var(--color-ledger-300);
-  --tui-border-control: var(--color-ledger-600); /* 4.89:1; 3.97 at worst — a form control's edge, 3:1 on every ground (§4) */
-  --tui-text-primary: var(--color-ledger-950);    /* 16.49:1 */
-  --tui-text-body: var(--color-ledger-900);       /* 12.44:1 */
-  --tui-text-secondary: var(--color-ledger-700);  /*  6.62:1 */
-  --tui-text-tertiary: var(--color-ledger-600);   /*  4.89:1 — placeholders and non-text marks only */
+  --tui-border-control: var(--color-ledger-600); /* 5.13:1; 3.97 at worst — a form control's edge, 3:1 on every ground (§4) */
+  --tui-text-primary: var(--color-ledger-950);    /* 17.31:1; 16.49 on the paper */
+  --tui-text-body: var(--color-ledger-900);       /* 13.07:1; 12.44 */
+  --tui-text-secondary: var(--color-ledger-700);  /*  6.95:1;  6.62 */
+  --tui-text-tertiary: var(--color-ledger-600);   /*  5.13:1;  4.89 — placeholders and non-text marks only */
 
   /* §4 — accent map, light. Step 700 for every role's text (§0 rule 4):
      4.72:1 or more on every ground §4 lists, its own tint included. On
-     canvas: success 6.24, danger 7.15, warning 6.74, agent 7.14, info
-     6.68. Interactive text is ink, 16.49 (§1, 2026-11-09). */
+     canvas: success 6.55, danger 7.51, warning 7.08, agent 7.49, info
+     7.01. On the paper: 6.24, 7.15, 6.74, 7.14, 6.68. Interactive text is
+     ink, 17.31 (§1, 2026-11-09). */
   --tui-text-interactive: var(--color-ledger-950); /* ink, with an underline: a link is not a state (§1) */
   --tui-text-danger: var(--color-vermilion-700);
   --tui-text-warning: var(--color-ochre-700);
@@ -391,19 +402,20 @@
   --tui-text-agent: var(--color-orchid-700);
   --tui-text-info: var(--color-lake-700);
 
-  /* §1 — the accent is ink: the primary fill is ledger-950, 16.49:1 on
-     paper. The focus ring is a step softer, ledger-800, 9.08:1 (§4,
-     2026-10-22). Links and selection (text, bg, border above and below)
+  /* §1 — the accent is ink: the primary fill is ledger-950, 17.31:1 on
+     the canvas. The focus ring is a step softer, ledger-800, 9.54:1, and
+     9.08:1 on the paper (§4, 2026-10-22). Links and selection (text, bg, border above and below)
      stay ivy. */
   --tui-fill-interactive: var(--color-ledger-950);
   --tui-ring: var(--color-ledger-800);
   --tui-fill-danger: var(--color-vermilion-700);
-  --tui-fill-warning: var(--color-ochre-500);     /* not -400: 2.26:1 on paper, under 3:1 (§4) */
+  --tui-fill-warning: var(--color-ochre-500);     /* not -400: 2.26:1 on paper, under 3:1 (§4). 3.52:1; 3.36 on the paper */
   --tui-fill-success: var(--color-ivy-700);
   --tui-fill-agent: var(--color-orchid-700);
   --tui-fill-info: var(--color-lake-700);
 
-  /* Paper, not white (2026-10-16): no #fff remains in the theme. */
+  /* Text on a fill is the paper, ledger-50, as it has been since
+     2026-10-16. It did not follow the canvas to ledger-25 (§4). */
   --tui-on-interactive: var(--color-ledger-50);   /* 16.49:1 on fill */
   --tui-on-danger: var(--color-ledger-50);        /* 7.15:1 */
   --tui-on-warning: var(--color-ledger-950);      /* 4.91:1 — paper on ochre-500 is 3.36:1, fails */
@@ -416,7 +428,7 @@
   --tui-bg-warning: --alpha(var(--color-ochre-500) / 10%);
   --tui-bg-success: --alpha(var(--color-ivy-500) / 8%);
   --tui-bg-agent: --alpha(var(--color-orchid-500) / 8%);
-  --tui-bg-info: --alpha(var(--color-lake-500) / 12%); /* §4: 8% read grey on the cream paper */
+  --tui-bg-info: --alpha(var(--color-lake-500) / 12%); /* §4: 8% reads grey on the paper, and on the canvas */
 
   --tui-border-interactive: --alpha(var(--color-ivy-500) / 20%);
   --tui-border-danger: --alpha(var(--color-vermilion-500) / 20%);
@@ -437,8 +449,8 @@
   /* §4 — selected text, not a selected row. The text steps to primary on it. */
   --tui-bg-selection: --alpha(var(--color-ivy-500) / 30%);
 
-  /* §6 — chart ramp, light: step 600 of each ramp, 4.60:1 or more on
-     paper. Vermilion and ivy, the polarity hues, come last (§6). */
+  /* §6 — chart ramp, light: step 600 of each ramp, 4.83:1 or more on
+     the canvas and 4.60:1 or more on the paper. Vermilion and ivy, the polarity hues, come last (§6). */
   --tui-chart-1: var(--color-lake-600);
   --tui-chart-2: var(--color-ochre-600);
   --tui-chart-3: var(--color-teal-600);
@@ -458,6 +470,7 @@
   --tui-canvas: var(--color-ledger-950);
   --tui-surface: var(--color-ledger-950);
   --tui-surface-raised: var(--color-ledger-925);
+  --tui-surface-sunken: var(--color-ledger-950); /* the canvas: no step sits under it (§3) */
   --tui-border: var(--color-ledger-800);
   --tui-border-strong: var(--color-ledger-700);
   --tui-border-control: var(--color-ledger-500); /* 4.95:1; 3.69 at worst (§4 Control edge) */
@@ -545,6 +558,7 @@
   --color-canvas: var(--tui-canvas);
   --color-surface: var(--tui-surface);
   --color-surface-raised: var(--tui-surface-raised);
+  --color-surface-sunken: var(--tui-surface-sunken);
   --color-border: var(--tui-border);
   --color-border-strong: var(--tui-border-strong);
   --color-border-control: var(--tui-border-control);

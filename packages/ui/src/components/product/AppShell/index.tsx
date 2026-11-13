@@ -482,8 +482,16 @@ function AppShell({
               (pinned || peek) && 'flex',
               pinned && [
                 'col-start-1 row-span-2 row-start-1',
-                // §4 elevation, inline panel: a background step plus a rule.
-                'border-r border-border bg-surface',
+                // §4 elevation, sunken: the frame beside the page. In light
+                // mode that is the paper, a step under the page's white; in
+                // dark it is the canvas, and the rule alone separates it.
+                'border-r border-border bg-surface-sunken',
+                // §3: a sunken region is the ground for what it holds, so
+                // anything here that states bg-canvas or bg-surface paints
+                // the frame, not a patch of the page. On the --tui-* layer:
+                // @theme inline has inlined --color-* (failure log). Raised
+                // is left alone, so a popup opened here is the page's white.
+                '[--tui-canvas:var(--tui-surface-sunken)] [--tui-surface:var(--tui-surface-sunken)]',
               ],
               peek && [
                 // Floats over main, below the top nav, so the toggle that

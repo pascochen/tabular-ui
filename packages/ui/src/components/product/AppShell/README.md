@@ -100,6 +100,23 @@ The model is complete without hover: Enter or a tap pins the sidebar, which reac
 
 **The toggle changes places, and focus goes with it.** Pinning removes the top-nav toggle the user pressed and reveals the one in the sidebar header. Collapsing does the reverse. The shell moves focus each time, so it never falls to `<body>`.
 
+## Grounds: the page and the frame
+
+Since 2026-11-12 (§3, "The page and the frame"; `docs/reviews/white-content-2026-11-12.md`).
+
+| Region | Ground | Light | Dark |
+|---|---|---|---|
+| Top nav, main, panel | `--color-canvas`, `--color-surface` | `ledger-25`, a warm white | `ledger-950` |
+| Pinned sidebar, with its header and footer | `--color-surface-sunken` | `ledger-50`, the paper | `ledger-950` |
+| Peek | `--color-surface-raised` | `ledger-25` | `ledger-925` |
+
+- **The step is 1.05:1, so the rules stay.** The sidebar reads as a frame because of its ground and its border together. The ground alone separates nothing.
+- **The pinned sidebar sets `--tui-canvas` and `--tui-surface` to the sunken value for its subtree.** A component in it that states `bg-canvas` or `bg-surface` paints the frame, not a patch of the page.
+- **A popup opened from the sidebar is on the raised surface,** the page's white, lighter than the frame under it. The peek is the same: it is an overlay, so it is not sunken.
+- **Text in the sidebar measures about 5% lower than on the page.** `check-contrast.mjs` gates every token on both.
+- **Collapsed, no paper is on the screen.** That was weighed and accepted: the top nav is part of the page.
+- **Dark mode has no frame.** No step sits under the canvas.
+
 ## Responsive behaviour
 
 **Desktop only: laptop through wide monitor.** There is one breakpoint, Tailwind's stock `xl` (80rem, which is 1280px at the default root size). **Width only sets the default:**
