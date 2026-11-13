@@ -105,7 +105,7 @@ export const people = {
     title: 'President and CEO',
     entity: 'KJP',
     email: 'tatsuya.mizuhara@kasane.example',
-    initials: 'TM',
+    initials: 'T',
     handle: 't.mizuhara',
   },
   cfo: {
@@ -115,7 +115,7 @@ export const people = {
     title: 'Director and Chief Financial Officer',
     entity: 'KJP',
     email: 'keiko.arimura@kasane.example',
-    initials: 'KA',
+    initials: 'K',
     handle: 'k.arimura',
   },
   controller: {
@@ -125,7 +125,7 @@ export const people = {
     title: 'Group Controller',
     entity: 'KJP',
     email: 'daisuke.onodera@kasane.example',
-    initials: 'DO',
+    initials: 'D',
     handle: 'd.onodera',
   },
   fpa: {
@@ -135,7 +135,7 @@ export const people = {
     title: 'Head of FP&A',
     entity: 'KJP',
     email: 'mei.tachibana@kasane.example',
-    initials: 'MT',
+    initials: 'M',
     handle: 'm.tachibana',
   },
   consolidation: {
@@ -145,7 +145,7 @@ export const people = {
     title: 'Consolidation and Reporting Manager',
     entity: 'KJP',
     email: 'sayaka.kurosawa@kasane.example',
-    initials: 'SK',
+    initials: 'S',
     handle: 's.kurosawa',
   },
   treasury: {
@@ -155,7 +155,7 @@ export const people = {
     title: 'Treasury Manager',
     entity: 'KJP',
     email: 'ren.fujisawa@kasane.example',
-    initials: 'RF',
+    initials: 'R',
     handle: 'r.fujisawa',
   },
   tax: {
@@ -165,7 +165,7 @@ export const people = {
     title: 'Tax Manager',
     entity: 'KJP',
     email: 'haruki.sone@kasane.example',
-    initials: 'HS',
+    initials: 'H',
     handle: 'h.sone',
   },
   receivables: {
@@ -175,7 +175,7 @@ export const people = {
     title: 'Accounts Receivable and Credit Lead',
     entity: 'KJP',
     email: 'yui.matsuda@kasane.example',
-    initials: 'YM',
+    initials: 'Y',
     handle: 'y.matsuda',
   },
   payables: {
@@ -185,7 +185,7 @@ export const people = {
     title: 'Accounts Payable Lead',
     entity: 'KJP',
     email: 'kenta.ishiguro@kasane.example',
-    initials: 'KI',
+    initials: 'K',
     handle: 'k.ishiguro',
   },
   plantCost: {
@@ -195,7 +195,7 @@ export const people = {
     title: 'Plant Cost Accountant (based at Tsukuba)',
     entity: 'KJP',
     email: 'takumi.hoshino@kasane.example',
-    initials: 'TH',
+    initials: 'T',
     handle: 't.hoshino',
   },
   dataAnalyst: {
@@ -205,7 +205,7 @@ export const people = {
     title: 'Finance Data and BI Analyst',
     entity: 'KJP',
     email: 'aoi.kanzaki@kasane.example',
-    initials: 'AK',
+    initials: 'A',
     handle: 'a.kanzaki',
   },
   generalLedger: {
@@ -215,7 +215,7 @@ export const people = {
     title: 'General Ledger Accountant',
     entity: 'KJP',
     email: 'shun.morimoto@kasane.example',
-    initials: 'SM',
+    initials: 'S',
     handle: 's.morimoto',
   },
   fpaAnalyst: {
@@ -225,7 +225,7 @@ export const people = {
     title: 'FP&A Analyst',
     entity: 'KJP',
     email: 'nanami.okabe@kasane.example',
-    initials: 'NO',
+    initials: 'N',
     handle: 'n.okabe',
   },
   fixedAssets: {
@@ -235,7 +235,7 @@ export const people = {
     title: 'Fixed Assets Accountant',
     entity: 'KJP',
     email: 'ryota.iwasaki@kasane.example',
-    initials: 'RI',
+    initials: 'R',
     handle: 'r.iwasaki',
   },
   usController: {
@@ -245,7 +245,7 @@ export const people = {
     title: 'VP Finance and Controller',
     entity: 'KUS',
     email: 'dana.whitfield@kasane.example',
-    initials: 'DW',
+    initials: 'D',
     handle: 'd.whitfield',
   },
   usCredit: {
@@ -255,7 +255,7 @@ export const people = {
     title: 'AR and Credit Manager',
     entity: 'KUS',
     email: 'marcus.bell@kasane.example',
-    initials: 'MB',
+    initials: 'M',
     handle: 'm.bell',
   },
   deFinance: {
@@ -265,7 +265,7 @@ export const people = {
     title: 'Head of Finance',
     entity: 'KDE',
     email: 'katrin.vogt@kasane.example',
-    initials: 'KV',
+    initials: 'K',
     handle: 'k.vogt',
   },
   ukController: {
@@ -275,7 +275,7 @@ export const people = {
     title: 'Financial Controller',
     entity: 'KUK',
     email: 'fiona.mcallister@kasane.example',
-    initials: 'FM',
+    initials: 'F',
     handle: 'f.mcallister',
   },
   ukAccountant: {
@@ -285,7 +285,7 @@ export const people = {
     title: 'Management Accountant',
     entity: 'KUK',
     email: 'tom.ashworth@kasane.example',
-    initials: 'TA',
+    initials: 'T',
     handle: 't.ashworth',
   },
   cnFinance: {
@@ -295,7 +295,7 @@ export const people = {
     title: 'Finance Manager',
     entity: 'KCN',
     email: 'lin.xiaoyu@kasane.example',
-    initials: 'LX',
+    initials: 'L',
     handle: 'l.xiaoyu',
   },
   longName: {
@@ -305,7 +305,7 @@ export const people = {
     title: 'Sales Operations and Contracts Coordinator',
     entity: 'KDE',
     email: 'anna-lena.schwarzenberger-hoffmann@kasane.example',
-    initials: 'AS',
+    initials: 'A',
     handle: 'a.schwarzenberger-hoffmann',
   },
 };

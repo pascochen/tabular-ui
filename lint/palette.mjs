@@ -31,7 +31,7 @@ export const UI_HUES = ['ivy', 'vermilion', 'ochre', 'lake', 'orchid'];
 /** The one neutral ramp. */
 export const NEUTRAL = 'ledger';
 
-/** Ramps that exist for the chart tokens only, never for UI state (§6). */
+/** Ramps that exist for the chart tokens (§6) and an avatar's identity ground (§1), never for UI state. */
 export const CHART_ONLY = ['teal'];
 
 /** Tailwind's chromatic scales, in its order. */

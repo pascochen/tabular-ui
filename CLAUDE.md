@@ -35,8 +35,8 @@ When the CSS and the doc disagree, **the CSS wins on values, the doc wins on rul
 
 Violating any of these fails review.
 
-1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary buttons, dividers: all neutral. A hue appears only when something is true about the data, the run, or the user's focus.
-2. **Five hues. No sixth.** Never add a hue for a new feature. Compose from the five plus shape, weight, icon, or a neutral tint. `teal` is the palette's chart-only ramp, never a UI state.
+1. **Color means state, never hierarchy.** Sidebar icons, table headers, section labels, secondary buttons, dividers: all neutral. A hue appears only when something is true about the data, the run, or the user's focus. The one exception is an avatar's fallback: one letter on a tint that says who the person is (2026-11-13, `docs/design-system.md` §1 "Identity colour").
+2. **Five hues. No sixth.** Never add a hue for a new feature. Compose from the five plus shape, weight, icon, or a neutral tint. `teal` is the palette's ramp for charts and avatar identity, never a UI state.
 3. **Never use 900/950 steps of chromatic scales as backgrounds.** They have hue-dependent lightness drift. Use `{hue}-500/10` over the canvas.
 4. **Dark and light are not mirrors.** Foregrounds are chosen by OKLCH lightness, never by inverting the other mode's step index. Every Riso ramp shares one lightness curve, so every role's text is one step per mode: dark **step 400 (L 73)**, light **step 700 (L 46)**. The word "foregrounds" is load-bearing — solid *fills* sit at their own steps (dark fills are 600 because 700 is under 3:1 against the canvas; the light warning fill is `ochre-500`). See `docs/design-system.md` §0 rule 4, §2 and §4. *(Until 2026-10-16 this rule set lightness bands, L 66–71 dark and L 43–51 light, because Tailwind's ramps put each step at a different lightness per hue.)*
 5. **Reach for the semantic layer first.** `--pad-cell-x` before `p-2`. `--color-text-danger` before `text-vermilion-400`.

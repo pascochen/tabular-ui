@@ -65,7 +65,7 @@ test('fallback initials start the trigger’s name: label-in-name holds (axe, by
   await gotoStory(page, 'product-accountmenu--initials');
   // Otherwise the rule has nothing to catch: an image has no text to compare.
   await expect(trigger(page).locator('[data-slot="avatar-fallback"]')).toBeVisible();
-  await expect(trigger(page)).toHaveAccessibleName('MT Mei Tachibana, account');
+  await expect(trigger(page)).toHaveAccessibleName('M Mei Tachibana, account');
   await injectAxe(page);
   const targets = await page.evaluate(async () => {
     // Named, because axe skips a rule tagged `experimental` unless asked, as

@@ -43,7 +43,7 @@ const gaps: Record<PresenceGround, string> = {
  * overlap reads as a cut-out and the 24px footprint doesn't change. It has to
  * know the ground, hence `ground`.
  *
- * **No hue, and no presence dot.** Being here is who someone is, not a state
+ * **No hue of its own, and no presence dot.** Being here is who someone is, not a state
  * of the data (§0 rule 1). A dot in the success hue would say "passed".
  *
  * **A list, named.** Each avatar is `aria-hidden` and its member's name is

@@ -17,6 +17,7 @@
 // - --color-text-tertiary 4.5:1 where it is a placeholder (canvas, surface, raised, sunken), and
 //   3:1 on row states, where it only marks icons (§3)
 // - the focus ring, solid fills and chart series 3:1
+// - an avatar's identity letter 4.5:1 on its own tint, over every ground (§1)
 // - --color-text-disabled is reported, never failed (WCAG 1.4.3 exempts it)
 // - --color-border-control 3:1 on every ground: it is a form control's whole boundary (§4)
 // - --color-border and --color-border-strong are reported, never failed (§3 publishes them)
@@ -181,6 +182,19 @@ for (const [mode, decls] of Object.entries(MODES)) {
     const series = L(`chart-${i}`);
     for (const ground of SURFACES)
       check(`chart-${i}`, series.ref, ground, wcagContrast(series.hex, composite(GROUNDS[ground])), 3);
+  }
+  // §1 Identity colour: an avatar's letter on its own tint, wherever an avatar can sit.
+  for (let i = 1; i <= 4; i++) {
+    const letter = L(`text-identity-${i}`);
+    const tint = L(`bg-identity-${i}`);
+    for (const [ground, layers] of Object.entries(GROUNDS))
+      check(
+        `text-identity-${i}`,
+        letter.ref,
+        `${ground} + own tint`,
+        wcagContrast(letter.hex, composite([...layers, tint])),
+        4.5,
+      );
   }
   // §4 Control edge: the border that draws a form control, 3:1 on every ground one sits on
   // (WCAG 1.4.11). An unchecked Checkbox on a hovered or selected row is the case that set it.
