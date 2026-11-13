@@ -552,9 +552,9 @@ function DataTable<TData>({
                       )}
                       {reserved ? (
                         // In the cells' own type. `ch` is the advance of a proportional
-                        // zero: in the mono that is a digit, and in Instrument Sans it is
-                        // 0.666em against a tabular digit's 0.600em, so a sans column
-                        // errs about 11% wide (§8.3). No figure is wider than this many
+                        // zero: in the mono that is a digit, and in Golos Text it is
+                        // 0.620em, the width of a tabular digit, so a sans column is
+                        // exact too (§8.3; in Instrument Sans it erred about 11% wide). No figure is wider than this many
                         // `ch`: a comma and a minus are narrower than a digit, and `¥`
                         // and `$`, a little wider than one, still fit in a `ch`.
                         <span
@@ -639,6 +639,13 @@ function DataTable<TData>({
                           // --pad-cell-y) and a badge at 5px, which is exactly
                           // §7.3's "18px badge sits comfortably in a 28px row".
                           'h-[var(--h-row-sm)] border-b border-border px-[var(--pad-cell-x)] align-middle',
+                          // A badge alone in a cell hangs from the top of its line,
+                          // not the text's baseline. On the baseline it reaches
+                          // below the line by more than Golos Text's short descent
+                          // (0.22em), and at 200% text the row grew 1px past its
+                          // token, which the virtualizer then misplaced 50,000
+                          // times (2026-11-13). The cell still centres the line.
+                          '[&>[data-slot=badge]]:align-top',
                           // §0 rule 6 — every figure column is tabular. Mono
                           // runs one step below adjacent sans (§8.3).
                           isNumeric(meta) && 'text-right tabular-nums',
@@ -657,8 +664,8 @@ function DataTable<TData>({
                           // text counts toward its column up to about 25 mono
                           // characters, so a short column keeps its own width and an
                           // identifier stays readable. A `ch` is the cell's own zero, so
-                          // the two fonts take two caps for about 168px of text: 21ch
-                          // of Instrument Sans, 28ch of Plex Mono at --text-xs (§8.3). A `size` still wins where
+                          // the two fonts take two caps: 21ch of Golos Text at --text-sm,
+                          // about 156px, and 28ch of Plex Mono at --text-xs, about 185px (§8.3). A `size` still wins where
                           // there's room, because a cell fills its column whatever
                           // its max-width says. A windowed table can't follow its
                           // cells, so they count for nothing and the header holds

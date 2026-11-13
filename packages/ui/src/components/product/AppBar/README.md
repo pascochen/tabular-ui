@@ -86,9 +86,13 @@ coloured pixel that is not carrying state is stealing attention from one that is
 reverse it, change `data-[active]:text-text-primary` to `text-text-interactive`; do
 not add an indicator bar.
 
-Active also shifts the weight 500 → 600 per §8.5, which changes the label's width
-slightly. That reflow only happens on navigation, when the page repaints anyway, so it
-is not worth reserving width to prevent.
+Active also shifts the weight 500 → 600 per §8.5, and **the width is reserved, so
+nothing moves** (owner, 2026-11-13, §8.5). A plain-text label renders beside a hidden
+copy of itself at 600, stacked in one column with no height and no accessible text
+(`content: attr(data-label) / ''`), so the item is as wide at rest as when active.
+Until then the reflow was accepted because it happens on navigation, when the page
+repaints anyway; with a client-side router the bar stays put and its items jumped. A
+label that is not a plain string renders as it is, without the reservation.
 
 **`role="list"` is explicit on the `<ul>`.** Tailwind's preflight sets
 `list-style: none`, and Safari drops list semantics from an unstyled list — the item
