@@ -7,10 +7,11 @@ import {
   CurrencyCircleDollarIcon,
   DotsThreeIcon,
   DotsThreeVerticalIcon,
+  FilesIcon,
   HashIcon,
   HouseIcon,
   LightningIcon,
-  MagnifyingGlassIcon,
+  ListChecksIcon,
   PlusIcon,
   PulseIcon,
   QuestionIcon,
@@ -591,8 +592,9 @@ export const PeopleAndCounts: Story = {
 /*
   The sidebar from the 2026-11-10 pivot: the product is for an SMB finance
   team's accountants. Top to bottom: the company, then New chat (questions on
-  the files they imported), Workflow (skills an accountant or auditor runs),
-  Search, the accounting agents, channels, direct messages, and the account.
+  the files they imported), Tasks, Sources (the imported files, with search
+  inside it), the accounting agents, channels, direct messages, and the
+  account. Until 2026-11-12 the second and third items were Workflow and Search.
 */
 
 const daisuke = {
@@ -656,11 +658,11 @@ function AccountantSidebar() {
         <AppShellNavItem href="#" icon={<PlusIcon />} active>
           New chat
         </AppShellNavItem>
-        <AppShellNavItem href="#" icon={<LightningIcon />}>
-          Workflow
+        <AppShellNavItem href="#" icon={<ListChecksIcon />}>
+          Tasks
         </AppShellNavItem>
-        <AppShellNavItem href="#" icon={<MagnifyingGlassIcon />}>
-          Search
+        <AppShellNavItem href="#" icon={<FilesIcon />}>
+          Sources
         </AppShellNavItem>
       </AppShellNavGroup>
       <AppShellNavGroup label="Agents">
