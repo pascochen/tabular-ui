@@ -66,7 +66,11 @@ export type ContextSwitcherProps = {
   actions?: ContextAction[];
   /** The create row's label — "Create project". */
   createLabel: string;
-  onCreate: () => void;
+  /**
+   * Opens the create flow. Omit it when the app has no such flow: the create
+   * row and the separator above it are then not drawn, so no row does nothing.
+   */
+  onCreate?: () => void;
   /**
    * `compact` sizes the trigger to its name with the caret beside it — the
    * sidebar header, where a toggle shares the band. `block` fills its
@@ -251,17 +255,21 @@ function ContextSwitcher({
               ),
             )}
           </MenuGroup>
-          <MenuSeparator />
-          <MenuItem onClick={onCreate}>
-            {trailingCheck ? (
-              <PlusIcon weight="bold" aria-hidden="true" />
-            ) : (
-              <LeadingSlot>
-                <PlusIcon weight="bold" aria-hidden="true" />
-              </LeadingSlot>
-            )}
-            {createLabel}
-          </MenuItem>
+          {onCreate && (
+            <>
+              <MenuSeparator />
+              <MenuItem onClick={onCreate}>
+                {trailingCheck ? (
+                  <PlusIcon weight="bold" aria-hidden="true" />
+                ) : (
+                  <LeadingSlot>
+                    <PlusIcon weight="bold" aria-hidden="true" />
+                  </LeadingSlot>
+                )}
+                {createLabel}
+              </MenuItem>
+            </>
+          )}
         </MenuContent>
       </Menu>
       {/*

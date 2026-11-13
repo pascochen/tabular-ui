@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
-import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle } from 'tabular-ui';
+import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle, useTheme } from 'tabular-ui';
 
 import { AboutDemoButton } from './components/DemoActions';
 import { HeroAnnouncer } from './components/HeroThread/Announcer';
@@ -22,6 +22,9 @@ import { slotsFor } from './views/slots';
  * page header and the right panel follow the view; nothing else is routed.
  */
 export function App() {
+  // Light until the visitor picks another in the account menu, and remembered.
+  // index.html ships the same mode, and applies a remembered one before paint.
+  const { preference, setPreference } = useTheme({ defaultPreference: 'light' });
   const view = useView();
   const slots = slotsFor(view);
   // One store for the close: every view and the panel read it (lib/close-state.ts).
@@ -62,7 +65,7 @@ export function App() {
           }
           sidebarHeader={<SidebarHeader />}
           sidebar={<Sidebar />}
-          sidebarFooter={<SidebarFooter />}
+          sidebarFooter={<SidebarFooter theme={preference} onThemeChange={setPreference} />}
           pageHeader={
             <AppShellPageHeader
               title={slots.title}

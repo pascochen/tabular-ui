@@ -39,7 +39,7 @@ Use `ContextSwitcher` directly only for a new kind of context, and give it a wra
 | `label` | `string` | The menu's section label — "Projects" |
 | `actions` | `ContextAction[]?` | The current item's submenu, top to bottom. Omit it for no submenu: the current row then only closes the menu, with its check at the trailing edge |
 | `createLabel` | `string` | "Create project" |
-| `onCreate` | `() => void` | |
+| `onCreate` | `() => void`, optional | Omit it when the app has no create flow: the create row and the separator above it aren't drawn (since 2026-11-13) |
 | `trigger` | `'compact' \| 'block'` | Default `compact` |
 | `labelId` | `string` | `block` only — the `ContextSwitcherLabel`'s `id` |
 

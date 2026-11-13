@@ -4,3 +4,6 @@ export const STORYBOOK_URL = 'https://storybook.tabularui.com';
 
 /** The site's page for the first of the AI components, the starting point of an agent run. */
 export const AI_COMPONENTS_URL = 'https://tabularui.com/components/chat-starter';
+
+/** The homepage, from the visitor's account menu. */
+export const SITE_URL = 'https://tabularui.com';

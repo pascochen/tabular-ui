@@ -8,8 +8,8 @@ export type OrgSwitcherProps = {
   currentOrgId: string;
   /** Called with the chosen org's id. Not called for the current org — picking it only closes the menu. */
   onSwitch: (orgId: string) => void;
-  /** Starts the create-workspace flow. */
-  onCreateOrg: () => void;
+  /** Starts the create-workspace flow. Omit it when there is none: the Create Workspace row is then not drawn. */
+  onCreateOrg?: () => void;
   className?: string;
 };
 

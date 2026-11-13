@@ -26,11 +26,16 @@ const longOrgs: Org[] = [
 ];
 
 /** The switcher in a 240px band — the width of the sidebar it lives in. */
-function Stateful({ orgs, initial }: { orgs: Org[]; initial: string }) {
+function Stateful({ orgs, initial, canCreate = true }: { orgs: Org[]; initial: string; canCreate?: boolean }) {
   const [current, setCurrent] = useState(initial);
   return (
     <div className="flex w-60 items-center">
-      <OrgSwitcher orgs={orgs} currentOrgId={current} onSwitch={setCurrent} onCreateOrg={() => {}} />
+      <OrgSwitcher
+        orgs={orgs}
+        currentOrgId={current}
+        onSwitch={setCurrent}
+        onCreateOrg={canCreate ? () => {} : undefined}
+      />
     </div>
   );
 }
@@ -56,4 +61,13 @@ export const LongNames: Story = {
 export const SingleOrg: Story = {
   args: { orgs: orgs.slice(0, 1), currentOrgId: orgs[0].id, ...handlers },
   render: () => <Stateful orgs={orgs.slice(0, 1)} initial={orgs[0].id} />,
+};
+
+/**
+ * No create flow: without `onCreateOrg`, the Create Workspace row and its
+ * separator aren't drawn.
+ */
+export const NoCreate: Story = {
+  args: { orgs: orgs.slice(0, 1), currentOrgId: orgs[0].id, onSwitch: () => {} },
+  render: () => <Stateful orgs={orgs.slice(0, 1)} initial={orgs[0].id} canCreate={false} />,
 };

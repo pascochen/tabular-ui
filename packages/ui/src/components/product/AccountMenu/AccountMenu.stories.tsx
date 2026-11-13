@@ -44,7 +44,7 @@ const handlers = {
  * starts from the toolbar's mode and doesn't remember the choice here, so
  * the toolbar still rules on the next visit.
  */
-function Footer({ user }: { user: AccountUser }) {
+function Footer({ user, pages = handlers }: { user: AccountUser; pages?: Partial<typeof handlers> }) {
   const [initial] = useState<'dark' | 'light'>(() =>
     document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
   );
@@ -53,7 +53,7 @@ function Footer({ user }: { user: AccountUser }) {
     // Pinned to the bottom of the viewport, as in the sidebar: the menu opens upward.
     <div className="flex h-dvh items-end">
       <div className="w-60 border-t border-border bg-surface px-[var(--pad-page-x)] py-2">
-        <AccountMenu {...handlers} user={user} theme={preference} onThemeChange={setPreference} />
+        <AccountMenu {...pages} user={user} theme={preference} onThemeChange={setPreference} />
       </div>
     </div>
   );
@@ -86,4 +86,14 @@ export const LongName: Story = {
       }}
     />
   ),
+};
+
+/**
+ * An app passes only the pages it has. Here, only Homepage: Profile, the
+ * workspace's settings and billing, and Sign out aren't drawn, and neither is
+ * a separator with nothing on one side. The Kasane demo's footer.
+ */
+export const OnlyHomepage: Story = {
+  args: { user: mei, theme: 'dark', onThemeChange: () => {}, onOpenHomepage: () => {} },
+  render: () => <Footer user={mei} pages={{ onOpenHomepage: () => {} }} />,
 };

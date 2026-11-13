@@ -11,6 +11,7 @@ import { agents, directMessages, type ChannelId } from './kasane';
  *   ?view=tasks · ?view=tasks&task=revenue-cut-off
  *   ?view=sources · ?view=sources&source=sales-invoices&item=revenue-cut-off
  *   ?view=search · ?view=search&q=delivery
+ *   ?view=agents: every agent, from the sidebar's More
  *   ?dm=fpaHead · ?dm=apLead · ?dm=cutoff-ai
  *   ?at=end, with any of them: the end state, for screenshots and sharing
  *
@@ -27,7 +28,8 @@ export type View =
   | { kind: 'dm'; member: string }
   | { kind: 'tasks'; task?: string }
   | { kind: 'sources'; source?: string; item?: string }
-  | { kind: 'search'; q?: string };
+  | { kind: 'search'; q?: string }
+  | { kind: 'agents' };
 
 /** The channels a visitor can open, in sidebar order. */
 export const BUILT_CHANNELS: readonly ChannelId[] = [
@@ -39,8 +41,15 @@ export const BUILT_CHANNELS: readonly ChannelId[] = [
   'intercompany',
 ];
 
-/** The places above the channels that are built, in sidebar order. */
+/** The places above the channels that are built, so open by their URL. */
 export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['search', 'tasks', 'sources'];
+
+/**
+ * The places the sidebar lists, in its order: the Accountant Workspace story's
+ * (since 2026-11-13). Search isn't one: the story moves it inside Sources,
+ * which isn't designed yet, so until then it opens only by its URL.
+ */
+export const SIDEBAR_PLACES: readonly ('tasks' | 'sources')[] = ['tasks', 'sources'];
 
 /** Where the visitor lands, and where an old or unknown URL opens: New chat (owner, 2026-11-12; #revenue until then). */
 export const DEFAULT_VIEW: View = { kind: 'new-chat' };
@@ -59,6 +68,7 @@ export function parseView(search: string): View {
   if (view === 'search' && BUILT_PLACES.includes('search')) {
     return { kind: 'search', q: params.get('q') ?? undefined };
   }
+  if (view === 'agents') return { kind: 'agents' };
   const channel = BUILT_CHANNELS.find((c) => c === view);
   return channel ? { kind: 'channel', channel } : DEFAULT_VIEW;
 }
@@ -84,6 +94,8 @@ export function hrefFor(view: View): string {
       return query({ view: 'sources', source: view.source, item: view.item });
     case 'search':
       return query({ view: 'search', q: view.q });
+    case 'agents':
+      return query({ view: 'agents' });
     case 'channel':
       return query({ view: view.channel });
     case 'new-chat':

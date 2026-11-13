@@ -3,12 +3,14 @@ import { expect, test } from '@playwright/test';
 import { selectedTask, usedBy } from '../../demo/src/lib/kasane';
 import {
   BUILT_CHANNELS,
+  BUILT_PLACES,
   DEFAULT_VIEW,
   hrefFor,
   parseAtEnd,
   parseView,
   placeOf,
   sameView,
+  SIDEBAR_PLACES,
 } from '../../demo/src/lib/view';
 
 /**
@@ -80,6 +82,17 @@ test('Sources opens by its URL, on a document and a finding’s records', () => 
 test('Search opens by its URL, with or without a query', () => {
   expect(parseView('?view=search')).toEqual({ kind: 'search' });
   expect(parseView('?view=search&q=Great+Lakes')).toEqual({ kind: 'search', q: 'Great Lakes' });
+});
+
+test('Search is out of the sidebar since 2026-11-13, and still opens by its URL', () => {
+  expect(SIDEBAR_PLACES).toEqual(['tasks', 'sources']);
+  expect(BUILT_PLACES).toContain('search');
+});
+
+test('More’s Agents page round-trips through its URL', () => {
+  expect(parseView('?view=agents')).toEqual({ kind: 'agents' });
+  expect(hrefFor({ kind: 'agents' })).toBe('?view=agents');
+  expect(placeOf({ kind: 'agents' })).not.toBe(placeOf({ kind: 'dm', member: 'cutoff-ai' }));
 });
 
 test('a view’s link carries what it selects, and encodes it', () => {
