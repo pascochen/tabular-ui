@@ -250,13 +250,13 @@ export const people = {
   },
   usCredit: {
     id: 'E1003',
-    name: 'Marcus Bell',
-    shortName: 'Marcus',
+    name: 'Vincent Bell',
+    shortName: 'Vincent',
     title: 'AR and Credit Manager',
     entity: 'KUS',
-    email: 'marcus.bell@kasane.example',
-    initials: 'M',
-    handle: 'm.bell',
+    email: 'vincent.bell@kasane.example',
+    initials: 'V',
+    handle: 'v.bell',
   },
   deFinance: {
     id: 'E2002',
