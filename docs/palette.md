@@ -32,7 +32,7 @@ Every ramp shares one lightness curve, so these hold for every ramp:
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | OKLCH L | 97.5% | 94.5% | 89% | 82% | 73% | 62.5% | 53% | 46% | 38.5% | 30.5% | 21% |
 
-Ledger alone has a twelfth step, **925** (L 25.75%, the midpoint of 900 and 950): the dark-mode raised surface for menus, popovers and dialogs.
+Ledger alone has two more steps. **925** (L 25.75%, the midpoint of 900 and 950) is the dark-mode raised surface for menus, popovers and dialogs. **25** (L 99%, the paper's hue at half its chroma) is the light-mode page: canvas, surface and raised. The paper, 50, is the ground of the frame beside it.
 
 ## ledger
 
@@ -40,6 +40,7 @@ Neutral: surfaces, borders, text. Replaces `olive`. Cream paper (85°, chroma 0.
 
 | Step | oklch() | Hex | WCAG vs paper | WCAG vs ink | APCA Lc vs paper | APCA Lc vs ink |
 |---|---|---|---|---|---|---|
+| 25 | `oklch(99.0% 0.003 85.0)` | `#fdfcf9` | 1.05 | 17.31 | 0.0 | 104.8 |
 | 50 | `oklch(97.5% 0.006 85.0)` | `#f9f6f2` | 1.00 | 16.49 | 0.0 | 101.1 |
 | 100 | `oklch(94.5% 0.007 85.0)` | `#efece8` | 1.09 | 15.08 | 0.0 | 94.6 |
 | 200 | `oklch(89.0% 0.008 85.0)` | `#dddad5` | 1.29 | 12.74 | 14.0 | 83.2 |
@@ -244,6 +245,7 @@ The current Tabular UI ramps (Tailwind defaults) against their replacements. ✕
 
 | Step | Old oklch() | Old hex | New oklch() | New hex | ΔL |
 |---|---|---|---|---|---|
+| 25 | — | — | `oklch(99.0% 0.003 85.0)` | `#fdfcf9` | |
 | 50 | `oklch(98.8% 0.003 106.5)` | `#fbfbf9` | `oklch(97.5% 0.006 85.0)` | `#f9f6f2` | -1.3 |
 | 100 | `oklch(96.6% 0.005 106.5)` | `#f4f4f0` | `oklch(94.5% 0.007 85.0)` | `#efece8` | -2.1 |
 | 200 | `oklch(93% 0.007 106.5)` | `#e8e8e3` | `oklch(89.0% 0.008 85.0)` | `#dddad5` | -4.0 |
@@ -257,7 +259,7 @@ The current Tabular UI ramps (Tailwind defaults) against their replacements. ✕
 | 925 | — | — | `oklch(25.75% 0.018 264.1)` | `#1f232c` | |
 | 950 | `oklch(15.3% 0.006 107.1)` | `#0c0c09` | `oklch(21.0% 0.018 264.1)` | `#141821` | 5.7 |
 
-olive: 0 of 11 outside sRGB. ledger: 0 of 12.
+olive: 0 of 11 outside sRGB. ledger: 0 of 13.
 
 ### emerald → ivy
 

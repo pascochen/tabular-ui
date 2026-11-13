@@ -77,8 +77,8 @@ export const CHROMATIC_SCALES = [
   ...new Set([...CHROMATIC, ...RAMPS.filter((ramp) => ramp !== NEUTRAL), ...Object.keys(DEPRECATED_RAMPS)]),
 ];
 
-/** Every step name. 925 exists in ledger only. */
-export const STEPS = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '925', '950'];
+/** Every step name. 25 and 925 exist in ledger only. */
+export const STEPS = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '925', '950'];
 
 /** `a|b|c`, for building a regular expression from a list. */
 export const alternation = (names) => names.join('|');

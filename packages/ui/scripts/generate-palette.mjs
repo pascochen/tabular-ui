@@ -246,7 +246,7 @@ const ramps = RAMPS.map((ramp) => {
   return { ...ramp, steps };
 });
 
-// Ledger's one extra step, 925. Dark mode needs a raised surface (menus, popovers, dialogs) between
+// Ledger's first extra step, 925. Dark mode needs a raised surface (menus, popovers, dialogs) between
 // the canvas (950, L 21) and 900 (L 30.5): on 900, role text on a highlighted menu row measured
 // 3.97–4.45:1, under AA. 925 is the midpoint of its neighbours in lightness and chroma, at their
 // shared ink hue. Neutral only: no chromatic ramp needs it, and the shared curve keeps eleven steps.
@@ -260,6 +260,21 @@ const ledger = ramps.find((r) => r.name === 'ledger');
   const limit = maxSrgbChroma(l, h) * GAMUT_MARGIN;
   if (wanted > limit) clipped.push({ token: 'ledger-925', wanted, allowed: limit });
   ledger.steps.splice(ledger.steps.indexOf(s950), 0, { step: 925, l, c: Math.min(wanted, limit), h });
+}
+
+// Ledger's other extra step, 25 (2026-11-12): the light-mode page. Canvas, surface and raised sit
+// on it, and the paper (50) becomes the ground of the frame beside them, the pinned sidebar
+// (docs/reviews/white-content-2026-11-12.md). A warm white, not oklch(100% 0 0): the paper's own
+// hue at half its chroma, so the page and the frame keep one temperature. L 99 is 1.05:1 from the
+// paper; every light-mode ratio measured on it is about 5% over the same pair on paper.
+// Neutral only, like 925, and the shared curve keeps eleven steps.
+{
+  const s50 = ledger.steps.find((s) => s.step === 50);
+  const l = 99;
+  const wanted = s50.c / 2;
+  const limit = maxSrgbChroma(l, s50.h) * GAMUT_MARGIN;
+  if (wanted > limit) clipped.push({ token: 'ledger-25', wanted, allowed: limit });
+  ledger.steps.splice(ledger.steps.indexOf(s50), 0, { step: 25, l, c: Math.min(wanted, limit), h: s50.h });
 }
 
 // One decimal of lightness, two only where a step needs them (ledger-925, L 25.75).
@@ -343,7 +358,7 @@ lines.push(
   '|---|' + STEPS.map(() => '---').join('|') + '|',
   '| OKLCH L | ' + LIGHTNESS.map((l) => `${l}%`).join(' | ') + ' |',
   '',
-  'Ledger alone has a twelfth step, **925** (L 25.75%, the midpoint of 900 and 950): the dark-mode raised surface for menus, popovers and dialogs.',
+  "Ledger alone has two more steps. **925** (L 25.75%, the midpoint of 900 and 950) is the dark-mode raised surface for menus, popovers and dialogs. **25** (L 99%, the paper's hue at half its chroma) is the light-mode page: canvas, surface and raised. The paper, 50, is the ground of the frame beside it.",
   '',
 );
 for (const r of ramps) {

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo } from './helpers';
+import { contrastRatio, focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo, token } from './helpers';
 
 /**
  * AppShell's behaviour is a function of viewport width, so it is tested here
@@ -598,5 +598,75 @@ test.describe('an unread nav item', () => {
     // Semibold is what active draws, so a bold unread name would look selected.
     expect(active.fontWeight).toBe('600');
     expect(unread.fontWeight).not.toBe(active.fontWeight);
+  });
+});
+
+/**
+ * §3, "The page and the frame" (2026-11-12). In light mode the page is a warm
+ * white and the pinned sidebar sits on the paper, a step under it. The step is
+ * 1.05:1, so a region that lost its ground would look almost right: nothing
+ * else would catch it.
+ */
+test.describe('grounds — the page and the frame', () => {
+  test.use({ viewport: SKETCH });
+
+  const ground = (page: Page, slot: string) =>
+    page
+      .locator(`[data-slot="${slot}"]`)
+      .first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+  /** What a ground token paints for something placed inside a region. */
+  const groundInside = (page: Page, slot: string, name: string) =>
+    page
+      .locator(`[data-slot="${slot}"]`)
+      .first()
+      .evaluate((el, tokenName) => {
+        const probe = el.appendChild(document.createElement('div'));
+        probe.style.backgroundColor = `var(${tokenName})`;
+        const color = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return color;
+      }, name);
+  const same = async (page: Page, a: string, b: string, what: string) =>
+    expect(await contrastRatio(page, a, b), what).toBeCloseTo(1, 2);
+
+  test('light: the sidebar is on the paper, and the top nav, main and panel on the page', async ({ page }) => {
+    await gotoStory(page, 'product-appshell--expanded', 'light');
+    const canvas = await token(page, '--color-canvas');
+    const sunken = await token(page, '--color-surface-sunken');
+    expect(await contrastRatio(page, canvas, sunken), 'the two grounds differ').toBeGreaterThan(1.03);
+
+    await same(page, await ground(page, 'app-shell-sidebar'), sunken, 'sidebar');
+    await same(page, await ground(page, 'app-shell'), canvas, 'the shell, which main shows through to');
+    await same(page, await ground(page, 'app-bar'), canvas, 'top nav');
+    await same(page, await ground(page, 'app-shell-panel'), canvas, 'panel');
+  });
+
+  test('light: the sidebar is the ground for what it holds, and its popups are on the page', async ({ page }) => {
+    await gotoStory(page, 'product-appshell--expanded', 'light');
+    const canvas = await token(page, '--color-canvas');
+    const sunken = await token(page, '--color-surface-sunken');
+    // A component that states bg-canvas or bg-surface inside the sidebar
+    // paints the frame, not a patch of the page.
+    await same(page, await groundInside(page, 'app-shell-sidebar', '--tui-canvas'), sunken, 'canvas in the sidebar');
+    await same(page, await groundInside(page, 'app-shell-sidebar', '--tui-surface'), sunken, 'surface in the sidebar');
+    // Raised is left alone: a popup is lighter than the frame it opens over.
+    await same(page, await groundInside(page, 'app-shell-sidebar', '--tui-surface-raised'), canvas, 'raised');
+  });
+
+  test('light: the peek is an overlay on the raised surface, not a sunken region', async ({ page }) => {
+    await gotoStory(page, 'product-appshell--collapsed', 'light');
+    await navToggle(page).hover();
+    await expect(dockedSidebar(page)).toHaveAttribute('data-state', 'peek');
+    const raised = await token(page, '--color-surface-raised');
+    await same(page, await ground(page, 'app-shell-sidebar'), raised, 'peek');
+    await same(page, await groundInside(page, 'app-shell-sidebar', '--tui-canvas'), raised, 'canvas in the peek');
+  });
+
+  test('dark: there is no frame, and every region is the canvas', async ({ page }) => {
+    await gotoStory(page, 'product-appshell--expanded', 'dark');
+    const canvas = await token(page, '--color-canvas');
+    for (const slot of ['app-shell-sidebar', 'app-shell', 'app-bar', 'app-shell-panel'])
+      await same(page, await ground(page, slot), canvas, slot);
   });
 });

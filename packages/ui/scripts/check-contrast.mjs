@@ -14,7 +14,7 @@
 // Thresholds (docs/design-system.md §3, §4, §6):
 // - text and on-colours 4.5:1 on every ground they sit on
 // - selected text 4.5:1 on --color-bg-selection, over every ground and role tint
-// - --color-text-tertiary 4.5:1 where it is a placeholder (canvas, surface, raised), and
+// - --color-text-tertiary 4.5:1 where it is a placeholder (canvas, surface, raised, sunken), and
 //   3:1 on row states, where it only marks icons (§3)
 // - the focus ring, solid fills and chart series 3:1
 // - --color-text-disabled is reported, never failed (WCAG 1.4.3 exempts it)
@@ -98,24 +98,32 @@ const lines = [];
 
 for (const [mode, decls] of Object.entries(MODES)) {
   const L = (token) => layer(token, decls, mode);
-  const [canvas, surface, raised, hover, selected] = [
+  const [canvas, surface, raised, sunken, hover, selected] = [
     'canvas',
     'surface',
     'surface-raised',
+    'surface-sunken',
     'bg-hover',
     'bg-interactive',
   ].map(L);
-  // Every ground text sits on: the three surfaces, and the row states §4 lists.
+  // Every ground text sits on: the four surfaces, and the row states §4 lists. The sunken
+  // surface (§3, 2026-11-12) is the frame beside the page, AppShell's pinned sidebar: in light
+  // mode it is the paper, a step under the page, so every ratio is lowest there. Its row states
+  // are gated too, because anything a page holds can be put in a sidebar.
   const GROUNDS = {
     canvas: [canvas],
     surface: [surface],
     raised: [raised],
+    sunken: [sunken],
     'row hover': [canvas, hover],
     'row selected': [canvas, selected],
     'selected + hover': [canvas, selected, hover],
     'popup row hover': [raised, hover],
+    'sunken row hover': [sunken, hover],
+    'sunken row selected': [sunken, selected],
+    'sunken selected + hover': [sunken, selected, hover],
   };
-  const SURFACES = ['canvas', 'surface', 'raised'];
+  const SURFACES = ['canvas', 'surface', 'raised', 'sunken'];
 
   const results = [];
   const check = (token, ref, ground, ratio, min) => {
@@ -151,6 +159,7 @@ for (const [mode, decls] of Object.entries(MODES)) {
       0,
     );
     check(`fill-${role}`, fill.ref, 'canvas', wcagContrast(fill.hex, canvas.hex), 3);
+    check(`fill-${role}`, fill.ref, 'sunken', wcagContrast(fill.hex, sunken.hex), 3);
   }
   // §4 Text selection: the text steps to primary on the highlight, over every ground, tints included.
   const selection = L('bg-selection');
