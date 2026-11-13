@@ -4,9 +4,12 @@
  * page ground. Three layers, each a change in lightness only: tooth, formation
  * clouds and a wire mesh.
  *
- * The ground is `ledger-50`, read from docs/palette.json, the generated
- * palette: no colour is typed here. Run it when the palette's paper or a value
- * below changes, then run the site's tests, which measure the result:
+ * The ground is the light canvas, `ledger-25`, read from docs/palette.json, the
+ * generated palette: no colour is typed here. It was `ledger-50` until
+ * 2026-11-12, when the library's page became the warm white (design-system.md
+ * §3) and the owner had the site's paper follow it. Run this when the canvas's
+ * step or a value below changes, then run the site's tests, which measure the
+ * result:
  *
  *   node apps/site/scripts/paper-tile.mjs
  *
@@ -53,7 +56,9 @@ const paper = {
 const tile = 426;
 
 const root = new URL('../../../', import.meta.url);
-const hex = JSON.parse(readFileSync(new URL('docs/palette.json', root), 'utf8')).paper50;
+// The step theme.css gives --tui-canvas in light mode. tests/paper.spec.ts compares
+// the tile's mean with the body's colour, so a canvas that moves again fails there.
+const hex = JSON.parse(readFileSync(new URL('docs/palette.json', root), 'utf8')).ramps.ledger['25'].hex;
 const ground = [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16));
 const out = new URL('apps/site/src/paper/', root);
 
