@@ -144,6 +144,10 @@ export type AppBarNavItemProps = React.ComponentProps<'a'> & {
  * Active state carries three signals: `aria-current="page"` for assistive
  * technology, `data-active` for styling, and weight plus colour for sighted
  * users. It survives grayscale, and no hue is spent on it.
+ *
+ * The weight moves nothing (§8.5, 2026-11-13). A text label reserves the width
+ * of its 600 form at rest, through `ReservedLabel`, so the items beside it stay
+ * put when the active page changes.
  */
 function AppBarNavItem({ className, active = false, render, children, ...props }: AppBarNavItemProps) {
   const linkClassName = cn(
@@ -169,13 +173,36 @@ function AppBarNavItem({ className, active = false, render, children, ...props }
   return (
     <li className="shrink-0">
       {isValidElement(render) ? (
-        cloneElement(render, { ...linkProps, className: cn(linkClassName, render.props.className) }, children)
+        cloneElement(
+          render,
+          { ...linkProps, className: cn(linkClassName, render.props.className) },
+          <ReservedLabel>{children}</ReservedLabel>,
+        )
       ) : (
         <a className={linkClassName} {...linkProps}>
-          {children}
+          <ReservedLabel>{children}</ReservedLabel>
         </a>
       )}
     </li>
+  );
+}
+
+/**
+ * A text label as wide as its 600 form, whatever its weight (§8.5). The label
+ * and a hidden copy at 600 stack in one column: the copy has no height and no
+ * accessible text (`content: … / ''`), so the label sets the height, the wider
+ * of the two sets the width, and nothing is read or copied twice. A label that
+ * is not a plain string renders as it is.
+ */
+function ReservedLabel({ children }: { children: React.ReactNode }) {
+  if (typeof children !== 'string') return children;
+  return (
+    <span
+      data-label={children}
+      className="inline-flex flex-col after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)_/_'']"
+    >
+      {children}
+    </span>
   );
 }
 

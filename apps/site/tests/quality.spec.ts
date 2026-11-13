@@ -154,7 +154,7 @@ test.describe('fonts', () => {
       .locator('link[rel="preload"][as="font"]')
       .evaluateAll((links) => links.map((l) => new URL((l as HTMLLinkElement).href).pathname));
     expect(preloads).toHaveLength(2);
-    expect(preloads[0]).toMatch(/\/instrument-sans-latin-wght-normal-[\w-]+\.woff2$/);
+    expect(preloads[0]).toMatch(/\/golos-text-latin-wght-normal-[\w-]+\.woff2$/);
     expect(preloads[1]).toMatch(/\/tabular-serif-600-[\w-]+\.woff2$/);
     for (const href of preloads)
       expect(

@@ -238,7 +238,7 @@ writeFileSync(
    src/index.css, without its @import 'tailwindcss': import this AFTER Tailwind in the app's own
    stylesheet. */\n${indexCss.slice(tailwindImport.length)}`,
 );
-const styleFiles = ['theme.css', 'palette.css', 'shadcn.css'].map((f) => join(src, 'styles', f));
+const styleFiles = ['theme.css', 'palette.css', 'shadcn.css', 'figures.css'].map((f) => join(src, 'styles', f));
 const cssDeps = [...indexCss.matchAll(/@import '([^.'][^']*)'/g)].map((m) => packageName(m[1]));
 items.unshift({
   name: 'tokens',

@@ -202,8 +202,8 @@ test('in a squeezed table, labels sit on their figures and a sort resizes no col
  */
 const readCells = (page: Page) =>
   page.evaluate(async () => {
-    await document.fonts.load('400 13px "Instrument Sans Variable"', '0');
-    await document.fonts.load('500 10px "Instrument Sans Variable"', 'A');
+    await document.fonts.load('400 13px "Golos Text Variable"', '0');
+    await document.fonts.load('500 10px "Golos Text Variable"', 'A');
     await document.fonts.ready;
     const table = document.querySelector('#storybook-root table')!;
     const scroller = table.parentElement!;
@@ -275,7 +275,7 @@ test('text gives way first, and past that the table scrolls sideways', async ({ 
 /**
  * A text column's floor (owner, 2026-11-03). `max-w-0` let a column fall to its
  * header's width, so at 420 every row read `fct_g…` and scrolling sideways didn't
- * help. A cap lets text count toward its column up to about 168px: 21ch in a
+ * help. A cap lets text count toward its column up to about 156–185px: 21ch in a
  * sans cell, 28ch in a mono one, since `ch` is each cell's own zero (§8.3). It
  * follows the text
  * below that, and stops there. The figures must stay in the first view, which is
@@ -284,7 +284,7 @@ test('text gives way first, and past that the table scrolls sideways', async ({ 
 const readTextColumns = (page: Page) =>
   page.evaluate(async () => {
     await document.fonts.load('400 11px "IBM Plex Mono"', '0');
-    await document.fonts.load('400 13px "Instrument Sans Variable"', '0');
+    await document.fonts.load('400 13px "Golos Text Variable"', '0');
     await document.fonts.ready;
     const table = document.querySelector('#storybook-root table')!;
     const scroller = table.parentElement!;
@@ -317,7 +317,7 @@ const readTextColumns = (page: Page) =>
               return range.getBoundingClientRect().right;
             }),
           ),
-          // 28ch in a mono cell, 21ch in the sans: about 168px of text either way (§8.3).
+          // 28ch in a mono cell (185px), 21ch in the sans (156px in Golos Text) (§8.3).
           floor: (cells[0].classList.contains('font-mono') ? 28 : 21) * zero.measureText('0').width,
           padding: parseFloat(style.paddingLeft) + parseFloat(style.paddingRight),
           widest,
@@ -650,7 +650,10 @@ test('the serif appears only at the metric tier and in headings', async ({ page 
  * entry point ships wght-only files, which leaves font-optical-sizing with
  * nothing to drive. All three render without an error.
  */
-const VARIABLE_FAMILIES = ['Instrument Sans Variable', 'Source Serif 4 Variable'];
+const VARIABLE_FAMILIES = ['Golos Text Variable', 'Source Serif 4 Variable'];
+// Golos Text has no italic (§8.3): an italic in the sans is the roman slanted,
+// by decision (owner, 2026-11-13).
+const ITALIC_FAMILIES = ['Source Serif 4 Variable'];
 const MONO_FACES = ['400', '500', '600'].flatMap((w) => [`${w} normal`, `${w} italic`]);
 
 test('fonts load under their registered names, and the serif carries opsz', async ({ page }) => {
@@ -690,12 +693,10 @@ test('fonts load under their registered names, and the serif carries opsz', asyn
     },
     { families: VARIABLE_FAMILIES, monoFaces: MONO_FACES },
   );
-  for (const f of VARIABLE_FAMILIES) {
-    expect(result.loaded, `${f} roman`).toContain(`${f} normal`);
-    expect(result.loaded, `${f} italic`).toContain(`${f} italic`);
-  }
+  for (const f of VARIABLE_FAMILIES) expect(result.loaded, `${f} roman`).toContain(`${f} normal`);
+  for (const f of ITALIC_FAMILIES) expect(result.loaded, `${f} italic`).toContain(`${f} italic`);
   for (const face of MONO_FACES) expect(result.mono, `IBM Plex Mono ${face}`).toContain(face);
-  expect(result.body.startsWith('"Instrument Sans Variable"'), result.body).toBe(true);
+  expect(result.body.startsWith('"Golos Text Variable"'), result.body).toBe(true);
   // 288 against 232px when the axis is present; equal when it is not.
   expect(result.opszSmall - result.opszLarge, 'opsz 8 and 60 render the same width').toBeGreaterThan(20);
 });

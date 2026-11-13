@@ -47,7 +47,14 @@ export function SiteNav() {
         'text-text-secondary data-[active]:font-semibold data-[active]:text-text-primary',
       )}
     >
-      {page.label}
+      {/* As wide as its 600 form at rest, so the current page's weight moves no
+          other link (§8.5): a hidden copy at 600, with no height and no text. */}
+      <span
+        data-label={page.label}
+        className="inline-flex flex-col after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)_/_'']"
+      >
+        {page.label}
+      </span>
     </a>
   );
 

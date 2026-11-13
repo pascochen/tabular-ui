@@ -26,7 +26,7 @@ export default defineConfig({
       closeBundle() {
         mkdirSync(path.join(dirname, 'dist/styles'), { recursive: true });
         cpSync(path.join(dirname, 'src/index.css'), path.join(dirname, 'dist/index.css'));
-        for (const file of ['theme.css', 'palette.css', 'shadcn.css']) {
+        for (const file of ['theme.css', 'palette.css', 'shadcn.css', 'figures.css']) {
           cpSync(path.join(dirname, 'src/styles', file), path.join(dirname, 'dist/styles', file));
         }
       },

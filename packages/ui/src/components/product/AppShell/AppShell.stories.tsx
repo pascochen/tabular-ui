@@ -295,11 +295,11 @@ function AnalysisPage() {
         {/*
           Prose sets its own measure. The shell's --w-content column (§7.9)
           caps the page on a wide monitor, not the line length.
-          45ch for about 68 characters a line: a `ch` is the width of "0"
-          (8.66px in Instrument Sans at 13px) and the average character in
-          prose is ~5.8px, so N characters take about 0.67×N ch (§8.3).
+          52ch for about 68 characters a line: a `ch` is the width of "0"
+          (8.06px in Golos Text at 13px) and the average character in
+          prose is ~6.2px, so N characters take about 0.77×N ch (§8.3).
         */}
-        <div className="flex max-w-[45ch] flex-col gap-[var(--gap-section)] pt-[var(--gap-section)]">
+        <div className="flex max-w-[52ch] flex-col gap-[var(--gap-section)] pt-[var(--gap-section)]">
           <section className="flex flex-col gap-[var(--gap-bonded)]">
             <div className="flex items-center justify-between gap-[var(--gap-inline)]">
               <h2 className="text-md font-semibold text-text-primary">Summary</h2>
