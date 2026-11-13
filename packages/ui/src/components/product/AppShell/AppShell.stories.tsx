@@ -648,7 +648,7 @@ function AccountantAccountFooter() {
  * Agents are named role word + "AI" (`docs/agent-voice.md` rule 1), so each
  * name says it's an agent and no `agent` badge is needed beside it.
  */
-const accountingAgents = ['Ledger AI', 'Margin AI', 'Till AI', 'Lever AI'];
+const accountingAgents = ['Revenue AI', 'Payments AI', 'Approvals AI', 'Credit AI'];
 const accountingChannels = ['close', 'payables'];
 /**
  * Colleagues only: the signed-in user (Daisuke) never appears as a direct
