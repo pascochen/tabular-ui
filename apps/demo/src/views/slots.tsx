@@ -12,7 +12,7 @@ import { ChannelView } from './Channel';
 import { NewChatView } from './NewChat';
 import { SearchView } from './Search';
 import { SourcesView } from './Sources';
-import { TaskPanel, TasksView } from './Tasks';
+import { NoTaskPanel, TaskPanel, TasksView } from './Tasks';
 
 /**
  * What one view puts in the shell's slots: the page header, the main body and,
@@ -42,8 +42,8 @@ export function slotsFor(view: View): ViewSlots {
         label: 'Task',
         content: (
           <>
-            <AppShellPanelHeader title={task.title} />
-            <TaskPanel task={task} />
+            <AppShellPanelHeader title={task ? task.title : 'Task'} />
+            {task ? <TaskPanel task={task} /> : <NoTaskPanel />}
           </>
         ),
       },

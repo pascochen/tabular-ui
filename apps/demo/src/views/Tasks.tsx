@@ -11,7 +11,7 @@ import { hrefFor, navigate, onViewLinkClick, useView, type View } from '../lib/v
 
 const taskView = (e: Exception): View => ({ kind: 'tasks', task: e.id });
 
-function useSelectedTask(): Exception {
+function useSelectedTask(): Exception | undefined {
   const view = useView();
   return selectedTask(view.kind === 'tasks' ? view.task : undefined);
 }
@@ -71,7 +71,7 @@ function TaskCell({ task }: { task: Exception }) {
   const { state } = useClose();
   const openPanel = usePanelSheet();
   const view = taskView(task);
-  const selected = useSelectedTask().id === task.id;
+  const selected = useSelectedTask()?.id === task.id;
   const next = nextStep(state, task);
   const notChecked = notCheckedWith(state, docsOf(task), task.notChecked).length;
   return (
@@ -121,7 +121,7 @@ function Heading({ children }: { children: string }) {
 export function TasksView() {
   const { state } = useClose();
   const openPanel = usePanelSheet();
-  const selected = useSelectedTask().id;
+  const selected = useSelectedTask()?.id;
 
   return (
     <div className="flex flex-col gap-[var(--gap-section)]">
@@ -241,6 +241,15 @@ export function TaskPanel({ task }: { task: Exception }) {
       >
         {step === 'needs-answer' ? 'Answer' : step === 'needs-confirmation' ? 'Review' : 'Open'} in #{task.channel}
       </a>
+    </AppShellPanelBody>
+  );
+}
+
+/** The panel for a link whose task doesn't exist: it says so, and no row is selected. */
+export function NoTaskPanel() {
+  return (
+    <AppShellPanelBody>
+      <p className="text-sm text-text-secondary">No task matches this link. Select one from the list.</p>
     </AppShellPanelBody>
   );
 }
