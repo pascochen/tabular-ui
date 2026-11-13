@@ -64,8 +64,10 @@ test('every tabular digit in the sans is one width, at 400, 500 and 600', async 
   for (const { weight, widths } of result.digits) {
     for (const w of widths) expect(w, `a digit at ${weight}`).toBeCloseTo(widths[0], 2);
   }
-  // Tabular `0` is 0.620em at 400: the patch takes the widest digit, it never narrows one.
-  expect(result.digits[0].widths[0]).toBeCloseTo(6 * 0.62 * 32, 0);
+  // Tabular `0` is 0.620em at 400, 19.84px at 32px: the patch takes the widest
+  // digit, it never narrows one. Per digit, within half a pixel: FreeType's
+  // hinting on CI's Linux rounds each advance to 20px, where macOS keeps 19.84.
+  expect(result.digits[0].widths[0] / 6).toBeCloseTo(0.62 * 32, 0);
   expect(result.proportional[0], 'proportional figures are unpatched').toBeLessThan(result.proportional[1] - 10);
   for (const w of result.amounts) expect(w, 'amounts of equal length share a width').toBeCloseTo(result.amounts[0], 2);
 });
