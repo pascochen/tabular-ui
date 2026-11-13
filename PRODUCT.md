@@ -12,7 +12,7 @@ Two audiences, in this order.
 
 **Builders.** Designers and engineers making software where an AI agent does work a person has to sign off on: finance, data, operations. They install components through the shadcn registry and read the docs and Storybook to decide whether the library fits. They know React, Tailwind and shadcn. They judge a component by its edge cases: the failed tool call, the file still uploading, the question nobody answered.
 
-**Reviewers.** The people those apps serve: experts checking agent output before it reaches a ledger, a report or a customer. In the demo, that's Kasane's Head of FP&A. They read fast, know the domain better than the agent, and answer for what they approve. The agent components exist to make their review faster and their approval deserved.
+**Reviewers.** The people those apps serve: experts checking agent output before it reaches a ledger, a report or a customer. In the demo, that's Kasane's Group Controller. They read fast, know the domain better than the agent, and answer for what they approve. The agent components exist to make their review faster and their approval deserved.
 
 ## Product Purpose
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { usedBy } from '../../demo/src/lib/kasane';
+import { selectedTask, usedBy } from '../../demo/src/lib/kasane';
 import {
   BUILT_CHANNELS,
   DEFAULT_VIEW,
@@ -113,4 +113,12 @@ test('a document says which findings use it', () => {
   expect(ids('supplier-payments')).toEqual(['duplicate-payment']);
   // An agent reads the close calendar, and no finding rests on it.
   expect(ids('close-calendar')).toEqual([]);
+});
+
+test('Tasks selects the first task when none is chosen, and nothing for an id that matches none', () => {
+  expect(selectedTask()?.id).toBe('revenue-cut-off');
+  expect(selectedTask('credit-limit')?.id).toBe('credit-limit');
+  // A fallback to the first task would say the link chose it.
+  expect(selectedTask('no-such-task')).toBeUndefined();
+  expect(selectedTask('')).toBeUndefined();
 });

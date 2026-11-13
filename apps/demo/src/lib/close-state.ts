@@ -331,3 +331,64 @@ export function isReopened(state: CloseState): boolean {
 export function isTiedOut(state: CloseState, id: string): boolean {
   return state.checks[id] === checks.find((x) => x.id === id)!.after;
 }
+
+// ---------------------------------------------------------------------------
+// Tasks: whose move each finding is (docs/reviews/tasks-2026-11-12.md)
+// ---------------------------------------------------------------------------
+
+/**
+ * Where a finding stands, as Tasks shows it. `open` alone covered five of
+ * these: the question unanswered, the agent reading, the proposal waiting, the
+ * check rerunning and the question skipped.
+ */
+export type TaskStep =
+  'needs-answer' | 'agent-reading' | 'needs-confirmation' | 'rerunning' | 'skipped' | 'open' | 'waiting' | 'resolved';
+
+export function taskStep(state: CloseState, id: string): TaskStep {
+  const status = state.exceptions[id as ExceptionId].status;
+  if (status !== 'open') return status;
+  if (id !== HERO) return 'open';
+  const round = current(state);
+  if (!round.answer) return 'needs-answer';
+  switch (round.stage) {
+    case 'reading':
+      return 'agent-reading';
+    case 'proposed':
+      return 'needs-confirmation';
+    case 'rerunning':
+      return 'rerunning';
+    case 'skipped':
+      return 'skipped';
+    default:
+      return 'open';
+  }
+}
+
+/** The proposal waiting for the visitor's confirmation: the entry for a reopen, the auditors' list otherwise. */
+export function heroProposal(state: CloseState) {
+  return current(state).answer === 'reopen' ? close.hero.entry : close.hero.record;
+}
+
+/** The decision log's line for a settled finding, or undefined while it's unsettled. */
+export function settledBy(state: CloseState, id: string): LogEntry | undefined {
+  return state.log.findLast((l) => l.exception === id);
+}
+
+/**
+ * Tasks' heading: every unsettled state, counted. "Nothing open." alone sat
+ * over a finding still waiting on Legal. Open is the sidebar's count, and
+ * what needs the visitor is part of it, not added to it.
+ */
+export function tasksSummary(state: CloseState): string {
+  const steps = exceptions.map((e) => taskStep(state, e.id));
+  const count = (step: TaskStep) => steps.filter((s) => s === step).length;
+  const open = openCount(state);
+  const parts = [open ? `${open} open.` : 'Nothing open.'];
+  const answer = count('needs-answer');
+  const confirmation = count('needs-confirmation');
+  const waiting = count('waiting');
+  if (answer) parts.push(`${answer} ${answer === 1 ? 'needs' : 'need'} your answer.`);
+  if (confirmation) parts.push(`${confirmation} ${confirmation === 1 ? 'needs' : 'need'} your confirmation.`);
+  if (waiting) parts.push(`${waiting} waiting.`);
+  return parts.join(' ');
+}

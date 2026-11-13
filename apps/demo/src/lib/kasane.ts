@@ -40,8 +40,13 @@ export type Exception = Omit<(typeof close.exceptions)[number], 'channel'> & { c
 /** The findings, the hero first. Each is a task, raised by one agent, and sits in one channel. */
 export const exceptions = close.exceptions as Exception[];
 
-/** The task Tasks' panel shows. Nothing chosen, or a task that doesn't exist: the hero, which is first. */
-export const selectedTask = (id?: string): Exception => exceptions.find((e) => e.id === id) ?? exceptions[0];
+/**
+ * The task Tasks' panel shows. Nothing chosen: the hero, which is first. An id
+ * that matches no task selects nothing: showing the hero for it would say the
+ * link chose a task it didn't.
+ */
+export const selectedTask = (id?: string): Exception | undefined =>
+  id === undefined ? exceptions[0] : exceptions.find((e) => e.id === id);
 
 /** The agents are members like any other, each keyed by its role: `cutoff-ai`… */
 export const agents = close.agents;
