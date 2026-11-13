@@ -42,6 +42,7 @@ from pathlib import Path
 import fontTools
 from fontTools import subset
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.tables._g_l_y_f import USE_MY_METRICS
 
 repo = Path(__file__).resolve().parents[3]
 package = repo / "packages/ui/node_modules/@fontsource-variable/golos-text"
@@ -99,6 +100,13 @@ def equalize(font: TTFont) -> dict:
         if glyph.isComposite():
             for component in glyph.components:
                 component.x += round(shift)
+                # Most .tf digits are one component, the proportional digit,
+                # flagged USE_MY_METRICS: take the component's advance, not
+                # this glyph's. FreeType honours the flag, so Chromium on
+                # Linux drew the proportional widths and CI caught it
+                # (2026-11-13); macOS reads hmtx and showed nothing. Cleared,
+                # the glyph's own advance below is the one every renderer uses.
+                component.flags &= ~USE_MY_METRICS
         else:
             glyph.coordinates.translate((round(shift), 0))
         glyph.recalcBounds(glyf)
