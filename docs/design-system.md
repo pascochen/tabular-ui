@@ -934,7 +934,14 @@ Added 2026-08-23 with `AttachmentRow`'s upload target, the first and so far only
 --w-sidebar     240px    AppShell's sidebar, and any popup sized to match it
 --w-panel       440px    AppShell's trailing panel (the chat drawer)
 --w-content    1280px    main's content column, gutters included, centred
+--w-sidebar-min 224px    the narrowest a person can drag the sidebar
+--w-sidebar-max 360px    the widest
+--w-panel-min   360px    the narrowest a person can drag the panel
+--w-panel-max   640px    the widest
+--w-main-min    600px    what a resize always leaves <main>
 ```
+
+The last five are the resize range, below (2026-11-13). `--w-sidebar` and `--w-panel` are the defaults within it.
 
 Widths are not density tokens and carry no cap. They exist because the same number was written in more than one place: the sidebar's `w-60` and the context switcher popup's `max-w-60` were one decision held in two literals. 440px comes from the shell sketch (about 440 at 1440 wide). At the 1280px floor with both sides open, main keeps 600px.
 
@@ -946,7 +953,7 @@ Widths are not density tokens and carry no cap. They exist because the same numb
 
 `--w-*` is the width counterpart of `--h-*`, but `tui/dimension-caps` does not check it, because nothing in this product caps a region's width. Added 2026-10-07 from the shell design audit.
 
-#### Resizing the sidebar and the panel — proposed 2026-11-13, awaiting the owner
+#### Resizing the sidebar and the panel — decided 2026-11-13 (owner)
 
 The owner asked (2026-11-13) for people to set the sidebar's and the panel's widths by dragging the edge they share with main. `--w-sidebar` and `--w-panel` stay the defaults. Each side gets a range, and main gets a floor:
 
@@ -976,7 +983,7 @@ main             600px   —                    none
 
 **Main's floor is the figure this section already guarantees.** At the 1280px floor with both sides at their defaults, main keeps 600px (above). A resize never takes it below that. There is no maximum: on a contained page `--w-content` still centres the column.
 
-**Each handle clamps live** to `min(its max, viewport − the other side's width − 600)`. At 1280 with both sides open, neither side can grow until the other shrinks: they trade width, and main stays at 600. At 1440 the sidebar reaches its 360 max and the panel 600 (the main floor binds before 640). **Below the 1280px floor** with both sides open, the clamp can fall under a side's minimum. The minimum wins, the handle can only shrink its side, and main gets what is left, as it already does (344px at 1024).
+**Each handle clamps live** to `min(its max, viewport − the other side's width − 600)`. At 1280 with both sides open, neither side can grow until the other shrinks: they trade width, and main stays at 600. At 1440 the sidebar reaches its 360 max and the panel 600 (the main floor binds before 640). **Below the 1280px floor** with both sides open, the clamp falls under the sides' minimums. The minimums win: each side sits at its minimum, its handle can't move, and main gets what is left. At 1024 that is 440px, where the defaults left it 344 before this section. With the sidebar collapsed, the panel narrows to leave main its 600px, down to its minimum: 424px at 1024. *(Corrected 2026-11-13, while building: the approved text said the handle could still shrink its side and main kept 344px, which a side at its minimum can't do. The defaults are clamped like any other width.)*
 
 **When the window shrinks under stored widths, the sidebar yields first.** The panel takes `min(its stored width, viewport − sidebar min − 600)`, then the sidebar takes what is left, down to its minimum. The measurements say why: at 224px the sidebar loses nothing, and at 360 the panel's captions already wrap. Opening the panel at 1280 therefore narrows a widened sidebar back toward 240, not the panel. A clamp never rewrites a stored width: the widths come back when the window does. Only a drag or a key stores one.
 
@@ -1001,11 +1008,11 @@ Double-click resets to the default too. Up and Down do nothing: the pattern make
 
 **Where there is no handle:** on the collapsed sidebar (there is no rule), on the peek (an overlay: it shows at the stored width, clamped to the sidebar's range, but resizing a preview that closes when the pointer leaves it is a trap), and on any panel an app renders outside the shell, such as the demo's under-1024px sheet.
 
-**Dragging past the minimum does not collapse the sidebar.** The toggle stays the one way to collapse it. Collapsing moves the toggle and its focus (`AppShell` README) and reflows the breadcrumb, which a drag that overshoots should not do, and the keyboard has no matching move. *Open: the owner's call.*
+**Dragging past the minimum does not collapse the sidebar.** The toggle stays the one way to collapse it. Collapsing moves the toggle and its focus (`AppShell` README) and reflows the breadcrumb, which a drag that overshoots should not do, and the keyboard has no matching move.
 
 **Widths persist per person** in `localStorage`, under the key `AppShell`'s `widthStorageKey` names (`tui-app-shell-widths` by default, `null` to not remember), as `useTheme`'s `storageKey` does. The stored value is what the person set, before any clamp.
 
-**Tokens — proposed, not declared.** The five limits are one decision held in `AppShell`, and its stories, tests and README read them. Declared beside the defaults, the whole range sits in one place, and the component reads every value at runtime rather than restating it (failure log):
+**The limits are tokens,** declared beside the defaults so the whole range sits in one place. `AppShell` reads every value at runtime rather than restating it (failure log), and so do its tests:
 
 ```
 --w-sidebar-min   224px
@@ -1015,7 +1022,7 @@ Double-click resets to the default too. Up and Down do nothing: the pattern make
 --w-main-min      600px
 ```
 
-The alternative is five constants in `AppShell`, with this section as their record. *Open: the owner's call. Nothing is added to `theme.css` until it is approved.*
+Five constants in `AppShell` were the alternative, with this section as their record. Approved as written by the owner on 2026-11-13, with the proposal's numbers, the sidebar yielding first, and no collapse on a drag past the minimum.
 
 ---
 

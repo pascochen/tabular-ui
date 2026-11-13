@@ -4,7 +4,10 @@ import { useSyncExternalStore } from 'react';
 // does for a smaller screen: enough to follow the story on a phone, not a phone
 // layout. Tailwind's stock lg and sm.
 
-/** Under this, main beside the 440px panel is under 584px, and narrower than a phone from 815px (`shell/PanelSheet.tsx`). */
+/**
+ * Under this the panel is a sheet (`shell/PanelSheet.tsx`). Docked, AppShell would narrow it toward its
+ * 360px minimum to keep main at 600px (§7.9), and main would be narrower than a phone from 735px.
+ */
 const noRoomForPanelQuery = '(width < 64rem)';
 /** Under this, the decision may land under the composer (`decision-in-view.ts`). */
 const phoneQuery = '(width < 40rem)';

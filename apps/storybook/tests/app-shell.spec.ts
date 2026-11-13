@@ -1,6 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { contrastRatio, focusRingStyle, gotoStory, injectAxe, ringOverhang, tabTo, token } from './helpers';
+import {
+  contrastRatio,
+  focusRingStyle,
+  gotoStory,
+  injectAxe,
+  ringOverhang,
+  rgba,
+  tabTo,
+  token,
+  tokenPx,
+} from './helpers';
 
 /**
  * AppShell's behaviour is a function of viewport width, so it is tested here
@@ -430,8 +440,12 @@ test.describe('below the 1280px floor', () => {
     await navToggle(page).click();
     await expect(dockedSidebar(page)).toHaveAttribute('data-state', 'pinned');
     await expect(page.getByRole('dialog')).toHaveCount(0);
-    expect((await box(page, 'app-shell-sidebar')).left).toBe(0);
-    expect((await box(page, 'app-shell-top-nav')).left).toBe(240);
+    const sidebar = await box(page, 'app-shell-sidebar');
+    expect(sidebar.left).toBe(0);
+    // Docked beside the open panel, it sits at its minimum to keep main its
+    // floor (§7.9), and the top nav starts on its rule.
+    expect(sidebar.width).toBe(await tokenPx(page, '--w-sidebar-min'));
+    expect((await box(page, 'app-shell-top-nav')).left).toBe(sidebar.width);
   });
 
   test('hover peeks below the floor too', async ({ page }) => {
@@ -668,5 +682,379 @@ test.describe('grounds — the page and the frame', () => {
     const canvas = await token(page, '--color-canvas');
     for (const slot of ['app-shell-sidebar', 'app-shell', 'app-bar', 'app-shell-panel'])
       await same(page, await ground(page, slot), canvas, slot);
+  });
+});
+
+/**
+ * §7.9 "Resizing the sidebar and the panel". Every limit is read from its
+ * token, never restated (failure log). The handle is a WAI-ARIA window
+ * splitter, so every key it promises is pressed here.
+ */
+test.describe('resizing — §7.9', () => {
+  const sidebarHandle = (page: Page) => page.locator('[data-slot="app-shell-sidebar-resize"]');
+  const panelHandle = (page: Page) => page.locator('[data-slot="app-shell-panel-resize"]');
+
+  async function limits(page: Page) {
+    const px = (name: string) => tokenPx(page, name);
+    return {
+      sidebar: { min: await px('--w-sidebar-min'), def: await px('--w-sidebar'), max: await px('--w-sidebar-max') },
+      panel: { min: await px('--w-panel-min'), def: await px('--w-panel'), max: await px('--w-panel-max') },
+      mainMin: await px('--w-main-min'),
+    };
+  }
+
+  const widths = async (page: Page) => ({
+    sidebar: (await box(page, 'app-shell-sidebar')).width,
+    panel: (await box(page, 'app-shell-panel')).width,
+    main: (await box(page, 'app-shell-main')).width,
+  });
+
+  const valueOf = async (handle: ReturnType<typeof sidebarHandle>) => ({
+    now: Number(await handle.getAttribute('aria-valuenow')),
+    min: Number(await handle.getAttribute('aria-valuemin')),
+    max: Number(await handle.getAttribute('aria-valuemax')),
+  });
+
+  /** A real drag: press on the strip, move in steps, release. */
+  async function drag(page: Page, handle: ReturnType<typeof sidebarHandle>, dx: number) {
+    const b = (await handle.boundingBox())!;
+    const x = b.x + b.width / 2;
+    const y = b.y + b.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + dx, y, { steps: 8 });
+    await page.mouse.up();
+  }
+
+  test.describe('at the sketch width', () => {
+    test.use({ viewport: SKETCH });
+
+    test('each handle is its rule plus 7px to the right, full height, and the separator its region names', async ({
+      page,
+    }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const sidebar = await box(page, 'app-shell-sidebar');
+      const panelBox = await box(page, 'app-shell-panel');
+      const s = (await sidebarHandle(page).boundingBox())!;
+      const p = (await panelHandle(page).boundingBox())!;
+      // The sidebar's rule is its last pixel column; the panel's its first.
+      expect(s).toMatchObject({ x: sidebar.left + sidebar.width - 1, width: 8, y: 0, height: SKETCH.height });
+      expect(p).toMatchObject({ x: panelBox.left, width: 8, y: panelBox.top, height: panelBox.height });
+
+      for (const [handle, region] of [
+        [sidebarHandle(page), page.getByRole('region', { name: 'Sidebar' })],
+        [panelHandle(page), page.getByRole('complementary', { name: 'Chat' })],
+      ] as const) {
+        await expect(handle).toHaveAttribute('role', 'separator');
+        await expect(handle).toHaveAttribute('aria-orientation', 'vertical');
+        await expect(handle).toHaveAttribute('tabindex', '0');
+        await expect(handle).toHaveAttribute('aria-controls', (await region.getAttribute('id'))!);
+      }
+      // Nothing covers the strip, the top nav included: the topmost element
+      // at every pixel of it, top band and body, is the handle.
+      for (const [handle, b] of [
+        [sidebarHandle(page), s],
+        [panelHandle(page), p],
+      ] as const) {
+        const slot = await handle.getAttribute('data-slot');
+        for (const y of [b.y + 10, b.y + b.height / 2])
+          for (let x = b.x; x < b.x + b.width; x++)
+            expect(
+              await page.evaluate(
+                ([px, py]) => document.elementFromPoint(px, py)?.getAttribute('data-slot'),
+                [x + 0.5, y],
+              ),
+              `${slot} at ${x},${y}`,
+            ).toBe(slot);
+      }
+      await expect(page.getByRole('separator', { name: 'Resize sidebar' })).toHaveCount(1);
+      await expect(page.getByRole('separator', { name: 'Resize panel' })).toHaveCount(1);
+    });
+
+    test('dragging the sidebar rule right widens it, and main gives the width', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      const before = await widths(page);
+      expect(before.sidebar).toBe(l.sidebar.def);
+      await drag(page, sidebarHandle(page), 60);
+      const after = await widths(page);
+      expect(after.sidebar).toBe(l.sidebar.def + 60);
+      expect(after.main).toBe(before.main - 60);
+      expect(after.panel).toBe(before.panel);
+      expect((await valueOf(sidebarHandle(page))).now).toBe(l.sidebar.def + 60);
+    });
+
+    test('dragging the panel rule left widens the panel', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      const before = await widths(page);
+      await drag(page, panelHandle(page), -60);
+      const after = await widths(page);
+      expect(after.panel).toBe(l.panel.def + 60);
+      expect(after.main).toBe(before.main - 60);
+      expect(after.sidebar).toBe(before.sidebar);
+    });
+
+    test('a drag stops at each limit, and main never drops under its floor', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      await drag(page, sidebarHandle(page), -400);
+      expect((await widths(page)).sidebar).toBe(l.sidebar.min);
+      await drag(page, sidebarHandle(page), 600);
+      expect((await widths(page)).sidebar).toBe(l.sidebar.max);
+      // At 1440 the panel's ceiling is main's floor, not --w-panel-max.
+      await drag(page, panelHandle(page), -800);
+      const w = await widths(page);
+      expect(w.panel).toBe(Math.min(l.panel.max, SKETCH.width - w.sidebar - l.mainMin));
+      expect(w.main).toBe(l.mainMin);
+      await drag(page, panelHandle(page), 800);
+      expect((await widths(page)).panel).toBe(l.panel.min);
+    });
+
+    test('a drag holds the resize cursor on the page, selects no text, and lands back where it was', async ({
+      page,
+    }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const b = (await sidebarHandle(page).boundingBox())!;
+      await page.mouse.move(b.x + 4, 300);
+      await page.mouse.down();
+      // Well past the strip, across main's text.
+      await page.mouse.move(b.x + 400, 400, { steps: 8 });
+      expect(await page.evaluate(() => getComputedStyle(document.body).cursor)).toBe('col-resize');
+      expect(await page.evaluate(() => getComputedStyle(document.body).userSelect)).toBe('none');
+      await expect(sidebarHandle(page)).toHaveAttribute('data-dragging', '');
+      await page.mouse.up();
+      await expect(sidebarHandle(page)).not.toHaveAttribute('data-dragging');
+      expect(await page.evaluate(() => String(getSelection()))).toBe('');
+      expect(await page.evaluate(() => document.body.style.cursor)).toBe('');
+    });
+
+    test('every key of the window splitter, on the sidebar', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      const handle = sidebarHandle(page);
+      expect(await tabTo(page, handle)).toBe(true);
+      const now = async () => (await valueOf(handle)).now;
+
+      await page.keyboard.press('ArrowRight');
+      expect(await now()).toBe(l.sidebar.def + 16);
+      await page.keyboard.press('ArrowLeft');
+      await page.keyboard.press('ArrowLeft');
+      expect(await now()).toBe(l.sidebar.def - 16);
+      await page.keyboard.press('Home');
+      expect(await now()).toBe(l.sidebar.min);
+      // Up and Down are optional on a vertical splitter, and do nothing here.
+      await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('ArrowDown');
+      expect(await now()).toBe(l.sidebar.min);
+      await page.keyboard.press('End');
+      expect(await now()).toBe((await valueOf(handle)).max);
+      expect(await now()).toBe(l.sidebar.max);
+      await page.keyboard.press('Enter');
+      expect(await now()).toBe(l.sidebar.def);
+      expect((await widths(page)).sidebar).toBe(l.sidebar.def);
+      await expect(handle).toBeFocused();
+    });
+
+    test('every key of the window splitter, on the panel: left widens it', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      const handle = panelHandle(page);
+      expect(await tabTo(page, handle)).toBe(true);
+      const now = async () => (await valueOf(handle)).now;
+
+      await page.keyboard.press('ArrowLeft');
+      expect(await now()).toBe(l.panel.def + 16);
+      await page.keyboard.press('ArrowRight');
+      await page.keyboard.press('ArrowRight');
+      expect(await now()).toBe(l.panel.def - 16);
+      await page.keyboard.press('Home');
+      expect(await now()).toBe(l.panel.min);
+      await page.keyboard.press('End');
+      const { max } = await valueOf(handle);
+      expect(await now()).toBe(max);
+      expect(max).toBe(Math.min(l.panel.max, SKETCH.width - l.sidebar.def - l.mainMin));
+      await page.keyboard.press('Enter');
+      expect(await now()).toBe(l.panel.def);
+      expect((await widths(page)).panel).toBe(l.panel.def);
+    });
+
+    test('a double-click returns a side to its default', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      await drag(page, sidebarHandle(page), 80);
+      expect((await widths(page)).sidebar).toBe(l.sidebar.def + 80);
+      await sidebarHandle(page).dblclick();
+      expect((await widths(page)).sidebar).toBe(l.sidebar.def);
+    });
+
+    test('widths survive a reload under the story key, and the story key alone holds them', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      await drag(page, sidebarHandle(page), 40);
+      await drag(page, panelHandle(page), -40);
+      expect(JSON.parse((await page.evaluate(() => localStorage.getItem('tui-app-shell-widths-story')))!)).toEqual({
+        sidebar: l.sidebar.def + 40,
+        panel: l.panel.def + 40,
+      });
+      await page.reload();
+      await gotoStory(page, 'product-appshell--resizable');
+      expect(await widths(page)).toMatchObject({ sidebar: l.sidebar.def + 40, panel: l.panel.def + 40 });
+      // Another shell, with its own key, keeps the defaults.
+      await gotoStory(page, 'product-appshell--expanded');
+      expect(await widths(page)).toMatchObject({ sidebar: l.sidebar.def, panel: l.panel.def });
+    });
+
+    test('widthStorageKey={null} remembers nothing', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--expanded');
+      const l = await limits(page);
+      await drag(page, sidebarHandle(page), 40);
+      expect((await widths(page)).sidebar).toBe(l.sidebar.def + 40);
+      expect(await page.evaluate(() => localStorage.length)).toBe(0);
+      await page.reload();
+      await gotoStory(page, 'product-appshell--expanded');
+      expect((await widths(page)).sidebar).toBe(l.sidebar.def);
+    });
+
+    test('no handle on the collapsed sidebar, the peek, or a closed panel', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--collapsed');
+      await expect(sidebarHandle(page)).toHaveCount(0);
+      await navToggle(page).hover();
+      await expect(dockedSidebar(page)).toHaveAttribute('data-state', 'peek');
+      await expect(sidebarHandle(page)).toHaveCount(0);
+      await expect(panelHandle(page)).toHaveCount(1);
+
+      await gotoStory(page, 'product-appshell--chat-closed');
+      await expect(panelHandle(page)).toHaveCount(0);
+      await expect(sidebarHandle(page)).toHaveCount(1);
+    });
+
+    test('the peek shows at the width the person set', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resizable');
+      const l = await limits(page);
+      await drag(page, sidebarHandle(page), 50);
+      await headerToggle(page).click();
+      await navToggle(page).hover();
+      await expect(dockedSidebar(page)).toHaveAttribute('data-state', 'peek');
+      expect((await box(page, 'app-shell-sidebar')).width).toBe(l.sidebar.def + 50);
+    });
+
+    for (const theme of ['dark', 'light'] as const) {
+      test(`${theme}: focus is an outline inside the strip, and hover and drag take the neutral overlay`, async ({
+        page,
+      }) => {
+        await gotoStory(page, 'product-appshell--resizable', theme);
+        const handle = sidebarHandle(page);
+        expect(await tabTo(page, handle)).toBe(true);
+        const ring = (await focusRingStyle(page))!;
+        const ringWidth = `${await tokenPx(page, '--ring-width')}px`;
+        expect(ring).toMatchObject({ outlineStyle: 'solid', outlineWidth: ringWidth, boxShadow: 'none' });
+        expect(ring.outlineOffset).toBe(`-${ringWidth}`);
+        expect(await rgba(page, ring.outlineColor)).toEqual(await rgba(page, await token(page, '--color-ring')));
+
+        const bg = () => handle.evaluate((el) => getComputedStyle(el).backgroundColor);
+        await page.keyboard.press('Tab'); // off the handle, so focus doesn't colour what follows
+        const b = (await handle.boundingBox())!;
+        await page.mouse.move(b.x + 4, 300);
+        await expect
+          .poll(async () => rgba(page, await bg()))
+          .toEqual(await rgba(page, await token(page, '--color-bg-hover')));
+        await page.mouse.down();
+        await page.mouse.move(b.x + 24, 300, { steps: 4 });
+        await expect
+          .poll(async () => rgba(page, await bg()))
+          .toEqual(await rgba(page, await token(page, '--color-bg-active')));
+        await page.mouse.up();
+      });
+    }
+  });
+
+  test.describe('at the 1280px floor', () => {
+    test.use({ viewport: { width: 1280, height: 800 } });
+
+    test('neither side can grow until the other shrinks, and main keeps its floor', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--at-floor');
+      const l = await limits(page);
+      expect(await valueOf(sidebarHandle(page))).toEqual({
+        now: l.sidebar.def,
+        min: l.sidebar.min,
+        max: l.sidebar.def,
+      });
+      expect(await valueOf(panelHandle(page))).toEqual({ now: l.panel.def, min: l.panel.min, max: l.panel.def });
+      await drag(page, sidebarHandle(page), 80);
+      await drag(page, panelHandle(page), -80);
+      expect(await widths(page)).toEqual({ sidebar: l.sidebar.def, panel: l.panel.def, main: l.mainMin });
+
+      // Trade: the sidebar gives up width, and the panel can take it.
+      expect(await tabTo(page, sidebarHandle(page))).toBe(true);
+      await page.keyboard.press('Home');
+      const freed = l.sidebar.def - l.sidebar.min;
+      expect((await valueOf(panelHandle(page))).max).toBe(l.panel.def + freed);
+      expect(await tabTo(page, panelHandle(page))).toBe(true);
+      await page.keyboard.press('End');
+      expect(await widths(page)).toEqual({ sidebar: l.sidebar.min, panel: l.panel.def + freed, main: l.mainMin });
+      // And the sidebar now can't grow back.
+      expect((await valueOf(sidebarHandle(page))).max).toBe(l.sidebar.min);
+    });
+
+    test('both sides at their minimums', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resized-to-minimums');
+      const l = await limits(page);
+      expect(await widths(page)).toEqual({
+        sidebar: l.sidebar.min,
+        panel: l.panel.min,
+        main: 1280 - l.sidebar.min - l.panel.min,
+      });
+    });
+
+    test('stored widths wider than the window: the sidebar yields first, and both come back', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--resized-to-maximums');
+      const l = await limits(page);
+      expect(await widths(page)).toEqual({
+        sidebar: l.sidebar.min,
+        panel: 1280 - l.sidebar.min - l.mainMin,
+        main: l.mainMin,
+      });
+      await page.setViewportSize({ width: 2560, height: 1440 });
+      await expect.poll(async () => (await widths(page)).sidebar).toBe(l.sidebar.max);
+      expect((await widths(page)).panel).toBe(l.panel.max);
+      // Opening the window back out rewrote nothing: the stored values stand.
+      expect(
+        JSON.parse((await page.evaluate(() => localStorage.getItem('tui-app-shell-widths-story-maximums')))!),
+      ).toEqual({ sidebar: Number.MAX_SAFE_INTEGER, panel: Number.MAX_SAFE_INTEGER });
+    });
+  });
+
+  test.describe('below the floor', () => {
+    test.use({ viewport: BELOW_FLOOR });
+
+    test('pinned beside the panel, both sides sit at their minimums and their handles cannot widen', async ({
+      page,
+    }) => {
+      await gotoStory(page, 'product-appshell--expanded');
+      const l = await limits(page);
+      await navToggle(page).click();
+      await expect(dockedSidebar(page)).toHaveAttribute('data-state', 'pinned');
+      expect(await widths(page)).toEqual({
+        sidebar: l.sidebar.min,
+        panel: l.panel.min,
+        main: BELOW_FLOOR.width - l.sidebar.min - l.panel.min,
+      });
+      expect(await valueOf(sidebarHandle(page))).toEqual({
+        now: l.sidebar.min,
+        min: l.sidebar.min,
+        max: l.sidebar.min,
+      });
+      expect(await valueOf(panelHandle(page))).toEqual({ now: l.panel.min, min: l.panel.min, max: l.panel.min });
+    });
+
+    test('collapsed, the panel leaves main its floor', async ({ page }) => {
+      await gotoStory(page, 'product-appshell--expanded');
+      const l = await limits(page);
+      await expect(dockedSidebar(page)).toBeHidden();
+      const panelWidth = (await box(page, 'app-shell-panel')).width;
+      expect(panelWidth).toBe(Math.min(l.panel.def, BELOW_FLOOR.width - l.mainMin));
+      expect((await box(page, 'app-shell-main')).width).toBe(BELOW_FLOOR.width - panelWidth);
+    });
   });
 });
