@@ -2,13 +2,16 @@
 @import 'tw-animate-css';
 /* Source Serif 4 MUST come from the opsz entry points, not the package
    default: the default index.css ships wght-only files, which silently makes
-   font-optical-sizing a no-op. Each family loads its italic file too; without
-   it the browser slants the roman. IBM Plex Mono is static, so it loads one
-   file per weight, the three of §8.5, roman and italic: a weight with no file
-   is synthesized. Each file is fetched only when a page renders it. See
-   design-system.md §8.3 and §8.4. */
-@import '@fontsource-variable/instrument-sans/wght.css';
-@import '@fontsource-variable/instrument-sans/wght-italic.css';
+   font-optical-sizing a no-op. Each family loads its italic file too, where
+   it has one; without it the browser slants the roman. Golos Text has none.
+   Its digits come from figures.css, which MUST follow the package's faces:
+   for a character two faces cover, the one declared last wins, and Golos
+   Text's own tabular digits are not one width. IBM Plex Mono is static, so
+   it loads one file per weight, the three of §8.5, roman and italic: a
+   weight with no file is synthesized. Each file is fetched only when a page
+   renders it. See design-system.md §8.3 and §8.4. */
+@import '@fontsource-variable/golos-text/wght.css';
+@import './styles/figures.css';
 @import '@fontsource-variable/source-serif-4/opsz.css';
 @import '@fontsource-variable/source-serif-4/opsz-italic.css';
 @import '@fontsource/ibm-plex-mono/400.css';
