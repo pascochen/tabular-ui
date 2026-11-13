@@ -1,6 +1,7 @@
-import { AgentBlock, AppShellPanelBody, DataTable, Sources, buttonVariants, cn, type DataTableProps } from 'tabular-ui';
+import { AgentBlock, AppShellPanelBody, DataTable, Sources, cn, type DataTableProps } from 'tabular-ui';
 
 import { TaskStepStatus } from '../components/ExceptionStatus';
+import { ThreadLink } from '../components/ThreadLink';
 import { useClose } from '../lib/close-context';
 import { heroProposal, notCheckedWith, settledBy, taskStep, tasksSummary, type CloseState } from '../lib/close-state';
 import { checks, close, docsOf, exceptions, memberName, selectedTask, type Exception } from '../lib/kasane';
@@ -164,8 +165,6 @@ function Part({ label, children }: { label: string; children: React.ReactNode })
  */
 export function TaskPanel({ task }: { task: Exception }) {
   const { state } = useClose();
-  const channel: View = { kind: 'channel', channel: task.channel };
-  const hash = `#${task.id}`;
   const step = taskStep(state, task.id);
   const { hero } = close;
   const next = nextStep(state, task);
@@ -234,13 +233,7 @@ export function TaskPanel({ task }: { task: Exception }) {
           ) : null}
         </div>
       </AgentBlock>
-      <a
-        className={buttonVariants({ variant: yours ? 'default' : 'outline' })}
-        href={`${hrefFor(channel)}${hash}`}
-        onClick={onViewLinkClick(channel, hash)}
-      >
-        {step === 'needs-answer' ? 'Answer' : step === 'needs-confirmation' ? 'Review' : 'Open'} in #{task.channel}
-      </a>
+      <ThreadLink task={task} />
     </AppShellPanelBody>
   );
 }

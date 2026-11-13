@@ -1,18 +1,25 @@
-import { useEffect, useMemo, type ReactNode } from 'react';
-import { AttachmentRow, DataTable, Switch, cn, type DataTableProps } from 'tabular-ui';
+import { useEffect, useId, useMemo, type ReactNode } from 'react';
+import { AgentBlock, AttachmentRow, DataTable, Switch, cn, type DataTableProps } from 'tabular-ui';
+
+import { ThreadLink } from '../components/ThreadLink';
 
 import { useClose } from '../lib/close-context';
-import { isSourceOn } from '../lib/close-state';
+import { isSourceOn, notCheckedWith } from '../lib/close-state';
 import {
+  docsOf,
   documents,
+  exceptions,
   memberName,
   refOf,
   usedBy,
   type DocumentTable,
   type DocumentText,
+  type Exception,
+  type Ref,
   type SourceDocument,
 } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
+import { restsOnLine, leftOutLine, readersOf, switchEffect } from '../lib/source-facts';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 
 type Row = string[];
@@ -109,7 +116,9 @@ function useRecordInView(selected: boolean) {
     let cancelled = false;
     void document.fonts.ready.then(() => {
       if (cancelled) return;
-      document.querySelector('[data-selected-record]')?.scrollIntoView({ block: 'center' });
+      // Nearest, not centre: the claim sits over the records, and centring a row
+      // that already shows would push the claim off the top.
+      document.querySelector('[data-selected-record]')?.scrollIntoView({ block: 'nearest' });
     });
     return () => {
       cancelled = true;
@@ -122,7 +131,13 @@ const GROUPS = [
   { label: 'Data', holds: (d: SourceDocument) => !!d.table },
 ];
 
+/**
+ * The list says who reads each file and, in words, when it's off: a switch
+ * shown only on the open file is a switch forgotten on the other eight. The
+ * agent's name is an actor label, the one hue on the row (§5).
+ */
 function DocumentList({ selected }: { selected: string }) {
+  const { state } = useClose();
   return (
     <nav aria-label="Sources" className="flex flex-col gap-[var(--gap-group)]">
       {GROUPS.map(({ label, holds }) => {
@@ -154,6 +169,19 @@ function DocumentList({ selected }: { selected: string }) {
                         />
                       }
                     />
+                    <span className="shrink-0 pr-[var(--pad-cell-x)] text-xs text-text-secondary">
+                      <span className="text-text-agent">
+                        {readersOf(d.slug)
+                          .map((a) => a.name)
+                          .join(', ')}
+                      </span>
+                      {isSourceOn(state, d.slug) ? null : (
+                        <>
+                          {' · '}
+                          <span className="font-medium text-text-primary">Off</span>
+                        </>
+                      )}
+                    </span>
                   </li>
                 );
               })}
@@ -188,12 +216,64 @@ function UsedBy({ slug }: { slug: string }) {
   );
 }
 
+/** A part's name inside agent output, as `Sources` labels its lists. */
+function Part({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-[var(--gap-bonded)] px-[var(--pad-cell-x)]">
+      <p className="text-xs font-medium text-text-secondary">{label}</p>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * The finding a reviewer came from, over the records it rests on: a tinted row
+ * says "selected", and only the claim beside it says what it is meant to prove.
+ * The agent's words sit in its `AgentBlock`. Under it, the page's own facts:
+ * how much the finding rests on, what the extract leaves out, and the way back to answer.
+ */
+function Claim({ task, doc, on }: { task: Exception; doc: SourceDocument; on: Ref }) {
+  const { state } = useClose();
+  const notChecked = notCheckedWith(state, docsOf(task), task.notChecked);
+  const leftOut = leftOutLine(doc);
+  return (
+    <section aria-label={`Finding: ${task.title}`} className="flex flex-col items-start gap-[var(--gap-field)]">
+      <AgentBlock className="w-full" authorship={memberName(task.agent)}>
+        <div className="flex flex-col gap-[var(--gap-group)]">
+          <Part label={task.title}>
+            <p className="tabular-nums">{task.evidence}</p>
+          </Part>
+          <Part label="Rule">
+            <p>{task.rule}</p>
+          </Part>
+          {notChecked.length ? (
+            <Part label="Not checked">
+              <ul role="list" className="flex flex-col gap-[var(--gap-bonded)]">
+                {notChecked.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </Part>
+          ) : null}
+        </div>
+      </AgentBlock>
+      <p className="text-sm text-text-body tabular-nums">
+        {restsOnLine(doc, on)}
+        {leftOut ? ` ${leftOut}` : null}
+      </p>
+      <ThreadLink task={task} />
+    </section>
+  );
+}
+
 function OpenDocument({ doc, item }: { doc: SourceDocument; item?: string }) {
   const { state, dispatch } = useClose();
   const ref = refOf(item, doc.slug);
   const selectedRows = ref?.rows;
   useRecordInView(!!ref);
   const on = isSourceOn(state, doc.slug);
+  const task = ref ? exceptions.find((e) => e.id === item) : undefined;
+  const effectId = useId();
   // Stable for one selection, so TanStack keeps its cells mounted (DataTable README).
   const columns = useMemo(() => (doc.table ? columnsOf(doc.table, selectedRows ?? []) : []), [doc.table, selectedRows]);
   return (
@@ -203,12 +283,22 @@ function OpenDocument({ doc, item }: { doc: SourceDocument; item?: string }) {
           <h2 className="min-w-0 break-all text-md font-semibold text-text-primary">{doc.file}</h2>
           <p className="text-sm text-text-secondary tabular-nums">{doc.about}</p>
         </div>
-        <label className="flex shrink-0 items-center gap-[var(--gap-inline)] text-sm text-text-body">
-          <Switch checked={on} onCheckedChange={(next) => dispatch({ type: 'source', id: doc.slug, on: next })} />
-          Agents read this
-        </label>
+        <div className="flex max-w-[20rem] flex-col gap-[var(--gap-bonded)]">
+          <label className="flex items-center gap-[var(--gap-inline)] text-sm text-text-body">
+            <Switch
+              checked={on}
+              aria-describedby={effectId}
+              onCheckedChange={(next) => dispatch({ type: 'source', id: doc.slug, on: next })}
+            />
+            Agents read this
+          </label>
+          {/* What the switch does, before and after: its effect lands on other pages. */}
+          <p id={effectId} className="text-xs text-text-secondary">
+            {switchEffect(state, doc.slug)}
+          </p>
+        </div>
       </div>
-      <UsedBy slug={doc.slug} />
+      {task && ref ? <Claim task={task} doc={doc} on={ref} /> : <UsedBy slug={doc.slug} />}
       <p className="text-sm text-text-secondary tabular-nums">{extractCount(doc)}</p>
       {doc.table ? (
         <DataTable
