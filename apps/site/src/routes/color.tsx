@@ -306,7 +306,10 @@ export default function Color() {
                 <p className="text-site-small font-semibold text-text-primary capitalize">
                   {ramp}
                   {ramp === 'teal' ? (
-                    <span className="font-normal normal-case text-text-secondary"> (chart series only)</span>
+                    <span className="font-normal normal-case text-text-secondary">
+                      {' '}
+                      (chart series and avatars only)
+                    </span>
                   ) : null}
                   {ramp === 'ledger' ? (
                     <span className="font-normal normal-case text-text-secondary"> (the neutral)</span>
