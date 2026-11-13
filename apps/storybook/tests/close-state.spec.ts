@@ -11,6 +11,9 @@ import {
   isSourceOn,
   notCheckedWith,
   openCount,
+  settledBy,
+  taskStep,
+  tasksSummary,
   landingState,
   progress,
   type CloseAction,
@@ -312,4 +315,43 @@ test('each typing indicator names the card its reply lands on', () => {
   });
   const s = closeReducer(landingState(), { type: 'event', index: 0, at: '14:00' });
   expect(s.typing).toEqual({ who: 'apLead', exception: 'duplicate-payment' });
+});
+
+test('Tasks names each step of the decision, so "open" never covers the agent working or a skipped question', () => {
+  const id = 'revenue-cut-off';
+  expect(taskStep(landingState(), id)).toBe('needs-answer');
+  const reading = run({ type: 'answer', answer: 'reopen', at: '14:00' });
+  expect(taskStep(reading, id)).toBe('agent-reading');
+  const proposed = closeReducer(reading, { type: 'read' });
+  expect(taskStep(proposed, id)).toBe('needs-confirmation');
+  const posted = closeReducer(proposed, { type: 'post', at: '14:01' });
+  expect(taskStep(posted, id)).toBe('rerunning');
+  expect(taskStep(closeReducer(posted, { type: 'rerun', at: '14:01' }), id)).toBe('resolved');
+  // "Don't post it" asks again.
+  expect(taskStep(closeReducer(proposed, { type: 'stop', at: '14:01' }), id)).toBe('needs-answer');
+  expect(taskStep(run({ type: 'answer', answer: 'skip', at: '14:00' }), id)).toBe('skipped');
+  // The other findings have no question: open until a teammate settles them.
+  expect(taskStep(landingState(), 'duplicate-payment')).toBe('open');
+  const end = run({ type: 'skip', at: '14:02' });
+  expect(taskStep(end, 'duplicate-payment')).toBe('resolved');
+  expect(taskStep(end, 'credit-limit')).toBe('waiting');
+});
+
+test('Tasks’ heading counts every unsettled state, and never says nothing is open without the waiting one', () => {
+  expect(tasksSummary(landingState())).toBe('4 open. 1 needs your answer.');
+  const reading = run({ type: 'answer', answer: 'reopen', at: '14:00' });
+  expect(tasksSummary(reading)).toBe('4 open.');
+  expect(tasksSummary(closeReducer(reading, { type: 'read' }))).toBe('4 open. 1 needs your confirmation.');
+  expect(tasksSummary(run({ type: 'skip', at: '14:02' }))).toBe('Nothing open. 1 waiting.');
+  expect(tasksSummary(run({ type: 'answer', answer: 'skip', at: '14:00' }, { type: 'skip', at: '14:01' }))).toBe(
+    '1 open. 1 waiting.',
+  );
+});
+
+test('a settled finding names who settled it, and an unsettled one names nobody', () => {
+  const end = run({ type: 'skip', at: '14:02' });
+  expect(settledBy(end, 'revenue-cut-off')).toMatchObject({ by: 'visitor', at: '14:02' });
+  expect(settledBy(end, 'duplicate-payment')).toMatchObject({ by: 'apLead' });
+  expect(settledBy(end, 'credit-limit')).toBeUndefined();
+  expect(settledBy(landingState(), 'revenue-cut-off')).toBeUndefined();
 });
