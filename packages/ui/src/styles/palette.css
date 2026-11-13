@@ -8,6 +8,7 @@
    tokens. Components never name these ramps (lint rejects them): colour is
    reached through the semantic tokens in theme.css. */
 @theme static {
+  --color-ledger-25: oklch(99.0% 0.003 85.0);
   --color-ledger-50: oklch(97.5% 0.006 85.0);
   --color-ledger-100: oklch(94.5% 0.007 85.0);
   --color-ledger-200: oklch(89.0% 0.008 85.0);

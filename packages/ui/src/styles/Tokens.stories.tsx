@@ -13,7 +13,8 @@ import { tokenSamples } from '../fixtures/a11y-exceptions';
  *
  * Every ratio shown is the measured figure from docs/design-system.md, as
  * scripts/check-contrast.mjs computes it. Light-mode ratios are measured
- * against the paper canvas (ledger-50), NOT #fff.
+ * against the canvas, ledger-25, a warm white, NOT #fff. On the paper,
+ * ledger-50, where AppShell's sidebar sits, each is about 5% lower (§3).
  *
  * Ramp/step labels are computed from {hue, step} pairs rather than written
  * as string literals so the raw-scale lint rule keeps guarding this file.
@@ -28,28 +29,28 @@ const ROLES = ['interactive', 'danger', 'warning', 'success', 'agent', 'info'] a
 /* One step per mode for every role (§0 rule 4): 400 dark, 700 light. */
 const TEXT_ROLES: Record<(typeof ROLES)[number], Record<Mode, { step: Step; ratio: string }>> = {
   interactive: {
-    dark: { step: { hue: 'ivy', step: 400 }, ratio: '7.89:1' },
-    light: { step: { hue: 'ivy', step: 700 }, ratio: '6.24:1' },
+    dark: { step: { hue: 'ledger', step: 50 }, ratio: '16.49:1' },
+    light: { step: { hue: 'ledger', step: 950 }, ratio: '17.31:1' },
   },
   danger: {
     dark: { step: { hue: 'vermilion', step: 400 }, ratio: '6.99:1' },
-    light: { step: { hue: 'vermilion', step: 700 }, ratio: '7.15:1' },
+    light: { step: { hue: 'vermilion', step: 700 }, ratio: '7.51:1' },
   },
   warning: {
     dark: { step: { hue: 'ochre', step: 400 }, ratio: '7.28:1' },
-    light: { step: { hue: 'ochre', step: 700 }, ratio: '6.74:1' },
+    light: { step: { hue: 'ochre', step: 700 }, ratio: '7.08:1' },
   },
   success: {
     dark: { step: { hue: 'ivy', step: 400 }, ratio: '7.89:1' },
-    light: { step: { hue: 'ivy', step: 700 }, ratio: '6.24:1' },
+    light: { step: { hue: 'ivy', step: 700 }, ratio: '6.55:1' },
   },
   agent: {
     dark: { step: { hue: 'orchid', step: 400 }, ratio: '7.00:1' },
-    light: { step: { hue: 'orchid', step: 700 }, ratio: '7.14:1' },
+    light: { step: { hue: 'orchid', step: 700 }, ratio: '7.49:1' },
   },
   info: {
     dark: { step: { hue: 'lake', step: 400 }, ratio: '7.38:1' },
-    light: { step: { hue: 'lake', step: 700 }, ratio: '6.68:1' },
+    light: { step: { hue: 'lake', step: 700 }, ratio: '7.01:1' },
   },
 };
 
@@ -92,33 +93,38 @@ const NEUTRAL_SURFACES: {
 }[] = [
   {
     token: '--color-canvas',
-    step: { dark: { hue: 'ledger', step: 950 }, light: { hue: 'ledger', step: 50 } },
+    step: { dark: { hue: 'ledger', step: 950 }, light: { hue: 'ledger', step: 25 } },
     ratio: { dark: 'ground', light: 'ground' },
   },
   {
     token: '--color-surface',
-    step: { dark: { hue: 'ledger', step: 950 }, light: { hue: 'ledger', step: 50 } },
+    step: { dark: { hue: 'ledger', step: 950 }, light: { hue: 'ledger', step: 25 } },
     ratio: { dark: 'the canvas — borders separate', light: 'the canvas — borders separate' },
   },
   {
     token: '--color-surface-raised',
-    step: { dark: { hue: 'ledger', step: 925 }, light: { hue: 'ledger', step: 50 } },
+    step: { dark: { hue: 'ledger', step: 925 }, light: { hue: 'ledger', step: 25 } },
     ratio: { dark: '1.13:1', light: 'the canvas — border only' },
+  },
+  {
+    token: '--color-surface-sunken',
+    step: { dark: { hue: 'ledger', step: 950 }, light: { hue: 'ledger', step: 50 } },
+    ratio: { dark: 'the canvas — border only', light: '1.05:1, the paper' },
   },
   {
     token: '--color-border',
     step: { dark: { hue: 'ledger', step: 800 }, light: { hue: 'ledger', step: 200 } },
-    ratio: { dark: '1.82:1', light: '1.29:1' },
+    ratio: { dark: '1.82:1', light: '1.36:1' },
   },
   {
     token: '--color-border-strong',
     step: { dark: { hue: 'ledger', step: 700 }, light: { hue: 'ledger', step: 300 } },
-    ratio: { dark: '2.49:1', light: '1.62:1' },
+    ratio: { dark: '2.49:1', light: '1.70:1' },
   },
   {
     token: '--color-border-control',
     step: { dark: { hue: 'ledger', step: 500 }, light: { hue: 'ledger', step: 600 } },
-    ratio: { dark: '4.95:1', light: '4.89:1' },
+    ratio: { dark: '4.95:1', light: '5.13:1' },
   },
 ];
 
@@ -131,28 +137,28 @@ const NEUTRAL_TEXT: {
   {
     token: '--color-text-primary',
     step: { dark: { hue: 'ledger', step: 50 }, light: { hue: 'ledger', step: 950 } },
-    ratio: { dark: '16.49:1', light: '16.49:1' },
+    ratio: { dark: '16.49:1', light: '17.31:1' },
   },
   {
     token: '--color-text-body',
     step: { dark: { hue: 'ledger', step: 100 }, light: { hue: 'ledger', step: 900 } },
-    ratio: { dark: '15.08:1', light: '12.44:1' },
+    ratio: { dark: '15.08:1', light: '13.07:1' },
   },
   {
     token: '--color-text-secondary',
     step: { dark: { hue: 'ledger', step: 300 }, light: { hue: 'ledger', step: 700 } },
-    ratio: { dark: '10.19:1', light: '6.62:1' },
+    ratio: { dark: '10.19:1', light: '6.95:1' },
   },
   {
     token: '--color-text-tertiary',
     step: { dark: { hue: 'ledger', step: 400 }, light: { hue: 'ledger', step: 600 } },
-    ratio: { dark: '7.41:1', light: '4.89:1' },
+    ratio: { dark: '7.41:1', light: '5.13:1' },
     note: 'placeholders and non-text marks only',
   },
   {
     token: '--color-text-disabled',
     step: { dark: { hue: 'ledger', step: 600 }, light: { hue: 'ledger', step: 400 } },
-    ratio: { dark: '3.37:1', light: '2.23:1' },
+    ratio: { dark: '3.37:1', light: '2.34:1' },
     note: 'dim on purpose — WCAG 1.4.3 exempt',
   },
 ];
@@ -178,37 +184,37 @@ const CHART: {
   {
     n: 1,
     step: { dark: { hue: 'lake', step: 400 }, light: { hue: 'lake', step: 600 } },
-    ratio: { dark: '7.38:1', light: '4.94:1' },
+    ratio: { dark: '7.38:1', light: '5.19:1' },
   },
   {
     n: 2,
     step: { dark: { hue: 'ochre', step: 400 }, light: { hue: 'ochre', step: 600 } },
-    ratio: { dark: '7.28:1', light: '4.97:1' },
+    ratio: { dark: '7.28:1', light: '5.22:1' },
   },
   {
     n: 3,
     step: { dark: { hue: 'teal', step: 400 }, light: { hue: 'teal', step: 600 } },
-    ratio: { dark: '7.74:1', light: '4.68:1' },
+    ratio: { dark: '7.74:1', light: '4.92:1' },
   },
   {
     n: 4,
     step: { dark: { hue: 'orchid', step: 400 }, light: { hue: 'orchid', step: 600 } },
-    ratio: { dark: '7.00:1', light: '5.31:1' },
+    ratio: { dark: '7.00:1', light: '5.57:1' },
   },
   {
     n: 5,
     step: { dark: { hue: 'ledger', step: 400 }, light: { hue: 'ledger', step: 600 } },
-    ratio: { dark: '7.41:1', light: '4.89:1' },
+    ratio: { dark: '7.41:1', light: '5.13:1' },
   },
   {
     n: 6,
     step: { dark: { hue: 'vermilion', step: 400 }, light: { hue: 'vermilion', step: 600 } },
-    ratio: { dark: '6.99:1', light: '5.36:1' },
+    ratio: { dark: '6.99:1', light: '5.63:1' },
   },
   {
     n: 7,
     step: { dark: { hue: 'ivy', step: 400 }, light: { hue: 'ivy', step: 600 } },
-    ratio: { dark: '7.89:1', light: '4.60:1' },
+    ratio: { dark: '7.89:1', light: '4.83:1' },
   },
 ];
 
@@ -255,7 +261,8 @@ function TokensPage({ mode }: { mode: Mode }) {
         <SectionTitle>Tabular UI tokens — verification surface ({mode} mode)</SectionTitle>
         <Caption>
           All ratios are the measured figures from docs/design-system.md. Light-mode figures are measured against the
-          paper canvas (ledger-50), not white — everything on this page sits directly on --color-canvas.
+          canvas, a warm white, not white itself. Everything on this page sits directly on --color-canvas. On the paper,
+          where the sidebar sits, each is about 5% lower.
         </Caption>
       </header>
 

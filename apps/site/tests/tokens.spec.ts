@@ -29,12 +29,16 @@ test('role tokens resolve to the spec’s steps, both modes (§4)', () => {
   expect(stepLabel(tokenStep('bg-warning', 'light'))).toBe('ochre-500 / 10%');
   expect(stepLabel(tokenStep('fill-warning', 'light'))).toBe('ochre-500');
   expect(stepLabel(tokenStep('surface-raised', 'dark'))).toBe('ledger-925');
+  // §3, 2026-11-12: the page is a warm white, and the paper is the frame beside it.
+  expect(stepLabel(tokenStep('canvas', 'light'))).toBe('ledger-25');
+  expect(stepLabel(tokenStep('surface-sunken', 'light'))).toBe('ledger-50');
+  expect(stepLabel(tokenStep('surface-sunken', 'dark'))).toBe('ledger-950');
 });
 
 test('contrast matches the spec’s measured ratios (§3, §4)', () => {
-  expect(onCanvas(tokenStep('text-success', 'light'), 'light')).toBe('6.24:1');
+  expect(onCanvas(tokenStep('text-success', 'light'), 'light')).toBe('6.55:1');
   expect(onCanvas(tokenStep('text-primary', 'dark'), 'dark')).toBe('16.49:1');
-  expect(onCanvas(tokenStep('text-secondary', 'light'), 'light')).toBe('6.62:1');
+  expect(onCanvas(tokenStep('text-secondary', 'light'), 'light')).toBe('6.95:1');
   expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);
 });
 

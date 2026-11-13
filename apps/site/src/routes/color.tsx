@@ -67,6 +67,7 @@ const surfaces = [
   { token: 'canvas', className: 'bg-canvas' },
   { token: 'surface', className: 'bg-surface' },
   { token: 'surface-raised', className: 'bg-surface-raised' },
+  { token: 'surface-sunken', className: 'bg-surface-sunken' },
   { token: 'border', className: 'bg-border' },
   { token: 'border-strong', className: 'bg-border-strong' },
   { token: 'border-control', className: 'bg-border-control' },
@@ -130,9 +131,10 @@ function RoleRow({ role }: { role: Role }) {
 
 /**
  * The steps every ramp has, the only ones the page shows (owner, 2026-10-27).
- * Ledger's extra step, 925, the dark raised surface, stays in palette.json,
- * theme.css and docs/design-system.md §3: this is a showcase, and a twelfth
- * step in one ramp drew more attention than it repaid.
+ * Ledger's extra steps stay in palette.json, theme.css and
+ * docs/design-system.md §3: 925, the dark raised surface, and 25, the light
+ * page (2026-11-12). This is a showcase, and a twelfth step in one ramp drew
+ * more attention than it repaid.
  */
 const sharedSteps = new Set(
   rampSteps(rampNames[0])
@@ -243,7 +245,8 @@ export default function Color() {
                         className={cn('size-8 shrink-0 border border-border-strong', s.className)}
                       />
                       {/* The swatch paints the real token. Its step is named only when the
-                          page shows it: dark raised is ledger-925, left off this page. */}
+                          page shows it: dark raised is ledger-925 and the light page is
+                          ledger-25, both left off this page. */}
                       <TokenLabel name={s.token} detail={shownStepLabel(tokenStep(s.token, mode))} />
                     </li>
                   ))}

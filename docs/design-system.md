@@ -148,7 +148,7 @@ Tailwind's 400 step was not perceptually equal across hues: on its darkest neutr
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | OKLCH L | 97.5% | 94.5% | 89% | 82% | 73% | 62.5% | 53% | 46% | 38.5% | 30.5% | 21% |
 
-`ledger` alone has a twelfth step, **925** (L 25.75%, the midpoint of 900 and 950), for dark-mode raised surfaces (§3).
+`ledger` alone has two more steps. **925** (L 25.75%, the midpoint of 900 and 950) is for dark-mode raised surfaces (§3). **25** (L 99%, the paper's hue at half its chroma, since 2026-11-12) is the light-mode page (§3).
 
 So one step serves every role that takes a hue: **400 in dark mode, 700 in light mode** (§0 rule 4). Interactive text takes none since 2026-11-09: a link is ink (§1).
 
@@ -189,6 +189,7 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-canvas` | `ledger-950` | — | |
 | `--color-surface` | `ledger-950` | 1.00:1, the canvas | |
 | `--color-surface-raised` | `ledger-925` | 1.13:1 | — |
+| `--color-surface-sunken` | `ledger-950` | 1.00:1, the canvas | |
 | `--color-border` | `ledger-800` | 1.82:1 | 1.61:1 |
 | `--color-border-strong` | `ledger-700` | 2.49:1 | 2.21:1 |
 | `--color-border-control` | `ledger-500` | **4.95:1** | 4.39:1 |
@@ -197,26 +198,37 @@ Dark text sits at L 73, above the old 66–71 band. The 500 step (L 62.5) would 
 | `--color-text-secondary` | `ledger-300` | **10.19:1** | 9.03:1 |
 | `--color-text-tertiary` | `ledger-400` | **7.41:1** | 6.56:1 |
 
-**Canvas and surface share `ledger-950`.** The shared curve has no step between 950 (L 21) and 900 (L 30.5) for a surface, so panels, the sidebar and cards sit on the page itself and separate by `--color-border`, like the ruled pages of a ledger.
+**Canvas and surface share `ledger-950`.** The shared curve has no step between 950 (L 21) and 900 (L 30.5) for a surface, so panels, the sidebar and cards sit on the page itself and separate by `--color-border`, like the ruled pages of a ledger. The sunken surface is the canvas too: no step sits under 950, so the light-mode frame (below) has no dark counterpart, by §0 rule 4.
 
 **Raised layers sit on `ledger-925`, the ramp's one extra step — decided 2026-10-16.** The draft put them on `ledger-900`. There, role text on its own tint over a highlighted menu row measured 3.97–4.45:1 (agent lowest), under AA, and `Select` lists put a `StatusBadge` in exactly that place. A raised surface flat on 950 would have passed but left menus no lift over the content they cover, and shadows barely register on a dark canvas. The generator makes 925 the midpoint of 900 and 950 in lightness and chroma; on it the same case measures 4.67:1 or more.
 
 ### Light mode
 
-| Token | Step | On canvas (`ledger-50`) |
-|---|---|---|
-| `--color-canvas` | `ledger-50` | — |
-| `--color-surface` | `ledger-50` | the canvas |
-| `--color-surface-raised` | `ledger-50` | the canvas |
-| `--color-border` | `ledger-200` | 1.29:1 |
-| `--color-border-strong` | `ledger-300` | 1.62:1 |
-| `--color-border-control` | `ledger-600` | **4.89:1** |
-| `--color-text-primary` | `ledger-950` | **16.49:1** |
-| `--color-text-body` | `ledger-900` | **12.44:1** |
-| `--color-text-secondary` | `ledger-700` | **6.62:1** |
-| `--color-text-tertiary` | `ledger-600` | **4.89:1** |
+| Token | Step | On canvas (`ledger-25`) | On sunken (`ledger-50`, the paper) |
+|---|---|---|---|
+| `--color-canvas` | `ledger-25` | — | 1.05:1 |
+| `--color-surface` | `ledger-25` | the canvas | |
+| `--color-surface-raised` | `ledger-25` | the canvas | |
+| `--color-surface-sunken` | `ledger-50` | 1.05:1 | — |
+| `--color-border` | `ledger-200` | 1.36:1 | 1.29:1 |
+| `--color-border-strong` | `ledger-300` | 1.70:1 | 1.62:1 |
+| `--color-border-control` | `ledger-600` | **5.13:1** | 4.89:1 |
+| `--color-text-primary` | `ledger-950` | **17.31:1** | 16.49:1 |
+| `--color-text-body` | `ledger-900` | **13.07:1** | 12.44:1 |
+| `--color-text-secondary` | `ledger-700` | **6.95:1** | 6.62:1 |
+| `--color-text-tertiary` | `ledger-600` | **5.13:1** | 4.89:1 |
 
-**Paper on paper — decided 2026-10-16.** Canvas, surface and raised are all `ledger-50`. A card or a popup separates from the page by its border, not by a white fill or a shadow. *(Overlays add the sheet, §4.)* No `#fff` remains in the theme: text on a fill is paper too (§4). So there is one column of ratios, measured on paper, and measuring on white instead overstates them by about 8% (`ivy-700` is 6.72:1 on white, 6.24:1 on paper).
+**The page and the frame — decided 2026-11-12 (owner, after a side-by-side in Storybook of four options; `docs/reviews/white-content-2026-11-12.md`).** Canvas, surface and raised are all `ledger-25`, a warm white: L 99, at the paper's hue and half its chroma. The paper, `ledger-50`, is `--color-surface-sunken`: the ground of the frame beside the page. `AppShell`'s pinned sidebar is the one thing on it. The top nav is part of the page.
+
+- **Why.** In a flat system lighter reads as closer, so the frame recedes and the content comes forward, and a ground is the strongest grouping cue a region can have. Everything on the page gains about 5% in contrast.
+- **Why a warm white, and not `oklch(100% 0 0)`.** A white with no hue beside a warm paper is the one place the ramp would change temperature. The owner chose the warm one from the side-by-side. It costs about four-tenths of the contrast a pure white would add, and the step between the two grounds is 1.05:1, not 1.08:1.
+- **What it does not do.** 1.05:1 separates nothing alone. Every rule stays (§0 rule 7), and a card or a popup still separates from the page by its border, not by a fill or a shadow: all three page grounds are one step. *(Overlays add the sheet, §4.)*
+- **Two columns of ratios.** The paper column is the lower one, and it is what the figures marked "on paper" elsewhere in this document measure. Design against it for anything that can sit in a sidebar. `packages/ui/scripts/check-contrast.mjs` gates every token on both grounds, with the row states over each.
+- **Text on a fill stays the paper,** `ledger-50` (§4). It did not follow the canvas.
+- **A sunken region redefines the page grounds for its subtree.** It sets `--tui-canvas` and `--tui-surface` to the sunken value, on the `--tui-*` layer, so a component inside it that states `bg-canvas` or `bg-surface` does not paint a patch of the page. The raised surface is left alone: a popup opened from the sidebar is on the page's white, lighter than the frame under it.
+- **Dark mode is unchanged.**
+
+*(History: from 2026-10-16 to 2026-11-12 light mode was "paper on paper": canvas, surface and raised were all `ledger-50`, with one column of ratios. Before the Riso Ledger palette the canvas was `olive-50` under `#fff` surfaces; see the archive.)* No `#fff` is in the theme: measuring on white overstates the canvas figures by about 3% and the paper figures by about 8% (`ivy-700` is 6.72:1 on white, 6.55:1 on the canvas, 6.24:1 on paper).
 
 **Secondary and tertiary moved a step darker than olive's.** On the shared curve, step 500 is 3.3:1 on paper, too low for text, so tertiary is `ledger-600` and secondary `ledger-700`. Primary and body take the ink end of the ramp, `ledger-950` and `ledger-900`.
 
@@ -283,20 +295,20 @@ Text ratios are against the canvas, `ledger-950`, and the raised surface, `ledge
 
 ### Light mode
 
-**Ratios are against the paper canvas, `ledger-50`, not `#fff`** (§3). Light mode is paper on paper, so this one column covers every surface.
+**Ratios are against the canvas, `ledger-25`, and the paper, `ledger-50`, where the sidebar sits. Neither is `#fff`** (§3). The paper column is the lower one.
 
-| Role | `--color-text-` | on canvas | worst ground | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
-|---|---|---|---|---|---|---|---|---|
-| interactive | `ledger-950` | 16.49:1 | 12.46:1 | `ledger-950` | `ledger-50` | 16.49:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
-| danger | `vermilion-700` | 7.15:1 | 5.34:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
-| warning | `ochre-700` | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.91:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
-| success | `ivy-700` | 6.24:1 | 4.72:1 | `ivy-700` | `ledger-50` | 6.24:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
-| agent | `orchid-700` | 7.14:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.14:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
-| info | `lake-700` | 6.68:1 | 4.86:1 | `lake-700` | `ledger-50` | 6.68:1 | `lake-500 / 12%` | `lake-500 / 20%` |
+| Role | `--color-text-` | on canvas | on paper | worst ground | `--color-fill-` | `--color-on-` | on fill | `--color-bg-` | `--color-border-` |
+|---|---|---|---|---|---|---|---|---|---|
+| interactive | `ledger-950` | 17.31:1 | 16.49:1 | 12.46:1 | `ledger-950` | `ledger-50` | 16.49:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
+| danger | `vermilion-700` | 7.51:1 | 7.15:1 | 5.34:1 | `vermilion-700` | `ledger-50` | 7.15:1 | `vermilion-500 / 8%` | `vermilion-500 / 20%` |
+| warning | `ochre-700` | 7.08:1 | 6.74:1 | 5.00:1 | `ochre-500` | `ledger-950` | 4.91:1 | `ochre-500 / 10%` | `ochre-500 / 25%` |
+| success | `ivy-700` | 6.55:1 | 6.24:1 | 4.72:1 | `ivy-700` | `ledger-50` | 6.24:1 | `ivy-500 / 8%` | `ivy-500 / 20%` |
+| agent | `orchid-700` | 7.49:1 | 7.14:1 | 5.37:1 | `orchid-700` | `ledger-50` | 7.14:1 | `orchid-500 / 8%` | `orchid-500 / 20%` |
+| info | `lake-700` | 7.01:1 | 6.68:1 | 4.86:1 | `lake-700` | `ledger-50` | 6.68:1 | `lake-500 / 12%` | `lake-500 / 20%` |
 
-"Worst ground" is the role's text on its own tint over a selected, hovered row. All six clear 4.5:1 everywhere. **Success (`ivy-700`) is the tightest role, at 6.24:1 on the canvas and 4.72:1 at worst.** Interactive text is ink since 2026-11-09 (§1), 12.46:1 at worst. The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
+"Worst ground" is the role's text on its own tint over a selected, hovered row on the paper, which is where a row in a sidebar would put it. The same row on the page measures 13.03, 5.60, 5.24, 4.93, 5.62 and 5.09:1, in the table's order. All six clear 4.5:1 everywhere. **Success (`ivy-700`) is the tightest role, at 6.55:1 on the canvas, 6.24:1 on paper and 4.72:1 at worst.** Interactive text is ink since 2026-11-09 (§1), 12.46:1 at worst. The interactive fill is ink, `ledger-950`, under paper (16.49:1). For the other roles but warning, text and fill share step 700: paper on a 700 fill clears 6.24:1, and the 600 steps (4.60–5.36:1 on paper) fall under 4.5:1 on a role's tint over a hovered row.
 
-**Light info tint is 12%, not 8% — decided 2026-11-06 (owner, for readability).** On the cream paper `lake-500` at 8% measured chroma 0.0046, which reads as grey. 12% is the least that clears chroma 0.008 (0.0092, composited in sRGB over the canvas). Info text on its own tint over a selected, hovered row falls from 5.06:1 to 4.86:1, still above 4.5:1; 14% would give 4.77:1 for little more colour. The cost: the info tint now sits 28% further from the paper than the median role tint, past the ±15% that `scripts/check-harmony.mjs` flags, so a running row is the strongest tinted row in light mode. Warning was already the other exception, at 10%. Dark mode is unchanged: every dark tint, info included, clears 0.008 at 10% except warning (0.0063), which is not changed here.
+**Light info tint is 12%, not 8% — decided 2026-11-06 (owner, for readability), and kept on 2026-11-12.** On the warm white canvas `lake-500` at 8% measures chroma 0.0059, still under the 0.008 floor below, so the page did not remove the reason; at 12% it is 0.0114 there. The figures that follow are on the paper. On the cream paper `lake-500` at 8% measured chroma 0.0046, which reads as grey. 12% is the least that clears chroma 0.008 (0.0092, composited in sRGB over the canvas). Info text on its own tint over a selected, hovered row falls from 5.06:1 to 4.86:1, still above 4.5:1; 14% would give 4.77:1 for little more colour. The cost: the info tint now sits 28% further from the paper than the median role tint, past the ±15% that `scripts/check-harmony.mjs` flags, so a running row is the strongest tinted row in light mode. Warning was already the other exception, at 10%. Dark mode is unchanged: every dark tint, info included, clears 0.008 at 10% except warning (0.0063), which is not changed here.
 
 **Light warning fill is `ochre-500`, not `-400` — decided 2026-10-16.** `ochre-400` takes ink at 7.28:1, but against paper the fill itself is 2.26:1, under the 3:1 a fill needs (`packages/ui/scripts/check-contrast.mjs` fails it). `ochre-500` is 3.36:1 against paper, with ink on it at 4.91:1. The cost is a browner, less sunny fill. Paper on `ochre-500` is 3.36:1 and fails, so warning takes ink in both modes. *(Tailwind's `amber-500` fill measured 2.06:1 against the olive canvas; nothing checked it.)*
 
@@ -392,8 +404,9 @@ Two things actually protect it, and a control needs at least one:
 
 ### Elevation
 
-**Three tiers, and only the top one carries a shadow.** Shadows barely register on a `ledger-950` canvas, and light mode is paper on paper (§3), so depth is a background step plus a 1px border:
+**Four tiers, and only the top one carries a shadow.** Shadows barely register on a `ledger-950` canvas, and in light mode the three page grounds are one step (§3), so depth is a background step plus a 1px border:
 
+- Sunken (the frame beside the page: `AppShell`'s pinned sidebar) → `--color-surface-sunken` + `--color-border`. In light mode that is the paper, a step under the page (§3, 2026-11-12). In dark it is the canvas, and the border alone separates it. Nothing else takes this tier without a decision: a second tinted region on a page is a hierarchy made of ground, which is what the rules are for.
 - Inline panel → `--color-surface` + `--color-border`. In both modes the surface is the canvas, so the border alone separates it.
 - Raised (dropdown, tooltip, menu, popover) → `--color-surface-raised` + `--color-border-strong`. In dark mode that is `ledger-925`, a step above the page (§3). No shadow in either mode, spaced menus included.
 - Overlay (modal, the sidebar peek) → `--color-surface-raised` + `--color-border-strong` + `--shadow-overlay`.
@@ -435,7 +448,7 @@ No blur, no black, no new colour. The overlay reads as the top sheet of a small 
 
 **It clears 3:1 on every ground a control sits on, which is why it is this step and not one lighter.** Composited in sRGB from `docs/palette.json`:
 
-| Ground | Light, `ledger-600` | Dark, `ledger-500` |
+| Ground | Light, `ledger-600`, on the paper | Dark, `ledger-500` |
 |---|---|---|
 | Canvas, surface | 4.89:1 | 4.95:1 |
 | Raised | 4.89:1 (paper) | 4.39:1 |
@@ -444,7 +457,7 @@ No blur, no black, no new colour. The overlay reads as the top sheet of a small 
 | Selected, hovered row | 3.99:1 | 3.72:1 |
 | Highlighted popup row | 4.34:1 | 3.70:1 |
 
-A step lighter (`ledger-500` light, `ledger-600` dark) clears 3:1 on the canvas only: 2.71:1 on a selected, hovered row in light, and 2.99:1 on the dark raised surface. A checkbox sits on those rows by design. `packages/ui/scripts/check-contrast.mjs` gates the token at 3:1 on all of them, and reports 3.97:1 and 3.69:1 at worst: it composites from the OKLCH values, so its second decimal differs from this table's.
+The light column is the paper's, where a control in the sidebar sits and every figure is lowest (§3). On the page the same edge is 5.13:1, and 4.19:1 on a selected, hovered row. A step lighter (`ledger-500` light, `ledger-600` dark) clears 3:1 on the canvas only: 2.71:1 on a selected, hovered row in light, and 2.99:1 on the dark raised surface. A checkbox sits on those rows by design. `packages/ui/scripts/check-contrast.mjs` gates the token at 3:1 on all of them, and reports 3.97:1 and 3.69:1 at worst: it composites from the OKLCH values, so its second decimal differs from this table's.
 
 **Not `--color-border`, and not `--color-border-strong`.** `--color-border` draws every divider, card edge and table rule (§0 rule 7), and a divider is not a control: raising it would turn the page's ruled quiet into a grid of dark lines. `--color-border-strong` is 1.62:1 in light and draws every popup's edge and the overlay sheet. Neither option's value is an existing border token's in either mode.
 
@@ -1201,9 +1214,9 @@ Follow the Tailwind v4 documented pattern — raw values on `:root` and `[data-t
 
 ```css
 :root {
-  --tui-canvas: var(--color-ledger-50);
+  --tui-canvas: var(--color-ledger-25);
   --tui-text-primary: var(--color-ledger-950);
-  --tui-text-interactive: var(--color-ivy-700);
+  --tui-text-interactive: var(--color-ledger-950);
   --tui-ring: var(--color-ledger-800);
   /* ... light mode values ... */
 }
@@ -1211,7 +1224,7 @@ Follow the Tailwind v4 documented pattern — raw values on `:root` and `[data-t
 [data-theme="dark"] {
   --tui-canvas: var(--color-ledger-950);
   --tui-text-primary: var(--color-ledger-50);
-  --tui-text-interactive: var(--color-ivy-400);
+  --tui-text-interactive: var(--color-ledger-50);
   --tui-ring: var(--color-ledger-200);
   /* ... dark mode values ... */
 }
@@ -1287,7 +1300,8 @@ Before the token set is considered done:
   `--color-text-secondary` (8.43:1 dark / 6.68:1 light) is the fix in each case. Left open deliberately: this is a design call about what counts as essential, not bookkeeping.
 
   **Resolved 2026-10-07: sidebar section labels**, `AppShellNavGroup`'s ("Business") and `ContextSwitcherLabel` ("Project"). They are navigation, and they sit on `--color-surface`, not the canvas, where tertiary measured **3.78:1** in dark mode on `neutral` (**3.98:1** on `olive-900`; light: 4.26:1 on `#fff`). Moved to `--color-text-secondary`, 7.30:1 on the olive sidebar. **The ratios in this section are measured against the canvas. A label on a surface or raised step measures lower**, so the `popupSurface` group labels above, which sit on `--color-surface-raised`, are worse than their row suggests.
-- [x] **Light-mode ratios measured against the paper canvas, `ledger-50`, not `#fff`** — asserted in `apps/storybook/tests/contrast.spec.ts`, which fails if `--color-text-interactive`, the tightest role, drifts off 6.23 or if the canvas ever equals white.
+- [x] **Light-mode ratios measured against the canvas, `ledger-25`, and the paper, `ledger-50`, never `#fff`** — asserted in `apps/storybook/tests/contrast.spec.ts`, which fails if `--color-text-success`, the tightest role, drifts off 6.55 on the canvas or 6.24 on the sunken surface, or if the canvas ever equals white or the paper. *(Until 2026-11-12 there was one ground, the paper.)*
+- [ ] **The page and the frame, by a person (2026-11-12).** The owner chose the warm white from Playwright renders and a Storybook side-by-side. Still to check on a monitor, in the demo: that the sidebar reads as a frame at 1.05:1, that the 6% hover is visible on a 28px row over the new canvas, and a sustained-reading session on it.
 - [x] **Role text clears 4.5:1 on its own tint, on every ground it sits on** (canvas, `--color-surface`, hovered row, selected row, both; `--color-surface-raised` and a highlighted popup row since 2026-10-16). Asserted for all six roles in both modes by `apps/storybook/tests/contrast.spec.ts`. **Resolved 2026-10-09:** eight pairs fell short (light interactive and success on hovered rows, down to 3.98:1; agent and info on selected + hovered; dark warning on `--color-surface` and selected + hovered). Fixed by the lightness bands in §0 rule 4: light text moved to emerald-800, violet-700 and sky-800, dark warning to amber-500 (§2). `KNOWN_SHORTFALLS` is empty, and the test fails on any new pair under 4.5:1.
 - [x] **No colour token declared under bare `--text-*`** — all 18 `--text-*` declarations in `theme.css` are a size or a `--line-height`. Enforced continuously by the `declaration-property-value-allowed-list` rule scoped to `theme.css`.
 - [x] Chart series 6 resolved — **ramp capped at seven, `lime` removed** (2026-08-02). An eighth series means the chart needs grouping, not another colour.
