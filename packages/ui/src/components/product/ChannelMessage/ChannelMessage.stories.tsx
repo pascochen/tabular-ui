@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { RobotIcon } from '@phosphor-icons/react';
+import { GearSixIcon, RobotIcon } from '@phosphor-icons/react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { Avatar, AvatarFallback } from '../../foundational/Avatar';
@@ -7,9 +7,10 @@ import { Badge } from '../../foundational/Badge';
 import { people } from '../../../fixtures/kasane';
 import { ChannelMessage, ChannelMessageList, ChannelMessageReply } from './index';
 
-const person = (p: { initials: string }) => (
+/** `identity` is the person's place in the channel's member list (§1 "Identity colour"). */
+const person = (p: { initials: string }, identity: number) => (
   <Avatar>
-    <AvatarFallback>{p.initials}</AvatarFallback>
+    <AvatarFallback identity={identity}>{p.initials}</AvatarFallback>
   </Avatar>
 );
 
@@ -21,9 +22,9 @@ const agentAvatar = (
   </Avatar>
 );
 
-const controller = { name: people.controller.name, avatar: person(people.controller) };
-const payables = { name: people.payables.name, avatar: person(people.payables) };
-const mei = { name: people.fpa.name, avatar: person(people.fpa) };
+const controller = { name: people.controller.name, avatar: person(people.controller, 1) };
+const payables = { name: people.payables.name, avatar: person(people.payables, 3) };
+const mei = { name: people.fpa.name, avatar: person(people.fpa, 2) };
 const agent = { name: 'Close agent', avatar: agentAvatar };
 
 /** §8.3: an identifier in mono, one step below the --text-base body beside it. */
@@ -168,7 +169,9 @@ export const SystemMember: Story = {
       name: 'Revenue cut-off check',
       avatar: (
         <Avatar>
-          <AvatarFallback>SY</AvatarFallback>
+          <AvatarFallback>
+            <GearSixIcon weight="bold" />
+          </AvatarFallback>
         </Avatar>
       ),
       badge: <Badge>System</Badge>,
@@ -187,7 +190,7 @@ export const SystemMember: Story = {
 export const Narrow: Story = {
   parameters: { panel: true },
   args: {
-    author: { name: people.longName.name, avatar: person(people.longName) },
+    author: { name: people.longName.name, avatar: person(people.longName, 4) },
     time: '10:12',
     dateTime: '2026-10-16T10:12',
     children: (

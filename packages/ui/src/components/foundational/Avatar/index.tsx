@@ -103,17 +103,48 @@ function AvatarImage({ className, animatedSrc, animate = false, ...props }: Avat
 }
 
 /**
- * Shown until the image loads, and if it never does. Initials, neutral — an
- * avatar is identity, not state, so it takes no hue (§0 rule 1). shadcn's
- * type as it ships: `text-sm`, `text-xs` at `sm`, regular weight, as typed.
+ * §1 "Identity colour": the four tint grounds a person's fallback can take,
+ * in the spec's order (lake, ochre, teal, ivy). A module-level list, so
+ * Tailwind sees each class whole.
  */
-function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props) {
+const identityGrounds = [
+  'bg-bg-identity-1 text-text-identity-1',
+  'bg-bg-identity-2 text-text-identity-2',
+  'bg-bg-identity-3 text-text-identity-3',
+  'bg-bg-identity-4 text-text-identity-4',
+];
+
+export type AvatarFallbackProps = AvatarPrimitive.Fallback.Props & {
+  /**
+   * The person's position in the workspace's member list, counted from 1. It
+   * picks one of §1's four identity grounds and starts again after the
+   * fourth, so pass the position as it is. Leave it out for anything that
+   * isn't a known person (an agent, the system): that stays neutral.
+   */
+  identity?: number;
+};
+
+/**
+ * Shown until the image loads, and if it never does: one letter, the first
+ * of the person's name (§1 "Identity colour", 2026-11-13). With `identity`
+ * it sits on that person's tint, the one place a hue says who and not what
+ * state; without it the ground is neutral. shadcn's type as it ships:
+ * `text-sm`, `text-xs` at `sm`, regular weight, as typed.
+ */
+function AvatarFallback({ className, identity, ...props }: AvatarFallbackProps) {
+  // 0 to 3, or undefined: the grounds repeat after the fourth person.
+  const slot =
+    identity != null && Number.isInteger(identity) && identity >= 1
+      ? (identity - 1) % identityGrounds.length
+      : undefined;
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
+      data-identity={slot == null ? undefined : slot + 1}
       className={cn(
         'flex size-full items-center justify-center rounded-full bg-surface-raised',
         'text-sm text-text-secondary group-data-[size=sm]/avatar:text-xs',
+        slot == null ? undefined : identityGrounds[slot],
         className,
       )}
       {...props}
@@ -126,6 +157,5 @@ function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props)
  * through. Derived from the parts themselves, so they cannot drift.
  */
 export type AvatarProps = ComponentProps<typeof Avatar>;
-export type AvatarFallbackProps = ComponentProps<typeof AvatarFallback>;
 
 export { Avatar, AvatarFallback, AvatarImage };

@@ -6,7 +6,7 @@ The sidebar footer's account row. It goes in `AppShell`'s `sidebarFooter` slot.
 
 ```tsx
 <AccountMenu
-  user={{ name: 'Mei Tachibana', shortName: 'Mei', email, avatarSrc, avatarAnimatedSrc, initials: 'MT' }}
+  user={{ name: 'Mei Tachibana', shortName: 'Mei', email, avatarSrc, avatarAnimatedSrc, initials: 'M', identity: 2 }}
   theme={preference}            // from useTheme()
   onThemeChange={setPreference}
   onOpenProfile={…}
@@ -26,7 +26,8 @@ The sidebar footer's account row. It goes in `AppShell`'s `sidebarFooter` slot.
 | `user.email` | `string` | Menu header |
 | `user.avatarSrc` | `string` | The still image |
 | `user.avatarAnimatedSrc` | `string` | The animated version. See `Avatar` |
-| `user.initials` | `string` | Fallback, and the start of the trigger's accessible name while it shows |
+| `user.initials` | `string` | Fallback: one letter, the first of the name (§1 "Identity colour"; the prop's name is from when it was two). The start of the trigger's accessible name while it shows |
+| `user.identity` | `number` | The user's position in the workspace's member list, from 1. Gives the fallback its identity ground; without it the fallback is neutral |
 | `theme` | `'dark' \| 'light' \| 'system'` | The user's preference, which the Theme group checks. Pass `useTheme()`'s `preference` (not its resolved `theme`, or System could never show as chosen) |
 | `onThemeChange` | `(theme) => void` | The user picked a preference. Pass `useTheme()`'s `setPreference`: the hook applies it and owns `data-theme` on the root |
 | `onOpenProfile`, `onOpenHomepage`, `onSignOut` | `() => void` | Router-agnostic; the caller navigates |
@@ -52,7 +53,7 @@ A 32px row (`--h-control`, the trigger's height) inside the footer's `py-2`, so 
 
 The ring is an **outline with a negative offset** (`-2px`, the ring width), so it paints inside the 2px border and never outside the 28px box. That is §4's inset form. It is not a box-shadow, and the sidebar's overflow cannot clip it.
 
-**The name starts with what the row shows** (label-in-name, WCAG 2.5.3). While the fallback's initials show, they are visible text too, so the name is "MT Mei Tachibana, account". Once the image loads, it is "Mei Tachibana, account". `aria-hidden` on the avatar would not do this: axe compares the name with the text on screen, whatever is hidden from assistive technology. `shortName` must be how `name` starts, or the rule fails.
+**The name starts with what the row shows** (label-in-name, WCAG 2.5.3). While the fallback's letter shows, it is visible text too, so the name is "M Mei Tachibana, account". Once the image loads, it is "Mei Tachibana, account". `aria-hidden` on the avatar would not do this: axe compares the name with the text on screen, whatever is hidden from assistive technology. `shortName` must be how `name` starts, or the rule fails.
 
 The trigger is the `Menu` primitive's own button, styled here, not a `Button`. No `Button` variant puts its ring on a child or has no fill on hover, and bending one to do both would override most of its contract.
 

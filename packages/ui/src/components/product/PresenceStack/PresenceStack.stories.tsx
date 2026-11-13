@@ -5,12 +5,13 @@ import { Avatar, AvatarFallback } from '../../foundational/Avatar';
 import { people } from '../../../fixtures/kasane';
 import { PresenceStack, type PresenceMember } from './index';
 
-const member = (p: { id: string; name: string; initials: string }): PresenceMember => ({
+/** `i` is the member's place in the list, which is what gives each their identity ground (§1). */
+const member = (p: { id: string; name: string; initials: string }, i: number): PresenceMember => ({
   id: p.id,
   name: p.name,
   avatar: (
     <Avatar>
-      <AvatarFallback>{p.initials}</AvatarFallback>
+      <AvatarFallback identity={i + 1}>{p.initials}</AvatarFallback>
     </Avatar>
   ),
 });

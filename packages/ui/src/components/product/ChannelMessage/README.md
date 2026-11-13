@@ -10,7 +10,7 @@ One member's message in a channel of several people, with its replies inline ben
     6 exceptions found since September was locked. 2 are resolved.
   </ChannelMessage>
   <ChannelMessage
-    author={{ name: 'Daisuke Onodera', avatar: <Avatar><AvatarFallback>DO</AvatarFallback></Avatar> }}
+    author={{ name: 'Daisuke Onodera', avatar: <Avatar><AvatarFallback identity={1}>D</AvatarFallback></Avatar> }}
     time="13:48"
     dateTime="2026-10-16T13:48"
     replies={[<ChannelMessageReply key="1" author={mei} time="13:52">Agreed.</ChannelMessageReply>]}
@@ -54,7 +54,7 @@ One member's message in a channel of several people, with its replies inline ben
 | **An agent's body is always an `AgentBlock`** | `CLAUDE.md`: agent-authored content never renders as a generic box. With `authorship` set, the component draws the block itself, so a caller can't put agent text beside a person's with no rail or label |
 | No badge on an agent's message | Its block's label already says "AI". A badge would say it twice, a line apart |
 | `badge` is for other non-people, and neutral | "System" is context, not a state (§0 rule 1). Orchid is the agent's alone (§1) |
-| The avatar is `aria-hidden` | The name is beside it. With the initials exposed, a message is read "DO Daisuke Onodera" |
+| The avatar is `aria-hidden` | The name is beside it. With the letter exposed, a message is read "D Daisuke Onodera" |
 | The header is as tall as the avatar (32px; 24px in a reply) | The name sits level with the avatar's centre, and the body starts under both. `min-h`, so a long name wraps instead of overlapping. Primitive steps, the avatar's own: `Avatar` has no size tokens |
 | Name `--text-base` 600, time `--text-xs` secondary | The body's size, one weight up, so the author leads. The time is read, so secondary, never tertiary (§3). In a reply the name drops to `--text-sm` with the 24px avatar |
 | Replies fold behind `Button variant="inline"` | `AgentReasoning`'s disclosure, with its recipe unchanged, so the two read as one control. `aria-expanded`, and `aria-controls` once the replies exist. The count stays the label, open or closed, and `select-none` keeps it out of a copy of the thread |

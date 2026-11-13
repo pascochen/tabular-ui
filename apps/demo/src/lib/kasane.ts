@@ -18,8 +18,11 @@ export type Person = {
   title: string;
   entity: string;
   email: string;
+  /** One letter: the first of the name. */
   initials: string;
   handle: string;
+  /** Position in the member list, from 1. `Avatar` turns it into an identity ground. */
+  identity: number;
 };
 
 /** The people in the script, by role: `visitor`, `apLead`, `fpaHead`… */

@@ -2,14 +2,29 @@
 
 Foundational, added 2026-10-07 (approved). Adopted from shadcn/ui (Base UI, `base-mira`) and retokenized.
 
-**Styling on hold (2026-10-27).** A restyle is planned. Until it lands, the fallback is back to shadcn's default type and the stories are shadcn's demo, initials only: `Default` (with a size control) and `Sizes`. `animatedSrc` is unchanged; `AccountMenu` shows it.
+**Styling on hold (2026-10-27).** A restyle is planned. Until it lands, the fallback is back to shadcn's default type and the stories are shadcn's demo, one letter only: `Default` (with a size control), `Sizes` and `Identity`. `animatedSrc` is unchanged; `AccountMenu` shows it.
 
 ```tsx
 <Avatar size="sm">
   <AvatarImage src={user.avatar} alt="Mei Tachibana" />
-  <AvatarFallback>MT</AvatarFallback>
+  <AvatarFallback identity={2}>M</AvatarFallback>
 </Avatar>
 ```
+
+## Identity: one letter on a tint
+
+Since 2026-11-13 (owner; `docs/design-system.md` §1 "Identity colour") a person's fallback is **one letter**, the first of their name, on a tinted ground that says who they are. It is the one exception to §0 rule 1.
+
+| Prop | On | Type | Notes |
+|---|---|---|---|
+| `identity` | `AvatarFallback` | `number` | The person's position in the workspace's member list, from 1. Picks one of four grounds, in §1's order: lake, ochre, teal, ivy. The fifth person starts again at the first, so pass the position as it is. |
+
+- **Leave it out for anything that isn't a known person.** An agent's avatar and the system's stay neutral.
+- **Never choose a ground by hashing a name**, and never pick one to mean something: the order carries no meaning.
+- **The ground never stands alone.** Two people can share a letter and, after the fourth, a ground. Keep the name beside the avatar or as its accessible name.
+- **Ochre is also "waits on you".** A `StatusDot` beside an ochre avatar is the same hue; shape carries the difference. §1 records this as an accepted cost.
+
+`check-contrast.mjs` gates each letter at 4.5:1 on its own tint over every ground. `tests/avatar.spec.ts` holds the four grounds, the repeat, and the neutral fallback.
 
 Kept: `Avatar`, `AvatarImage`, `AvatarFallback`. Dropped: `AvatarBadge`, `AvatarGroup`, `AvatarGroupCount`. Their stacked-avatar separator is a `ring-2`, which is a box-shadow (§4). Restore them from the registry with an outline-based separator if a stacked group is needed.
 
@@ -20,13 +35,13 @@ Kept: `Avatar`, `AvatarImage`, `AvatarFallback`. Dropped: `AvatarBadge`, `Avatar
 | `sm` | 24 | In a 28px row or beside a 32px control, such as the sidebar footer |
 | `default` | 32 | A menu header or a comment |
 
-In rem (`size-[1.5rem]`, `size-[2rem]`), 24px and 32px at the default text size: an avatar holds initials, so it grows with them (§7.5, since 2026-11-10; `size-6` and `size-8` until then). There are no avatar size tokens. If a third size or a third component needs one, that's the moment to ask for a token.
+In rem (`size-[1.5rem]`, `size-[2rem]`), 24px and 32px at the default text size: an avatar holds a letter, so it grows with it (§7.5, since 2026-11-10; `size-6` and `size-8` until then). There are no avatar size tokens. If a third size or a third component needs one, that's the moment to ask for a token.
 
 ## Appearance
 
 - **Shape:** `--radius-full`. §7.7 lists the avatar among the inherently round shapes.
 - **Rim:** a 1px `--color-border` rim drawn as an `::after` over the image, blended (`darken` in light mode, `lighten` in dark). It reads as a light rim against any image in both modes without changing the 24/32px footprint.
-- **Fallback:** initials, neutral (`--color-surface-raised`, `--color-text-secondary`). An avatar is identity, not state, so it takes no hue (§0 rule 1). Type is shadcn's as it ships: `--text-sm`, `--text-xs` at `sm`, regular weight, in the case the caller passes.
+- **Fallback:** one letter. With `identity`, on that person's tint (`--color-bg-identity-N`, `--color-text-identity-N`). Without it, neutral (`--color-surface-raised`, `--color-text-secondary`). Type is shadcn's as it ships: `--text-sm`, `--text-xs` at `sm`, regular weight, in the case the caller passes.
 
 ## Animation: `animatedSrc` and `animate`
 

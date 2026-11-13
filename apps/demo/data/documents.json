@@ -76,7 +76,7 @@
     "slug": "close-memo",
     "file": "close_memo_2026-09.md",
     "about": "The controller’s memo on the September 2026 close",
-    "size": 4804,
+    "size": 4805,
     "text": {
       "section": "What drove the month",
       "firstLine": 25,
@@ -96,7 +96,7 @@
         "- **Great Lakes Duplicating Supply (C-KUS-0001)**, US dealer, Michigan.",
         "  - **Balance:** $1.42m outstanding at 30 Sep vs a $600k credit limit.",
         "  - **Payment history:** no payment received since 21 July. $507k is now more than 60 days past due.",
-        "  - **Actions:** account on credit hold since 10 Sep. 60% specific reserve booked (prepared by Marcus Bell, approved by Dana Whitfield). KUS allowance up from $173k to $971k.",
+        "  - **Actions:** account on credit hold since 10 Sep. 60% specific reserve booked (prepared by Vincent Bell, approved by Dana Whitfield). KUS allowance up from $173k to $971k.",
         "  - **Next step:** legal is reviewing whether to file a claim.",
         "- The balance is warranty provisions on the higher equipment volume.",
         "",
@@ -113,7 +113,7 @@
     "slug": "finance-team",
     "file": "finance_team.md",
     "about": "Who owns what in finance, and the approval rules",
-    "size": 3511,
+    "size": 3513,
     "text": {
       "section": "Approval rules",
       "firstLine": 65,

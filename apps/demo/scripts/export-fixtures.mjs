@@ -300,7 +300,9 @@ const person = (id) => {
     title: e.job_title,
     entity: e.entity_id,
     email: e.email,
-    initials: (parts[0][0] + parts.at(-1)[0]).toUpperCase(),
+    // One letter since 2026-11-13 (docs/design-system.md §1 "Identity colour"). The field keeps
+    // its name: AccountMenu's `user.initials` and every story read it.
+    initials: parts[0][0].toUpperCase(),
     handle: `${parts[0][0]}.${parts.at(-1)}`.toLowerCase(),
   };
 };
@@ -696,15 +698,16 @@ function packPath(name) {
   return [docs[name]];
 }
 
-// People: each must be an employee.
+// People: each must be an employee. `identity` is the person's position in this list, from 1:
+// Avatar turns it into one of §1's four grounds.
 const closePeople = Object.fromEntries(
-  Object.entries(closeSource.people).map(([key, id]) => {
+  Object.entries(closeSource.people).map(([key, id], i) => {
     must(
       employees.some((e) => e.employee_id === id),
       `employee ${id} (${key}) in employees.csv`,
     );
     const p = person(id);
-    return [key, { key, ...p }];
+    return [key, { key, ...p, identity: i + 1 }];
   }),
 );
 
