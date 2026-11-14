@@ -69,10 +69,24 @@ test('a message is found by its body, and lands on its finding in its channel', 
 });
 
 test('a reply that hasn’t landed isn’t found, and is once it has', () => {
-  expect(inGroup('Midwest Freight', 'Messages')).toEqual([]);
+  // Kenta's direct message names the supplier before landing; its reply in #payables lands after.
+  expect(inGroup('has agreed to credit', 'Messages')).toEqual([]);
   const end = closeReducer(landingState(), { type: 'skip', at: '14:00' });
-  expect(inGroup('Midwest Freight', 'Messages', end).map((r) => r.view)).toEqual([
+  expect(inGroup('has agreed to credit', 'Messages', end).map((r) => r.view)).toEqual([
     { kind: 'channel', channel: 'payables' },
+  ]);
+});
+
+test('what was said in a direct message before landing is found, replies included, and opens that message', () => {
+  expect(inGroup('Midwest Freight', 'Messages').map((r) => r.view)).toEqual([{ kind: 'dm', member: 'apLead' }]);
+  expect(inGroup('footnote it', 'Messages')).toEqual([
+    expect.objectContaining({ title: 'Mei Tachibana, direct message, 10:36', view: { kind: 'dm', member: 'fpaHead' } }),
+  ]);
+  expect(inGroup('What does it find', 'Messages')).toEqual([
+    expect.objectContaining({
+      title: 'Daisuke Onodera to Kenta Ishiguro, 11:12',
+      view: { kind: 'dm', member: 'apLead' },
+    }),
   ]);
 });
 

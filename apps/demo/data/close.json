@@ -148,6 +148,191 @@
     }
   ],
   "directMessages": ["fpaHead", "apLead"],
+  "conversations": {
+    "fpaHead": [
+      {
+        "author": "fpaHead",
+        "at": "10:12",
+        "text": "The board commentary is with the CFO. H1 figures are final from the 8 Oct 2026 lock.",
+        "blocks": [
+          {
+            "type": "tiles",
+            "tiles": [
+              {
+                "label": "Net sales",
+                "value": "¥34,436m",
+                "delta": "+7.9%",
+                "deltaValue": 7.9,
+                "caption": "vs H1 last year"
+              },
+              {
+                "label": "Operating profit",
+                "value": "¥2,193m",
+                "delta": "−13.9%",
+                "deltaValue": -13.9,
+                "caption": "vs budget"
+              },
+              {
+                "label": "Net income",
+                "value": "¥1,573m",
+                "delta": "−17.3%",
+                "deltaValue": -17.3,
+                "caption": "vs budget"
+              }
+            ]
+          }
+        ],
+        "replies": []
+      },
+      {
+        "author": "fpaHead",
+        "at": "10:12",
+        "text": "Budget to actual, for the bridge slide.",
+        "blocks": [
+          {
+            "type": "bridge",
+            "rows": [
+              { "id": "budget", "label": "Budget", "yen": 2547970754 },
+              {
+                "id": "fx-subsidiaries",
+                "label": "Exchange rates: subsidiary profits worth fewer yen",
+                "yen": -41415809
+              },
+              {
+                "id": "fx-intercompany",
+                "label": "Exchange rates: KJP margin on intercompany sales",
+                "yen": -275333022
+              },
+              { "id": "bad-debt", "label": "Great Lakes Duplicating Supply reserve (US)", "yen": -112654251 },
+              { "id": "vacancy", "label": "Seventh-floor vacancy (real estate)", "yen": -37800000 },
+              { "id": "personnel", "label": "Personnel costs (hiring freeze)", "yen": 417533766 },
+              { "id": "other", "label": "Gross profit at constant rates and other", "yen": -305523245 }
+            ],
+            "total": { "label": "Actual", "yen": 2192778193 }
+          }
+        ],
+        "replies": [
+          {
+            "author": "visitor",
+            "at": "10:31",
+            "text": "The Great Lakes line is a specific reserve, not a write-off. Legal is still reviewing whether to file a claim."
+          },
+          {
+            "author": "fpaHead",
+            "at": "10:36",
+            "text": "I’ll footnote it, and leave the 6+6 as it is until Legal decides on 30 Oct."
+          }
+        ]
+      },
+      {
+        "author": "fpaHead",
+        "at": "10:38",
+        "text": "The 6+6 memo, in case the board asks where H2 comes from.",
+        "blocks": [{ "type": "attachment", "name": "forecast_memo_fy2026_6+6.md", "bytes": 3702 }],
+        "replies": []
+      },
+      {
+        "author": "fpaHead",
+        "at": "13:52",
+        "text": "Revenue AI flagged the Tsukuba invoice. If its ¥42.7m moves to October, H1 changes after the lock.",
+        "blocks": [
+          {
+            "type": "tiles",
+            "tiles": [
+              {
+                "label": "Operating profit, as locked",
+                "value": "¥2,193m",
+                "delta": "−13.9%",
+                "deltaValue": -13.9,
+                "caption": "vs budget"
+              },
+              {
+                "label": "If the invoice moves",
+                "value": "¥2,180m",
+                "delta": "−14.4%",
+                "deltaValue": -14.4,
+                "caption": "vs budget"
+              }
+            ]
+          }
+        ],
+        "replies": []
+      },
+      {
+        "author": "fpaHead",
+        "at": "13:52",
+        "text": "Tell me which way you go before Nanami recuts the deck. Fieldwork runs 19–30 Oct, and the release is 6 Nov.",
+        "blocks": [{ "type": "thread", "finding": "revenue-cut-off" }],
+        "replies": []
+      }
+    ],
+    "apLead": [
+      {
+        "author": "apLead",
+        "at": "09:31",
+        "text": "Payments AI is right about MFL-58821. KUS entered it twice, and paid both entries.",
+        "blocks": [
+          {
+            "type": "entries",
+            "currency": "USD",
+            "rows": [
+              {
+                "entry": "API-KUS-2607-00007",
+                "date": "14 Jul 2026",
+                "description": "Outbound freight - June 2026 linehaul surcharge",
+                "amount": "$48,216.40",
+                "payment": "PAY-KUS-2608-0002",
+                "paidOn": "14 Aug 2026",
+                "duplicate": false
+              },
+              {
+                "entry": "API-KUS-2607-00011",
+                "date": "21 Jul 2026",
+                "description": "Outbound freight - Jun 2026 linehaul surcharge",
+                "amount": "$48,216.40",
+                "payment": "PAY-KUS-2608-0003",
+                "paidOn": "21 Aug 2026",
+                "duplicate": true
+              }
+            ]
+          },
+          { "type": "sources", "finding": "duplicate-payment" }
+        ],
+        "replies": []
+      },
+      {
+        "author": "apLead",
+        "at": "11:05",
+        "text": "This is the match I’d like the October payment runs to use. It no longer compares the description, so a retyped month can’t get past it.",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "sql",
+            "label": "Duplicate supplier invoice check",
+            "code": "-- One supplier invoice number, entered more than once.\n-- The description is no longer compared: \"June\" and \"Jun\" got past it.\nselect supplier_id,\n       supplier_invoice_number,\n       count(*)          as entries,\n       sum(gross_amount) as gross_total\nfrom supplier_invoices\ngroup by supplier_id, supplier_invoice_number\nhaving count(*) > 1;"
+          }
+        ],
+        "replies": [
+          { "author": "visitor", "at": "11:12", "text": "What does it find over H1?" },
+          { "author": "apLead", "at": "11:20", "text": "One number in 559 entries, across all 5 entities: this one." }
+        ]
+      },
+      {
+        "author": "apLead",
+        "at": "13:40",
+        "text": "I’ve asked Midwest Freight to credit $48,216.40 against their next invoice. No answer yet.",
+        "blocks": [{ "type": "attachment", "name": "MFL-58821_credit_request.pdf" }],
+        "replies": []
+      },
+      {
+        "author": "apLead",
+        "at": "13:41",
+        "text": "A change to a payment control needs your sign-off. Can I switch the new match on before the next run?",
+        "blocks": [{ "type": "thread", "finding": "duplicate-payment" }],
+        "replies": []
+      }
+    ]
+  },
   "typingMs": 1500,
   "searchSuggestions": ["MFL-58821", "Great Lakes", "delivery"],
   "newChat": {

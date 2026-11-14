@@ -5,7 +5,8 @@ import { ClosePanel } from '../components/ClosePanel';
 import { channels, documents, lastClosedMonth, member, memberName, selectedTask } from '../lib/kasane';
 import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
-import { NoMessages, Profile } from './parts';
+import { Profile } from './parts';
+import { DirectMessageView } from './DirectMessage';
 import { AgentProfile, AgentView } from './AgentView';
 import { AgentsView } from './Agents';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
@@ -84,7 +85,8 @@ export function slotsFor(view: View): ViewSlots {
     }
     return {
       title: memberName(view.member),
-      body: <NoMessages memberKey={view.member} />,
+      // Keyed so a half-typed message stays with the person it was for.
+      body: <DirectMessageView key={view.member} memberKey={view.member} />,
       panel: {
         label: 'Profile',
         content: (
