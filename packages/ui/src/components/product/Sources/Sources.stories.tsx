@@ -7,15 +7,15 @@ import { Sources, type Source } from './index';
 
 /**
  * Kasane's duplicate payment: KUS entered supplier invoice MFL-58821 twice and
- * paid both. The names and sizes are the Kasane pack's.
+ * paid both. The names and sizes are the Kasane files'.
  */
 const sources: Source[] = [
   { id: 'invoices', name: 'supplier_invoices_fy2026_h1.csv', size: '116 KB', href: '#' },
-  { id: 'interview', name: '05_interview_ar_ap_2026-10-14.txt', size: '4 KB', href: '#' },
+  { id: 'payments', name: 'supplier_payments_fy2026_h1.csv', size: '51 KB', href: '#' },
 ];
 
 const notChecked = [
-  'KUS’s bank statements: the pack holds KJP’s September export only, so both payments are as the invoice file records them.',
+  'KUS’s bank statements: the files hold KJP’s September export only, so both payments are as the invoice file records them.',
   'Invoices after September: the supplier file covers H1.',
 ];
 
@@ -81,8 +81,8 @@ export const WithCitations: Story = {
         <InlineCitation number={1} source={sources[0]} locator="API-KUS-2607-00007 and API-KUS-2607-00011" />
       </p>
       <p className="text-text-secondary">
-        AP said the system blocks a repeated invoice number in every entity.
-        <InlineCitation number={2} source={sources[1]} />
+        KUS paid both entries in August.
+        <InlineCitation number={2} source={sources[1]} locator="PAY-KUS-2608-0002 and PAY-KUS-2608-0003" />
       </p>
       <Sources {...args} />
     </div>
@@ -102,7 +102,7 @@ export const Unnumbered: Story = {
     const rows = within(list).getAllByRole('listitem');
     await expect(rows).toHaveLength(2);
     await expect(rows[0]).toHaveTextContent(/^supplier_invoices_fy2026_h1\.csv/);
-    await expect(rows[1]).toHaveTextContent(/^05_interview/);
+    await expect(rows[1]).toHaveTextContent(/^supplier_payments_fy2026_h1\.csv/);
   },
 };
 
@@ -120,7 +120,7 @@ export const Overflow: Story = {
       href: '#',
     })),
     notChecked: [
-      'Intercompany balances between KJP and KCN: the pack has no intercompany schedule, and the trial balance nets them, so a mismatch would not show in any file I read.',
+      'Intercompany balances between KJP and KCN: no file holds an intercompany schedule, and the trial balance nets them, so a mismatch would not show in any file I read.',
     ],
   },
 };

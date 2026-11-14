@@ -28,7 +28,7 @@ export type SourcesProps = {
   numbered?: boolean;
   /**
    * What wasn't checked, one sentence each, naming the part and why: "KUS's
-   * bank statements: the pack holds KJP's September export only." **Required.**
+   * bank statements: the files hold KJP's September export only." **Required.**
    * Pass `[]` only when every part of the question was checked, and the
    * component says so. A node, so file names can be mono (§8.3).
    */
