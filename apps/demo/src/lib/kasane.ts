@@ -1,12 +1,18 @@
 // The Kasane app's script: Kasane's people, its agents, its channels and their checks.
 // The data is in apps/demo/data/, written by scripts/export-fixtures.mjs from the full Kasane
 // dataset, which is not in this repository. Kasane Corporation is fictional.
+//
+// Five files: the workspace, its members, their checks, the items the checks raised, and the
+// documents they read. This module is the only one that imports them, and it hands the screens
+// the shapes they were written against: an agent with its check, a `close` with its decision.
 
 import checksData from '../../data/checks.json' with { type: 'json' };
-import closeData from '../../data/close.json' with { type: 'json' };
-import company from '../../data/company.json' with { type: 'json' };
 import documentsData from '../../data/documents.json' with { type: 'json' };
-import peopleData from '../../data/people.json' with { type: 'json' };
+import itemsData from '../../data/items.json' with { type: 'json' };
+import membersData from '../../data/members.json' with { type: 'json' };
+import workspace from '../../data/workspace.json' with { type: 'json' };
+
+const { company, ...script } = workspace;
 
 export const kasaneCompany = company;
 
@@ -20,18 +26,60 @@ export type Person = {
   email: string;
   /** One letter: the first of the name. */
   initials: string;
-  handle: string;
   /** Position in the member list, from 1. `Avatar` turns it into an identity ground. */
   identity: number;
 };
 
+/** A question an agent suggests, with the answer it gives and what that rests on. */
+type Starter = { question: string; answer: string; sources: string[]; notChecked: string[] };
+type AgentMember = { key: string; name: string; ask: string; starters: Starter[] };
+/** `members.json`: people and agents in one list. */
+const members = membersData as (({ kind: 'person' } & Person) | ({ kind: 'agent' } & AgentMember))[];
+/** What `Tasks` and the close panel show of a check: its figure before and after the fix. */
+type CheckFigure = {
+  label: string;
+  meaning: string;
+  currency: string;
+  before: number;
+  after: number;
+  beforeLabel: string;
+  afterLabel: string;
+};
+/** One check an agent: its rule, the documents it reads, and the item it raised. */
+type Check = { agent: string; rule: string; reads: string[]; raised: string; figure?: CheckFigure };
+const agentChecks = checksData as Check[];
+
 /** The people in the script, by role: `visitor`, `apLead`, `fpaHead`… */
-export const people: Record<string, Person> = peopleData;
+export const people: Record<string, Person> = Object.fromEntries(
+  members.flatMap((m) => (m.kind === 'person' ? [[m.key, m]] : [])),
+);
 
 /** The visitor plays this person. */
 export const visitor = people.visitor;
 
-export const close = closeData;
+/** The agents are members like any other, each keyed by its role: `cutoff-ai`… Each carries its check. */
+export const agents = members.flatMap((m) => {
+  if (m.kind !== 'agent') return [];
+  const check = agentChecks.find((c) => c.agent === m.key);
+  if (!check) throw new Error(`No check for ${m.key} in checks.json`);
+  return [{ ...m, checks: check.rule, reads: check.reads, finding: check.raised }];
+});
+export type Agent = (typeof agents)[number];
+
+/** The checks the close panel shows a figure for, each under the id of the item it raised. */
+export const checks = agentChecks.flatMap((c) => (c.figure ? [{ id: c.raised, ...c.figure }] : []));
+
+/** The one item with a decision: what the agent asks, the two answers, and what each would do. */
+const decided = itemsData.find((i) => 'decision' in i && i.decision);
+if (!decided?.decision) throw new Error('No item in items.json has a decision');
+
+/** The workspace's script, the items as `exceptions`, and the decision as `hero`, under the item it belongs to. */
+export const close = {
+  ...script,
+  agents,
+  exceptions: itemsData,
+  hero: { exception: decided.id, ...decided.decision },
+};
 
 export type Channel = (typeof close.channels)[number];
 export type ChannelId = 'close' | 'cash' | 'receivables' | 'payables' | 'revenue' | 'intercompany';
@@ -51,10 +99,6 @@ export const exceptions = close.exceptions as Exception[];
 export const selectedTask = (id?: string): Exception | undefined =>
   id === undefined ? exceptions[0] : exceptions.find((e) => e.id === id);
 
-/** The agents are members like any other, each keyed by its role: `cutoff-ai`… */
-export const agents = close.agents;
-export type Agent = (typeof agents)[number];
-
 /** A member of a channel or a direct message: a person, or an agent. */
 export type Member = { kind: 'person'; person: Person } | { kind: 'agent'; agent: Agent };
 
@@ -68,7 +112,7 @@ export function member(key: string): Member | null {
 /** A member's display name: the person's full name, or the agent's. */
 export function memberName(key: string): string {
   const m = member(key);
-  if (!m) throw new Error(`No member "${key}" in close.json or people.json`);
+  if (!m) throw new Error(`No member "${key}" in members.json`);
   return m.kind === 'agent' ? m.agent.name : m.person.name;
 }
 
@@ -96,7 +140,7 @@ export type DmBlock =
   | { type: 'code'; language: 'sql'; label: string; code: string }
   /** A finding's files, as its card lists them. */
   | { type: 'sources'; finding: string }
-  /** `bytes` only for a file in the pack: an invented one has no size to state. */
+  /** `bytes` only for a file the dataset holds: an invented one has no size to state. */
   | { type: 'attachment'; name: string; bytes?: number }
   | { type: 'thread'; finding: string };
 export type DmReply = { author: string; at: string; text: string };
@@ -104,8 +148,6 @@ export type DmMessage = DmReply & { blocks: DmBlock[]; replies: DmReply[] };
 
 /** Each direct message's history before the visitor lands, by member. */
 export const conversations = close.conversations as Record<string, DmMessage[]>;
-
-export const checks = checksData;
 
 export type TableColumn = { name: string; style?: 'id' | 'figure' };
 export type DocumentTable = {

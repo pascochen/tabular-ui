@@ -4,8 +4,8 @@ import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 /**
- * The Kasane app's generated data (apps/demo/data/close.json, people.json,
- * checks.json, documents.json) must agree with the rest of the demo's data. The export script
+ * The Kasane app's generated data (apps/demo/data/: workspace.json, members.json,
+ * checks.json, items.json, documents.json) must agree with itself. The export script
  * checks each figure against the Kasane dataset, which isn't in this
  * repository. This checks what CI can see: that every id, file, person,
  * account and amount one file names exists in, and matches, the others.
@@ -73,20 +73,83 @@ type Doc = {
   };
 };
 
-const close = read<Close>('close.json');
-const people = read<Record<string, { id: string; name: string }>>('people.json');
-const checks = read<{ id: string; before: number; after: number }[]>('checks.json');
+const FILES = ['checks.json', 'documents.json', 'items.json', 'members.json', 'workspace.json'];
+
+type PersonMember = { kind: 'person'; key: string; id: string; name: string };
+type AgentMember = { kind: 'agent' } & Omit<Agent, 'checks' | 'finding' | 'reads'>;
+type Check = {
+  agent: string;
+  rule: string;
+  reads: string[];
+  raised: string;
+  figure?: { label: string; before: number; after: number };
+};
+type Item = Exception & { decision?: Omit<Close['hero'], 'exception'> };
+
+const workspace = read<Pick<Close, 'period' | 'agentRules' | 'channels' | 'directMessages'>>('workspace.json');
+const memberList = read<(PersonMember | AgentMember)[]>('members.json');
+const checkList = read<Check[]>('checks.json');
+const items = read<Item[]>('items.json');
 const documents = read<Doc[]>('documents.json');
+
+// The same joins apps/demo/src/lib/kasane.ts makes: an agent with its check, the decision under its item.
+const checkOf = (agent: string) => checkList.find((c) => c.agent === agent)!;
+const decided = items.find((i) => i.decision)!;
+const close: Close = {
+  ...workspace,
+  agents: memberList.flatMap((m) => {
+    if (m.kind !== 'agent') return [];
+    const c = checkOf(m.key);
+    return [{ ...m, checks: c.rule, reads: c.reads, finding: c.raised }];
+  }),
+  exceptions: items,
+  hero: { exception: decided.id, ...decided.decision! },
+};
+const people = Object.fromEntries(memberList.flatMap((m) => (m.kind === 'person' ? [[m.key, m]] : [])));
+const checks = checkList.flatMap((c) => (c.figure ? [{ id: c.raised, ...c.figure }] : []));
 const docOf = (slug: string) => documents.find((d) => d.slug === slug);
 const slugs = new Set(documents.map((d) => d.slug));
 const members = new Set([...Object.keys(people), ...close.agents.map((a) => a.key)]);
+
+test('five files, named for what they hold and not for a close', () => {
+  expect(readdirSync(dataDir).sort()).toEqual(FILES);
+});
+
+test('a member is a person or an agent, and no two share a key', () => {
+  for (const m of memberList) expect(['person', 'agent'], m.key).toContain(m.kind);
+  expect(new Set(memberList.map((m) => m.key)).size).toBe(memberList.length);
+  // People first, in their identity order, then the agents.
+  const kinds = memberList.map((m) => m.kind);
+  expect(kinds).toEqual([...kinds].sort().reverse());
+});
+
+test('one check an agent, in the agents’ order, and a figure only where an item was raised', () => {
+  const agentKeys = memberList.filter((m) => m.kind === 'agent').map((m) => m.key);
+  expect(checkList.map((c) => c.agent)).toEqual(agentKeys);
+  for (const c of checkList) {
+    expect(c.rule, c.agent).toBeTruthy();
+    expect(c.reads.length, c.agent).toBeGreaterThan(0);
+    expect(
+      items.map((i) => i.id),
+      c.agent,
+    ).toContain(c.raised);
+  }
+});
+
+test('one item holds the decision, and no file keeps a field for a screen that is gone', () => {
+  expect(items.filter((i) => i.decision)).toHaveLength(1);
+  for (const name of FILES) {
+    const text = readFileSync(path.join(dataDir, name), 'utf8');
+    expect(text, name).not.toMatch(/"hero"|"handle"|"persona"|"exceptions"|"agents"/);
+  }
+});
 
 test('every finding and agent names documents that exist', () => {
   for (const e of close.exceptions) for (const r of e.refs) expect(slugs, `${e.id}: ${r.doc}`).toContain(r.doc);
   for (const a of close.agents) for (const f of a.reads) expect(slugs, `${a.key} reads ${f}`).toContain(f);
 });
 
-test('everyone who speaks, resolves or belongs is a person in people.json', () => {
+test('everyone who speaks, resolves or belongs is in members.json', () => {
   const named = [
     ...close.exceptions.flatMap((e) => [...e.replies.map((r) => r.author), ...(e.resolution ? [e.resolution.by] : [])]),
     ...close.channels.flatMap((c) => c.members),
@@ -124,7 +187,7 @@ test('every check belongs to an exception and has something to fix', () => {
 });
 
 test('no authored token is left unfilled', () => {
-  for (const name of ['close.json', 'people.json', 'checks.json', 'documents.json']) {
+  for (const name of FILES) {
     expect(readFileSync(path.join(dataDir, name), 'utf8')).not.toMatch(/\{[a-zA-Z]+\}/);
   }
 });
@@ -188,7 +251,7 @@ test('a finding’s ref holds lines into a text file, or rows into a table, and 
 
 test('the data stays on checks and ledgers: no interview source, no claim, no gap or question list', () => {
   const names = readdirSync(dataDir);
-  for (const gone of ['discovery.json', 'findings.json', 'pack.json', 'sources.json'])
+  for (const gone of ['discovery.json', 'findings.json', 'pack.json', 'sources.json', 'close.json', 'people.json'])
     expect(names).not.toContain(gone);
   for (const name of names) {
     const text = readFileSync(path.join(dataDir, name), 'utf8');

@@ -150,7 +150,7 @@ The wireframe's Storybook link, "Proposed, approved and rejected states in Story
 
 **D5. The stories and their figures — decided 2026-10-25 (owner).** None of the wireframes' figures are in the data: no ¥184m gap, no ¥121m Tsukuba variance, no account 5900, no ¥12.6m rebate accrual, and no "Operating profit, Sep, ¥312m". September operating profit was ¥819m against a ¥794m budget, ahead rather than behind (`lastMonth` in `packages/ui/src/fixtures/kasane.ts`). A site whose second principle is "Every number opens down to the entry behind it" opens with figures that have entries behind them.
 
-1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/close.json`, `duplicate-payment`).
+1. **The hero and the Agent block tell the duplicate payment** (`apps/demo/data/items.json`, `duplicate-payment`).
    - KUS entered supplier invoice MFL-58821 twice, as API-KUS-2607-00007 and API-KUS-2607-00011, $48,216.40 each, and paid both. The sources are `supplier_invoices_fy2026_h1.csv` and `supplier_payments_fy2026_h1.csv`.
    - The agent proposes reversing API-KUS-2607-00011, so the supplier owes the amount back. A person posts it.
    - *Changed 2026-10-26 (owner review):* the question is "Did we pay any invoice twice?" ("this half" assumed the reader knows fiscal halves). The answer leads in plain words, "Invoice MFL-58821 was entered twice and paid twice, $48,216.40 each time", and the entry ID moves to the smaller source line. The proposed entry reads "Reverse the duplicate payment". The entity code and the first entry's ID no longer show, and the source line cites the invoice file only.
@@ -182,7 +182,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 | Slot | Copy | Source of each specific |
 |---|---|---|
-| Heading | Four agents checked a finance team's books and raised four issues. You decide. | The first "Four": the number of `agents` in `apps/demo/data/close.json`, exported as `agents` in `apps/site/data/kasane.json`. The second: the number of findings, exported as `findings`. Each is written as a word (`numberWord`) |
+| Heading | Four agents checked a finance team's books and raised four issues. You decide. | The first "Four": the number of agents in `apps/demo/data/members.json`, exported as `agents` in `apps/site/data/kasane.json`. The second: the number of findings, exported as `findings`. Each is written as a word (`numberWord`) |
 | Line | Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller. | "Kasane": `company.name` in `kasane.json`; "controller": the last word of the visitor's title in `apps/demo/data/people.json` (`visitor`, Group Controller), exported as `company.visitor.title` and set in lowercase |
 | Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo (opens in a new tab)" |
 

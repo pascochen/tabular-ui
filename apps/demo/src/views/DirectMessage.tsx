@@ -143,7 +143,7 @@ function FindingSources({ finding }: { finding: string }) {
 
 /**
  * A direct message with a teammate: what was said before the visitor landed,
- * from `close.json`'s `conversations`, then whatever the visitor writes, and
+ * from `workspace.json`'s `conversations`, then whatever the visitor writes, and
  * the composer. Nobody replies to a post: the first one gets the System note,
  * as a channel's does.
  *
