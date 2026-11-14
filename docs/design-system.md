@@ -934,7 +934,14 @@ Added 2026-08-23 with `AttachmentRow`'s upload target, the first and so far only
 --w-sidebar     240px    AppShell's sidebar, and any popup sized to match it
 --w-panel       440px    AppShell's trailing panel (the chat drawer)
 --w-content    1280px    main's content column, gutters included, centred
+--w-sidebar-min 224px    the narrowest a person can drag the sidebar
+--w-sidebar-max 360px    the widest
+--w-panel-min   360px    the narrowest a person can drag the panel
+--w-panel-max   640px    the widest
+--w-main-min    600px    what a resize always leaves <main>
 ```
+
+The last five are the resize range, below (2026-11-13). `--w-sidebar` and `--w-panel` are the defaults within it.
 
 Widths are not density tokens and carry no cap. They exist because the same number was written in more than one place: the sidebar's `w-60` and the context switcher popup's `max-w-60` were one decision held in two literals. 440px comes from the shell sketch (about 440 at 1440 wide). At the 1280px floor with both sides open, main keeps 600px.
 
@@ -945,6 +952,77 @@ Widths are not density tokens and carry no cap. They exist because the same numb
 **Table pages opt out: `AppShell contentWidth="full"`.** On a page whose content is a wide data grid, such as a run log, a ledger or a reconciliation table, extra width means extra columns, and capping it hides data the user came to see. `"full"` keeps the frame tier (the 48px gutter and the top inset) and drops only the `--w-content` cap, so the grid runs to main's edges less the gutter. The page header follows the same setting, so the title stays on the grid's x. Everything else stays `"contained"`, the default: prose, forms, dashboards and detail pages, where a wider column only lengthens lines and spreads tiles apart. The test is whether the page's main content is a grid that scrolls sideways, or would, when narrow. Added 2026-10-08, with the first two table pages (`AppShell`'s `WithTable` and `Wide` stories).
 
 `--w-*` is the width counterpart of `--h-*`, but `tui/dimension-caps` does not check it, because nothing in this product caps a region's width. Added 2026-10-07 from the shell design audit.
+
+#### Resizing the sidebar and the panel — decided 2026-11-13 (owner)
+
+The owner asked (2026-11-13) for people to set the sidebar's and the panel's widths by dragging the edge they share with main. `--w-sidebar` and `--w-panel` stay the defaults. Each side gets a range, and main gets a floor:
+
+```
+                 min     default              max
+sidebar          224px   240px (--w-sidebar)  360px
+panel            360px   440px (--w-panel)    640px
+main             600px   —                    none
+```
+
+**The minimums are measured, on the Kasane demo (2026-11-13), at 1440×900, in Instrument Sans and again in Golos Text (#176).** A minimum is the narrowest width at which the content the shell is built for still fits. The binding item in each column:
+
+| Column | Item | Fits from (Instrument / Golos) | Gives way below it |
+|---|---|---|---|
+| Sidebar | Footer row: About this demo (129 / 131px), Skip, Start over | 216 / 218px | The row overflows the sidebar |
+| | The same row with §7.3's 4px floor between About and Skip | 218 / 220px | About and Skip read as one group |
+| | `OrgSwitcher` trigger, "Kasane Corporation" beside the toggle | 204 / 206px | The company name truncates |
+| | Longest nav label ("intercompany", agent and people names) | 158 / 160px | Labels truncate |
+| Panel | The close panel's `MetricTile` figure `$48,216.40`, two tiles side by side | 338px (after Skip; 322 at the start) | A figure is cut, which the failure log never allows |
+| | The Task panel's evidence file name | 316px | The name truncates (it has a tooltip) |
+| | The tiles' labels | 316px | "Supplier payments" wraps |
+| | The tiles' captions | 396px | Captions run to three lines, not two: accepted |
+
+224px clears every sidebar item with 4px to spare in Golos, the wider face. 360px keeps every figure whole with 22px to spare. Between 360 and 396 the close panel's captions take one more line, which is the cost of a narrower panel, not a defect.
+
+**The maximums are judgements, not measurements.** 360px is one and a half times the default: room for long channel and people names, and still a quarter of a 1440 screen. 640px gives a figure-heavy panel, such as a task with its evidence, room for more columns. In a chat, a 640px panel runs an agent's line to about 98 characters at `--text-base` (608px of column at Golos Text's ~6.2px a character, `AppShell` README; about 105 in Instrument Sans), well past the ~68 main's prose is set to. Estimated, not measured. Accepted: the person dragged it there.
+
+**Main's floor is the figure this section already guarantees.** At the 1280px floor with both sides at their defaults, main keeps 600px (above). A resize never takes it below that. There is no maximum: on a contained page `--w-content` still centres the column.
+
+**Each handle clamps live** to `min(its max, viewport − the other side's width − 600)`. At 1280 with both sides open, neither side can grow until the other shrinks: they trade width, and main stays at 600. At 1440 the sidebar reaches its 360 max and the panel 600 (the main floor binds before 640). **Below the 1280px floor** with both sides open, the clamp falls under the sides' minimums. The minimums win: each side sits at its minimum, its handle can't move, and main gets what is left. At 1024 that is 440px, where the defaults left it 344 before this section. With the sidebar collapsed, the panel narrows to leave main its 600px, down to its minimum: 424px at 1024. *(Corrected 2026-11-13, while building: the approved text said the handle could still shrink its side and main kept 344px, which a side at its minimum can't do. The defaults are clamped like any other width.)*
+
+**When the window shrinks under stored widths, the sidebar yields first.** The panel takes `min(its stored width, viewport − sidebar min − 600)`, then the sidebar takes what is left, down to its minimum. The measurements say why: at 224px the sidebar loses nothing, and at 360 the panel's captions already wrap. Opening the panel at 1280 therefore narrows a widened sidebar back toward 240, not the panel. A clamp never rewrites a stored width: the widths come back when the window does. Only a drag or a key stores one.
+
+**The handle is the rule the regions already share.**
+
+- **Hit area: the 1px rule plus 7px on its right side,** 8px in all, full height of its region. Right, not centred, because a scrollbar sits on the left side of both rules: the sidebar body's own, and main's against the panel. The 7px falls on main's 24px gutter or the panel's 16px one, so no target overlaps it.
+- **Resting, nothing is drawn but the rule.** A visible grip on every page edge would be chrome on chrome.
+- **Hover and drag:** `cursor: col-resize`, and the 8px strip takes the neutral overlay (`--color-bg-hover`, then `--color-bg-active` while dragging; §4 "Interaction states"). The rule stays 1px: a 2px edge is reserved (§7.8). No hue: resizing is not a state of the data.
+- **Focus:** `--color-ring` as an `outline`, `--ring-width` with a negative offset so the ring draws inside the strip, where no `overflow` can clip it (§4 "Focus ring").
+- **During a drag,** text selection is off on the page and the cursor holds `col-resize` wherever the pointer goes, so a fast drag that overshoots the strip doesn't flicker or select text.
+
+**Keyboard, the WAI-ARIA window splitter.** `role="separator"`, `aria-orientation="vertical"`, `aria-controls` the region it sizes, `aria-valuenow` its width in px, `aria-valuemin` its minimum, `aria-valuemax` its current clamp (not the 360 or 640 ceiling: the most the key will reach now), and a name, "Resize sidebar" or "Resize panel". It is in the tab order.
+
+| Key | Effect |
+|---|---|
+| Left / Right | Moves the rule 16px that way. On the sidebar's rule Right widens; on the panel's, Left widens |
+| Home | The side's minimum |
+| End | The side's current maximum |
+| Enter | The default, `--w-sidebar` or `--w-panel` |
+
+Double-click resets to the default too. Up and Down do nothing: the pattern makes them optional on a vertical splitter.
+
+**Where there is no handle:** on the collapsed sidebar (there is no rule), on the peek (an overlay: it shows at the stored width, clamped to the sidebar's range, but resizing a preview that closes when the pointer leaves it is a trap), and on any panel an app renders outside the shell, such as the demo's under-1024px sheet.
+
+**Dragging past the minimum does not collapse the sidebar.** The toggle stays the one way to collapse it. Collapsing moves the toggle and its focus (`AppShell` README) and reflows the breadcrumb, which a drag that overshoots should not do, and the keyboard has no matching move.
+
+**Widths persist per person** in `localStorage`, under the key `AppShell`'s `widthStorageKey` names (`tui-app-shell-widths` by default, `null` to not remember), as `useTheme`'s `storageKey` does. The stored value is what the person set, before any clamp.
+
+**The limits are tokens,** declared beside the defaults so the whole range sits in one place. `AppShell` reads every value at runtime rather than restating it (failure log), and so do its tests:
+
+```
+--w-sidebar-min   224px
+--w-sidebar-max   360px
+--w-panel-min     360px
+--w-panel-max     640px
+--w-main-min      600px
+```
+
+Five constants in `AppShell` were the alternative, with this section as their record. Approved as written by the owner on 2026-11-13, with the proposal's numbers, the sidebar yielding first, and no collapse on a drag past the minimum.
 
 ---
 

@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -104,6 +105,97 @@ const mainInsetY = [regionInsetY, '@2xl/main:pt-[var(--pad-frame-top)]'];
  */
 const footerBand = 'shrink-0 py-3';
 
+/**
+ * §7.9 "Resizing the sidebar and the panel". The limits are tokens, read at
+ * runtime so no value is restated here (failure log). `def` is the region's
+ * own width token, the width a reset returns to.
+ */
+type ResizeSide = 'sidebar' | 'panel';
+type SideLimits = { min: number; def: number; max: number };
+type ShellLimits = Record<ResizeSide, SideLimits> & { mainMin: number };
+type StoredWidths = Partial<Record<ResizeSide, number>>;
+
+const LIMIT_TOKENS = {
+  sidebar: { min: '--w-sidebar-min', def: '--w-sidebar', max: '--w-sidebar-max' },
+  panel: { min: '--w-panel-min', def: '--w-panel', max: '--w-panel-max' },
+} as const;
+
+/** §7.9: an arrow key moves the rule 16px. */
+const RESIZE_STEP = 16;
+
+function readLimits(el: Element): ShellLimits | null {
+  const style = getComputedStyle(el);
+  const px = (name: string) => parseFloat(style.getPropertyValue(name));
+  const side = (tokens: (typeof LIMIT_TOKENS)[ResizeSide]): SideLimits => ({
+    min: px(tokens.min),
+    def: px(tokens.def),
+    max: px(tokens.max),
+  });
+  const limits = { sidebar: side(LIMIT_TOKENS.sidebar), panel: side(LIMIT_TOKENS.panel), mainMin: px('--w-main-min') };
+  const values = [limits.mainMin, ...Object.values(limits.sidebar), ...Object.values(limits.panel)];
+  // A page without theme.css has no limits: the regions keep their CSS widths
+  // and no handle is drawn, rather than every width clamping to NaN.
+  return values.every(Number.isFinite) ? limits : null;
+}
+
+/** The low bound wins: below the 1280px floor a side's ceiling falls under its minimum (§7.9). */
+const clampWidth = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+
+/**
+ * The width each side gets, from what the person set (or the default) and the
+ * room there is. The panel resolves first, against the sidebar's minimum, and
+ * the sidebar takes what is left: when both can't fit, the sidebar yields
+ * (§7.9). The stored widths are never rewritten by this, so they come back
+ * when the window does.
+ */
+function resolveWidths(
+  limits: ShellLimits,
+  shellWidth: number,
+  stored: StoredWidths,
+  { sidebarDocked, panelOpen }: { sidebarDocked: boolean; panelOpen: boolean },
+) {
+  const { sidebar: s, panel: p, mainMin } = limits;
+  const panel = panelOpen
+    ? clampWidth(stored.panel ?? p.def, p.min, Math.min(p.max, shellWidth - (sidebarDocked ? s.min : 0) - mainMin))
+    : 0;
+  // A peek floats over main, so main's floor doesn't bound it.
+  const sidebarCeiling = sidebarDocked ? Math.min(s.max, shellWidth - panel - mainMin) : s.max;
+  const sidebar = clampWidth(stored.sidebar ?? s.def, s.min, sidebarCeiling);
+  return {
+    sidebar,
+    panel,
+    // What each handle can reach now: aria-valuemax, End, and a drag's ceiling.
+    // Each is bounded by the other side as it stands, so a resize never
+    // pushes the other side: at the floor the two can only trade width.
+    sidebarMax: Math.max(s.min, sidebarCeiling),
+    panelMax: Math.max(p.min, Math.min(p.max, shellWidth - (sidebarDocked ? sidebar : 0) - mainMin)),
+  };
+}
+
+function readStoredWidths(key: string): StoredWidths {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '{}');
+    const out: StoredWidths = {};
+    if (parsed && typeof parsed === 'object') {
+      for (const side of ['sidebar', 'panel'] as const) {
+        const value = (parsed as Record<string, unknown>)[side];
+        if (typeof value === 'number' && Number.isFinite(value)) out[side] = value;
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writeStoredWidths(key: string, widths: StoredWidths) {
+  try {
+    localStorage.setItem(key, JSON.stringify(widths));
+  } catch {
+    // Private mode or blocked storage: the width applies, unremembered.
+  }
+}
+
 export type AppShellProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   /**
    * The top band over main and panel — normally an `AppBar` whose `brand`
@@ -147,6 +239,12 @@ export type AppShellProps = Omit<React.ComponentProps<'div'>, 'children'> & {
    * Prose, forms, dashboards and detail pages stay `contained`.
    */
   contentWidth?: AppShellContentWidth;
+  /**
+   * Where the sidebar and panel widths a person drags to are remembered, in
+   * `localStorage`. Defaults to `tui-app-shell-widths`. `null` keeps them for
+   * this page load only. Give each shell its own key if an app has two.
+   */
+  widthStorageKey?: string | null;
   /** The page itself, in `<main>`'s scrolling body. */
   children: React.ReactNode;
 };
@@ -208,6 +306,7 @@ function AppShell({
   onPanelOpenChange,
   pageHeader,
   contentWidth = 'contained',
+  widthStorageKey = 'tui-app-shell-widths',
   children,
   className,
   ...props
@@ -252,10 +351,91 @@ function AppShell({
 
   useEffect(() => () => clearTimeout(peekCloseTimer.current), []);
 
+  // §7.9 resizing. Nothing here runs on a server: until the layout effect
+  // reads the limits, both regions keep their CSS widths (--w-sidebar,
+  // --w-panel) and no handle renders, so the first client render matches the
+  // server's markup.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [limits, setLimits] = useState<ShellLimits | null>(null);
+  const [shellWidth, setShellWidth] = useState(0);
+  const [storedWidths, setStoredWidths] = useState<StoredWidths>({});
+  const [dragging, setDragging] = useState<ResizeSide | null>(null);
+
+  // Layout, not passive: a remembered width lands before the first paint, so
+  // the sidebar never flashes at 240px and jumps.
+  useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const measure = () => setShellWidth(el.getBoundingClientRect().width);
+    const load = () => {
+      setLimits(readLimits(el));
+      setStoredWidths(widthStorageKey ? readStoredWidths(widthStorageKey) : {});
+    };
+    load();
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [widthStorageKey]);
+
+  // While a drag runs, the whole page holds the resize cursor and selects no
+  // text, so a fast drag that overshoots the 8px strip neither flickers nor
+  // paints a selection across main.
+  useEffect(() => {
+    if (!dragging) return;
+    const { style } = document.body;
+    const before = { cursor: style.cursor, userSelect: style.userSelect };
+    style.cursor = 'col-resize';
+    style.userSelect = 'none';
+    return () => {
+      style.cursor = before.cursor;
+      style.userSelect = before.userSelect;
+    };
+  }, [dragging]);
+
   const hasSidebar = sidebar != null || sidebarHeader != null || sidebarFooter != null;
   const pinned = hasSidebar && (wide ? pinnedWide : pinnedNarrow);
   const peek = hasSidebar && !pinned && peeking;
   const panelOpen = panel != null && (panelOpenProp ?? panelOpenState);
+
+  const widths =
+    limits && shellWidth > 0
+      ? resolveWidths(limits, shellWidth, storedWidths, { sidebarDocked: pinned, panelOpen })
+      : null;
+
+  /**
+   * Sets one side's width, clamped to what its handle can reach now. `null`
+   * returns it to the default. Persisted only when asked: a drag writes once,
+   * when it ends.
+   */
+  const setSideWidth = (side: ResizeSide, value: number | null, persist: boolean) => {
+    if (!limits || !widths) return;
+    const next = { ...storedWidths };
+    if (value === null) delete next[side];
+    else
+      next[side] = clampWidth(
+        Math.round(value),
+        limits[side].min,
+        side === 'sidebar' ? widths.sidebarMax : widths.panelMax,
+      );
+    setStoredWidths(next);
+    if (persist && widthStorageKey) writeStoredWidths(widthStorageKey, next);
+  };
+
+  const resizeHandle = (side: ResizeSide) =>
+    limits && widths ? (
+      <ResizeHandle
+        side={side}
+        controls={side === 'sidebar' ? sidebarId : panelId}
+        value={widths[side]}
+        min={limits[side].min}
+        max={side === 'sidebar' ? widths.sidebarMax : widths.panelMax}
+        dragging={dragging === side}
+        onDragChange={(active) => setDragging(active ? side : null)}
+        onResize={(value, persist) => setSideWidth(side, value, persist)}
+        onReset={() => setSideWidth(side, null, true)}
+      />
+    ) : null;
 
   // The toggle changes places: pinning removes the one the user pressed
   // (top nav) and reveals the other (sidebar header), and unpinning does the
@@ -347,6 +527,7 @@ function AppShell({
   return (
     <AppShellContext.Provider value={context}>
       <div
+        ref={rootRef}
         data-slot="app-shell"
         data-sidebar={pinned ? 'pinned' : peek ? 'peek' : 'collapsed'}
         className={cn(
@@ -429,14 +610,18 @@ function AppShell({
               id={panelId}
               aria-label={panelLabel}
               data-slot="app-shell-panel"
+              // The width a person set, clamped (§7.9). Until the client has
+              // read the limits, the CSS default below holds.
+              style={widths ? { width: widths.panel } : undefined}
               className={cn(
                 // --w-panel (440px), from the shell sketch (§7.9). No padding
                 // and no scroll here: header and footer pin, and only
                 // AppShellPanelBody scrolls.
-                'flex w-[var(--w-panel)] min-h-0 shrink-0 flex-col border-l border-border bg-surface',
+                'relative flex w-[var(--w-panel)] min-h-0 shrink-0 flex-col border-l border-border bg-surface',
               )}
             >
               {panel}
+              {resizeHandle('panel')}
             </aside>
           ) : null}
         </div>
@@ -474,6 +659,8 @@ function AppShell({
               // Following a link out of a peek is the end of the glance.
               if (peek && (event.target as Element).closest('a[href]')) setPeeking(false);
             }}
+            // The width a person set, clamped (§7.9); a peek shows it too.
+            style={widths ? { width: widths.sidebar } : undefined}
             className={cn(
               // --w-sidebar (240px), §7.9.
               'w-[var(--w-sidebar)] min-h-0 flex-col',
@@ -481,7 +668,8 @@ function AppShell({
               // `hidden` attribute.
               (pinned || peek) && 'flex',
               pinned && [
-                'col-start-1 row-span-2 row-start-1',
+                // Relative: the resize handle hangs off its trailing rule.
+                'relative col-start-1 row-span-2 row-start-1',
                 // §4 elevation, sunken: the frame beside the page. In light
                 // mode that is the paper, a step under the page's white; in
                 // dark it is the canvas, and the rule alone separates it.
@@ -537,10 +725,134 @@ function AppShell({
                 {sidebarFooter}
               </div>
             ) : null}
+            {/* Pinned only: a peek is a preview that closes when the pointer leaves (§7.9). */}
+            {pinned ? resizeHandle('sidebar') : null}
           </section>
         ) : null}
       </div>
     </AppShellContext.Provider>
+  );
+}
+
+type ResizeHandleProps = {
+  side: ResizeSide;
+  /** The id of the region it sizes. */
+  controls: string;
+  value: number;
+  min: number;
+  /** What it can reach now, not the side's ceiling: the other side bounds it. */
+  max: number;
+  dragging: boolean;
+  onDragChange: (dragging: boolean) => void;
+  onResize: (value: number, persist: boolean) => void;
+  onReset: () => void;
+};
+
+/**
+ * The rule a region shares with main, made draggable: the WAI-ARIA window
+ * splitter (§7.9). Not exported. A `separator` with a value, focusable, so it
+ * promises the pattern's keys, and every one is tested (failure log).
+ *
+ * The 8px strip is the region's 1px rule plus 7px on its right. Right, not
+ * centred: a scrollbar sits left of both rules (the sidebar body's own, and
+ * main's against the panel), and a centred strip would take its edge.
+ */
+function ResizeHandle({
+  side,
+  controls,
+  value,
+  min,
+  max,
+  dragging,
+  onDragChange,
+  onResize,
+  onReset,
+}: ResizeHandleProps) {
+  // Where the drag began, and the last width it set, which pointerup writes.
+  const drag = useRef<{ x: number; width: number; last: number } | null>(null);
+  // On the sidebar's rule, right widens; on the panel's (its leading edge),
+  // left does. The arrow moves the rule, and the width follows.
+  const widenRight = side === 'sidebar';
+
+  const endDrag = () => {
+    const current = drag.current;
+    if (!current) return;
+    drag.current = null;
+    onDragChange(false);
+    onResize(current.last, true);
+  };
+
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={side === 'sidebar' ? 'Resize sidebar' : 'Resize panel'}
+      aria-controls={controls}
+      aria-valuenow={value}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      tabIndex={0}
+      data-slot={`app-shell-${side}-resize`}
+      data-dragging={dragging ? '' : undefined}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        // No text selection, and no focus jump, from the press itself.
+        event.preventDefault();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        drag.current = { x: event.clientX, width: value, last: value };
+        onDragChange(true);
+      }}
+      onPointerMove={(event) => {
+        const current = drag.current;
+        if (!current) return;
+        const delta = event.clientX - current.x;
+        current.last = clampWidth(current.width + (widenRight ? delta : -delta), min, max);
+        onResize(current.last, false);
+      }}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onLostPointerCapture={endDrag}
+      onDoubleClick={onReset}
+      onKeyDown={(event) => {
+        const step = (towardRight: boolean) => value + (towardRight === widenRight ? RESIZE_STEP : -RESIZE_STEP);
+        const next =
+          event.key === 'ArrowLeft'
+            ? step(false)
+            : event.key === 'ArrowRight'
+              ? step(true)
+              : event.key === 'Home'
+                ? min
+                : event.key === 'End'
+                  ? max
+                  : undefined;
+        if (next !== undefined) {
+          event.preventDefault();
+          onResize(next, true);
+        } else if (event.key === 'Enter') {
+          event.preventDefault();
+          onReset();
+        }
+      }}
+      className={cn(
+        // z-50: above the top nav, which is sticky at z-40 and would cover
+        // the sidebar strip's 7px beside it. Every popup portals to the end
+        // of <body> at z-50, so it still paints over the strip.
+        'absolute inset-y-0 z-50 w-2 cursor-col-resize touch-none',
+        // The rule's own pixel plus 7px to its right. An absolute child is
+        // placed from the padding edge, which is the rule's inner side: the
+        // sidebar's strip ends a full strip (8px) past it, so it starts on
+        // the rule and hangs 7px over main; the panel's steps back over its
+        // own leading rule. A transparent border is geometry (failure log).
+        side === 'sidebar' ? '-right-2' : '-left-[var(--border-width)]',
+        // §4 interaction states: the one neutral overlay. The rule stays 1px
+        // (a 2px edge is reserved, §7.8) and takes no hue: resizing is not a
+        // state of the data.
+        'transition-colors hover:bg-bg-hover data-[dragging]:bg-bg-active',
+        // §4 focus ring, inside the strip: nothing around it can clip it.
+        'outline-none focus-visible:outline-solid focus-visible:outline-ring',
+        'focus-visible:outline-[length:var(--ring-width)] focus-visible:outline-offset-[calc(var(--ring-width)*-1)]',
+      )}
+    />
   );
 }
 

@@ -123,8 +123,30 @@ Since 2026-11-12 (§3, "The page and the frame"; `docs/reviews/white-content-202
 
 - ≥1280px starts pinned (`defaultSidebarOpen`). Below 1280px it starts collapsed, and crossing below the floor collapses it.
 - Pinning below the floor docks the sidebar there too: it pushes main rather than covering it. That pin doesn't survive a trip above the floor and back. Each width class keeps its own pin state, so a user who collapsed the sidebar on a wide screen gets it back collapsed.
-- **The panel pushes main instead of covering it**, at every width. At the 1280px floor with both sides open, main keeps 600px (`AtFloor` story). Below the floor, pinning the sidebar with the chat open leaves main narrow: 344px at 1024px.
+- **The panel pushes main instead of covering it**, at every width. At the 1280px floor with both sides open, main keeps 600px (`AtFloor` story). Below the floor, each side narrows to keep main at `--w-main-min` (600px), down to its own minimum: pinning the sidebar with the chat open at 1024px leaves both sides at their minimums and main at 440px. See *Resizing* below.
 - **The page is capped, the prose is not.** Once `<main>` is wider than `--w-content` (1280px, gutters included), the page header and body centre in that column (§7.9), so a wide monitor gets margins either side. **Table pages opt out with `contentWidth="full"`**: where extra width means extra columns, the grid runs to main's edges less the 48px frame gutter, and the page header follows. Prose, forms, dashboards and detail pages keep the default, `"contained"`. Compare the `Wide` and `CentredColumn` stories, both at 2560. Prose still sets its own, narrower measure; the story uses `max-w-[52ch]`, about 68 characters a line at `--text-base`. A `ch` is the width of "0" (8.06px in Golos Text at 13px), wider than the average character (~6.2px, spaces included), so `Nch` gives roughly 1.3×N characters. The ratio is the font's: it was ~1.3 in Inter (8.2px against ~6.2px) and Archivo (7.4px against ~5.7px), and ~1.2 in Source Sans 3 (6.46px against ~5.3px), when the story used 56ch. The measure moved to 45ch with Instrument Sans (2026-11-07), where the ratio was ~1.5 (8.66px against ~5.8px), and to 52ch with Golos Text (2026-11-13), to keep about the same line length (§8.3). `72ch` looked right and ran to about 95. Use container queries (`@container`) for content that has to respond to the width of main. Pinning, collapsing and the panel all change that width while the viewport stays the same.
+
+## Resizing: drag the rule
+
+Since 2026-11-13 (§7.9 "Resizing the sidebar and the panel"). A person can set the pinned sidebar's width and the panel's by dragging the rule each shares with main (`Resizable` story).
+
+| | Min | Default | Max |
+|---|---|---|---|
+| Sidebar | `--w-sidebar-min` 224px | `--w-sidebar` 240px | `--w-sidebar-max` 360px |
+| Panel | `--w-panel-min` 360px | `--w-panel` 440px | `--w-panel-max` 640px |
+| Main | `--w-main-min` 600px | — | none |
+
+The minimums are measured on the Kasane demo: the sidebar footer's three controls, and the close panel's two `MetricTile` figures side by side. §7.9 has the table.
+
+- **Main keeps 600px.** Each handle stops at `min(its max, the shell's width − the other side − 600)`. At the 1280px floor with both sides at their defaults, neither can grow until the other shrinks: they trade width (`AtFloor`). Below the floor, the sides sit at their minimums and main takes what is left.
+- **When the window narrows under stored widths, the sidebar yields first.** The panel takes what main's floor leaves beside the sidebar's minimum, then the sidebar takes the rest (`ResizedToMaximums`, at 1280 and at 2560). A clamp never rewrites a stored width: widen the window and they come back.
+- **The handle** is the 1px rule plus 7px on its right side, 8px in all, full height. Right, because a scrollbar sits left of both rules. It sits at `z-50`, above the top nav (sticky at `z-40`) and under every popup, which portals later at `z-50`. At rest nothing is drawn but the rule. Hover takes `--color-bg-hover`, a drag `--color-bg-active`, with `cursor: col-resize`. A drag holds that cursor on the whole page and turns off text selection until it ends.
+- **The keyboard: a WAI-ARIA window splitter.** `role="separator"`, vertical, focusable, named "Resize sidebar" or "Resize panel", with `aria-controls` on its region and `aria-valuenow`, `aria-valuemin` and `aria-valuemax` in px. `aria-valuemax` is what the handle can reach now, not the token's ceiling. Left and Right move the rule 16px (Left widens the panel, Right the sidebar), Home and End go to the minimum and that maximum, Enter returns to the default. Double-click does too. Focus is `--color-ring` as an inset `outline`.
+- **No handle** on the collapsed sidebar, on the peek, or on a panel the app renders outside the shell (the demo's under-1024px sheet). The peek shows at the stored width.
+- **Dragging past the minimum doesn't collapse the sidebar.** The toggle is the one way to collapse it (owner, 2026-11-13).
+- **Widths are remembered** in `localStorage` under `widthStorageKey`, `tui-app-shell-widths` by default, as `{ "sidebar": 300, "panel": 520 }`. `null` remembers nothing, which every story but the resize ones uses so that a drag in one story doesn't follow a reader to the next. A key holds what the person set, before any clamp.
+- **Server rendering.** Until the client has read the tokens, both regions render at their CSS defaults and no handle is drawn, so hydration matches. A remembered width lands in a layout effect, before the first paint.
+- **The limits are read from the tokens at runtime.** A page without `theme.css` gets no handles rather than widths of `NaN`.
 
 ## Parts
 
@@ -157,13 +179,14 @@ The shell's landmarks: the top nav is `AppBar`'s `banner`, the page is `main`, t
 | `panelLabel` | — | Name of the `complementary` landmark. Pass it whenever `panel` is set |
 | `pageHeader` | — | An `AppShellPageHeader`. Rendered at the top of `<main>`, above its scrolling body |
 | `panelOpen` / `defaultPanelOpen` / `onPanelOpenChange` | — / `true` / — | Controlled or uncontrolled panel state |
+| `widthStorageKey` | `"tui-app-shell-widths"` | Where the widths a person drags to are remembered, in `localStorage`. `null` keeps them for the page load only. Give each shell its own key if an app has two |
 
 If none of the three sidebar slots is set, the shell has no sidebar, and neither toggle renders.
 
 ## Geometry
 
 - **Header bands: 49px**, measured: `--pad-band-y` (8px) around a 32px `--h-control` child, plus the 1px rule. `AppBar` uses the same recipe. The height is emergent on purpose (§7.4 explains why there is no `--h-band`), so a band's child must be at least `--h-control` tall. Both headings have a 32px minimum height for that reason. Two rules run across the shell: the top nav with the sidebar header, and the page header with the panel header. The spec checks both.
-- **Sidebar: `--w-sidebar` (240px). Panel: `--w-panel` (440px).** §7.9. The panel width comes from the sketch (about 440px at 1440). `ContextSwitcher`'s compact popup is capped at `--w-sidebar` too.
+- **Sidebar: `--w-sidebar` (240px). Panel: `--w-panel` (440px).** §7.9. Those are the defaults: a person can drag either within its range (*Resizing*). The panel width comes from the sketch (about 440px at 1440). `ContextSwitcher`'s compact popup is capped at `--w-sidebar` too.
 - **One top inset for every region: `--pad-page-y` (16px)**, while `<main>` is under 672px. The sidebar body, `<main>` and the panel body all start their first content 16px below the shared header rule, so the three columns open on one line. Before the 2026-10-07 audit these were 8px, 16px and 12px. Once main is 672px or wider, it opens `--pad-frame-top` (48px) below the rule instead (§7.3 "Frame tier"); the sidebar and panel stay at 16px.
 - **One side gutter for every chrome column: `--pad-page-x` (16px).** The sidebar's edges match the top nav's, and the panel's content edge lines up with the top nav's trailing action above it. The panel used `--pad-panel` (12px) until 2026-10-07. `--pad-panel` stays the token for panels *inside* a page, such as `Dialog`.
 - **Main is wider: `--pad-content-x` (24px)**, on the page header and the main body alike, while main is under 672px. The title and the body text start at x+24 from main's edge, in line with the breadcrumb text in the top nav (§7.4). **At 672px and wider, the frame tier's `--pad-frame-x` (48px)** takes over, and the breadcrumb alignment is given up for the page's air (§7.3). `<main>` is an `@container/main`, so this follows main's own width: pinning the sidebar or opening the panel can switch it while the viewport stays the same. At the 1280px floor with both sides open (600px), the frame is off. Tabs indent their labels by their own 8px padding, so their underline starts on the text edge.
@@ -236,10 +259,9 @@ These shell features are also not built yet:
 
 - Persisting collapsed state (the docked sidebar is uncontrolled).
 - A keyboard shortcut for either toggle.
-- Resizable regions.
 
 ## Testing
 
-`apps/storybook/tests/app-shell.spec.ts` (Playwright, 29 tests) covers the sketch geometry, the shared rule, one text-start x for every sidebar label, trigger and nav item, pin and collapse with the focus hand-off, peek (overlay geometry, survives crossing into it, closes on leave and Escape, pins on either toggle, doesn't reflow the breadcrumb, doesn't open for a toggle that reappears under a resting pointer), the panel toggle, virtualization, focus-ring room, the skip link, and pin state across the floor, and axe's `region` rule on the whole page, Storybook's own hidden screens removed first. Behaviour depends on the viewport, and the vitest browser runner ignores Storybook's viewport globals, so this coverage lives in Playwright rather than story play functions.
+`apps/storybook/tests/app-shell.spec.ts` (Playwright, 55 tests) covers the sketch geometry, the shared rule, one text-start x for every sidebar label, trigger and nav item, pin and collapse with the focus hand-off, peek (overlay geometry, survives crossing into it, closes on leave and Escape, pins on either toggle, doesn't reflow the breadcrumb, doesn't open for a toggle that reappears under a resting pointer), the panel toggle, virtualization, focus-ring room, the skip link, and pin state across the floor, axe's `region` rule on the whole page, Storybook's own hidden screens removed first, and resizing: each handle's place on its rule and that nothing covers it, drag, every splitter key, double-click, the clamps at 1024, 1280 and 1440, the sidebar yielding to stored widths and their return, persistence and `widthStorageKey={null}`, no handle on the peek, the collapsed sidebar or a closed panel, and the ring and overlay in both modes. Behaviour depends on the viewport, and the vitest browser runner ignores Storybook's viewport globals, so this coverage lives in Playwright rather than story play functions.
 
 Stories pin a viewport with `globals: { viewport: { value: 'laptopLg' } }` (1440, the sketch's width). The desktop viewports are defined in `apps/storybook/.storybook/preview.tsx`.

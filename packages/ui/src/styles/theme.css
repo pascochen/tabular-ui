@@ -110,6 +110,10 @@
    scripts/tabular-figures.py (§8.3). The --gap-control-icon comment names
    Golos Text's 3.25px word space, from §7.4 (comment only, no value
    changed, same day).
+   --w-sidebar-min, --w-sidebar-max, --w-panel-min, --w-panel-max and
+   --w-main-min added from §7.9 "Resizing the sidebar and the panel"
+   (2026-11-13, user-approved): the range AppShell's resize handles
+   clamp to. Read by AppShell at runtime.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -298,6 +302,11 @@
   --w-sidebar: 240px;      /* AppShell sidebar, and popups sized to match it */
   --w-panel: 440px;        /* AppShell trailing panel — the chat drawer */
   --w-content: 1280px;     /* main's content column, frame gutters included, centred */
+  --w-sidebar-min: 224px;  /* §7.9 resize range: narrowest sidebar a drag reaches */
+  --w-sidebar-max: 360px;  /* widest sidebar */
+  --w-panel-min: 360px;    /* narrowest panel */
+  --w-panel-max: 640px;    /* widest panel */
+  --w-main-min: 600px;     /* what a resize always leaves <main> */
 
   /* §8.3 — families. --font-display is the metric tier; --font-heading is
      every h1–h6, applied once in the base layer below. Both are the serif.
