@@ -30,8 +30,10 @@ The sidebar footer's account row. It goes in `AppShell`'s `sidebarFooter` slot.
 | `user.identity` | `number` | The user's position in the workspace's member list, from 1. Gives the fallback its identity ground; without it the fallback is neutral |
 | `theme` | `'dark' \| 'light' \| 'system'` | The user's preference, which the Theme group checks. Pass `useTheme()`'s `preference` (not its resolved `theme`, or System could never show as chosen) |
 | `onThemeChange` | `(theme) => void` | The user picked a preference. Pass `useTheme()`'s `setPreference`: the hook applies it and owns `data-theme` on the root |
-| `onOpenProfile`, `onOpenHomepage`, `onSignOut` | `() => void` | Router-agnostic; the caller navigates |
-| `onOpenWorkspaceSettings`, `onOpenBilling` | `() => void` | The **current** workspace's settings and billing. The caller knows which workspace is current; the menu does not |
+| `onOpenProfile`, `onOpenHomepage`, `onSignOut` | `() => void`, optional | Router-agnostic; the caller navigates |
+| `onOpenWorkspaceSettings`, `onOpenBilling` | `() => void`, optional | The **current** workspace's settings and billing. The caller knows which workspace is current; the menu does not |
+
+Each of the five draws its item only when it is passed (optional since 2026-11-13). An app with no such page leaves it out rather than drawing a row that does nothing, and a separator with nothing on one side goes with it. Theme is always there. The Kasane demo passes only Homepage (`OnlyHomepage` story).
 
 ## Row
 
@@ -71,7 +73,7 @@ Each hover starts the loop from the first frame. See `Avatar`.
 
 `MenuContent density="spaced"`, as in the switchers: 36px rows 4px apart, no shadow (§4). See `Menu`'s README.
 
-Header (32px avatar, full name, email) → Your profile → **Theme**: Dark · Light · System → Workspace settings · Subscription and billing · Homepage → Sign out.
+Header (32px avatar, full name, email) → Your profile → **Theme**: Dark · Light · System → Workspace settings · Subscription and billing · Homepage → Sign out. Every group but the header and Theme is drawn only when one of its handlers is passed (see *Props*).
 
 **Theme** is a `MenuRadioGroup` with its own `MenuLabel`, so it is announced as a group named "Theme" of three `menuitemradio` rows. **System** (added 2026-10-11) follows the OS setting, live; Dark and Light keep their places, and System goes last. The design sketch drew a sun/moon segmented control inside one row. That would be two buttons nested in a menu item, out of reach of the menu's arrow keys, and no foundational toggle group exists. The radio indicator sits in the same `--size-icon-sm` column as the other rows' icons, so "Dark" starts where "Your profile" does. Radio items keep the menu open, so the change is seen.
 

@@ -48,6 +48,16 @@ test('wording: the Workspaces label and the Create Workspace row', async ({ page
   await expect(item(page, 'Create Workspace')).toBeVisible();
 });
 
+test('without onCreateOrg: no Create Workspace row and no separator, only the org', async ({ page }) => {
+  await gotoStory(page, 'product-orgswitcher--no-create');
+  await trigger(page).click();
+  await expect(menu(page)).toBeVisible();
+  await expect(item(page, 'Create Workspace')).toHaveCount(0);
+  await expect(menu(page).locator('[data-slot="menu-separator"]')).toHaveCount(0);
+  await expect(menu(page).getByRole('menuitem')).toHaveCount(1);
+  await expect(currentRow(page)).toBeVisible();
+});
+
 test('picking the current org closes the menu and switches nothing', async ({ page }) => {
   await gotoStory(page, 'product-orgswitcher--default');
   await trigger(page).click();

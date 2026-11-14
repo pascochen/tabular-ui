@@ -21,8 +21,8 @@ export type ProjectSwitcherProps = {
    * irreversible action, and the menu has already closed.
    */
   onDeleteProject: (projectId: string) => void;
-  /** Starts the create-project flow. */
-  onCreateProject: () => void;
+  /** Starts the create-project flow. Omit it when there is none: the Create project row is then not drawn. */
+  onCreateProject?: () => void;
   /** The `id` of the `ContextSwitcherLabel` above it. */
   labelId?: string;
   className?: string;

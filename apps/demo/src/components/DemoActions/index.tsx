@@ -35,45 +35,54 @@ export function AboutDemoButton({ className }: { className?: string }) {
         <InfoIcon aria-hidden="true" />
         About this demo
       </Button>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>About this demo</DialogTitle>
-            <DialogDescription>
-              The month-end close of an AI finance tool, built from Tabular UI&rsquo;s components.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
-            <p>{whoYouAre}</p>
-            <p>
-              <span className="font-medium text-text-primary">The company is fictional.</span> {kasaneCompany.legalName}{' '}
-              makes stencil duplicators and inkjet printers in Tokyo and sells through subsidiaries in the US, Germany,
-              the UK and China. Its people, customers and numbers were generated, and its books balance to the yen.
-            </p>
-            <p>
-              <span className="font-medium text-text-primary">The people and the agents are scripted.</span> Every
-              figure they quote is computed from Kasane&rsquo;s books. You make one decision, and only what it touches
-              changes.
-            </p>
-            <p>
-              <span className="font-medium text-text-primary">The interface is real.</span> Every control, colour and
-              spacing on these screens comes from Tabular UI, a design system for dense finance and data tools.
-            </p>
-          </div>
-          <DialogFooter>
-            <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
-              Storybook
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-            <a className={buttonVariants()} href={AI_COMPONENTS_URL} target="_blank" rel="noreferrer">
-              Browse the AI components
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AboutDemoDialog open={open} onOpenChange={setOpen} />
     </>
+  );
+}
+
+/**
+ * The About dialog on its own, for a control that isn't About's button: the
+ * workspace switcher opens it for the companies and the create flow the demo
+ * doesn't have (`shell/Sidebar.tsx`).
+ */
+export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>About this demo</DialogTitle>
+          <DialogDescription>
+            The month-end close of an AI finance tool, built from Tabular UI&rsquo;s components.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
+          <p>{whoYouAre}</p>
+          <p>
+            <span className="font-medium text-text-primary">The company is fictional.</span> {kasaneCompany.legalName}{' '}
+            makes stencil duplicators and inkjet printers in Tokyo and sells through subsidiaries in the US, Germany,
+            the UK and China. Its people, customers and numbers were generated, and its books balance to the yen.
+          </p>
+          <p>
+            <span className="font-medium text-text-primary">The people and the agents are scripted.</span> Every figure
+            they quote is computed from Kasane&rsquo;s books. You make one decision, and only what it touches changes.
+          </p>
+          <p>
+            <span className="font-medium text-text-primary">The interface is real.</span> Every control, colour and
+            spacing on these screens comes from Tabular UI, a design system for dense finance and data tools.
+          </p>
+        </div>
+        <DialogFooter>
+          <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
+            Storybook
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+          <a className={buttonVariants()} href={AI_COMPONENTS_URL} target="_blank" rel="noreferrer">
+            Browse the AI components
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -28,7 +28,7 @@ Product. `ContextSwitcher` with the project wording and the `block` trigger. Goe
 | `pinned` | `boolean` | Default `false`. Flips the action to "Unpin project" with the slashed pin |
 | `onTogglePin` | `(id) => void` | Read `pinned` for which way |
 | `onDeleteProject` | `(id) => void` | **Confirm in a `Dialog` before deleting.** See below |
-| `onCreateProject` | `() => void` | |
+| `onCreateProject` | `() => void`, optional | Omit it when there is no create flow: the Create project row isn't drawn |
 | `labelId` | `string` | The label's `id`. The trigger is named "Project FY2026 H1 close" |
 
 ## Submenu

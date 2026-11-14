@@ -20,7 +20,7 @@ The sidebar header's workspace switcher. The component and its props keep the `o
 | `orgs` | `{ id: string; name: string }[]` | Every org the user belongs to, in display order |
 | `currentOrgId` | `string` | The org shown on the trigger and checked in the menu |
 | `onSwitch` | `(orgId) => void` | Picking another org. The menu closes |
-| `onCreateOrg` | `() => void` | The create-workspace flow |
+| `onCreateOrg` | `() => void`, optional | The create-workspace flow. Omit it when there is none: the Create Workspace row and its separator aren't drawn (`NoCreate` story) |
 | `className` | `string` | Applied to the trigger |
 
 Both handlers are required, so a consumer cannot ship a menu row that does nothing.

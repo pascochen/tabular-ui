@@ -611,14 +611,24 @@ const daisuke = {
   identity: 1,
 };
 
-/** Kasane is the only company: the switcher shows its name and the chevron, nothing else. */
+/**
+ * The group's companies by their short names, as a workspace list shows them,
+ * then Create Workspace: the Kasane demo's switcher (owner, 2026-11-13). The
+ * other OrgSwitcher stories keep the legal names, for long-name overflow.
+ */
+const accountantCompanies = [
+  { id: kasaneOrgs[0].id, name: 'Kasane Corporation' },
+  { id: kasaneOrgs[1].id, name: 'Kasane Americas' },
+  { id: kasaneOrgs[2].id, name: 'Kasane Europe' },
+];
+
 function AccountantOrgSwitcher() {
-  const companies = kasaneOrgs.slice(0, 1).map(({ id, name }) => ({ id, name }));
+  const [current, setCurrent] = useState(accountantCompanies[0].id);
   return (
     <OrgSwitcher
-      orgs={companies}
-      currentOrgId={companies[0].id}
-      onSwitch={() => {}}
+      orgs={accountantCompanies}
+      currentOrgId={current}
+      onSwitch={setCurrent}
       // TODO: hook into the create-workspace flow — none exists yet.
       onCreateOrg={() => {}}
     />
@@ -654,7 +664,8 @@ function AccountantAccountFooter() {
  * name says it's an agent and no `agent` badge is needed beside it.
  */
 const accountingAgents = ['Revenue AI', 'Payments AI', 'Approvals AI', 'Credit AI'];
-const accountingChannels = ['close', 'payables'];
+/** The Kasane demo's six, in its order (since 2026-11-13; `close` and `payables` until then). */
+const accountingChannels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'];
 /**
  * Colleagues only: the signed-in user (Daisuke) never appears as a direct
  * message. He is first in the member list, so they take the second and third

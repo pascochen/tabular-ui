@@ -7,6 +7,7 @@ import type { View } from '../lib/view';
 import { ChannelPresence } from '../shell/ChannelPresence';
 import { NoMessages, Profile } from './parts';
 import { AgentProfile, AgentView } from './AgentView';
+import { AgentsView } from './Agents';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
 import { ChannelView } from './Channel';
 import { NewChatView } from './NewChat';
@@ -59,6 +60,9 @@ export function slotsFor(view: View): ViewSlots {
   }
   if (view.kind === 'search') {
     return { title: 'Search', body: <SearchView q={view.q} /> };
+  }
+  if (view.kind === 'agents') {
+    return { title: 'Agents', body: <AgentsView /> };
   }
   if (view.kind === 'dm') {
     const m = member(view.member);

@@ -232,6 +232,24 @@ test('the menu: header, profile, theme, workspace settings, billing, homepage, s
   ]);
 });
 
+test('an app passes only its pages: Homepage alone, with no separator on an empty side', async ({ page }) => {
+  await gotoStory(page, 'product-accountmenu--only-homepage');
+  await trigger(page).click();
+  await expect(menu(page).locator('[role^="menuitem"]')).toHaveText(['Dark', 'Light', 'System', 'Homepage']);
+  // Header | Theme | Homepage: two separators, each with an item on both sides.
+  const order = await menu(page).evaluate((el) =>
+    [...el.querySelectorAll('[data-slot="account-menu-header"], [data-slot="menu-separator"], [role^="menuitem"]')].map(
+      (n) =>
+        n.getAttribute('data-slot') === 'menu-separator'
+          ? '|'
+          : n.getAttribute('data-slot') === 'account-menu-header'
+            ? 'header'
+            : n.textContent,
+    ),
+  );
+  expect(order).toEqual(['header', '|', 'Dark', 'Light', 'System', '|', 'Homepage']);
+});
+
 test('spaced density: 36px rows, as in the switchers', async ({ page }) => {
   await gotoStory(page, STORY);
   await trigger(page).click();

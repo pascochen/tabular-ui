@@ -46,13 +46,18 @@ export type AccountMenuProps = {
   theme: ThemePreference;
   /** The user picked a preference. Pass `useTheme()`'s `setPreference`, which applies it. */
   onThemeChange: (theme: ThemePreference) => void;
-  onOpenProfile: () => void;
+  /*
+    Each of the five below draws its item only when it is passed. An app with
+    no such page leaves it out, rather than drawing a row that does nothing;
+    a separator with no item on one side is left out with it.
+  */
+  onOpenProfile?: () => void;
   /** The current workspace's settings. The caller knows which workspace is current. */
-  onOpenWorkspaceSettings: () => void;
+  onOpenWorkspaceSettings?: () => void;
   /** The current workspace's subscription and billing. */
-  onOpenBilling: () => void;
-  onOpenHomepage: () => void;
-  onSignOut: () => void;
+  onOpenBilling?: () => void;
+  onOpenHomepage?: () => void;
+  onSignOut?: () => void;
   className?: string;
 };
 
@@ -159,11 +164,15 @@ function AccountMenu({
             </div>
           </div>
           <MenuSeparator />
-          <MenuItem onClick={onOpenProfile}>
-            <UserIcon weight="bold" aria-hidden="true" />
-            Your profile
-          </MenuItem>
-          <MenuSeparator />
+          {onOpenProfile && (
+            <>
+              <MenuItem onClick={onOpenProfile}>
+                <UserIcon weight="bold" aria-hidden="true" />
+                Your profile
+              </MenuItem>
+              <MenuSeparator />
+            </>
+          )}
           {/*
             A radio group, not a segmented control inside a row: two buttons
             in one menuitem would be nested controls the menu's arrow keys
@@ -177,24 +186,34 @@ function AccountMenu({
             <MenuRadioItem value="light">Light</MenuRadioItem>
             <MenuRadioItem value="system">System</MenuRadioItem>
           </MenuRadioGroup>
-          <MenuSeparator />
-          <MenuItem onClick={onOpenWorkspaceSettings}>
-            <BuildingsIcon weight="bold" aria-hidden="true" />
-            Workspace settings
-          </MenuItem>
-          <MenuItem onClick={onOpenBilling}>
-            <ReceiptIcon weight="bold" aria-hidden="true" />
-            Subscription and billing
-          </MenuItem>
-          <MenuItem onClick={onOpenHomepage}>
-            <GlobeIcon weight="bold" aria-hidden="true" />
-            Homepage
-          </MenuItem>
-          <MenuSeparator />
-          <MenuItem onClick={onSignOut}>
-            <SignOutIcon weight="bold" aria-hidden="true" />
-            Sign out
-          </MenuItem>
+          {(onOpenWorkspaceSettings || onOpenBilling || onOpenHomepage) && <MenuSeparator />}
+          {onOpenWorkspaceSettings && (
+            <MenuItem onClick={onOpenWorkspaceSettings}>
+              <BuildingsIcon weight="bold" aria-hidden="true" />
+              Workspace settings
+            </MenuItem>
+          )}
+          {onOpenBilling && (
+            <MenuItem onClick={onOpenBilling}>
+              <ReceiptIcon weight="bold" aria-hidden="true" />
+              Subscription and billing
+            </MenuItem>
+          )}
+          {onOpenHomepage && (
+            <MenuItem onClick={onOpenHomepage}>
+              <GlobeIcon weight="bold" aria-hidden="true" />
+              Homepage
+            </MenuItem>
+          )}
+          {onSignOut && (
+            <>
+              <MenuSeparator />
+              <MenuItem onClick={onSignOut}>
+                <SignOutIcon weight="bold" aria-hidden="true" />
+                Sign out
+              </MenuItem>
+            </>
+          )}
         </MenuContent>
       </Menu>
     </div>

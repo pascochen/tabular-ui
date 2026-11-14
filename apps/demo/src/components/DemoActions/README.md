@@ -1,8 +1,8 @@
 # DemoActions
 
-The demo's own controls, in one row at the foot of the sidebar, above the visitor: **About this demo**, **Skip to the end** and **Start over**.
+The demo's own controls, in one row at the foot of the sidebar, above the visitor's `AccountMenu`: **About this demo**, **Skip to the end** and **Start over**.
 
-`AboutDemoButton` opens a dialog saying who the visitor is playing, what is fictional (the company), what is scripted (the people and the agents) and what is real (the interface), with links to Storybook and to the AI components on tabularui.com. While the sidebar is collapsed, the top nav holds it too.
+`AboutDemoButton` opens a dialog saying who the visitor is playing, what is fictional (the company), what is scripted (the people and the agents) and what is real (the interface), with links to Storybook and to the AI components on tabularui.com. While the sidebar is collapsed, the top nav holds it too. `AboutDemoDialog` is the dialog alone: the workspace switcher opens it for the companies and the create flow the demo doesn't have.
 
 Skip is disabled at the end, not hidden, so the row doesn't shift under the pointer. Start over goes back to landing from any point.
 

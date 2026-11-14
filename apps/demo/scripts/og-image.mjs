@@ -1,6 +1,7 @@
 /**
- * Writes public/og.png, the demo's one social image: #revenue as a visitor
- * lands on it, with the sidebar pinned and the question in view. It's a
+ * Writes public/og.png, the demo's one social image: New chat as a visitor
+ * lands on it, with the sidebar pinned and Revenue AI's question in view
+ * (#revenue was the landing page until 2026-11-12). It's a
  * screenshot of the build, so nothing in it is typed here.
  *
  * 1000px wide at 1.2× makes the 1200×630 that index.html declares: under 1024px
