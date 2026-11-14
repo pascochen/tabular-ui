@@ -11,7 +11,7 @@ function Ident({ children }: { children: string }) {
 }
 
 const invoices = 'supplier_invoices_fy2026_h1.csv';
-const interview = '05_interview_ar_ap_2026-10-14.txt';
+const payments = 'supplier_payments_fy2026_h1.csv';
 const bank = 'bank_export_kjp_2026-09.csv';
 
 /** Kasane's duplicate payment: the three files the answer read. */
@@ -34,21 +34,26 @@ const readInvoices = {
   ),
 };
 
-const readInterview = {
+const readPayments = {
   running: (
     <>
-      Reading <Ident>{interview}</Ident>
+      Reading <Ident>{payments}</Ident>
     </>
   ),
   done: (
     <>
-      Read <Ident>{interview}</Ident>
+      Read <Ident>{payments}</Ident>
     </>
   ),
-  detail: 'In the interview, accounts payable says the system blocks repeated invoice numbers in every entity.',
+  detail: (
+    <>
+      Both entries are paid, $48,216.40 each: <Ident>PAY-KUS-2608-0002</Ident> on 14 Aug 2026 and{' '}
+      <Ident>PAY-KUS-2608-0003</Ident> on 21 Aug 2026.
+    </>
+  ),
 };
 
-/** The failure is real: the bank export has no header row (findings.json, bank-header). */
+/** The bank export has no header row, so the read fails. */
 const bankFailure = {
   error: (
     <>
@@ -70,7 +75,7 @@ type GroupCall = ToolCall & { id: string };
 
 const allDone: GroupCall[] = [
   { ...readInvoices, id: 'invoices', status: 'done' },
-  { ...readInterview, id: 'interview', status: 'done' },
+  { ...readPayments, id: 'payments', status: 'done' },
 ];
 
 const withFailure: GroupCall[] = [...allDone, { ...readBank, id: 'bank', status: 'failed', ...bankFailure }];
@@ -176,7 +181,7 @@ export const Group: Story = {
     await userEvent.click(toggle);
     // Each call is its own line, and opens on its own.
     const invoicesLine = canvas.getByRole('button', { name: `Read ${invoices}` });
-    await expect(canvas.getByRole('button', { name: `Read ${interview}` })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: `Read ${payments}` })).toBeVisible();
     await userEvent.click(invoicesLine);
     await expect(canvas.getByText(/appears twice/)).toBeVisible();
   },
@@ -189,13 +194,13 @@ export const GroupRunning: Story = {
       summary="Read 2 files"
       calls={[
         { ...readInvoices, id: 'invoices', status: 'done' },
-        { ...readInterview, id: 'interview', status: 'running' },
+        { ...readPayments, id: 'payments', status: 'running' },
       ]}
     />
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('button', { name: `Reading ${interview}` })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: `Reading ${payments}` })).toBeVisible();
     await expect(canvas.queryByText('Read 2 files')).toBeNull();
   },
 };

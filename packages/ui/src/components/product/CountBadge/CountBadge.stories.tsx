@@ -121,8 +121,8 @@ export const Dense: Story = {
 export const LongLabel: Story = {
   render: () => (
     <div className="flex w-72 flex-wrap items-center gap-[var(--gap-inline)]">
-      <CountBadge label="Reconciliation contradictions" count={5} />
-      <CountBadge label="Unresolved follow-ups" count={17} />
+      <CountBadge label="Reconciliation differences" count={5} />
+      <CountBadge label="Unapproved manual journals" count={17} />
     </div>
   ),
 };

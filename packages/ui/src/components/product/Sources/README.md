@@ -8,7 +8,7 @@ What an answer rests on, numbered unless you turn it off, and what wasn't checke
 <Sources
   sources={[
     { id: 'invoices', name: 'supplier_invoices_fy2026_h1.csv', size: '116 KB', href: '/files/invoices' },
-    { id: 'interview', name: '05_interview_ar_ap_2026-10-14.txt', size: '4 KB', href: '/files/interview' },
+    { id: 'payments', name: 'supplier_payments_fy2026_h1.csv', size: '51 KB', href: '/files/payments' },
   ]}
   notChecked={['Invoices after September: the supplier file covers H1.']}
 />

@@ -7,7 +7,7 @@ import { InlineCitation } from './index';
 
 /** Kasane's duplicate payment, as in the Sources stories. */
 const invoices: Source = { id: 'invoices', name: 'supplier_invoices_fy2026_h1.csv', href: '#' };
-const interview: Source = { id: 'interview', name: '05_interview_ar_ap_2026-10-14.txt' };
+const payments: Source = { id: 'payments', name: 'supplier_payments_fy2026_h1.csv' };
 
 /**
  * A citation sits in an answer's line, so every story renders it in agent
@@ -50,11 +50,11 @@ export const Default: Story = {
 
 /** The locator as a link to the record: one citation's own place in the file, which the shared `Source` can't hold. */
 export const RecordLink: Story = {
-  args: { locator: 'S-18, API-KUS-2607-00007', locatorHref: '#record' },
+  args: { locator: 'API-KUS-2607-00007', locatorHref: '#record' },
   play: async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: /^Source 1/ }));
     const popup = await within(document.body).findByRole('dialog', { name: /supplier_invoices_fy2026_h1\.csv/ });
-    const link = within(popup).getByRole('link', { name: 'S-18, API-KUS-2607-00007' });
+    const link = within(popup).getByRole('link', { name: 'API-KUS-2607-00007' });
     await expect(link).toHaveAttribute('href', '#record');
   },
 };
@@ -83,12 +83,12 @@ export const Open: Story = {
 
 /** A source with no link and no locator still names itself. */
 export const NameOnly: Story = {
-  args: { number: 2, source: interview, locator: undefined },
+  args: { number: 2, source: payments, locator: undefined },
   play: async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: /^Source 2/ }));
     const popup = await within(document.body).findByRole('dialog');
     await expect(within(popup).queryByRole('link')).toBeNull();
-    await expect(popup).toHaveTextContent('05_interview_ar_ap_2026-10-14.txt');
+    await expect(popup).toHaveTextContent('supplier_payments_fy2026_h1.csv');
   },
 };
 
