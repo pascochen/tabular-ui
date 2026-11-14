@@ -813,6 +813,7 @@ const closeTokens = {
   glFirstPeriod: fmtPeriod(glHistory[0].period),
   glLastPeriod: fmtPeriod(glHistory.at(-1).period),
   glOpen: money(glHistory.at(-1).open, 'USD'),
+  entityCount: String(fixtures.company.entities),
 };
 const fill = (text) =>
   curly(
@@ -1268,6 +1269,137 @@ const newChat = {
   })),
 };
 
+// Direct messages: each person's history before the visitor lands. The copy is authored; every
+// block is resolved here from the data, so the app renders what it's given and computes nothing.
+const yenMillions = (v) => `${v < 0 ? '−' : ''}¥${Math.round(Math.abs(v) / 1e6).toLocaleString('en-US')}m`;
+const pctAgainst = (actual, against) => {
+  const pct = Math.round((actual / against - 1) * 1000) / 10;
+  return { delta: `${pct > 0 ? '+' : pct < 0 ? '−' : ''}${Math.abs(pct).toFixed(1)}%`, deltaValue: pct };
+};
+must(H1.includes(cutoff.period), `${cutoff.invoice_id} is in H1, so moving it changes H1`);
+const cutoffProfit = num(cutoff.net_amount) - num(cutoffItem.cost_amount_local);
+must(cutoffProfit > 0, `${cutoff.invoice_id} earns a margin`);
+const DM_FIGURES = {
+  'h1.netSales': h1.netSales,
+  'h1.operatingProfit': h1.operatingProfit,
+  'h1.netIncome': h1.netIncome,
+  // The hero's reversal takes the invoice's revenue and its cost out of September, so H1 loses its margin.
+  'h1.operatingProfitCutoff': { ...h1.operatingProfit, actual: h1.operatingProfit.actual - cutoffProfit },
+};
+const bridgeRows = [
+  { id: 'budget', label: 'Budget', yen: operatingBridge.budget },
+  ...operatingBridge.steps.map((s) => ({ id: s.id, label: s.label, yen: s.value })),
+];
+must(sum(bridgeRows.map((r) => r.yen)) === operatingBridge.actual, 'the H1 bridge adds up from budget to actual');
+const supplierHeader = pack.find((f) => f.name === P.supplierInvoices).firstLine.split(',');
+const blockOf = (b, where) => {
+  switch (b.type) {
+    case 'tiles':
+      return {
+        type: 'tiles',
+        tiles: b.tiles.map((t) => {
+          const f = DM_FIGURES[t.figure];
+          must(f && t.against in f, `a ${t.against} for ${t.figure} (${where})`);
+          return {
+            label: fill(t.label),
+            value: yenMillions(f.actual),
+            ...pctAgainst(f.actual, f[t.against]),
+            caption: fill(t.caption),
+          };
+        }),
+      };
+    case 'bridge':
+      return { type: 'bridge', rows: bridgeRows, total: { label: 'Actual', yen: operatingBridge.actual } };
+    case 'entries':
+      return {
+        type: 'entries',
+        currency: dup[0].currency,
+        rows: dup.map((d, i) => ({
+          entry: d.ap_invoice_id,
+          date: fmtDate(d.invoice_date),
+          description: d.description,
+          amount: money(num(d.gross_amount), d.currency),
+          payment: dupPayments[i].payment_id,
+          paidOn: fmtDate(dupPayments[i].payment_date),
+          duplicate: i > 0,
+        })),
+      };
+    case 'code':
+      must(b.file === P.supplierInvoices, `the code reads ${P.supplierInvoices} (${where})`);
+      for (const col of b.columns) {
+        must(
+          supplierHeader.includes(col) && b.code.includes(col),
+          `${col} is a column of ${b.file}, and the code uses it (${where})`,
+        );
+      }
+      // What the reply says the match finds over H1: one number, this one.
+      must(numbersEnteredTwice.length === 1, `the match finds one number over H1 (${where})`);
+      must(
+        new Set(supplierRows.map((r) => r.entity_id)).size === fixtures.company.entities,
+        `H1's supplier invoices span every entity (${where})`,
+      );
+      return { type: 'code', language: b.language, label: b.label, code: b.code };
+    case 'sources': {
+      // The finding's own files, each opening at what it rests on.
+      const e = closeExceptions.find((x) => x.id === b.finding);
+      must(e, `${b.finding} is a finding (${where})`);
+      return { type: 'sources', finding: b.finding };
+    }
+    case 'attachment':
+      if (b.file) {
+        const file = pack.find((f) => f.name === b.file);
+        must(file, `${b.file} is a pack file (${where})`);
+        return { type: 'attachment', name: file.name, bytes: file.bytes };
+      }
+      return { type: 'attachment', name: fill(b.name) };
+    case 'thread':
+      must(
+        closeExceptions.some((e) => e.id === b.finding),
+        `${b.finding} is a finding (${where})`,
+      );
+      return { type: 'thread', finding: b.finding };
+    default:
+      throw new Error(`Unknown block "${b.type}" (${where})`);
+  }
+};
+const { $comment: _conversationsComment, ...conversationSource } = closeSource.conversations;
+must(
+  Object.keys(conversationSource).join() === closeSource.directMessages.join(),
+  'close-demo.json has one conversation per direct message, in their order',
+);
+const conversations = Object.fromEntries(
+  Object.entries(conversationSource).map(([key, messages]) => {
+    let last = '00:00';
+    const inTime = (at, where) => {
+      must(
+        /^\d{2}:\d{2}$/.test(at) && at >= last && at < closeSource.scene.landingTime,
+        `${where} at ${at} is in order, before landing`,
+      );
+      last = at;
+    };
+    return [
+      key,
+      messages.map((m, i) => {
+        const where = `${key} message ${i + 1}`;
+        must(m.author === key || m.author === 'visitor', `${where} is by ${key} or the visitor`);
+        inTime(m.at, where);
+        const replies = (m.replies ?? []).map((r, j) => {
+          must(r.author === key || r.author === 'visitor', `${where} reply ${j + 1} is by ${key} or the visitor`);
+          inTime(r.at, `${where} reply ${j + 1}`);
+          return { author: r.author, at: r.at, text: fill(r.text) };
+        });
+        return {
+          author: m.author,
+          at: m.at,
+          text: fill(m.text),
+          blocks: (m.blocks ?? []).map((b) => blockOf(b, where)),
+          replies,
+        };
+      }),
+    ];
+  }),
+);
+
 await writeJson('apps/demo/data/people.json', closePeople);
 await writeJson('apps/demo/data/documents.json', documents);
 await writeJson('apps/demo/data/close.json', {
@@ -1277,6 +1409,7 @@ await writeJson('apps/demo/data/close.json', {
   agents: closeAgents,
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
+  conversations,
   typingMs: closeSource.typingMs,
   searchSuggestions: fillAll(closeSource.searchSuggestions),
   newChat,

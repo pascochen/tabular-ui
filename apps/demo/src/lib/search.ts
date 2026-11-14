@@ -4,6 +4,7 @@
 import type { CloseState } from './close-state';
 import {
   channels,
+  conversations,
   close,
   directMessages,
   documents,
@@ -115,6 +116,27 @@ export function search(state: CloseState, query: string): SearchResult[] {
         });
       }
     });
+  }
+
+  // What was said in each direct message before landing, replies included.
+  for (const [key, messages] of Object.entries(conversations)) {
+    const dm: View = { kind: 'dm', member: key };
+    messages
+      .flatMap((m) => [m, ...m.replies])
+      .forEach((m, i) => {
+        if (!matches(q, m.text)) return;
+        results.push({
+          group: 'Messages',
+          key: `dm-${key}-${i}`,
+          // "Mei Tachibana in Mei Tachibana" says nothing: the place is the pair.
+          title:
+            m.author === key
+              ? `${memberName(key)}, direct message, ${m.at}`
+              : `${memberName(m.author)} to ${memberName(key)}, ${m.at}`,
+          detail: m.text,
+          view: dm,
+        });
+      });
   }
 
   // The hero's question is a message too, in its thread.

@@ -1,36 +1,7 @@
-import { UserIcon } from '@phosphor-icons/react';
-import { AppShellPanelBody, EmptyState, buttonVariants } from 'tabular-ui';
+import { AppShellPanelBody } from 'tabular-ui';
 
 import { people } from '../lib/kasane';
-import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 import { MemberAvatar } from '../shell/members';
-
-/**
- * A direct message before anyone has written in it: what the view is, and the
- * way back to where the close is happening. A real empty state, not a
- * placeholder, so the view is never a dead end.
- */
-const REVENUE: View = { kind: 'channel', channel: 'revenue' };
-
-export function NoMessages({ memberKey }: { memberKey: string }) {
-  return (
-    <EmptyState
-      size="page"
-      icon={UserIcon}
-      title={`No messages with ${people[memberKey].name} yet`}
-      description="The close is happening in #revenue."
-      action={
-        <a
-          className={buttonVariants({ variant: 'outline' })}
-          href={hrefFor(REVENUE)}
-          onClick={onViewLinkClick(REVENUE)}
-        >
-          Go to #revenue
-        </a>
-      }
-    />
-  );
-}
 
 /** A person's profile, in the right panel of their direct messages. */
 export function Profile({ memberKey }: { memberKey: string }) {

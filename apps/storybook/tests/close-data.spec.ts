@@ -298,7 +298,7 @@ test('every Sources list in the demo leaves its numbers off, since no mark point
   const uses = walk(path.resolve(dataDir, '../src')).flatMap((file) =>
     [...readFileSync(file, 'utf8').matchAll(/<Sources\b[^>]*>/g)].map((m) => ({ file, tag: m[0] })),
   );
-  expect(uses).toHaveLength(4);
+  expect(uses).toHaveLength(5);
   for (const { file, tag } of uses) expect(tag, file).toContain('numbered={false}');
 });
 

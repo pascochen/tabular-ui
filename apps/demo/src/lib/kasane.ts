@@ -74,6 +74,37 @@ export function memberName(key: string): string {
 
 export const directMessages = close.directMessages;
 
+/** A figure as a `MetricTile` shows it, formatted by the export. */
+export type DmTile = { label: string; value: string; delta: string; deltaValue: number; caption: string };
+/** What a direct message carries under its text. The export resolves each from the data. */
+export type DmBlock =
+  | { type: 'tiles'; tiles: DmTile[] }
+  | { type: 'bridge'; rows: { id: string; label: string; yen: number }[]; total: { label: string; yen: number } }
+  | {
+      type: 'entries';
+      currency: string;
+      rows: {
+        entry: string;
+        date: string;
+        description: string;
+        amount: string;
+        payment: string;
+        paidOn: string;
+        duplicate: boolean;
+      }[];
+    }
+  | { type: 'code'; language: 'sql'; label: string; code: string }
+  /** A finding's files, as its card lists them. */
+  | { type: 'sources'; finding: string }
+  /** `bytes` only for a file in the pack: an invented one has no size to state. */
+  | { type: 'attachment'; name: string; bytes?: number }
+  | { type: 'thread'; finding: string };
+export type DmReply = { author: string; at: string; text: string };
+export type DmMessage = DmReply & { blocks: DmBlock[]; replies: DmReply[] };
+
+/** Each direct message's history before the visitor lands, by member. */
+export const conversations = close.conversations as Record<string, DmMessage[]>;
+
 export const checks = checksData;
 
 export type TableColumn = { name: string; style?: 'id' | 'figure' };
