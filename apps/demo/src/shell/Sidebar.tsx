@@ -1,12 +1,5 @@
 import { useState, type ReactElement, type ReactNode } from 'react';
-import {
-  CurrencyCircleDollarIcon,
-  DotsThreeIcon,
-  FilesIcon,
-  HashIcon,
-  ListChecksIcon,
-  PlusIcon,
-} from '@phosphor-icons/react';
+import { DotsThreeIcon, FilesIcon, HashIcon, ListChecksIcon, PlusIcon, RobotIcon } from '@phosphor-icons/react';
 import {
   AccountMenu,
   AppShellNav,
@@ -24,6 +17,7 @@ import { BUILT_CHANNELS, SIDEBAR_PLACES, hrefFor, onViewLinkClick, placeOf, useV
 import { useClose } from '../lib/close-context';
 import { channelMark, channelMarkText, isUnread, openCount } from '../lib/close-state';
 import { AboutDemoDialog, DemoActions } from '../components/DemoActions';
+import { agentIcons } from './agent-icons';
 import { MemberAvatar } from './members';
 
 function NavLink({
@@ -70,8 +64,9 @@ const PLACES = {
  * visitor leaves, so a section with nothing built isn't drawn, and More opens
  * the Agents page rather than an add-an-agent flow that doesn't exist.
  *
- * The agents take the story's one icon here; in a thread each keeps the agent
- * glyph (`MemberAvatar`), which marks authorship beside a person's letter.
+ * The agents are the one departure from the story: it gives every agent one
+ * currency icon, and here each takes its own glyph (`agentIcons`), the one its
+ * avatar draws in a thread, so the four tell apart (owner, 2026-11-14).
  */
 export function Sidebar() {
   const { state } = useClose();
@@ -103,11 +98,14 @@ export function Sidebar() {
         </AppShellNavGroup>
       ) : null}
       <AppShellNavGroup label="Agents">
-        {agents.map((a) => (
-          <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} icon={<CurrencyCircleDollarIcon />}>
-            {a.name}
-          </NavLink>
-        ))}
+        {agents.map((a) => {
+          const AgentIcon = agentIcons[a.key] ?? RobotIcon;
+          return (
+            <NavLink key={a.key} view={{ kind: 'dm', member: a.key }} icon={<AgentIcon />}>
+              {a.name}
+            </NavLink>
+          );
+        })}
         <NavLink view={{ kind: 'agents' }} icon={<DotsThreeIcon />}>
           More
         </NavLink>
