@@ -23,9 +23,18 @@ type Close = {
     }[];
   };
 };
-const close = JSON.parse(
-  readFileSync(path.resolve(import.meta.dirname, '../../demo/data/close.json'), 'utf8'),
-) as Close;
+const data = <T>(name: string) =>
+  JSON.parse(readFileSync(path.resolve(import.meta.dirname, '../../demo/data', name), 'utf8')) as T;
+// One check an agent (checks.json), and the items they raised (items.json).
+const close: Close = {
+  agents: data<{ agent: string; reads: string[]; raised: string }[]>('checks.json').map((c) => ({
+    key: c.agent,
+    reads: c.reads,
+    finding: c.raised,
+  })),
+  exceptions: data<Close['exceptions']>('items.json'),
+  newChat: data<Pick<Close, 'newChat'>>('workspace.json').newChat,
+};
 
 test('the page suggests four questions, in plain words', () => {
   expect(suggestions([])).toEqual([

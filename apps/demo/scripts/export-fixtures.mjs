@@ -9,12 +9,15 @@
 //
 // Writes:
 //   packages/ui/src/fixtures/kasane.ts   story fixtures (never exported from src/index.ts)
-//   apps/demo/data/company.json          the company and the visitor's persona
-//   apps/demo/data/people.json           the close demo's people, by role, from employees.csv
-//   apps/demo/data/close.json            the scripted workspace: agents, channels, exceptions, replies,
-//                                        the hero decision and its proposed entry (copy from
-//                                        demo/close-demo.json, figures from the data)
-//   apps/demo/data/checks.json           each close check's figure before and after its fix
+//   apps/demo/data/workspace.json        the company, its periods, channels and direct messages, and the
+//                                        copy around them (copy from demo/close-demo.json)
+//   apps/demo/data/members.json          people (from employees.csv) and agents in one list, by `kind`
+//   apps/demo/data/checks.json           one check an agent: its rule, the documents it reads, the item it
+//                                        raised and, where the close panel shows one, its figure before and
+//                                        after the fix
+//   apps/demo/data/items.json            the work items the checks raised, each with its replies, and its
+//                                        decision where a person has one to make (the proposed entry's
+//                                        figures are from the data)
 //   apps/demo/data/documents.json        each file a finding rests on or an agent reads, with a trimmed
 //                                        extract. A document knows nothing about the findings
 //   apps/site/data/kasane.json           the public site's specimen records and closing band (docs/site.md §5)
@@ -674,10 +677,6 @@ await writeFormatted(
       .join(''),
 );
 
-await writeJson('apps/demo/data/company.json', {
-  ...fixtures.company,
-  persona: { name: people.fpa.name, title: people.fpa.title },
-});
 // ---------------------------------------------------------------------------
 // The Kasane app: the scripted workspace. The copy is authored in demo/close-demo.json; every
 // figure in it is a {token} filled here from the data, and the people are employee ids.
@@ -707,7 +706,9 @@ const closePeople = Object.fromEntries(
       `employee ${id} (${key}) in employees.csv`,
     );
     const p = person(id);
-    return [key, { key, ...p, identity: i + 1 }];
+    // `handle` is the stories': no screen of the demo reads it.
+    const { handle: _handle, ...read } = p;
+    return [key, { key, ...read, identity: i + 1 }];
   }),
 );
 
@@ -1400,32 +1401,64 @@ const conversations = Object.fromEntries(
   }),
 );
 
-await writeJson('apps/demo/data/people.json', closePeople);
-await writeJson('apps/demo/data/documents.json', documents);
-await writeJson('apps/demo/data/close.json', {
+// Five files, and finance only in their values. A member is a person or an agent; a check is one
+// agent's rule and what it reads; an item is what a check raised, and holds its own decision.
+const { exception: decisionItem, ...decisionCopy } = closeSource.hero;
+const decision = fillAll({
+  ...decisionCopy,
+  entry: {
+    ...closeSource.hero.entry,
+    entity: cutoff.entity_id,
+    postingDate: `${LAST_CLOSED}-${cutoff.invoice_date.slice(8)}`,
+    currency: 'JPY',
+    lines: reversal,
+  },
+});
+must(
+  closeExceptions.filter((e) => e.hero).length === 1 && closeExceptions.find((e) => e.hero).id === decisionItem,
+  'one item is marked for the decision, and it is the one the decision names',
+);
+for (const c of closeChecks) {
+  must(
+    closeAgents.some((a) => a.finding === c.id),
+    `the ${c.id} figure belongs to an item an agent raised`,
+  );
+}
+
+await writeJson('apps/demo/data/workspace.json', {
+  // Only what a screen reads: the names and the last closed period.
+  company: {
+    name: fixtures.company.name,
+    legalName: fixtures.company.legalName,
+    lastClosedPeriod: fixtures.company.lastClosedPeriod,
+  },
   scene: closeSource.scene,
   period: fillAll(closeSource.period),
   agentRules: closeSource.agentRules,
-  agents: closeAgents,
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   conversations,
   typingMs: closeSource.typingMs,
   searchSuggestions: fillAll(closeSource.searchSuggestions),
   newChat,
-  exceptions: closeExceptions,
-  hero: fillAll({
-    ...closeSource.hero,
-    entry: {
-      ...closeSource.hero.entry,
-      entity: cutoff.entity_id,
-      postingDate: `${LAST_CLOSED}-${cutoff.invoice_date.slice(8)}`,
-      currency: 'JPY',
-      lines: reversal,
-    },
-  }),
 });
-await writeJson('apps/demo/data/checks.json', closeChecks);
+await writeJson('apps/demo/data/members.json', [
+  ...Object.values(closePeople).map((p) => ({ kind: 'person', ...p })),
+  ...closeAgents.map(({ key, name, ask, starters }) => ({ kind: 'agent', key, name, ask, starters })),
+]);
+await writeJson(
+  'apps/demo/data/checks.json',
+  closeAgents.map((a) => {
+    const figure = closeChecks.find((c) => c.id === a.finding);
+    const { id: _id, ...shown } = figure ?? {};
+    return { agent: a.key, rule: a.checks, reads: a.reads, raised: a.finding, ...(figure ? { figure: shown } : {}) };
+  }),
+);
+await writeJson(
+  'apps/demo/data/items.json',
+  closeExceptions.map(({ hero, ...item }) => (hero ? { ...item, decision } : item)),
+);
+await writeJson('apps/demo/data/documents.json', documents);
 
 // The public site (apps/site, docs/site.md §5 and D5): exactly the records it shows, and nothing it
 // would have to type. It comes after the workspace because the closing band (D7) names the workspace's

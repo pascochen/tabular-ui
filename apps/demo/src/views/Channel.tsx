@@ -16,7 +16,7 @@ import { MemberAvatar } from '../shell/members';
 const titleOf = (id: string) => exceptions.find((e) => e.id === id)!.title;
 const channelOf = (id: string) => exceptions.find((e) => e.id === id)!.channel;
 
-const isHero = (e: Exception) => 'hero' in e && e.hero === true;
+const isHero = (e: Exception) => 'decision' in e && e.decision !== undefined;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
 
 /**

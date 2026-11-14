@@ -1,0 +1,180 @@
+[
+  {
+    "kind": "person",
+    "key": "visitor",
+    "id": "E0010",
+    "name": "Daisuke Onodera",
+    "shortName": "Daisuke",
+    "title": "Group Controller",
+    "entity": "KJP",
+    "email": "daisuke.onodera@kasane.example",
+    "initials": "D",
+    "identity": 1
+  },
+  {
+    "kind": "person",
+    "key": "fpaHead",
+    "id": "E0011",
+    "name": "Mei Tachibana",
+    "shortName": "Mei",
+    "title": "Head of FP&A",
+    "entity": "KJP",
+    "email": "mei.tachibana@kasane.example",
+    "initials": "M",
+    "identity": 2
+  },
+  {
+    "kind": "person",
+    "key": "apLead",
+    "id": "E0016",
+    "name": "Kenta Ishiguro",
+    "shortName": "Kenta",
+    "title": "Accounts Payable Lead",
+    "entity": "KJP",
+    "email": "kenta.ishiguro@kasane.example",
+    "initials": "K",
+    "identity": 3
+  },
+  {
+    "kind": "person",
+    "key": "glAccountant",
+    "id": "E0019",
+    "name": "Shun Morimoto",
+    "shortName": "Shun",
+    "title": "General Ledger Accountant",
+    "entity": "KJP",
+    "email": "shun.morimoto@kasane.example",
+    "initials": "S",
+    "identity": 4
+  },
+  {
+    "kind": "person",
+    "key": "fpaAnalyst",
+    "id": "E0020",
+    "name": "Nanami Okabe",
+    "shortName": "Nanami",
+    "title": "FP&A Analyst",
+    "entity": "KJP",
+    "email": "nanami.okabe@kasane.example",
+    "initials": "N",
+    "identity": 5
+  },
+  {
+    "kind": "person",
+    "key": "arLead",
+    "id": "E0015",
+    "name": "Yui Matsuda",
+    "shortName": "Yui",
+    "title": "Accounts Receivable and Credit Lead",
+    "entity": "KJP",
+    "email": "yui.matsuda@kasane.example",
+    "initials": "Y",
+    "identity": 6
+  },
+  {
+    "kind": "person",
+    "key": "usCredit",
+    "id": "E1003",
+    "name": "Vincent Bell",
+    "shortName": "Vincent",
+    "title": "AR and Credit Manager",
+    "entity": "KUS",
+    "email": "vincent.bell@kasane.example",
+    "initials": "V",
+    "identity": 7
+  },
+  {
+    "kind": "person",
+    "key": "treasury",
+    "id": "E0013",
+    "name": "Ren Fujisawa",
+    "shortName": "Ren",
+    "title": "Treasury Manager",
+    "entity": "KJP",
+    "email": "ren.fujisawa@kasane.example",
+    "initials": "R",
+    "identity": 8
+  },
+  {
+    "kind": "agent",
+    "key": "cutoff-ai",
+    "name": "Revenue AI",
+    "ask": "Ask about September’s revenue.",
+    "starters": [
+      {
+        "question": "Were any other September invoices delivered in October?",
+        "answer": "No. INV-KJP-2609-00363 is the only one of the 887 September invoices delivered after the month.",
+        "sources": ["sales-invoices"],
+        "notChecked": [
+          "Delivery dates against logistics: the files have no delivery confirmations, only each invoice’s delivery date."
+        ]
+      },
+      {
+        "question": "What does the policy say about the delivery date?",
+        "answer": "Revenue belongs to the month of delivery. The delivery date on each invoice decides which month that is.",
+        "sources": ["accounting-policies"],
+        "notChecked": ["Whether a locked month is reopened: the policy doesn’t say."]
+      }
+    ]
+  },
+  {
+    "kind": "agent",
+    "key": "payments-ai",
+    "name": "Payments AI",
+    "ask": "Ask about supplier invoices in FY2026 H1.",
+    "starters": [
+      {
+        "question": "Is any other supplier invoice number entered twice?",
+        "answer": "No. MFL-58821 is the only number entered twice by one supplier, across the 559 supplier invoices in FY2026 H1.",
+        "sources": ["supplier-invoices"],
+        "notChecked": ["Invoices with different numbers for the same amount: I compared numbers, not amounts."]
+      },
+      {
+        "question": "How do the two entries differ?",
+        "answer": "In the date and the description. API-KUS-2607-00007 is dated 14 Jul 2026 and reads \"Outbound freight - June 2026 linehaul surcharge\". API-KUS-2607-00011 is dated 21 Jul 2026 and reads \"Outbound freight - Jun 2026 linehaul surcharge\". The supplier, the invoice number and the amount match.",
+        "sources": ["supplier-invoices"],
+        "notChecked": ["Why the system let the second entry through: the file records the entries, not the ERP’s rule."]
+      }
+    ]
+  },
+  {
+    "kind": "agent",
+    "key": "approvals-ai",
+    "name": "Approvals AI",
+    "ask": "Ask about manual entries in FY2026 H1.",
+    "starters": [
+      {
+        "question": "Is any other manual entry self-approved?",
+        "answer": "No. JE-KUK-2608-00055 is the only one of the 10 manual entries in FY2026 H1 with the same person as creator and approver.",
+        "sources": ["manual-journals"],
+        "notChecked": ["Entries outside FY2026 H1: the file covers those six months."]
+      },
+      {
+        "question": "Who created and approved it?",
+        "answer": "E3003 did both, on 31 Aug 2026. The entry moves £18,400 from advertising (6100) to prepaid expenses (1300).",
+        "sources": ["manual-journals"],
+        "notChecked": ["The approver’s limit: the employee master isn’t in these files."]
+      }
+    ]
+  },
+  {
+    "kind": "agent",
+    "key": "credit-ai",
+    "name": "Credit AI",
+    "ask": "Ask about Great Lakes Duplicating Supply’s balance.",
+    "starters": [
+      {
+        "question": "Which month-ends before the credit hold were over the limit?",
+        "answer": "Sep 2025, Nov 2025 and every month from Mar 2026 to Aug 2026, 8 month-ends in all. The limit is $600,000.",
+        "sources": ["ar-aging"],
+        "notChecked": ["Months before Apr 2025: the aging file starts there."]
+      },
+      {
+        "question": "How much does Great Lakes owe now?",
+        "answer": "$1.42m at the end of Sep 2026, against a limit of $600,000.",
+        "sources": ["ar-aging"],
+        "notChecked": ["Receipts after Sep 2026: the aging file stops at that month."]
+      }
+    ]
+  }
+]

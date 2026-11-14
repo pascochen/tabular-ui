@@ -18,7 +18,7 @@ export type TimelineEvent = { gap: number; effect: TimelineEffect };
 const END_PAUSE_MS = 2000;
 
 function build(): TimelineEvent[] {
-  // Every scripted step, at its time after the decision (the `delayMs` in close.json).
+  // Every scripted step, at its time after the decision (the `delayMs` in items.json).
   const timed: { at: number; effect: TimelineEffect }[] = [];
   for (const e of close.exceptions) {
     for (const r of e.replies) {
