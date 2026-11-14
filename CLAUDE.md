@@ -221,7 +221,7 @@ The log was a section of this file until 2026-11-11. It is 120 entries, and it w
 - Mono is one step below the adjacent sans: `--text-xs` in a `--text-sm` row.
 - Every `--text-*` size is declared with its `--text-*--line-height` partner.
 - A size added to §8.1's scale is added to twMerge's config in `src/lib/utils.ts` too, or `cn()` reads it as a colour and drops the text colour.
-- A `ch` is the width of "0", not of a character. In Instrument Sans, N characters are about 0.67×N `ch` (§8.3).
+- A `ch` is the width of "0", not of a character. In Golos Text, N characters are about 0.77×N `ch` (§8.3).
 - When Tailwind adds a colour scale, add it to §9's strip list and to `lint/palette.mjs`. Held by `palette.spec.ts`.
 
 ### Tailwind and CSS
