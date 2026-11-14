@@ -63,6 +63,11 @@ const meta = {
   // 1280px floor, which silently shows the collapsed layout instead. 1440 is
   // the width the shell sketch was drawn at.
   globals: { viewport: { value: 'laptopLg', isRotated: false } },
+  // Widths a reader drags to are not remembered across stories: a sidebar
+  // dragged in one would turn up at that width in every other, and the
+  // stories would stop showing the defaults. The resize stories below each
+  // keep their own key.
+  args: { widthStorageKey: null },
 } satisfies Meta<typeof AppShell>;
 
 export default meta;
@@ -739,6 +744,56 @@ export const AccountantWorkspace: Story = {
 };
 
 /**
+ * Drag the rule beside the sidebar or the panel to resize it (§7.9). Each
+ * handle is a WAI-ARIA window splitter: Tab to it, then Left and Right move
+ * it 16px, Home and End go to the narrowest and widest it can reach, and
+ * Enter or a double-click returns it to the default. Main never drops under
+ * --w-main-min (600px), so at the 1280px floor the two sides can only trade
+ * width.
+ *
+ * The widths are remembered: this story keeps them under its own key, so
+ * reload it and they come back. An app keeps them under
+ * `tui-app-shell-widths` unless `widthStorageKey` says otherwise.
+ */
+export const Resizable: Story = {
+  args: { ...Expanded.args, widthStorageKey: 'tui-app-shell-widths-story' },
+};
+
+/**
+ * Both sides at their minimums, --w-sidebar-min (224px) and --w-panel-min
+ * (360px), at the 1280px floor. The narrowest the shell lets a person make
+ * them; main gets the 696px left over.
+ */
+export const ResizedToMinimums: Story = {
+  args: { ...Expanded.args, widthStorageKey: 'tui-app-shell-widths-story-minimums' },
+  globals: { viewport: { value: 'laptop', isRotated: false } },
+  // A stored 0 clamps to each side's minimum, so the story restates no token.
+  loaders: [
+    () => localStorage.setItem('tui-app-shell-widths-story-minimums', JSON.stringify({ sidebar: 0, panel: 0 })),
+  ],
+};
+
+/**
+ * Both sides stored wider than any window allows, on a 2560 monitor: the
+ * sidebar at --w-sidebar-max (360px), the panel at --w-panel-max (640px). On
+ * a narrower window the panel takes what main's 600px floor leaves beside
+ * the sidebar's minimum, and the sidebar yields: at 1280 that is 456px and
+ * 224px (§7.9). Widen the window and both come back.
+ */
+export const ResizedToMaximums: Story = {
+  args: { ...Expanded.args, widthStorageKey: 'tui-app-shell-widths-story-maximums' },
+  globals: { viewport: { value: 'wide', isRotated: false } },
+  // A stored width past any ceiling clamps to it.
+  loaders: [
+    () =>
+      localStorage.setItem(
+        'tui-app-shell-widths-story-maximums',
+        JSON.stringify({ sidebar: Number.MAX_SAFE_INTEGER, panel: Number.MAX_SAFE_INTEGER }),
+      ),
+  ],
+};
+
+/**
  * The regions as placeholders. Dashed borders mean placeholder in this
  * system (§7.8) — the frame without content.
  */
@@ -765,6 +820,7 @@ export const Regions: Story = {
         }
         panelLabel="Panel"
         pageHeader={<AppShellPageHeader title="pageHeader" />}
+        widthStorageKey={null}
       >
         {slot('main — the only region that scrolls the page')}
       </AppShell>

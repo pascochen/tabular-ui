@@ -61,6 +61,20 @@ for (const file of storyFiles) {
         // file. A fixed 30s timed out AppShell's eleven stories on CI.
         test.setTimeout(30_000 + stories.length * 15_000);
 
+        // No caret for the whole visit, not only at the capture. `caret: 'hide'`
+        // below hides it for the screenshot, but a caret drawn while a play
+        // function types has already been painted, and a frame that rastered
+        // its column drew the text's subpixel fringe there too. Whether such a
+        // frame landed is timing. ChatComposer's In panel story sends what it
+        // typed, and the right fringe of the "t" in "budget", where the caret
+        // stood before "?", outlived the text on 11 of 30 loads: 2px, either
+        // mode. With the caret hidden from the start, 30 of 30 were identical.
+        await page.addInitScript(() => {
+          const sheet = new CSSStyleSheet();
+          sheet.replaceSync('*, ::before, ::after { caret-color: transparent !important; }');
+          document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+        });
+
         for (const { id } of stories) {
           await gotoStory(page, id, theme);
           // A story's play function can still be running after first paint:

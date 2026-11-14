@@ -299,6 +299,7 @@ The log was a section of this file until 2026-11-11. It is 120 entries, and it w
 - Measure after the fonts load, which `gotoStory` waits for. To test a timing theory, delay the one resource it blames.
 - A test on a story's page shares globals with addons still running. Run axe only once the render is `finished`, as `injectAxe` does.
 - A story ends in a still state before its screenshot: no typing in flight, a jump in place of a smooth scroll under `navigator.webdriver`, and text a play function changes keeps its first glyph.
+- Hide the caret for the whole visit, not only at the capture: a caret drawn while a play function types leaves a subpixel fringe behind. Two identical renders don't prove a story deterministic. Held by `visual.spec.ts`.
 - A fake clock removes real time only from the moment it stops. Stop it before what it times begins: a margin does not close a race.
 - Assert a visual truncation on the visible node's `textContent`, never `innerText`, which includes `sr-only` text.
 - `getComputedStyle` returns `oklch`, `oklab` or `rgb`, with chroma in a different slot in each. Parse all three.
