@@ -35,7 +35,7 @@ packages/ui/                       the tabular-ui package: components and tokens
 apps/storybook/                    Storybook config; serves the registry at /r
   tests/                           Playwright specs; stories are their fixtures
   tests/visual.spec.ts-snapshots/  approved screenshots, one per story per theme
-apps/demo/                         the Kasane onboarding demo, built on the package
+apps/demo/                         the Kasane demo, built on the package
   data/                            its JSON fixtures, generated
 brand/                             the wordmark and favicon, used unchanged
 lint/                              the design-system lint rules (CSS half, shared scale list)

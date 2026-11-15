@@ -15,7 +15,7 @@ above a table or panel.
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
-| `label` | `string` | — | The category — "Gaps", "Unmatched" |
+| `label` | `string` | — | The category — "Unmatched", "Stale" |
 | `count` | `number` | — | The figure |
 | `max` | `number` | `99` | Above this the figure renders `{max}+`; the true count still reaches AT |
 

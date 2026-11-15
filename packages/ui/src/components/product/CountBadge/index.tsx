@@ -4,7 +4,7 @@ import { Badge, type BadgeProps } from '../../foundational/Badge';
 export type CountBadgeProps = Omit<BadgeProps, 'children' | 'shape' | 'tone' | 'role'> & {
   /** An ARIA role for the element. The tone is always neutral. */
   role?: React.AriaRole;
-  /** The category being counted — "Gaps", "Follow-ups", "Unmatched". */
+  /** The category being counted — "Unmatched", "Needs review", "Stale". */
   label: string;
   count: number;
   /**

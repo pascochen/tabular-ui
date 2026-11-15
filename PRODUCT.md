@@ -78,5 +78,5 @@ Accessibility is a lens on the agent loop, not an addendum to it.
 
 These apply to tabularui.com and the Kasane demo, not to the library's stories.
 
-- Demos run on data that's wrong somewhere. Review UI only proves itself on data that contains contradictions.
+- Demos run on data that's wrong somewhere. Review UI only proves itself when there is something to find.
 - shadcn/ui documentation is the baseline builders expect for install, API and examples. Storybook holds the API, and the site links to it.

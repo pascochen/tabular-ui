@@ -61,7 +61,7 @@ Three decisions:
 
 **D2. The before/after pair — decided 2026-10-25 (owner).** The Agent block wireframe (`78:595`) heads its two plates "Agent mark" (orchid) and "Person mark" (ivy). The library gives no colour to a person, and ivy already means success and links (`docs/design-system.md` §1). The two colours are the wordmark's, which §1 "Brand assets" says nothing may be derived from.
 
-The headings also implied that approval hands an entry over to the person. Books record both the preparer and the approver, and keeping them apart is the control. Kasane's own data has the failure: JE-KUK-2608-00055 was created and approved by one person (`apps/demo/data/findings.json`, `self-approved-entry`). Authorship doesn't wash off when a person approves.
+The headings also implied that approval hands an entry over to the person. Books record both the preparer and the approver, and keeping them apart is the control. Kasane's own data has the failure: JE-KUK-2608-00055 was created and approved by one person (`apps/demo/data/items.json`, `self-approved-entry`). Authorship doesn't wash off when a person approves.
 
 1. **No plate headings.** Each block's own label carries its state. One caption under the pair, for example "The same entry, before and after a person posts it." Screen readers tell the plates apart by the labels.
 2. **The posted block shows both people.**
@@ -178,7 +178,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 
 **D7. Closing band copy — decided 2026-10-25 (owner).** The wireframe says "See every component in a working dashboard" and "Its September close runs on these components".
 - `demo.tabularui.com` is the Kasane app, a finance workspace laid out as a team chat (`apps/demo/README.md`). The visitor plays Daisuke Onodera, Kasane's Group Controller. Four scripted agents have each raised a finding, the visitor makes one decision, and teammates resolve the rest.
-- The band's first copy was written for the onboarding journey the demo replaced, which neither wireframe line described.
+- The band's first copy was written for the demo's first version, which neither wireframe line described.
 
 | Slot | Copy | Source of each specific |
 |---|---|---|
@@ -186,7 +186,7 @@ Specimens below the first screen play once as they scroll into view, from a fram
 | Line | Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller. | "Kasane": `company.name` in `kasane.json`; "controller": the last word of the visitor's title in `apps/demo/data/people.json` (`visitor`, Group Controller), exported as `company.visitor.title` and set in lowercase |
 | Action | Open the demo ↗ | The arrow is `aria-hidden`; the link's name is "Open the demo (opens in a new tab)" |
 
-Changed 2026-11-04 (owner): the band names the four agents and the controller, the visitor's role in the demo's workspace. It replaces the onboarding journey's copy (Head of FP&A, 20 files, the duplicate payment above).
+Changed 2026-11-04 (owner): the band names the four agents and the controller, the visitor's role in the demo's workspace. It replaces the first version's copy (Head of FP&A, 20 files, the duplicate payment above).
 
 - **The band closes Home only.** Other pages end at the footer.
 - The copy was reviewed with the Tabular UI copywriter rules: no banned words, and each sentence 15 words or fewer.

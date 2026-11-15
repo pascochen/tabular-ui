@@ -1,6 +1,6 @@
 # Demo: the Kasane app
 
-The public demo at [demo.tabularui.com](https://demo.tabularui.com): a finance workspace for an AI finance tool, laid out as a team chat, built from Tabular UI. It replaces the onboarding journey, which is kept at the tag `demo-part-1`.
+The public demo at [demo.tabularui.com](https://demo.tabularui.com): a finance workspace for an AI finance tool, laid out as a team chat, built from Tabular UI.
 
 **Being reworked** into a workspace with Tasks, six channels, four specialist agents, Sources and Search, one step per PR. Step 1 is the data: the four findings, the agents, the channels, the visitor swap and the documents. Step 2 is the shell: every view kind in the URL, the sidebar in its final order, and the header and footer on two lines. Step 3 is Tasks, which absorbs `#open-items`. Step 4 is the six channels, which replace `#sep-close`. Step 5 is the four agents. Step 6 is Sources. Step 7 is Search. The sidebar holds only built views, so each step adds its items.
 
