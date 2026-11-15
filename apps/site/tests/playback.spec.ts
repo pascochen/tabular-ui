@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { expect, test, type Page } from '@playwright/test';
 
+import { componentPages } from './routes';
+
 /** The specimens' playback, the hero teaser, and the Agent block card's choices (docs/site.md §6, D6). */
 
 const kasane = JSON.parse(readFileSync(new URL('../data/kasane.json', import.meta.url), 'utf8')) as {
@@ -400,5 +402,127 @@ test.describe('with reduced motion', () => {
     await block.getByRole('button', { name: 'Replay Agent block' }).click();
     await expect(block.getByRole('button', { name: 'Post entry' })).toBeFocused();
     await expect(block.locator('[aria-busy="true"]')).toHaveCount(0);
+  });
+});
+
+/**
+ * A component page's pair (docs/site.md, "Component page"; owner, 2026-11-15):
+ * at rest until asked, then the after plate plays from the before state to its own.
+ */
+test.describe('a component page’s pair', () => {
+  const frame = '#pair-title ~ figure > div:first-child';
+  const plates = (page: Page) => page.locator('#pair-title ~ figure [data-theme="dark"]');
+  const playButton = (page: Page) => page.locator('#pair-title ~ figure').getByRole('button', { name: /^Play / });
+  // The playing plate, not a component inside one: a plan being written is aria-busy too.
+  const busy = (page: Page) => page.locator('#pair-title ~ figure [data-theme="dark"][aria-busy="true"]');
+  // Play's own live region. Components have theirs (AgentReasoning, Tool).
+  const said = (page: Page) => page.locator('#pair-title ~ figure [data-pair-play] [role="status"]');
+  /**
+   * What each plate shows: its text, without the invisible states that hold the after
+   * plate's height, and without a component's own announcement (Tool says what it read).
+   */
+  const shown = (page: Page) =>
+    plates(page).evaluateAll((els) =>
+      els.map((el, i) => {
+        const state = (i === 0 ? el : el.querySelector(':scope > div > div')!).cloneNode(true) as Element;
+        state.querySelectorAll('[role="status"]').forEach((region) => region.remove());
+        return state.textContent;
+      }),
+    );
+
+  for (const width of [1280, 390]) {
+    for (const route of componentPages) {
+      test(`${route}: Play runs the after plate from the before state to its own, at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await open(page, route);
+        // Nothing plays on its own: the pair is what a visitor first reads.
+        await expect(busy(page)).toHaveCount(0);
+        const [before, atRest] = await shown(page);
+        const name = (await playButton(page).getAttribute('aria-label'))!.replace(/^Play /, '');
+
+        // Press Play and read the first state two frames later, in one script so it isn't missed.
+        const [restHeight, midHeight, first] = await page.locator(frame).evaluate(async (el) => {
+          const h = () => Math.round(el.getBoundingClientRect().height);
+          const rest = h();
+          el.parentElement!.querySelector<HTMLButtonElement>('button[aria-label^="Play "]')!.click();
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          const playing = el.querySelector('[data-theme="dark"][aria-busy="true"] > div > div')?.cloneNode(true) as
+            Element | undefined;
+          playing?.querySelectorAll('[role="status"]').forEach((region) => region.remove());
+          return [rest, h(), playing?.textContent ?? null];
+        });
+        expect(first, 'the run starts on the before state').toBe(before);
+        expect(midHeight, 'the frame keeps its height').toBe(restHeight);
+
+        await expect(said(page)).toHaveText(`${name} played.`, { timeout: 6000 });
+        await expect(busy(page)).toHaveCount(0);
+        const [beforeAfter, afterAfter] = await shown(page);
+        expect(beforeAfter).toBe(before);
+        expect(afterAfter).toBe(atRest);
+      });
+    }
+  }
+
+  test('a mouse that moves into the frame plays it once, and says nothing', async ({ page }) => {
+    await open(page, '/components/agent-plan');
+    // On a page with rules to follow, the pair starts below the first screen.
+    await page.locator(frame).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const box = (await page.locator(frame).boundingBox())!;
+    const inside = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    await page.mouse.move(inside.x, box.y - 40);
+    await expect(busy(page)).toHaveCount(0);
+    await page.mouse.move(inside.x, inside.y);
+    await expect(busy(page)).toHaveCount(1);
+    await expect(busy(page)).toHaveCount(0, { timeout: 6000 });
+    await expect(said(page)).toHaveText('');
+
+    // Still inside: moving again plays nothing. A pointerleave is what arms the next run,
+    // so the check waits on a move the frame has received.
+    await page.mouse.move(inside.x + 10, inside.y + 10);
+    await page.mouse.move(inside.x, inside.y);
+    await expect(busy(page)).toHaveCount(0);
+
+    // Out and back in: once more.
+    await page.mouse.move(inside.x, box.y - 40);
+    await page.mouse.move(inside.x, inside.y);
+    await expect(busy(page)).toHaveCount(1);
+  });
+
+  // A live plate is there to select from or press. A run would take Inline citation's
+  // mark away as the mouse reached it, which is how its font test first failed.
+  for (const name of ['inline-citation', 'attachment-row', 'status-badge']) {
+    test(`${name}: the mouse plays nothing over a live plate`, async ({ page }) => {
+      await open(page, `/components/${name}`);
+      // On a page with rules to follow, the pair starts below the first screen.
+      await page.locator(frame).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      const box = (await page.locator(frame).boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y - 40);
+      // The frame's own listener is what would have played it, so wait for a move it received.
+      await page.locator(frame).evaluate((el) => {
+        el.addEventListener('pointermove', () => el.setAttribute('data-moved', ''), { once: true });
+      });
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await expect(page.locator(frame)).toHaveAttribute('data-moved', '');
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await expect(busy(page)).toHaveCount(0);
+    });
+  }
+
+  test.describe('with reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+
+    test('nothing moves: Play and the mouse leave the pair at rest', async ({ page }) => {
+      await open(page, '/components/agent-plan');
+      const atRest = await shown(page);
+      // On a page with rules to follow, the pair starts below the first screen.
+      await page.locator(frame).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      const box = (await page.locator(frame).boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await expect(busy(page)).toHaveCount(0);
+      await playButton(page).click();
+      await expect(said(page)).toHaveText('Agent plan played.');
+      await expect(busy(page)).toHaveCount(0);
+      expect(await shown(page)).toEqual(atRest);
+    });
   });
 });
