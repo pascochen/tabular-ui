@@ -7,7 +7,7 @@ const meta = {
   title: 'Product/CountBadge',
   component: CountBadge,
   parameters: { layout: 'padded' },
-  args: { label: 'Gaps', count: 3 },
+  args: { label: 'Unmatched', count: 3 },
 } satisfies Meta<typeof CountBadge>;
 
 export default meta;
@@ -76,20 +76,20 @@ export const StaticVersusInteractive: Story = {
     <div className="flex flex-col gap-[var(--gap-field)]">
       <div className="flex items-center gap-[var(--gap-inline)]">
         <span className="w-24 text-xs text-text-secondary">Static</span>
-        <CountBadge label="Gaps" count={3} />
-        <CountBadge label="Follow-ups" count={7} />
-        <CountBadge label="Contradictions" count={5} />
+        <CountBadge label="Unmatched" count={3} />
+        <CountBadge label="Needs review" count={7} />
+        <CountBadge label="Stale" count={5} />
       </div>
       <div className="flex items-center gap-[var(--gap-inline)]">
         <span className="w-24 text-xs text-text-secondary">Interactive</span>
         <Chip>
-          Gaps <span className="tabular-nums text-text-secondary">3</span>
+          Unmatched <span className="tabular-nums text-text-secondary">3</span>
         </Chip>
         <Chip data-selected="">
-          Follow-ups <span className="tabular-nums">7</span>
+          Needs review <span className="tabular-nums">7</span>
         </Chip>
         <Chip>
-          Contradictions <span className="tabular-nums text-text-secondary">5</span>
+          Stale <span className="tabular-nums text-text-secondary">5</span>
         </Chip>
       </div>
     </div>

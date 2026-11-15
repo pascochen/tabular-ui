@@ -6,7 +6,7 @@ asking (product: yes; foundational: never without asking).
 
 > **All 52 components are built.** The foundational 18 and the product 34 (the product `StatusDot` added 2026-11-03, for §5's `open` status; the product `PresenceStack` added 2026-10-29, after `ChannelMessage`; the product `ChannelMessage` added 2026-10-29, for the Kasane close demo; the product `Tool` added 2026-10-28, after `Question`; the product `Question` added 2026-10-28, after `Confirmation`; the product `Confirmation` added 2026-10-28, after its definition on tabularui.com was signed off; the product `Sources` and `InlineCitation` added 2026-10-28; the foundational `Spinner` added 2026-10-20; the product `ChatStarter` added 2026-10-14; the foundational `Textarea` and the product `ChatComposer` added 2026-10-13; the foundational `MessageScroller` and the product `AgentReasoning`, `AgentPlan` and `ChatThread` added 2026-10-12; `OrgSwitcher` added 2026-10-06; `ContextSwitcher`, `ProjectSwitcher`, `TruncatedText`, `AccountMenu` and the foundational `Avatar` 2026-10-07 — beyond the original 14 + 16).
 >
-> **Validation status (first real screen: the onboarding journey,
+> **Validation status (first real screen: the demo's first version,
 > `apps/demo`, 2026-08-24).** Exercised end to end by that screen:
 > `AppBar`, `AttachmentRow` (incl. the UploadTarget composition),
 > `CountBadge`, `EmptyState`, `StatusBadge` (+ `runStatuses`), `ProgressBar`,
