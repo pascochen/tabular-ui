@@ -529,7 +529,7 @@ test.describe('the demo', () => {
       await expect(action).toHaveAttribute('href', demo);
     }
     await expect(
-      page.getByRole('contentinfo').getByRole('list', { name: 'Try it' }).getByRole('link', { name: 'Demo' }),
+      page.getByRole('contentinfo').getByRole('list', { name: 'Live' }).getByRole('link', { name: 'Demo' }),
     ).toHaveAttribute('href', demo);
     await expect(page.getByRole('button', { name: 'Demo (soon)' })).toHaveCount(0);
     await expect(page.getByText('Demo (soon)')).toHaveCount(0);
@@ -744,18 +744,18 @@ test.describe('the jump index', () => {
 test.describe('the footer', () => {
   // Owner, 2026-10-27: four link columns beside the brand, About in place of the
   // closing line, and Principles out of the footer (it keeps its page).
-  test('has Guide, Foundations, Try it and About, and no closing line', async ({ page }) => {
+  test('has Guide, Foundations, Live and About, and no closing line', async ({ page }) => {
     await page.goto('/');
     const footer = page.getByRole('contentinfo');
     await expect(footer).toContainText('Components for agent-written, human-verified work.');
     const column = (name: string) => footer.getByRole('list', { name });
     await expect(column('Guide').getByRole('listitem')).toHaveText(['Components', 'Vocabulary', 'Get started']);
     await expect(column('Foundations').getByRole('listitem')).toHaveText(['Color', 'Typography', 'Density']);
-    await expect(column('Try it').getByRole('listitem')).toHaveText([/^Demo/, /^Storybook/]);
-    await expect(column('About').getByRole('listitem')).toHaveText([/^By Pascal/, /^MIT license/, /^GitHub/]);
+    await expect(column('Live').getByRole('listitem')).toHaveText([/^Demo/, /^Storybook/]);
+    await expect(column('About').getByRole('listitem')).toHaveText([/^LinkedIn/, /^MIT license/, /^GitHub/]);
     const about = column('About');
     for (const [name, href] of [
-      ['By Pascal', 'https://www.linkedin.com/in/pascal-chenier/'],
+      ['LinkedIn', 'https://www.linkedin.com/in/pascal-chenier/'],
       ['MIT license', 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE'],
       ['GitHub', 'https://github.com/pascochen/tabular-ui'],
     ]) {
@@ -779,7 +779,7 @@ test.describe('the footer', () => {
       await page.goto('/');
       const footer = page.getByRole('contentinfo');
       const tops = await Promise.all(
-        ['Guide', 'Foundations', 'Try it', 'About'].map(async (name) =>
+        ['Guide', 'Foundations', 'Live', 'About'].map(async (name) =>
           Math.round((await footer.getByRole('list', { name }).boundingBox())!.y),
         ),
       );

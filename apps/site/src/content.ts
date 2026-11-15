@@ -55,8 +55,9 @@ export const external = {
   demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: true as boolean },
   github: { href: 'https://github.com/pascochen/tabular-ui', label: 'GitHub' },
   license: { href: 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE', label: 'MIT license' },
-  // The footer's About column names the author (owner, 2026-10-27).
-  author: { href: 'https://www.linkedin.com/in/pascal-chenier/', label: 'By Pascal' },
+  // The footer's About column links to the author (owner, 2026-10-27). The label
+  // names the destination, as GitHub's does: it read "By Pascal" until 2026-11-15.
+  author: { href: 'https://www.linkedin.com/in/pascal-chenier/', label: 'LinkedIn' },
 } as const;
 
 /** A link to another site opens a new tab (owner, 2026-11-05). Spread it on the `<a>`, with ExternalMark inside. */
