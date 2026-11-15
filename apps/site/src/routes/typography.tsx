@@ -4,7 +4,7 @@ import { FoundationsHeader, ModePair, TokenLabel } from '../components/foundatio
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { PageKey } from '../components/page-key';
 import { pages } from '../content';
-import { kasane, packFile } from '../data';
+import { kasane, fileNamed } from '../data';
 import { cn } from '../lib/cn';
 import { exactMoney, money } from '../lib/format';
 import { onCanvas, px, stepLabel, themeToken, tokenStep } from '../tokens';
@@ -71,7 +71,7 @@ function TypographyKey({ figure }: { figure: string }) {
         },
         {
           mark: (
-            <span className="font-mono text-sm text-text-primary">{packFile('supplier_invoices_fy2026_h1.csv')}</span>
+            <span className="font-mono text-sm text-text-primary">{fileNamed('supplier_invoices_fy2026_h1.csv')}</span>
           ),
           meaning: 'Identifiers, one step down',
           name: '--font-mono',
@@ -141,7 +141,7 @@ export default function Typography() {
             <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
               <TokenLabel name="--font-mono" detail={firstFamily('--font-mono')} />
               <p className="font-mono text-text-primary">
-                {kasane.duplicatePayment.entries[0]} {packFile('trial_balance_monthly.csv')}
+                {kasane.duplicatePayment.entries[0]} {fileNamed('trial_balance_monthly.csv')}
               </p>
             </li>
           </ul>

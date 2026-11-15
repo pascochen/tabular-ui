@@ -49,8 +49,8 @@ export const closingBand = {
   role: kasane.company.visitor.title.split(' ').at(-1)?.toLowerCase(),
 };
 
-/** A pack file's name, failing the build if the export stops producing it. */
-export function packFile(name: string): string {
-  if (!kasane.pack.some((f) => f.name === name)) throw new Error(`kasane.json's pack has no file named ${name}`);
+/** A file's name, failing the build if the export stops producing it. */
+export function fileNamed(name: string): string {
+  if (!kasane.files.some((f) => f.name === name)) throw new Error(`kasane.json's files has none named ${name}`);
   return name;
 }
