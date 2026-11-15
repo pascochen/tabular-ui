@@ -11,7 +11,7 @@ type FooterLink = { href: string; label: string; external?: boolean; soon?: bool
  * isn't built yet is left out, and a column with nothing live is too.
  *
  * Owner, 2026-10-27: Principles left the footer (the page stays, linked from
- * each component page that carries a principle), GitHub moved from Try it to
+ * each component page that carries a principle), GitHub moved from Try it (now Live) to
  * About, and About replaced the closing line that named the license and author.
  */
 const columns: { title: string; links: FooterLink[] }[] = [
@@ -30,7 +30,8 @@ const columns: { title: string; links: FooterLink[] }[] = [
       .map(({ href, label }) => ({ href, label })),
   },
   {
-    title: 'Try it',
+    // Named "Try it" until 2026-11-15 (owner): it was the only heading that gave an instruction.
+    title: 'Live',
     links: [
       // While the demo isn't ready, its entry is text, not a link (owner, 2026-10-26).
       external.demo.ready
