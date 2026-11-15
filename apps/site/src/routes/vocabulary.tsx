@@ -1,5 +1,6 @@
 import { AgentBlock, AgentPlan, AgentReasoning, runStatuses, StatusBadge, type RunStatus } from 'tabular-ui';
 
+import { Card } from '../components/card';
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { KeyedHead, PageKey } from '../components/page-key';
 import { component, moments } from '../content';
@@ -40,9 +41,12 @@ const waits = [
   },
 ];
 
-/** The authorship labels `docs/agent-voice.md` defines: the role, or the role and a state. */
+/**
+ * The authorship labels `docs/agent-voice.md` defines, each with a state. The
+ * bare role, "AI", is not shown on its own (owner, 2026-11-15): the Activity
+ * lines card beside this one already draws it.
+ */
 const labels = [
-  { label: 'AI', use: 'Content the agent wrote.' },
   { label: 'AI · Awaiting review', use: 'A proposal waiting for a person.' },
   { label: 'AI · Posted', use: 'A proposal a person posted.' },
   { label: 'AI · Not posted', use: 'A proposal a person declined.' },
@@ -136,11 +140,7 @@ export default function Vocabulary() {
           />
           <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
             {waits.map((w) => (
-              <li
-                key={w.name}
-                className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap)]"
-              >
-                <h3 className="text-site-title font-semibold text-text-primary">{component(w.name).title}</h3>
+              <Card as="li" key={w.name} title={component(w.name).title}>
                 {[
                   ['The agent needs', w.needs],
                   ['The person can', w.can],
@@ -154,7 +154,7 @@ export default function Vocabulary() {
                     <p className="text-site-body text-text-body">{text}</p>
                   </div>
                 ))}
-              </li>
+              </Card>
             ))}
           </ul>
         </Rail>
@@ -169,9 +169,7 @@ export default function Vocabulary() {
           />
 
           <div className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
-            <div className="flex flex-col gap-[var(--gap-group)]">
-              <h3 className="text-site-title-sm font-semibold text-text-primary">Statuses</h3>
-              <p className="text-site-small text-text-secondary">The state of a run or an item, from StatusBadge.</p>
+            <Card title="Statuses" lead="The state of a run or an item, from StatusBadge.">
               <ul role="list" className="flex flex-col gap-[var(--gap-inline)]">
                 {statuses.map((s) => (
                   <li key={s} className="flex items-center justify-between gap-[var(--gap-inline)]">
@@ -180,26 +178,21 @@ export default function Vocabulary() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Card>
 
-            <div className="flex flex-col gap-[var(--gap-group)]">
-              <h3 className="text-site-title-sm font-semibold text-text-primary">Activity lines</h3>
-              <p className="text-site-small text-text-secondary">
-                What is happening now: a present participle, no subject, ending in an ellipsis.
-              </p>
+            <Card
+              title="Activity lines"
+              lead="What is happening now: a present participle, no subject, ending in an ellipsis."
+            >
               <AgentBlock authorship="AI" className="bg-canvas">
                 <div className="flex flex-col gap-[var(--gap-group)]">
                   <AgentReasoning status="streaming" text="" />
                   <AgentPlan title="Explain the H1 gap" description="" status="streaming" steps={[]} />
                 </div>
               </AgentBlock>
-            </div>
+            </Card>
 
-            <div className="flex flex-col gap-[var(--gap-group)]">
-              <h3 className="text-site-title-sm font-semibold text-text-primary">Authorship labels</h3>
-              <p className="text-site-small text-text-secondary">
-                Who wrote it, and its state: the role, or the role and a state.
-              </p>
+            <Card title="Authorship labels" lead="Who wrote it, and its state: the role and a state.">
               <ul role="list" className="flex flex-col gap-[var(--gap-inline)]">
                 {labels.map((l) => (
                   <li key={l.label}>
@@ -209,7 +202,7 @@ export default function Vocabulary() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Card>
           </div>
 
           <table className="w-full border-collapse border border-border bg-canvas text-site-small">

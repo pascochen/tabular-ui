@@ -220,7 +220,7 @@ Changed 2026-11-04 (owner): the band names the four agents and the controller, t
 
 **D10. Library first — decided 2026-11-02 (owner).** A pattern a product could reuse ships in `packages/ui` first, as its own decision and PR. The site never shows a pattern the library can't produce, and a library component is never restyled in `apps/site`.
 
-Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand`, `DemoAction` and `BridgeTable`. A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
+Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `ExternalMark`, `SiteNav`, `SiteFooter`, `HeroSection`, `ClosingBand`, `ComponentsSection`, `SpecimenFrame`, `ComponentCard`, `ComponentTag`, `Pair`, `ComponentPair`, the specimens, `ComponentList`, `FoundationsHeader`, `ModePair`, `TokenLabel`, `CopyCommand`, `DemoAction`, `BridgeTable` and `Card` (2026-11-15, Vocabulary's titled card). A new site component is added to this list by name, or moved to the library. *Proposal, for the owner to confirm:* the list is what `apps/site` holds today, and existing library calls have not been audited against "never restyled".
 
 **D11. The double rule stays rare — decided 2026-11-02 (owner).** A double rule is the ledger's mark for a closed total. To a finance reader it says the total is final and adds up, so it's never a divider.
 
@@ -366,6 +366,7 @@ The pair is static. It shows two states, not a sequence, and has no Replay. *Sin
   - Statuses are read from `runStatuses` and rendered as real `StatusBadge`s.
   - Activity lines are rendered by the components in their working state, so the words on the page are the component's own. *Changed in step 5a:* this named `ChatThread` and finished states. It is `AgentReasoning` and `AgentPlan`, streaming, in three columns rather than tables (§13).
   - Authorship labels are the forms `docs/agent-voice.md` defines.
+  - *Changed 2026-11-15 (owner):* each of the three columns sits in the site's `Card`, the frame the three "waits" cards have, so the page's two three-column sections read as one set. The contents didn't change: the agent blocks keep their own borders inside the card's. The same day, the bare "AI" label left Authorship labels, which now shows the three forms that carry a state.
 
   The "Instead of" and "Seen in shipping products" columns are owner copy. The Use column is not tinted, because colour for emphasis is hierarchy (§0 rule 1). It's distinguished by being first and by weight.
 
@@ -656,7 +657,7 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
 - **The install command** has a copy button that says "Copied", and announces it once, after the clipboard write succeeds.
 - **Getting started reads its code from `packages/ui/README.md`** at build time, by `##` section, so the page and the README can't give different commands. A section renamed or left without code fails the build. The prose around the code is the site's own. It adds the README's "Use" step to the three in §4.
 - **Vocabulary**, changed from §4:
-  - Status words sit in three columns, not three tables: a list of badges with their tones, the activity lines, and the four authorship labels in real `AgentBlock`s.
+  - Status words sit in three columns, not three tables: a list of badges with their tones, the activity lines, and the four authorship labels in real `AgentBlock`s (three since 2026-11-15, §4's Vocabulary).
   - The activity lines are `AgentReasoning` and `AgentPlan` streaming ("Thinking…", "Drafting step 1…"), not `ChatThread`. `ChatThread`'s "Working…" sits in a full thread, which doesn't fit a column.
   - The three definitions carried a "Draft definition" tag until the owner signed them off on 2026-10-28. The tag is gone.
 - **Principles** links onward to the Components page, and Home's Principles and Moments headers link to the new pages.
