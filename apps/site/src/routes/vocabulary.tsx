@@ -1,4 +1,4 @@
-import { AgentBlock, AgentPlan, AgentReasoning, Badge, runStatuses, StatusBadge, type RunStatus } from 'tabular-ui';
+import { AgentBlock, AgentPlan, AgentReasoning, runStatuses, StatusBadge, type RunStatus } from 'tabular-ui';
 
 import { Rail, Section, SectionHeader } from '../components/layout';
 import { KeyedHead, PageKey } from '../components/page-key';
@@ -75,29 +75,17 @@ const keyStates: { status: RunStatus; meaning: string }[] = [
 ];
 
 /**
- * The head stays still, as Home's hero does (D6). A working status draws the
- * Spinner, so here it takes the static icon runStatuses keeps as its fallback,
- * on the same Badge, tone and label: no restyle (D10). The proper fix is a
- * still option in the library, which is its own decision.
+ * The working badge moves here, as it does everywhere else (owner, 2026-11-14).
+ * Until then the head stood still, as Home's hero does (D6), and drew the
+ * status map's fallback icon, the robot, which no badge in the product shows.
+ * Under reduced motion the Spinner rests on its still frame.
  */
-function StillStatus({ status }: { status: RunStatus }) {
-  const s = runStatuses[status];
-  if (!s.working) return <StatusBadge status={status} />;
-  const Icon = s.icon;
-  return (
-    <Badge tone={s.tone} data-status={status}>
-      <Icon weight="bold" aria-hidden="true" />
-      {s.label}
-    </Badge>
-  );
-}
-
 function VocabularyKey() {
   return (
     <PageKey
       label="One word per state"
       rows={keyStates.map(({ status, meaning }) => ({
-        mark: <StillStatus status={status} />,
+        mark: <StatusBadge status={status} />,
         meaning,
         name: status,
       }))}
