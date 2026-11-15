@@ -4,8 +4,8 @@ import { expect, test, type Page } from '@playwright/test';
  * PROTOTYPE: the keyed page heads (docs/reviews/inner-page-heads-2026-11-05.md).
  * Each claim the review measured by hand, as a test: the plate starts at the
  * title, the key shows from `lg` only, its name column reaches the plate's
- * right edge, every name it gives is real, and the head stays still, Vocabulary's
- * working badge included. Geometry is asserted exactly, after the fonts load,
+ * right edge, every name it gives is real, and the head stays still but for Vocabulary's
+ * working badge, which spins as the product's does. Geometry is asserted exactly, after the fonts load,
  * because a box measured mid-swap is a different box (failure log, Tabs).
  */
 
@@ -56,15 +56,35 @@ for (const route of Object.keys(keyed) as Route[]) {
         await expect(key(page, route)).toBeHidden();
       });
 
-      test(`${state}: the head runs no animation, without reduced motion`, async ({ page }) => {
+      // Vocabulary's working badge spins, as it does in the product (owner, 2026-11-14). Nothing else in a head moves.
+      const spinners = route === '/vocabulary' ? 1 : 0;
+
+      test(`${state}: nothing in the head moves but a working badge's spinner`, async ({ page }) => {
         await hold(page, route, state);
-        // A spinner's lap starts on mount; give a late one time to begin before asserting none did.
+        // A spinner's lap starts on mount; give a late one time to begin before counting.
+        await page.waitForTimeout(300);
+        await expect(head(page).locator('[data-slot="spinner"]')).toHaveCount(spinners);
+        const running = await head(page).evaluate((el) =>
+          el
+            .getAnimations({ subtree: true })
+            .filter((a) => a.playState === 'running')
+            .map((a) => {
+              const target = (a.effect as KeyframeEffect | null)?.target;
+              return target?.closest('[data-slot="spinner"]') ? 'spinner' : 'other';
+            }),
+        );
+        expect(running.filter((r) => r === 'other')).toEqual([]);
+        expect(running.length > 0).toBe(spinners > 0);
+      });
+
+      test(`${state}: under reduced motion the head is still`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await hold(page, route, state);
         await page.waitForTimeout(300);
         const running = await head(page).evaluate(
           (el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === 'running').length,
         );
         expect(running).toBe(0);
-        await expect(head(page).locator('[data-slot="spinner"]')).toHaveCount(0);
       });
     }
 
@@ -121,19 +141,13 @@ for (const route of Object.keys(keyed) as Route[]) {
   });
 }
 
-test("Vocabulary's still badge is the real badge, standing still", async ({ page }) => {
+test("Vocabulary's working badge is the real badge, spinner and all", async ({ page }) => {
   await hold(page, '/vocabulary', 'hydrated');
-  const still = head(page).locator('[data-status="agent-working"]');
-  // The real one, in the Statuses list below the head.
+  const inHead = head(page).locator('[data-status="agent-working"]');
+  // The same badge in the Statuses list below the head.
   const real = page.locator('main > section').nth(3).locator('[data-status="agent-working"]');
   await expect(real).toHaveCount(1);
-  // textContent, not innerText: innerText applies the badge's uppercase.
-  await expect(still).toHaveText((await real.textContent())!);
-  const [a, b] = await Promise.all([still.boundingBox(), real.boundingBox()]);
-  expect([a!.width, a!.height]).toEqual([b!.width, b!.height]);
-  for (const prop of ['background-color', 'color', 'font-size', 'font-weight', 'text-transform']) {
-    await expect(still).toHaveCSS(prop, await real.evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), prop));
-  }
-  // It keeps a mark: a still icon where the spinner would be, hidden from assistive technology as the spinner is.
-  await expect(still.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+  // The whole badge, mark included: the head once drew the robot where the product draws the Spinner.
+  expect(await inHead.evaluate((el) => el.outerHTML)).toBe(await real.evaluate((el) => el.outerHTML));
+  await expect(inHead.locator('svg')).toHaveCount(1);
 });
