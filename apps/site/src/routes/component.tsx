@@ -215,7 +215,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
             <h2 id="pair-title" className="sr-only font-semibold">
               Before and after
             </h2>
-            <ComponentPair name={c.name} />
+            <ComponentPair name={c.name} title={c.title} />
           </section>
 
           {c.name === 'lineage-tree' ? (

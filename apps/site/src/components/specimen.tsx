@@ -1,6 +1,12 @@
+import { useRef } from 'react';
+import { PlayIcon } from '@phosphor-icons/react';
+import { Button } from 'tabular-ui';
+
 import { componentPage, type SiteComponent } from '../content';
 import { focusRing, standaloneLink } from '../lib/styles';
 import { cn } from '../lib/cn';
+import { useAnnouncer, usePlayback } from '../lib/playback';
+import { LiveRegion } from '../playback';
 
 /**
  * Where a specimen's plate sits (docs/site.md D3, decided (c) on 2026-10-26):
@@ -134,38 +140,87 @@ export function ComponentTag({ component }: { component: SiteComponent }) {
 }
 
 /**
- * A component's before/after pair (docs/site.md D2): two states in one frame,
- * each on a dark plate (D3), with no headings. Each state's own label carries
- * it, and one caption beneath says what changed. Static: no Replay, and each
- * plate is inert unless the pair says otherwise (`inert` in src/specimens.tsx),
- * so a press can't turn the before into the after.
+ * A component's before/after pair (docs/site.md D2, and "Component page"): two
+ * states in one frame, each on a dark plate (D3), with no headings. Each state's
+ * own label carries it, and one caption beneath says what changed.
+ *
+ * It rests on the two states. Play, beneath the frame, steps the after plate
+ * from the before state to its own, and a mouse that moves into the frame does
+ * the same, once each time it comes in (owner, 2026-11-15). The before plate
+ * never moves. Nothing plays on its own, and with reduced motion nothing moves:
+ * the player jumps to rest (src/lib/playback.ts).
+ *
+ * Each plate is inert unless the pair says otherwise (`inert` in
+ * src/specimens.tsx), so a press can't turn the before into the after. Play is
+ * outside both. A live plate is there to select from or press, so the mouse
+ * plays nothing over a pair that has one. While it plays, the after plate is
+ * inert and aria-busy. The before state sits invisibly in the after plate's cell
+ * at all times, and the after state joins it during a run, so the frame keeps
+ * its height: stacked on a phone, the after plate is as tall as the taller state.
  */
 export function Pair({
-  before,
-  after,
+  title,
+  states,
+  children,
   caption,
   inert = true,
 }: {
-  before: React.ReactNode;
-  after: React.ReactNode;
+  title: string;
+  states: number;
+  children: (index: number) => React.ReactNode;
   caption: string;
   inert?: boolean;
 }) {
+  const { frame, playing, play } = usePlayback({ frames: states, autoplay: false });
+  const { announce, message } = useAnnouncer();
+  // One run each time the mouse comes in. Armed again when it leaves.
+  const armed = useRef(true);
+  const plate = 'flex flex-col justify-center bg-canvas p-[var(--site-gap-tight)] text-base text-text-body';
+  const cell = 'col-start-1 row-start-1 min-w-0';
   return (
-    <figure className="flex flex-col gap-[var(--gap-group)]">
-      <div className="grid grid-cols-1 gap-2 border border-border-strong bg-canvas p-2 md:grid-cols-2">
-        {[before, after].map((state, i) => (
-          <div
-            key={i}
-            data-theme="dark"
-            inert={inert || undefined}
-            className="flex flex-col justify-center bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
-          >
-            {state}
+    <figure className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[var(--gap-group)]">
+      <div
+        className="col-span-2 grid grid-cols-1 gap-2 border border-border-strong bg-canvas p-2 md:grid-cols-2"
+        // pointermove, not pointerenter: a page scrolled under a still mouse plays nothing.
+        onPointerMove={(event) => {
+          // A live plate is there to select from or press, so the mouse plays nothing over it.
+          if (!inert || event.pointerType !== 'mouse' || !armed.current) return;
+          armed.current = false;
+          if (!playing) play();
+        }}
+        onPointerLeave={() => {
+          armed.current = true;
+        }}
+      >
+        <div data-theme="dark" inert={inert || undefined} className={plate}>
+          {children(0)}
+        </div>
+        <div data-theme="dark" inert={inert || playing || undefined} aria-busy={playing || undefined} className={plate}>
+          <div className="grid grid-cols-1 items-center">
+            <div className={cell}>{children(frame)}</div>
+            {/* The before state always, so a stacked plate never grows when Play starts; the
+                after state while it plays. */}
+            {(playing ? [0, states - 1] : [0]).map((index) => (
+              <div key={index} aria-hidden="true" className={cn(cell, 'invisible')}>
+                {children(index)}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-      <figcaption className="text-site-small text-text-secondary">{caption}</figcaption>
+      <div data-pair-play="" className="col-start-2 row-start-2">
+        <Button
+          size="sm"
+          variant="outline"
+          aria-label={`Play ${title}`}
+          onClick={() => play(() => announce(`${title} played.`))}
+        >
+          <PlayIcon aria-hidden="true" />
+          Play
+        </Button>
+        <LiveRegion message={message} />
+      </div>
+      <figcaption className="col-start-1 row-start-2 text-site-small text-text-secondary">{caption}</figcaption>
     </figure>
   );
 }

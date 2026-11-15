@@ -883,8 +883,13 @@ export function StatusSpecimen() {
 // ---------------------------------------------------------------------------
 
 /**
- * One composition per built component: its two states and the caption beneath.
- * Every caption is approved (owner, 2026-10-28).
+ * One composition per built component: its states in order and the caption
+ * beneath. `state(0)` is the before plate and `state(states - 1)` the after
+ * plate; Play steps the after plate through every one (docs/site.md, "Component
+ * page"). Every caption is approved (owner, 2026-10-28).
+ *
+ * A state that takes its open or decided form only on mount carries a `key`, so
+ * the step to it remounts the component.
  *
  * A plate with a control is inert, so a press can't turn the before into the
  * after (owner, 2026-10-28). Inert also takes the plate out of the accessibility
@@ -894,68 +899,78 @@ export function StatusSpecimen() {
  * its caption asks the reader to press the mark, and the popover opens over the
  * plate and leaves it as it was. `tests/pages.spec.ts` holds the rule.
  */
-type PairParts = { before: React.ReactNode; after: React.ReactNode; caption: string; inert?: false };
+type PairParts = { states: number; state: (index: number) => React.ReactNode; caption: string; inert?: false };
+
+/** A pair with nothing between its two states. */
+function two(before: React.ReactNode, after: React.ReactNode): Pick<PairParts, 'states' | 'state'> {
+  return { states: 2, state: (index) => (index === 0 ? before : after) };
+}
 
 function chatStarterPair(): PairParts {
   return {
-    before: (
+    ...two(
       <ChatStarter
         description={`Ask about ${kasane.company.name}’s books, from the files it shared.`}
         suggestions={suggestions}
         onSelect={noop}
-      />
+      />,
+      <ChatComposer value={question} onValueChange={noop} onSend={noop} />,
     ),
-    after: <ChatComposer value={question} onValueChange={noop} onSend={noop} />,
     caption: 'Picking a question fills the box without sending it, so you can still edit it.',
   };
 }
 
 function composerPair(): PairParts {
   const file = kasane.files.find((f) => f.name === fileNamed('trial_balance_monthly.csv'))!;
-  const attachment = (status: RunStatus) => [{ id: file.name, name: file.name, size: formatBytes(file.bytes), status }];
+  const composer = (status: RunStatus) => (
+    <ChatComposer
+      value={question}
+      onValueChange={noop}
+      onSend={noop}
+      attachments={[{ id: file.name, name: file.name, size: formatBytes(file.bytes), status }]}
+    />
+  );
   return {
-    before: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('running')} />,
-    after: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('passed')} />,
+    ...two(composer('running'), composer('passed')),
     caption: 'Nothing sends while a file is still uploading.',
   };
 }
 
 function reasoningPair(): PairParts {
   return {
-    before: (
+    ...two(
       <AgentBlock authorship="AI">
-        <AgentReasoning status="streaming" text={reasoningText} />
-      </AgentBlock>
-    ),
-    after: (
+        <AgentReasoning key="thinking" status="streaming" text={reasoningText} />
+      </AgentBlock>,
       <AgentBlock authorship="AI">
         <div className="flex flex-col gap-[var(--gap-group)]">
-          <AgentReasoning status="done" text={reasoningText} defaultOpen />
+          <AgentReasoning key="done" status="done" text={reasoningText} defaultOpen />
           <p>
             H1 operating profit is {money(h1Gap.shortfall)} under budget. Exchange rates explain{' '}
             {money(h1Gap.exchangeRates)} of it.
           </p>
         </div>
-      </AgentBlock>
+      </AgentBlock>,
     ),
     caption: 'The reasoning stays folded while the AI thinks. Open it to read the steps.',
   };
 }
 
 function planPair(): PairParts {
-  const plan = (status: 'streaming' | 'ready', count: number) => (
-    <AgentBlock authorship="AI">
-      <AgentPlan
-        title="Explain the H1 gap"
-        description={`Split the ${money(h1Gap.shortfall)} between exchange rates and performance, and trace each part to its entries.`}
-        status={status}
-        steps={planSteps.slice(0, count)}
-      />
-    </AgentBlock>
-  );
+  // Written from its second step on, one step a state, then ready.
+  const written = [2, 3, planSteps.length];
   return {
-    before: plan('streaming', 2),
-    after: plan('ready', planSteps.length),
+    states: written.length + 1,
+    state: (index) => (
+      <AgentBlock authorship="AI">
+        <AgentPlan
+          title="Explain the H1 gap"
+          description={`Split the ${money(h1Gap.shortfall)} between exchange rates and performance, and trace each part to its entries.`}
+          status={index === written.length ? 'ready' : 'streaming'}
+          steps={planSteps.slice(0, written[Math.min(index, written.length - 1)])}
+        />
+      </AgentBlock>
+    ),
     caption: 'Steps appear as the plan is written. Run plan waits for the last one.',
   };
 }
@@ -967,8 +982,7 @@ function toolPair(): PairParts {
     </AgentBlock>
   );
   return {
-    before: group(2),
-    after: group(3),
+    ...two(group(2), group(3)),
     caption: 'Each line changes from Reading to Read only when the file is done. A failure says what happens next.',
   };
 }
@@ -987,24 +1001,31 @@ function lineagePair(): PairParts {
     },
   ];
   return {
-    before: <LineageTree defaultExpanded={[]} nodes={nodes} />,
-    after: <LineageTree defaultExpanded={['actual']} nodes={nodes} />,
+    ...two(
+      <LineageTree key="closed" defaultExpanded={[]} nodes={nodes} />,
+      <LineageTree key="open" defaultExpanded={['actual']} nodes={nodes} />,
+    ),
     caption: 'Open a line to see what it’s built from, without leaving the page.',
   };
 }
 
 function attachmentPair(): PairParts {
   const files = attachmentFiles.map((name) => kasane.files.find((f) => f.name === fileNamed(name))!);
-  const rows = (statusAt: (i: number) => RunStatus) => (
-    <div className="flex flex-col">
-      {files.map((file, i) => (
-        <AttachmentRow key={file.name} name={file.name} size={formatBytes(file.bytes)} status={statusAt(i)} />
-      ))}
-    </div>
-  );
   return {
-    before: rows((i) => (i === 0 ? 'running' : 'queued')),
-    after: rows(() => 'passed'),
+    // One file read a state: the first is running in the before plate, and all have passed in the after.
+    states: files.length + 1,
+    state: (index) => (
+      <div className="flex flex-col">
+        {files.map((file, i) => (
+          <AttachmentRow
+            key={file.name}
+            name={file.name}
+            size={formatBytes(file.bytes)}
+            status={i < index ? 'passed' : i === index ? 'running' : 'queued'}
+          />
+        ))}
+      </div>
+    ),
     caption: 'Each file shows its own state. Its name stays text you can select and copy.',
     inert: false,
   };
@@ -1012,7 +1033,7 @@ function attachmentPair(): PairParts {
 
 function sourcesPair(): PairParts {
   return {
-    before: (
+    ...two(
       <AgentBlock authorship="AI">
         <div className="flex flex-col gap-[var(--gap-group)]">
           <CitedAnswer cited={false} />
@@ -1020,15 +1041,13 @@ function sourcesPair(): PairParts {
             Found in <code>{answerSources[0].name}</code>.
           </p>
         </div>
-      </AgentBlock>
-    ),
-    after: (
+      </AgentBlock>,
       <AgentBlock authorship="AI">
         <div className="flex flex-col gap-[var(--gap-group)]">
           <CitedAnswer cited />
           <Sources sources={answerSources} notChecked={notChecked} />
         </div>
-      </AgentBlock>
+      </AgentBlock>,
     ),
     caption: 'The answer lists every file it read, and says what it didn’t check.',
   };
@@ -1036,15 +1055,13 @@ function sourcesPair(): PairParts {
 
 function citationPair(): PairParts {
   return {
-    before: (
+    ...two(
       <AgentBlock authorship="AI">
         <CitedAnswer cited={false} />
-      </AgentBlock>
-    ),
-    after: (
+      </AgentBlock>,
       <AgentBlock authorship="AI">
         <CitedAnswer cited />
-      </AgentBlock>
+      </AgentBlock>,
     ),
     caption: 'Each figure names its source in its own line. Press the mark for the file and the entries.',
     inert: false,
@@ -1053,24 +1070,22 @@ function citationPair(): PairParts {
 
 function questionPair(): PairParts {
   return {
-    before: <AskEntities answer={null} />,
-    after: <AskEntities answer={{ kind: 'option', id: 'kjp' }} />,
+    ...two(<AskEntities answer={null} />, <AskEntities answer={{ kind: 'option', id: 'kjp' }} />),
     caption: 'Each answer is one press. Skip and Choose for me are always there.',
   };
 }
 
 function confirmationPair(): PairParts {
   return {
-    before: <SendSummary outcome="waiting" />,
-    after: <SendSummary outcome="sent" />,
+    ...two(<SendSummary outcome="waiting" />, <SendSummary outcome="sent" />),
     caption: 'Before it sends, you see what changes and who it reaches. Send summary sends it once.',
   };
 }
 
 function agentBlockPair(): PairParts {
   return {
-    before: <Proposal fixed="waiting" />,
-    after: <Proposal fixed="posted" />,
+    // Keyed: a fixed proposal reads its outcome once, on mount.
+    ...two(<Proposal key="waiting" fixed="waiting" />, <Proposal key="posted" fixed="posted" />),
     caption: 'The AI proposes the entry. Only a person can post it, with Post entry.',
   };
 }
@@ -1088,8 +1103,7 @@ function threadPair(): PairParts {
     </div>
   );
   return {
-    before: thread(),
-    after: thread(answer),
+    ...two(thread(), thread(answer)),
     caption: 'The reply shows Working… as soon as you ask, then the answer takes its place.',
   };
 }
@@ -1100,16 +1114,22 @@ function runLogPair(): PairParts {
     <div className="flex flex-col">
       <RunLogRow status="passed" name={names[0]} />
       <RunLogRow status="passed" name={names[1]} />
-      <RunLogRow status="failed" name={names[2]} defaultOpen={open} detail={runFailure} />
+      {/* Keyed: the row takes its open state only on mount. */}
+      <RunLogRow
+        key={open ? 'open' : 'closed'}
+        status="failed"
+        name={names[2]}
+        defaultOpen={open}
+        detail={runFailure}
+      />
     </div>
   );
-  return { before: rows(false), after: rows(true), caption: 'A failed row opens to its error in place.' };
+  return { ...two(rows(false), rows(true)), caption: 'A failed row opens to its error in place.' };
 }
 
 function statusPair(): PairParts {
   return {
-    before: <StatusBadge status="agent-working" />,
-    after: <StatusBadge status="agent-proposed" />,
+    ...two(<StatusBadge status="agent-working" />, <StatusBadge status="agent-proposed" />),
     caption: 'Each badge says what’s happening now: AI working, then proposed.',
     inert: false,
   };
@@ -1134,9 +1154,14 @@ const pairs: Record<string, () => PairParts> = {
   'status-badge': statusPair,
 };
 
-/** A built component's before/after pair, on dark plates (D2, D3). */
-export function ComponentPair({ name }: { name: string }) {
+/** A built component's before/after pair, on dark plates (D2, D3), with Play named for it. */
+export function ComponentPair({ name, title }: { name: string; title: string }) {
   const parts = pairs[name]?.();
   if (!parts) throw new Error(`No before/after pair for ${name}`);
-  return <Pair {...parts} />;
+  const { state, ...rest } = parts;
+  return (
+    <Pair title={title} {...rest}>
+      {state}
+    </Pair>
+  );
 }

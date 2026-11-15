@@ -170,7 +170,8 @@ test.describe('component pages', () => {
       expect(before).not.toBe(after);
     });
 
-    // Owner, 2026-10-28: the plates are static. Run log row's "before" could be
+    // Owner, 2026-10-28: a press never changes a plate. (Play does, since 2026-11-15:
+    // tests/playback.spec.ts.) Run log row's "before" could be
     // pressed open, and then it read the same as its "after". A plate with a
     // control is inert; the pairs below hold none, except Inline citation, whose
     // caption asks the reader to press the mark (src/specimens.tsx, PairParts).
@@ -208,7 +209,10 @@ test.describe('component pages', () => {
     for (const label of ['Post entry', 'Edit entry', 'Don’t post']) {
       await expect(before.locator('button', { hasText: label })).toBeVisible();
     }
-    await expect(after.locator('button')).toHaveCount(0);
+    // Its first cell is what it shows. The before state sits invisibly beside it, to hold
+    // the plate's height while Play runs (tests/playback.spec.ts).
+    await expect(after.locator(':scope > div > div').first().locator('button')).toHaveCount(0);
+    await expect(after.locator('button:visible')).toHaveCount(0);
   });
 });
 
