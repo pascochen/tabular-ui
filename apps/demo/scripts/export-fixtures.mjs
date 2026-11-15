@@ -39,7 +39,7 @@ const data = resolve(process.env.KASANE_DATA_DIR);
 for (const dir of ['01_master_data', '03_general_ledger', '05_reporting', 'docs', 'demo']) {
   if (!existsSync(join(data, dir))) throw new Error(`KASANE_DATA_DIR has no ${dir}/: is ${data} the dataset's root?`);
 }
-const MAX_PACK_FILE_BYTES = 5 * 1024 * 1024; // the demo's per-file limit (apps/demo/src/lib/files.ts)
+const MAX_FILE_BYTES = 5 * 1024 * 1024; // the demo's per-file limit (apps/demo/src/lib/files.ts)
 
 // ---------------------------------------------------------------------------
 // CSV
@@ -336,7 +336,7 @@ const people = Object.fromEntries(Object.entries(PEOPLE_IDS).map(([k, id]) => [k
 
 // ---------------------------------------------------------------------------
 // Findings: what the checks raise. Every evidence value is read from the data, and `sources` are
-// pack file names.
+// file names.
 // ---------------------------------------------------------------------------
 
 const P = {
@@ -492,41 +492,41 @@ const findings = [
 ];
 
 // ---------------------------------------------------------------------------
-// Demo pack
+// The dataset's files the demo and the site name
 // ---------------------------------------------------------------------------
 
 // Each file is built in memory and recorded, never written: the demo needs its name, kind and size,
 // and a spreadsheet's first line, which the header check really reads.
-const pack = [];
-const addPack = (name, kind, buf) => {
+const files = [];
+const addFile = (name, kind, buf) => {
   const bytes = buf.length;
-  if (bytes > MAX_PACK_FILE_BYTES) throw new Error(`${name} is ${bytes} bytes, over the demo's 5 MB limit`);
+  if (bytes > MAX_FILE_BYTES) throw new Error(`${name} is ${bytes} bytes, over the demo's 5 MB limit`);
   const entry = { name, kind, bytes };
   if (kind === 'spreadsheet') entry.firstLine = buf.toString('utf8').split(/\r?\n/, 1)[0];
-  pack.push(entry);
+  files.push(entry);
 };
 const copy = (from) => readFileSync(join(data, from));
 const writeText = (text) => Buffer.from(text);
 
-addPack(P.profile, 'document', copy('docs/01_company_profile.md'));
-addPack(P.policies, 'document', copy('docs/06_accounting_policies.md'));
-addPack(P.closeCalendar, 'document', copy('docs/07_close_calendar.md'));
-addPack(P.financeTeam, 'document', copy('docs/08_finance_team.md'));
-addPack(P.closeMemo, 'document', copy(closeMemoFile));
-addPack(P.forecastMemo, 'document', copy('docs/commentary/FY2026_6+6_forecast_memo.md'));
-addPack(P.trialBalance, 'spreadsheet', copy('03_general_ledger/trial_balance_monthly.csv'));
-addPack(P.coa, 'spreadsheet', copy('01_master_data/chart_of_accounts.csv'));
-addPack(P.aging, 'spreadsheet', copy('05_reporting/ar_aging_monthly.csv'));
-addPack(P.budget, 'spreadsheet', copy('04_planning/budget_forecast_monthly.csv'));
+addFile(P.profile, 'document', copy('docs/01_company_profile.md'));
+addFile(P.policies, 'document', copy('docs/06_accounting_policies.md'));
+addFile(P.closeCalendar, 'document', copy('docs/07_close_calendar.md'));
+addFile(P.financeTeam, 'document', copy('docs/08_finance_team.md'));
+addFile(P.closeMemo, 'document', copy(closeMemoFile));
+addFile(P.forecastMemo, 'document', copy('docs/commentary/FY2026_6+6_forecast_memo.md'));
+addFile(P.trialBalance, 'spreadsheet', copy('03_general_ledger/trial_balance_monthly.csv'));
+addFile(P.coa, 'spreadsheet', copy('01_master_data/chart_of_accounts.csv'));
+addFile(P.aging, 'spreadsheet', copy('05_reporting/ar_aging_monthly.csv'));
+addFile(P.budget, 'spreadsheet', copy('04_planning/budget_forecast_monthly.csv'));
 const jeCols = Object.keys(journal[0]);
 const manualRows = journal.filter((l) => l.je_type === 'Manual' && H1.includes(l.period));
 const supplierRows = supplierInvoices.filter((r) => H1.includes(r.period));
 const salesRows = salesInvoices.filter((r) => r.period === LAST_CLOSED);
-addPack(P.manualJournals, 'spreadsheet', writeText(toCsv(manualRows, jeCols)));
-addPack(P.supplierInvoices, 'spreadsheet', writeText(toCsv(supplierRows, Object.keys(supplierInvoices[0]))));
-addPack(P.salesInvoices, 'spreadsheet', writeText(toCsv(salesRows, Object.keys(salesInvoices[0]))));
+addFile(P.manualJournals, 'spreadsheet', writeText(toCsv(manualRows, jeCols)));
+addFile(P.supplierInvoices, 'spreadsheet', writeText(toCsv(supplierRows, Object.keys(supplierInvoices[0]))));
+addFile(P.salesInvoices, 'spreadsheet', writeText(toCsv(salesRows, Object.keys(salesInvoices[0]))));
 const paymentRows = supplierPayments.filter((r) => H1.includes(r.payment_date.slice(0, 7)));
-addPack(P.supplierPayments, 'spreadsheet', writeText(toCsv(paymentRows, Object.keys(supplierPayments[0]))));
+addFile(P.supplierPayments, 'spreadsheet', writeText(toCsv(paymentRows, Object.keys(supplierPayments[0]))));
 // The bank export has no header row, as a bank portal produces it.
 const opening = num(
   trialBalance.find((r) => r.entity_id === 'KJP' && r.period === LAST_CLOSED && r.account_id === '1000')
@@ -552,7 +552,7 @@ const closing = num(
     .closing_balance,
 );
 if (balance !== closing) throw new Error(`bank export balance ${balance} does not tie to GL cash ${closing}`);
-addPack(
+addFile(
   P.bank,
   'spreadsheet',
   writeText(toCsv(bankRows, ['date', 'ref', 'desc', 'out', 'in', 'balance'], { header: false })),
@@ -683,9 +683,9 @@ await writeFormatted(
 // ---------------------------------------------------------------------------
 
 const closeSource = JSON.parse(readFileSync(join(data, 'demo/close-demo.json'), 'utf8'));
-const packNames = new Set(pack.map((f) => f.name));
-const packText = (name) => readFileSync(join(data, ...packPath(name)), 'utf8');
-function packPath(name) {
+const fileNames = new Set(files.map((f) => f.name));
+const fileText = (name) => readFileSync(join(data, ...filePath(name)), 'utf8');
+function filePath(name) {
   const docs = {
     [P.policies]: 'docs/06_accounting_policies.md',
     [P.closeCalendar]: 'docs/07_close_calendar.md',
@@ -731,12 +731,12 @@ must(
   cutoffBefore === num(cutoff.net_amount),
   `${cutoff.invoice_id} is the only ${LAST_CLOSED} invoice delivered later`,
 );
-const calendarText = packText(P.closeCalendar);
+const calendarText = fileText(P.closeCalendar);
 const earningsRelease = calendarText.match(/earnings release[^|]*\| \w{3} (\d+ \w{3}) \d{4}/)?.[1];
 must(earningsRelease, 'close_calendar.md gives the H1 earnings release date');
 const auditFieldwork = calendarText.match(/Auditor interim review fieldwork \| ([^(|]+?) \(/)?.[1];
 must(auditFieldwork, "close_calendar.md gives the auditors' interim fieldwork dates");
-const legalDecision = packText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
+const legalDecision = fileText(P.closeMemo).match(/legal decision on recovery by (\d+ \w{3})/)?.[1];
 must(legalDecision, 'the close memo gives the date legal decides on Great Lakes');
 // What the agents' scripted answers claim, each read from the file the answer names.
 const lateInvoices = salesRows.filter((r) => r.delivery_date.slice(0, 7) > LAST_CLOSED);
@@ -766,8 +766,8 @@ must(
   'the aging file and the Great Lakes history span the same months',
 );
 must(
-  /revenue belongs to the period in which delivery occurs/i.test(packText(P.policies)) &&
-    /`delivery_date` on each invoice is the control field/.test(packText(P.policies)),
+  /revenue belongs to the period in which delivery occurs/i.test(fileText(P.policies)) &&
+    /`delivery_date` on each invoice is the control field/.test(fileText(P.policies)),
   'the accounting policies still put revenue in the month of delivery, with the delivery date as the control',
 );
 
@@ -848,8 +848,8 @@ const documentFiles = [
   ...new Set([...findings.flatMap((f) => f.sources), ...closeSource.agents.flatMap((a) => a.reads)]),
 ]
   .map((name) => {
-    const file = pack.find((f) => f.name === name);
-    must(file, `${name} (a finding's source or an agent's read) is a pack file`);
+    const file = files.find((f) => f.name === name);
+    must(file, `${name} (a finding's source or an agent's read) is one of the exported files`);
     return file;
   })
   .sort((a, b) => DOCUMENT_ORDER[a.kind] - DOCUMENT_ORDER[b.kind] || byCodeUnit(a.name, b.name));
@@ -1025,7 +1025,7 @@ function csvTable(name) {
 }
 
 function fileLines(name) {
-  const lines = packText(name).split('\n');
+  const lines = fileText(name).split('\n');
   return lines.at(-1) === '' ? lines.slice(0, -1) : lines;
 }
 
@@ -1132,7 +1132,7 @@ const closeExceptions = closeSource.exceptions.map((e) => {
   must(channelIds.includes(e.channel), `${e.id} sits in a channel in close-demo.json`);
   for (const r of e.replies) mustBeMember(r.author, `${e.id} reply`);
   if (e.resolution) mustBeMember(e.resolution.by, `${e.id} resolution`);
-  for (const s of finding.sources) must(packNames.has(s), `${s} (${e.id}) is a pack file`);
+  for (const s of finding.sources) must(fileNames.has(s), `${s} (${e.id}) is one of the exported files`);
   // Sources needs it (docs/agent-voice.md principle 4): [] says every part was checked.
   must(Array.isArray(e.notChecked), `${e.id} says what wasn't checked (notChecked, [] for nothing)`);
   ruleStands(e, finding);
@@ -1158,7 +1158,7 @@ for (const a of closeSource.agents) {
     `${a.key}'s finding ${a.finding} exists`,
   );
   must(a.starters.length === 2, `${a.key} has two suggested questions`);
-  for (const f of a.reads) must(packNames.has(f), `${f} (${a.key} reads) is a pack file`);
+  for (const f of a.reads) must(fileNames.has(f), `${f} (${a.key} reads) is one of the exported files`);
   for (const q of a.starters) {
     // Sources needs it (docs/agent-voice.md principle 4).
     must(Array.isArray(q.notChecked), `${a.key}: "${q.question}" says what wasn't checked`);
@@ -1292,7 +1292,7 @@ const bridgeRows = [
   ...operatingBridge.steps.map((s) => ({ id: s.id, label: s.label, yen: s.value })),
 ];
 must(sum(bridgeRows.map((r) => r.yen)) === operatingBridge.actual, 'the H1 bridge adds up from budget to actual');
-const supplierHeader = pack.find((f) => f.name === P.supplierInvoices).firstLine.split(',');
+const supplierHeader = files.find((f) => f.name === P.supplierInvoices).firstLine.split(',');
 const blockOf = (b, where) => {
   switch (b.type) {
     case 'tiles':
@@ -1348,8 +1348,8 @@ const blockOf = (b, where) => {
     }
     case 'attachment':
       if (b.file) {
-        const file = pack.find((f) => f.name === b.file);
-        must(file, `${b.file} is a pack file (${where})`);
+        const file = files.find((f) => f.name === b.file);
+        must(file, `${b.file} is one of the exported files (${where})`);
         return { type: 'attachment', name: file.name, bytes: file.bytes };
       }
       return { type: 'attachment', name: fill(b.name) };
@@ -1481,7 +1481,7 @@ await writeJson('apps/site/data/kasane.json', {
     visitor: { title: closePeople.visitor.title },
   },
   agents: closeSource.agents.length,
-  pack: pack.map(({ name, kind, bytes }) => ({ name, kind, bytes })),
+  files: files.map(({ name, kind, bytes }) => ({ name, kind, bytes })),
   findings: findings.length,
   duplicatePayment: {
     entity: dup[0].entity_id,
@@ -1498,7 +1498,7 @@ await writeJson('apps/site/data/kasane.json', {
 });
 
 console.log(
-  `kasane fixtures: ${pack.length} pack files (${(sum(pack.map((f) => f.bytes)) / 1024 / 1024).toFixed(1)} MB), ` +
+  `kasane fixtures: ${files.length} files (${(sum(files.map((f) => f.bytes)) / 1024 / 1024).toFixed(1)} MB), ` +
     `${findings.length} findings; ` +
     `H1 operating profit ¥${(h1.operatingProfit.actual / 1e6).toFixed(0)}m vs budget ¥${(h1.operatingProfit.budget / 1e6).toFixed(0)}m`,
 );

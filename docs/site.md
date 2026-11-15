@@ -277,7 +277,7 @@ Site-only, and staying in `apps/site`: `Rail`, `Section`, `SectionHeader`, `Exte
 
 **A4. CI (§10):** a `site_only` flag in `ci.yml`'s Scope step. A site-only PR skips the library suites. Every other non-docs PR adds the site build and the site tests. `Verify` stays the one required check, and nothing is renamed.
 
-**A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5): the two duplicate entries, the operating bridge, the pack's file names and sizes, the agent count, the visitor's title, and the next KUS October journal number.
+**A5. Fixture export:** `apps/demo/scripts/export-fixtures.mjs` also writes `apps/site/data/*.json` (§5): the two duplicate entries, the operating bridge, the files' names and sizes, the agent count, the visitor's title, and the next KUS October journal number.
 - Entries are numbered per entity per month (`JE-KUK-2608-00055`). The script takes the highest number in KUS's open month from the journal and adds one, and stops if the journal's IDs no longer follow that form. *Corrected 2026-10-26:* this spec first assumed October had no entries yet, so `JE-KUS-2610-00001`. The `october-open` gap means October has no month-end entries; its daily entries run to 15 Oct, 39 of them for KUS, so the first export wrote `JE-KUS-2610-00040`. Assuming would have shipped a number that already exists.
 - The export needs the full dataset, `demo/` included: a copy without it stops at its first check. Run against the right copy, the export reproduces every file already in the repo byte for byte. That is the check that the dataset is the one the repo was generated from.
 - It reads the full Kasane dataset, which lives outside the repo, so the owner runs it, once the change lands and before PR 4.
@@ -419,7 +419,7 @@ The site has three kinds of content, and each has one source.
 
 A test fails if a name in it is neither a registry item nor marked as to build.
 
-**Kasane data.** Every figure, ID, file name and date in a specimen comes from data. The site never imports `packages/ui/src/fixtures/kasane.ts`: fixtures are story data and are not in the package's `dist` (`tools.md`, "Package and releases"). `apps/demo/data/*.json` belongs to the demo. Instead, `export-fixtures.mjs` writes `apps/site/data/*.json` with exactly the records the specimens and the closing band use (A5): the duplicate supplier invoice and its two entries, the operating bridge, the pack's file names and sizes, the agent count, the visitor's title, and the next KUS October journal number. It is the one generator for all three consumers.
+**Kasane data.** Every figure, ID, file name and date in a specimen comes from data. The site never imports `packages/ui/src/fixtures/kasane.ts`: fixtures are story data and are not in the package's `dist` (`tools.md`, "Package and releases"). `apps/demo/data/*.json` belongs to the demo. Instead, `export-fixtures.mjs` writes `apps/site/data/*.json` with exactly the records the specimens and the closing band use (A5): the duplicate supplier invoice and its two entries, the operating bridge, the files' names and sizes, the agent count, the visitor's title, and the next KUS October journal number. It is the one generator for all three consumers.
 
 A test scans `apps/site/src` for currency figures and long digit runs outside `data/`, so a typed figure fails the build instead of passing silently.
 
@@ -461,15 +461,15 @@ On mobile the answer folds behind a disclosure, as the wireframe (`77:107`) draw
 | Component | Shows | Data |
 |---|---|---|
 | Chat starter | Suggested questions; a pick fills the composer and never sends | Written questions, no figures |
-| Chat composer | A file attaching, Send held until it uploads | A file name and size from the pack |
+| Chat composer | A file attaching, Send held until it uploads | A file name and size from the files |
 | Chat thread | A question, and the answer growing in place | As Agent reasoning |
-| Agent reasoning | Folded summary of the H1 gap; open, it lists the files read | Pack file names; the gap and FX figures, compact |
-| Agent plan | A plan's steps, ticking through | Pack file names |
+| Agent reasoning | Folded summary of the H1 gap; open, it lists the files read | File names; the gap and FX figures, compact |
+| Agent plan | A plan's steps, ticking through | File names |
 | Tool | The duplicate-payment answer's reads, one at a time, then one line, "Read 2 of 3 files", with the bank export's failure and the next step under it. Open, each read opens to what it found | `duplicate-payment`'s two sources, then the pack's only bank export, whose missing header row is real (`bank-header`, the failure Run log row shows). The next step agrees with Sources' not-checked line (added 2026-10-28) |
 | Lineage tree | H1 operating profit down to the bridge's six steps | `operatingBridge`, exact yen |
-| Attachment row | Three source files, name as link | The pack |
+| Attachment row | Three source files, name as link | The files |
 | Inline citation | The duplicate-payment answer, then a mark on each figure; a mark opens its file and entries | `duplicate-payment`: its sources and entries (added 2026-10-28) |
-| Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the pack's only bank file and the invoice file's H1 range (added 2026-10-28, copy approved by the owner the same day) |
+| Sources | The answer's two files, read one after another, then what wasn't checked | `duplicate-payment`'s sources; the not-checked lines name the only bank file and the invoice file's H1 range (added 2026-10-28, copy approved by the owner the same day) |
 | Question | Vocabulary's question with two options as buttons; an option, Skip or Choose for me puts its outcome where the controls were | The approved example; Choose for me's reason names `duplicate-payment`'s entity (added 2026-10-28) |
 | Confirmation | The variance summary, then Vocabulary's question; Send summary or Don't send puts the outcome where the buttons were | `operatingBridge` through `h1Gap`, compact; the company's name (added 2026-10-28) |
 | Agent block | Reversal of the duplicate invoice, proposed | `duplicate-payment` |

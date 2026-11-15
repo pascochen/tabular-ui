@@ -25,7 +25,7 @@ import {
   type ToolCall,
 } from 'tabular-ui';
 
-import { duplicatePayment, h1Gap, kasane, packFile } from './data';
+import { duplicatePayment, h1Gap, kasane, fileNamed } from './data';
 import { exactMoney, formatBytes, money } from './lib/format';
 import { useAnnouncer, usePlayback } from './lib/playback';
 import { Pair } from './components/specimen';
@@ -145,7 +145,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
               </p>
               {live ? null : (
                 <p className="text-text-secondary" {...unreached(frame < 2)}>
-                  Found in <code>{packFile(invoices)}</code>. I can reverse the second entry, <code>{d.reverse}</code>,
+                  Found in <code>{fileNamed(invoices)}</code>. I can reverse the second entry, <code>{d.reverse}</code>,
                   so the supplier owes it back.
                 </p>
               )}
@@ -473,7 +473,7 @@ export function ConfirmationSpecimen() {
 // The other cards
 // ---------------------------------------------------------------------------
 
-const reasoningText = `Read ${packFile('trial_balance_monthly.csv')} and ${packFile('budget_forecast_monthly.csv')}. Translated each entity at budget rates, then compared H1 with budget.`;
+const reasoningText = `Read ${fileNamed('trial_balance_monthly.csv')} and ${fileNamed('budget_forecast_monthly.csv')}. Translated each entity at budget rates, then compared H1 with budget.`;
 
 /** Agent reasoning: thinking, then folded, with the answer it led to (D5, the H1 gap). */
 export function ReasoningSpecimen() {
@@ -501,7 +501,7 @@ const planSteps = [
     id: 'read',
     label: (
       <>
-        Read <code>{packFile('trial_balance_monthly.csv')}</code> for H1
+        Read <code>{fileNamed('trial_balance_monthly.csv')}</code> for H1
       </>
     ),
   },
@@ -510,7 +510,7 @@ const planSteps = [
     id: 'compare',
     label: (
       <>
-        Compare with <code>{packFile('budget_forecast_monthly.csv')}</code>
+        Compare with <code>{fileNamed('budget_forecast_monthly.csv')}</code>
       </>
     ),
   },
@@ -549,7 +549,7 @@ type Read = ToolCall & { id: string };
 
 /**
  * The three files the answer read, in order. The first two are the answer's
- * sources; the third is the pack's only bank export, and its failure is real:
+ * sources; the third is the only bank export among the files, and its failure is real:
  * it has no header row, the same failure Run log row shows. The next step agrees with Sources' not-checked line.
  */
 function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' | 'detail'> }[] {
@@ -586,7 +586,7 @@ function reads(): { file: string; done?: Pick<Read & { status: 'done' }, 'done' 
         ),
       },
     },
-    { file: packFile(bankFiles[0]) },
+    { file: fileNamed(bankFiles[0]) },
   ];
 }
 
@@ -648,7 +648,7 @@ export function ChatStarterSpecimen() {
 
 /** Chat composer: a file queued, then uploading, holds Send. */
 export function ComposerSpecimen() {
-  const file = kasane.pack.find((f) => f.name === packFile('trial_balance_monthly.csv'));
+  const file = kasane.files.find((f) => f.name === fileNamed('trial_balance_monthly.csv'));
   const statuses: (RunStatus | null)[] = [null, 'queued', 'running'];
   return (
     <Specimen title="Chat composer" frames={statuses.length}>
@@ -698,7 +698,7 @@ const attachmentFiles = ['trial_balance_monthly.csv', 'budget_forecast_monthly.c
 
 /** Attachment row: the files the answer rests on, read one after another. */
 export function AttachmentSpecimen() {
-  const files = attachmentFiles.map((name) => kasane.pack.find((f) => f.name === packFile(name))!);
+  const files = attachmentFiles.map((name) => kasane.files.find((f) => f.name === fileNamed(name))!);
   return (
     <Specimen title="Attachment row" frames={files.length + 1}>
       {(f) => (
@@ -721,9 +721,9 @@ export function AttachmentSpecimen() {
 // Sources and Inline citation: what the duplicate-payment answer rests on (D5)
 // ---------------------------------------------------------------------------
 
-/** A pack file as a Source, with its size. No link: the site serves no pack files. */
-function packSource(name: string): Source {
-  const file = kasane.pack.find((f) => f.name === packFile(name))!;
+/** A file as a Source, with its size. No link: the site serves none of the files. */
+function fileSource(name: string): Source {
+  const file = kasane.files.find((f) => f.name === fileNamed(name))!;
   return { id: file.name, name: file.name, size: formatBytes(file.bytes) };
 }
 
@@ -733,10 +733,10 @@ const answerSources = (() => {
   if (!invoices || !payments)
     throw new Error('kasane.json’s duplicate payment no longer cites an invoice file and a payment file');
   // Citation order: the figure's file first, then the payments.
-  return [packSource(invoices), packSource(payments)];
+  return [fileSource(invoices), fileSource(payments)];
 })();
 
-const bankFiles = kasane.pack.filter((f) => f.name.startsWith('bank_export_')).map((f) => f.name);
+const bankFiles = kasane.files.filter((f) => f.name.startsWith('bank_export_')).map((f) => f.name);
 
 /** An identifier in a --text-sm line: mono, one step below (§8.3). */
 function Ident({ children }: { children: React.ReactNode }) {
@@ -744,7 +744,7 @@ function Ident({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * What the answer didn't check, from the pack itself: the only bank file isn't
+ * What the answer didn't check, from the files themselves: the only bank file isn't
  * the entity's, and the invoice file covers H1. Approved by the owner, 2026-10-28.
  */
 const notChecked = [
@@ -839,7 +839,7 @@ const runFiles = ['trial_balance_monthly.csv', 'supplier_invoices_fy2026_h1.csv'
  * error. The failure is real: the bank export has no header row. No times or durations: the data has none.
  */
 export function RunLogSpecimen() {
-  const names = runFiles.map(packFile);
+  const names = runFiles.map(fileNamed);
   return (
     <Specimen title="Run log row" frames={names.length + 1}>
       {(f) => (
@@ -911,7 +911,7 @@ function chatStarterPair(): PairParts {
 }
 
 function composerPair(): PairParts {
-  const file = kasane.pack.find((f) => f.name === packFile('trial_balance_monthly.csv'))!;
+  const file = kasane.files.find((f) => f.name === fileNamed('trial_balance_monthly.csv'))!;
   const attachment = (status: RunStatus) => [{ id: file.name, name: file.name, size: formatBytes(file.bytes), status }];
   return {
     before: <ChatComposer value={question} onValueChange={noop} onSend={noop} attachments={attachment('running')} />,
@@ -994,7 +994,7 @@ function lineagePair(): PairParts {
 }
 
 function attachmentPair(): PairParts {
-  const files = attachmentFiles.map((name) => kasane.pack.find((f) => f.name === packFile(name))!);
+  const files = attachmentFiles.map((name) => kasane.files.find((f) => f.name === fileNamed(name))!);
   const rows = (statusAt: (i: number) => RunStatus) => (
     <div className="flex flex-col">
       {files.map((file, i) => (
@@ -1095,7 +1095,7 @@ function threadPair(): PairParts {
 }
 
 function runLogPair(): PairParts {
-  const names = runFiles.map(packFile);
+  const names = runFiles.map(fileNamed);
   const rows = (open: boolean) => (
     <div className="flex flex-col">
       <RunLogRow status="passed" name={names[0]} />

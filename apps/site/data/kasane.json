@@ -7,7 +7,7 @@
     "visitor": { "title": "Group Controller" }
   },
   "agents": 4,
-  "pack": [
+  "files": [
     { "name": "company_profile.md", "kind": "document", "bytes": 5912 },
     { "name": "accounting_policies.md", "kind": "document", "bytes": 9018 },
     { "name": "close_calendar.md", "kind": "document", "bytes": 4947 },
