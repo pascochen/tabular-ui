@@ -420,12 +420,15 @@ test.describe('a component page’s pair', () => {
   /**
    * What each plate shows: its text, without the invisible states that hold the after
    * plate's height, and without a component's own announcement (Tool says what it read).
+   * Without anything aria-hidden either: a working label's visible copy counts its
+   * seconds ("Drafting step 3 · 0:03"), so the before plate read differently after a
+   * run of three seconds, and failed in CI. Its hidden copy, the bare label, stays.
    */
   const shown = (page: Page) =>
     plates(page).evaluateAll((els) =>
       els.map((el, i) => {
         const state = (i === 0 ? el : el.querySelector(':scope > div > div')!).cloneNode(true) as Element;
-        state.querySelectorAll('[role="status"]').forEach((region) => region.remove());
+        state.querySelectorAll('[role="status"], [aria-hidden="true"]').forEach((region) => region.remove());
         return state.textContent;
       }),
     );
@@ -448,7 +451,7 @@ test.describe('a component page’s pair', () => {
           await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
           const playing = el.querySelector('[data-theme="dark"][aria-busy="true"] > div > div')?.cloneNode(true) as
             Element | undefined;
-          playing?.querySelectorAll('[role="status"]').forEach((region) => region.remove());
+          playing?.querySelectorAll('[role="status"], [aria-hidden="true"]').forEach((region) => region.remove());
           return [rest, h(), playing?.textContent ?? null];
         });
         expect(first, 'the run starts on the before state').toBe(before);
