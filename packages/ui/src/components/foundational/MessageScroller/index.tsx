@@ -1,5 +1,6 @@
 import { ArrowDownIcon } from '@phosphor-icons/react';
 import { MessageScroller as MessageScrollerPrimitive } from '@shadcn/react/message-scroller';
+import { useSyncExternalStore } from 'react';
 
 import { useReducedMotion } from '../../../lib/motion';
 import { cn } from '../../../lib/utils';
@@ -37,7 +38,23 @@ import { IconButton } from '../IconButton';
  *   its show/hide transition is off. The primitive does neither.
  * - The frame and the viewport take their parent's background (`bg-inherit`).
  *   See the viewport.
+ * - The viewport hides while its opening scroll is pending only on a client
+ *   render, never in server HTML. See the viewport.
  */
+
+const subscribeNever = () => () => {};
+
+/**
+ * True when React renders on the client, false on the server and while it
+ * hydrates server HTML. React re-renders with true once hydration is done.
+ */
+function useClientRender() {
+  return useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
+}
 
 export type MessageScrollerProviderProps = React.ComponentProps<typeof MessageScrollerPrimitive.Provider>;
 
@@ -70,6 +87,7 @@ export type MessageScrollerViewportProps = React.ComponentProps<typeof MessageSc
 
 /** The scrolling element. A labelled region ("Messages" unless named). */
 function MessageScrollerViewport({ className, ...props }: MessageScrollerViewportProps) {
+  const clientRender = useClientRender();
   return (
     <MessageScrollerPrimitive.Viewport
       data-slot="message-scroller-viewport"
@@ -89,8 +107,11 @@ function MessageScrollerViewport({ className, ...props }: MessageScrollerViewpor
         // short of the composer's edge below. AppShellPanelBody reserves none.
         '[contain:content] [scrollbar-width:thin]',
         // Hidden until the opening position is applied, so a thread that
-        // opens at its last turn does not flash its first one.
-        'data-[pending-scroll]:invisible',
+        // opens at its last turn does not flash its first one. On a client
+        // render only: the primitive marks server HTML pending too, and only
+        // script can apply the scroll, so a page read before or without
+        // hydration showed an empty thread (docs/failure-log.md, 2026-11-16).
+        clientRender && 'data-[pending-scroll]:invisible',
         // §4: a focusable scroll container draws its ring inside itself.
         'outline-none focus-visible:outline-solid focus-visible:outline-ring',
         'focus-visible:outline-[length:var(--ring-width)] focus-visible:outline-offset-[-2px]',
