@@ -120,9 +120,11 @@ export function ComponentsSection() {
           <nav aria-label="Components by moment" className={`${panel} p-[var(--site-gap-tight)]`}>
             <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
               {moments.map((moment) => (
-                <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">
-                  {/* A label, not a link (owner, 2026-10-27), styled as the footer's column
-                    titles: it names the group, and the components under it are the links. */}
+                <li key={moment.id} className="flex flex-col gap-[var(--gap-group)]">
+                  {/* A label, not a link (owner, 2026-10-27), styled and spaced as the footer's
+                    column titles: it names the group, and the components under it are the links.
+                    12px above its list, twice the gap between links, so it reads as the list's
+                    title and not its first item (owner, 2026-11-16; it was 6px). */}
                   <p id={`jump-${moment.id}`} className="text-site-small font-semibold text-text-secondary">
                     {moment.title}
                   </p>
