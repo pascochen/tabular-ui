@@ -256,6 +256,7 @@ The log was a section of this file until 2026-11-11. It is 120 entries, and it w
 - Add each new Base UI entry point to `optimizeDeps.include`, or the browser test suite reloads mid-run and looks flaky.
 - Never resolve a component from a function during render. Index a module-level map.
 - A module augmentation lives in the module that owns it, so it travels with the import graph.
+- A state only script can clear never reaches server HTML: what hides until the client acts is visible on the server. A test that waits for hydration cannot see it. Held by the site's `playback.spec.ts`, "without JavaScript".
 - A value one effect consumes and another may overwrite is read once into state before any effect runs.
 - Open a hover affordance on a real `pointermove`, not `pointerenter`. A test that something did not open first waits for the event that would have opened it.
 

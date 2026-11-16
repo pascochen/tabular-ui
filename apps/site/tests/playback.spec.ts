@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { expect, test, type Page } from '@playwright/test';
 
-import { componentPages } from './routes';
+import { componentPages, routes } from './routes';
 
 /** The specimens' playback, the hero teaser, and the Agent block card's choices (docs/site.md §6, D6). */
 
@@ -403,6 +403,42 @@ test.describe('with reduced motion', () => {
     await expect(block.getByRole('button', { name: 'Post entry' })).toBeFocused();
     await expect(block.locator('[aria-busy="true"]')).toHaveCount(0);
   });
+});
+
+/**
+ * The prerendered HTML is the rest frame (docs/site.md §6), and it is what a
+ * visitor sees before hydration, which the site defers past the first paint.
+ * MessageScroller hid its thread until a scroll only script can apply, so with
+ * no script the Chat thread card was an empty frame (docs/failure-log.md, 2026-11-16).
+ */
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the Chat thread card shows its question and its answer', async ({ page }) => {
+    await page.goto('/');
+    const thread = card(page, 'chat-thread');
+    await expect(thread.getByText('Did we pay any invoice twice?')).toBeVisible();
+    await expect(thread.getByText('paid supplier invoice', { exact: false })).toBeVisible();
+  });
+
+  for (const route of routes) {
+    test(`${route}: no message thread hides itself`, async ({ page }) => {
+      await page.goto(route);
+      // A thread inside a copy that is invisible on purpose, the one that holds a
+      // plate's height, inherits that, so only a thread that hides itself counts.
+      const hidden = await page
+        .locator('[data-slot="message-scroller-viewport"]')
+        .evaluateAll(
+          (els) =>
+            els.filter(
+              (el) =>
+                getComputedStyle(el).visibility !== 'visible' &&
+                getComputedStyle(el.parentElement!).visibility === 'visible',
+            ).length,
+        );
+      expect(hidden).toBe(0);
+    });
+  }
 });
 
 /**
