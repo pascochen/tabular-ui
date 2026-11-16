@@ -81,7 +81,10 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border pt-[calc(var(--site-section-y)/2)] pb-8">
+    // The same space above and below, from the section rhythm: 40px on a phone,
+    // 48px at tablet width, 64px from 1200px (owner, 2026-11-16). It was half a
+    // section above and 32px below, which left the last links tight to the page's end.
+    <footer className="border-t border-border py-[calc(var(--site-section-y)/2+16px)]">
       {/* One column on a phone. At tablet width the brand takes its own row above
           four link columns, which at five across were about 130px wide; five
           across from lg. */}
