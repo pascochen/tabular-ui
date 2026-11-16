@@ -55,7 +55,7 @@ function TypographyKey({ figure }: { figure: string }) {
       rows={[
         {
           mark: (
-            <span className="font-display text-site-title-sm font-semibold text-text-primary">Explain the H1 gap</span>
+            <span className="font-display text-site-title-sm font-medium text-text-primary">Explain the H1 gap</span>
           ),
           meaning: 'Headings',
           name: '--font-heading',
@@ -137,7 +137,7 @@ export default function Typography() {
             </li>
             <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-heading" detail={firstFamily('--font-display')} />
-              <h3 className="text-site-title font-semibold text-text-primary">Every heading, by element</h3>
+              <h3 className="text-site-title font-medium text-text-primary">Every heading, by element</h3>
             </li>
             <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-mono" detail={firstFamily('--font-mono')} />

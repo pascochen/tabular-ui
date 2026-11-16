@@ -56,7 +56,7 @@ export function FoundationsHeader({
   );
   const intro = (
     <>
-      <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">{title}</h1>
+      <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">{title}</h1>
       <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">{lead}</p>
     </>
   );
@@ -80,7 +80,7 @@ export function FoundationsHeader({
           </ul>
         </nav>
         <div className="flex flex-col gap-[var(--gap-group)]">
-          <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">{title}</h1>
+          <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">{title}</h1>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">{lead}</p>
         </div>
       </Rail>

@@ -105,7 +105,7 @@ export function ComponentCard({
       </SpecimenFrame>
       <div className="flex flex-col gap-[var(--gap-control-icon)]">
         {/* An <h4>: the card sits under its moment's <h3>, in Home's Components section. */}
-        <h4 className="text-site-title-sm font-semibold text-text-primary">
+        <h4 className="text-site-title-sm font-medium text-text-primary">
           {component.built ? (
             <a href={componentPage(component.name)} className={standaloneLink}>
               {component.title}

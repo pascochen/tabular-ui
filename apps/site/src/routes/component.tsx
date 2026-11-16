@@ -48,7 +48,7 @@ function RulesFollowed({ name }: { name: string }) {
       aria-labelledby="rules-title"
       className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}
     >
-      <h2 id="rules-title" className="text-site-title font-semibold text-text-primary">
+      <h2 id="rules-title" className="text-site-title font-medium text-text-primary">
         {followed.length === 1 ? 'The rule it follows' : 'The rules it follows'}
       </h2>
       <ul role="list" className="flex flex-col gap-[var(--gap-group)]">
@@ -112,7 +112,7 @@ function ComponentList({ current }: { current: string }) {
 function WhenList({ id, title, lines }: { id: string; title: string; lines: readonly string[] }) {
   return (
     <div className="flex flex-col gap-[var(--gap-group)] border-t border-border pt-[var(--gap-group)]">
-      <h2 id={id} className="text-site-title font-semibold text-text-primary">
+      <h2 id={id} className="text-site-title font-medium text-text-primary">
         {title}
       </h2>
       <ul role="list" aria-labelledby={id} className="flex list-disc flex-col gap-[var(--gap-inline)] pl-5">
@@ -196,7 +196,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           </Menu>
 
           <div className="flex flex-col gap-[var(--gap-group)]">
-            <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">{c.title}</h1>
+            <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">{c.title}</h1>
             <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">{c.decision}</p>
           </div>
 
@@ -209,10 +209,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
 
           <section aria-labelledby="pair-title">
             {/* Hidden, not absent: a component's own heading inside the pair (AgentPlan's
-              <h3>) must not follow the page's <h1> with a level skipped. Semibold
-              like every heading, so it draws from the preloaded serif and doesn't fetch
+              <h3>) must not follow the page's <h1> with a level skipped. Medium
+              like every site heading, so it draws from the preloaded serif and doesn't fetch
               the 400 file (index.css). */}
-            <h2 id="pair-title" className="sr-only font-semibold">
+            <h2 id="pair-title" className="sr-only font-medium">
               Before and after
             </h2>
             <ComponentPair name={c.name} title={c.title} />
@@ -220,7 +220,7 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
 
           {c.name === 'lineage-tree' ? (
             <section aria-labelledby="bridge-title" className="flex flex-col gap-[var(--gap-group)]">
-              <h2 id="bridge-title" className="text-site-title font-semibold text-text-primary">
+              <h2 id="bridge-title" className="text-site-title font-medium text-text-primary">
                 The same figures, in a Data table
               </h2>
               <p className="max-w-[var(--site-w-prose)] text-site-body text-text-body">
@@ -232,9 +232,9 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
           ) : null}
 
           <div className="flex flex-col gap-[var(--gap-group)]">
-            <h2 className="text-site-title font-semibold text-text-primary">Install</h2>
+            <h2 className="text-site-title font-medium text-text-primary">Install</h2>
             <CopyCommand command={install(c.name)} />
-            <h3 className="pt-[var(--gap-inline)] text-site-small font-semibold text-text-primary">Usage</h3>
+            <h3 className="pt-[var(--gap-inline)] text-site-small font-medium text-text-primary">Usage</h3>
             <CodeView language="tsx" label={`${c.title} usage`}>
               {usage(c.name)}
             </CodeView>

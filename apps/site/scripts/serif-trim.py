@@ -3,9 +3,10 @@ Writes the site's trimmed serif (docs/site.md §12): Source Serif 4's Latin
 upright file, cut to one weight per file, with every optical size kept.
 
 The package's file carries every weight from 200 to 900, 122 KB, and the hero's
-heading waited on it before its first paint. The site sets the serif at 600,
-and at 400 in one place, Inline citation's popover number. So it gets two files:
-600, preloaded, and 400, fetched only when a page asks for it. The `opsz` axis
+heading waited on it before its first paint. The site sets its headings at 500
+(since 2026-11-16), library headings and MetricTile's figure at 600, and 400 in
+one place, Inline citation's popover number. So it gets three files: 500,
+preloaded, and 600 and 400, fetched only when a page asks for them. The `opsz` axis
 stays, because it gives the 64px heading the display cut (docs/design-system.md
 §8.4).
 

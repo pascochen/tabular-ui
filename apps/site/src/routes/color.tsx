@@ -97,7 +97,7 @@ function RoleRow({ role }: { role: Role }) {
   const c = roleClasses[role];
   return (
     <div className="flex flex-col gap-[var(--gap-group)]">
-      <h3 className="text-site-title-sm font-semibold text-text-primary capitalize">{role}</h3>
+      <h3 className="text-site-title-sm font-medium text-text-primary capitalize">{role}</h3>
       <ModePair>
         {(mode) => {
           const text = tokenStep(`text-${role}`, mode);

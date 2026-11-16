@@ -23,7 +23,7 @@ export function HeroSection() {
         <div className="flex flex-col gap-[var(--site-gap)] lg:col-span-5">
           <h1
             id="hero-title"
-            className="text-site-display-sm font-semibold text-balance text-text-primary md:text-site-display"
+            className="text-site-display-sm font-medium text-balance text-text-primary md:text-site-display"
           >
             A design system for the human in the loop
           </h1>

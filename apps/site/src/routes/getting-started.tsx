@@ -42,7 +42,7 @@ function Code({ heading, index = 0, label }: { heading: string; index?: number; 
 function Step({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <li className="flex flex-col gap-[var(--gap-group)] border-t border-border pt-[var(--site-gap)]">
-      <h3 className="text-site-title font-semibold text-text-primary">{title}</h3>
+      <h3 className="text-site-title font-medium text-text-primary">{title}</h3>
       {children}
     </li>
   );
@@ -55,7 +55,7 @@ export default function GettingStarted() {
     <>
       <Section rule={false}>
         <Rail size="reading" className="flex flex-col gap-[var(--gap-group)]">
-          <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Getting started</h1>
+          <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">Getting started</h1>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
             Tabular UI installs as source: the shadcn registry copies each component into your app, where you own it.
             The app needs React 19, Tailwind CSS 4 and a components.json from shadcn init.
