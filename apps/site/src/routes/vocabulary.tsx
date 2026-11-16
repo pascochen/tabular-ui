@@ -104,7 +104,7 @@ export default function Vocabulary() {
       <KeyedHead
         intro={
           <>
-            <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Vocabulary</h1>
+            <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">Vocabulary</h1>
             <p className="max-w-[var(--site-w-prose)] text-site-lead text-text-secondary">
               The words Tabular UI uses when an agent is working, waiting for you, or done. Each word names one state,
               so a label never means two things.
@@ -120,7 +120,7 @@ export default function Vocabulary() {
           <ol role="list" className="grid grid-cols-1 gap-[var(--site-gap-tight)] md:grid-cols-5">
             {moments.map((m) => (
               <li key={m.id} className={`flex flex-col gap-[var(--gap-bonded)] ${panel} p-[var(--site-gap-tight)]`}>
-                <h3 className="text-site-title-sm font-semibold text-text-primary">{m.title}</h3>
+                <h3 className="text-site-title-sm font-medium text-text-primary">{m.title}</h3>
                 <p className="text-site-small text-text-body">{m.line}</p>
                 <p className="text-xs text-text-secondary">{m.components.map((c) => c.title).join(', ')}</p>
               </li>

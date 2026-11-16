@@ -15,10 +15,10 @@ import './index.css';
 // pushed the specimen down (Lighthouse, 2026-10-27: CLS 0.165 of 0.166). They
 // are the files the stylesheets load: the sans is the package's, imported by
 // path because the fonts are `packages/ui`'s dependency, not the site's; the
-// serif is the site's trimmed 600 (index.css). Vite gives each the same hashed
+// serif is the site's trimmed 500, the hero's weight since 2026-11-16 (index.css). Vite gives each the same hashed
 // URL in both places, and tests/quality.spec.ts checks they match.
 import sansUrl from '../../../packages/ui/node_modules/@fontsource-variable/golos-text/files/golos-text-latin-wght-normal.woff2?url';
-import serifUrl from './fonts/tabular-serif-600.woff2?url';
+import serifUrl from './fonts/tabular-serif-500.woff2?url';
 
 export const links: Route.LinksFunction = () =>
   [sansUrl, serifUrl].map((href) => ({

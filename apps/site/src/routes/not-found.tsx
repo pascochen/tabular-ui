@@ -21,7 +21,7 @@ export default function NotFound() {
       {/* The hero's rhythm: heading and lead together, the action a step further down. */}
       <Rail size="reading" className="flex flex-col items-start gap-[var(--site-gap)]">
         <div className="flex flex-col gap-[var(--gap-group)]">
-          <h1 className="text-site-display-sm font-semibold text-text-primary md:text-site-display">Page not found</h1>
+          <h1 className="text-site-display-sm font-medium text-text-primary md:text-site-display">Page not found</h1>
           <p className="text-site-lead text-text-secondary">The link may be out of date, or the page may have moved.</p>
         </div>
         <a href={componentGrid} className={buttonVariants({ size: 'lg' })}>

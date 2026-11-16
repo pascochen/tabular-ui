@@ -29,7 +29,7 @@ export function Card({
 }) {
   return (
     <Tag className={cn('flex flex-col gap-[var(--gap-group)] p-[var(--site-gap)]', panel, className)}>
-      <h3 className="text-site-title font-semibold text-text-primary">{title}</h3>
+      <h3 className="text-site-title font-medium text-text-primary">{title}</h3>
       {lead ? <p className="text-site-small text-text-secondary">{lead}</p> : null}
       {children}
     </Tag>

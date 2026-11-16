@@ -155,7 +155,7 @@ test.describe('fonts', () => {
       .evaluateAll((links) => links.map((l) => new URL((l as HTMLLinkElement).href).pathname));
     expect(preloads).toHaveLength(2);
     expect(preloads[0]).toMatch(/\/golos-text-latin-wght-normal-[\w-]+\.woff2$/);
-    expect(preloads[1]).toMatch(/\/tabular-serif-600-[\w-]+\.woff2$/);
+    expect(preloads[1]).toMatch(/\/tabular-serif-500-[\w-]+\.woff2$/);
     for (const href of preloads)
       expect(
         fetched.filter((f) => f === href),
@@ -167,8 +167,10 @@ test.describe('fonts', () => {
   // scripts/serif-trim.py. A page that asked for another weight, or text that
   // fell through to the package's own serif, would fetch another serif file
   // on load. Specimens play as they scroll in, so each page is scrolled first.
-  // Section headings are 500 since 2026-11-16 (§7), so a page may fetch two
-  // cuts: the 600, preloaded, and the 500, once. The 400 waits for a citation.
+  // Every site heading is 500 since 2026-11-16 (§7), and every page has an
+  // <h1>, so each fetches the 500, preloaded, once. The 600 is fetched at most
+  // once, by a library heading or MetricTile's figure. The 400 waits for a
+  // citation.
   test('every page draws its serif from the two trimmed files alone', async ({ page }) => {
     const fetched: string[] = [];
     page.on('request', (r) => {
@@ -186,10 +188,10 @@ test.describe('fonts', () => {
       await page.waitForLoadState('networkidle');
       const serifs = fetched.filter((f) => /serif/.test(f));
       expect(
-        serifs.filter((f) => /^tabular-serif-600-/.test(f)),
+        serifs.filter((f) => /^tabular-serif-500-/.test(f)),
         route,
       ).toHaveLength(1);
-      expect(serifs.filter((f) => /^tabular-serif-500-/.test(f)).length, route).toBeLessThanOrEqual(1);
+      expect(serifs.filter((f) => /^tabular-serif-600-/.test(f)).length, route).toBeLessThanOrEqual(1);
       expect(
         serifs.filter((f) => !/^tabular-serif-(?:600|500)-/.test(f)),
         route,
@@ -225,7 +227,7 @@ test.describe('fonts', () => {
       [8, 60].map((opsz) => {
         const span = document.createElement('span');
         span.textContent = 'Hamburgefonstiv';
-        span.style.cssText = `font: 600 32px "Tabular Serif"; font-variation-settings: 'opsz' ${opsz}; position: absolute`;
+        span.style.cssText = `font: 500 32px "Tabular Serif"; font-variation-settings: 'opsz' ${opsz}; position: absolute`;
         document.body.append(span);
         const width = span.getBoundingClientRect().width;
         span.remove();
