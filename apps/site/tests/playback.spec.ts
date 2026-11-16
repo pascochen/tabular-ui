@@ -7,7 +7,11 @@ import { componentPages, routes } from './routes';
 /** The specimens' playback, the hero teaser, and the Agent block card's choices (docs/site.md §6, D6). */
 
 const kasane = JSON.parse(readFileSync(new URL('../data/kasane.json', import.meta.url), 'utf8')) as {
-  duplicatePayment: { nextJournalId: string; entries: string[] };
+  duplicatePayment: {
+    nextJournalId: string;
+    entries: string[];
+    reversal: { account: string; name: string; debit: number; credit: number }[];
+  };
 };
 const journalId = kasane.duplicatePayment.nextJournalId;
 const reversed = kasane.duplicatePayment.entries.at(-1)!;
@@ -35,6 +39,21 @@ test.describe('the hero', () => {
     await expect(hero(page).getByRole('button').filter({ hasNotText: 'Demo' })).toHaveCount(1);
     await expect(hero(page).getByRole('button', { name: 'Replay the hero’s run' })).toBeVisible();
     await expect(hero(page).getByText('Run log row', { exact: false })).toHaveCount(0);
+  });
+
+  // The entry as its ledger lines (owner, 2026-11-16), one row per account, from
+  // data. They balance, and there is no totals row: D11 keeps the site's one
+  // double rule on Lineage tree's page.
+  test('shows the entry as its ledger lines, balanced, from the data', async ({ page }) => {
+    await open(page, '/');
+    const { reversal } = kasane.duplicatePayment;
+    const rows = hero(page).locator('table tbody tr');
+    await expect(rows).toHaveCount(reversal.length);
+    for (const [i, line] of reversal.entries()) {
+      await expect(rows.nth(i).getByRole('rowheader')).toHaveText(`${line.account} ${line.name}`);
+    }
+    const sum = (key: 'debit' | 'credit') => reversal.reduce((total, line) => total + line[key], 0);
+    expect(sum('debit')).toBe(sum('credit'));
   });
 
   test('Replay plays the run back to the proposal, at the same height, and says so once', async ({ page }) => {
@@ -336,13 +355,37 @@ test.describe('the cards in a row', () => {
     });
   }
 
-  test('share one height across the moments at the widest cards, Sources apart', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await open(page, '/');
-    for (const name of ['chat-starter', 'chat-thread', 'agent-plan', 'lineage-tree', 'agent-block', 'run-log-row']) {
-      expect(await height(page, `#${name} article > :first-child`), name).toBe(310);
-    }
-  });
+  // Showing's four cards sit two to a row, the other moments' three (owner,
+  // 2026-11-16): equal widths in every moment, and Showing's two rows of two
+  // each reach both edges of the list, so Sources isn't left alone on a row.
+  for (const width of [1440, 1280, 1024]) {
+    test(`take three to a row, and Showing two, at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await open(page, '/');
+      for (const moment of ['asking', 'thinking', 'showing', 'waiting', 'recording']) {
+        const { list, items } = await page.locator(`#${moment} > ul`).evaluate((ul) => {
+          const box = (el: Element) => {
+            const r = el.getBoundingClientRect();
+            return { top: Math.round(r.top), left: Math.round(r.left), right: Math.round(r.right), width: r.width };
+          };
+          return { list: box(ul), items: [...ul.children].map((li) => ({ name: li.id, ...box(li) })) };
+        });
+        const perRow = moment === 'showing' ? 2 : 3;
+        expect(new Set(items.map((c) => Math.round(c.width))).size, `${moment} at ${width}px: equal widths`).toBe(1);
+        expect(
+          items.filter((c) => c.top === items[0].top),
+          `${moment} at ${width}px`,
+        ).toHaveLength(Math.min(perRow, items.length));
+        if (moment !== 'showing') continue;
+        for (const top of new Set(items.map((c) => c.top))) {
+          const row = items.filter((c) => c.top === top);
+          const label = `showing at ${width}px: ${row.map((c) => c.name).join(', ')}`;
+          expect(Math.min(...row.map((c) => c.left)), label).toBe(list.left);
+          expect(Math.max(...row.map((c) => c.right)), label).toBe(list.right);
+        }
+      }
+    });
+  }
 
   // A shorter box cut the answer off behind "Scroll to latest" at 1024px, with no
   // error, and the frame's height still passed.

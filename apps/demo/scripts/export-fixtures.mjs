@@ -1185,6 +1185,19 @@ must(
   sum(reversal.map((l) => l.debit)) === sum(reversal.map((l) => l.credit)),
   `the ${cutoff.invoice_id} reversal balances`,
 );
+
+// The duplicate's proposed reversal (the site's hero, 2026-11-16): the second entry's own
+// lines, from the chart of accounts. Payable debited, so the supplier owes it back; the
+// expense it was booked to credited. No tax line, so a taxed duplicate fails here first.
+must(num(dupSecond.tax_amount) === 0, `${dupSecond.ap_invoice_id} carries no tax`);
+const dupReversal = [
+  { ...account(dupSecond.payable_account_id), debit: num(dupSecond.gross_amount), credit: 0 },
+  { ...account(dupSecond.expense_account_id), debit: 0, credit: num(dupSecond.net_amount) },
+];
+must(
+  sum(dupReversal.map((l) => l.debit)) === sum(dupReversal.map((l) => l.credit)),
+  `the ${dupSecond.ap_invoice_id} reversal balances`,
+);
 must(closeSource.hero.exception === 'revenue-cut-off', 'the hero decision is the revenue cut-off');
 must(
   closeSource.hero.options.some((o) => o.id === closeSource.hero.delegate.option),
@@ -1492,6 +1505,7 @@ await writeJson('apps/site/data/kasane.json', {
     paid: dupPaid,
     sources: [P.supplierInvoices, P.supplierPayments],
     payments: dupPayments.map((p) => p.payment_id),
+    reversal: dupReversal,
     nextJournalId: `${jePrefix}${String(Math.max(0, ...openNumbers) + 1).padStart(5, '0')}`,
   },
   operatingBridge: fixtures.operatingBridge,

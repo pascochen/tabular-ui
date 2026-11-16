@@ -22,3 +22,15 @@ export const textLink = `text-text-interactive underline underline-offset-2 ${fo
  * ghost buttons, not this.
  */
 export const standaloneLink = `decoration-1 underline-offset-2 hover:underline ${focusRing}`;
+
+/**
+ * A bordered panel's ground and edge (docs/site.md D3, decided 2026-11-16): the
+ * paper, `--color-surface-sunken`, on the warm white page, with a
+ * `--color-border` edge. Cards, specimen frames, the nav and every other panel
+ * take it. Like AppShell's sidebar (design-system.md §3, "A sunken region"), it
+ * redefines the page grounds for its subtree, on the `--tui-*` layer, so a
+ * component inside that states `bg-canvas` or `bg-surface` doesn't paint a
+ * patch of the page. A dark plate inside sets its own (`data-theme="dark"`).
+ */
+export const panel =
+  'border border-border bg-surface-sunken [--tui-canvas:var(--tui-surface-sunken)] [--tui-surface:var(--tui-surface-sunken)]';

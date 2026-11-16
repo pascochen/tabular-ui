@@ -6,7 +6,7 @@ import { CopyCommand } from '../components/copy-command';
 import { ExternalMark, Rail, Section } from '../components/layout';
 import { componentPage, components, newTab, pages, principles, storybookDocs } from '../content';
 import { cn } from '../lib/cn';
-import { focusRing, standaloneLink } from '../lib/styles';
+import { focusRing, panel, standaloneLink } from '../lib/styles';
 import { install, usage } from '../component-usage';
 import { notFoundMeta, pageMeta } from '../lib/meta';
 import { ComponentPair } from '../specimens';
@@ -46,7 +46,7 @@ function RulesFollowed({ name }: { name: string }) {
   return (
     <section
       aria-labelledby="rules-title"
-      className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]"
+      className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}
     >
       <h2 id="rules-title" className="text-site-title font-semibold text-text-primary">
         {followed.length === 1 ? 'The rule it follows' : 'The rules it follows'}

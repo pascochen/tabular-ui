@@ -36,7 +36,7 @@ out = repo / "apps/site/src/fonts"
 
 # Name records that must not change: copyright, trademark, licence and its URL.
 kept = {0, 7, 13, 14}
-weights = {400: "Regular", 600: "SemiBold"}
+weights = {400: "Regular", 500: "Medium", 600: "SemiBold"}
 
 
 def sha256(path: Path) -> str:

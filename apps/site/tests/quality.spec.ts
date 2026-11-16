@@ -163,11 +163,13 @@ test.describe('fonts', () => {
       ).toHaveLength(1);
   });
 
-  // §12: the site's serif is the package's file cut to 600 and 400 by
+  // §12: the site's serif is the package's file cut to 600, 500 and 400 by
   // scripts/serif-trim.py. A page that asked for another weight, or text that
-  // fell through to the package's own serif, would fetch a second serif file
+  // fell through to the package's own serif, would fetch another serif file
   // on load. Specimens play as they scroll in, so each page is scrolled first.
-  test('every page draws its serif from the preloaded 600 file alone', async ({ page }) => {
+  // Section headings are 500 since 2026-11-16 (§7), so a page may fetch two
+  // cuts: the 600, preloaded, and the 500, once. The 400 waits for a citation.
+  test('every page draws its serif from the two trimmed files alone', async ({ page }) => {
     const fetched: string[] = [];
     page.on('request', (r) => {
       if (r.url().endsWith('.woff2')) fetched.push(new URL(r.url()).pathname.split('/').pop()!);
@@ -183,8 +185,15 @@ test.describe('fonts', () => {
       });
       await page.waitForLoadState('networkidle');
       const serifs = fetched.filter((f) => /serif/.test(f));
-      expect(serifs, route).toHaveLength(1);
-      expect(serifs[0], route).toMatch(/^tabular-serif-600-/);
+      expect(
+        serifs.filter((f) => /^tabular-serif-600-/.test(f)),
+        route,
+      ).toHaveLength(1);
+      expect(serifs.filter((f) => /^tabular-serif-500-/.test(f)).length, route).toBeLessThanOrEqual(1);
+      expect(
+        serifs.filter((f) => !/^tabular-serif-(?:600|500)-/.test(f)),
+        route,
+      ).toEqual([]);
     }
   });
 

@@ -51,6 +51,45 @@ type Outcome = 'waiting' | 'editing' | 'posted' | 'declined';
 type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
 
 /**
+ * The hero's journal entry as its ledger lines (owner, 2026-11-16): each account
+ * from the chart of accounts, debit and credit in their own right-aligned
+ * columns, from kasane.json. No totals row: the site's one double rule is on
+ * Lineage tree's page (D11), and two lines read as balanced without one.
+ */
+function JournalLines() {
+  const { reversal, currency } = duplicatePayment;
+  const figure = (n: number) => (n === 0 ? '' : money(n, currency));
+  return (
+    <table className="mt-1 w-full border-collapse text-sm">
+      <thead>
+        <tr className="text-xs text-text-secondary">
+          <th scope="col" className="pb-1 text-left font-medium">
+            Account
+          </th>
+          <th scope="col" className="pb-1 text-right font-medium">
+            Debit
+          </th>
+          <th scope="col" className="pb-1 pl-4 text-right font-medium">
+            Credit
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {reversal.map((line) => (
+          <tr key={line.account} className="border-t border-border">
+            <th scope="row" className="py-1 text-left font-normal text-text-body">
+              <code className="text-xs">{line.account}</code> {line.name}
+            </th>
+            <td className="py-1 text-right text-text-body">{figure(line.debit)}</td>
+            <td className="py-1 pl-4 text-right text-text-body">{figure(line.credit)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+/**
  * The agent's proposal. In the hero it's a teaser (owner, 2026-10-26): it rests
  * on the waiting proposal with no buttons, and Replay plays the run back to it.
  * On the Agent block card it's live: it stops and waits, and the visitor is the
@@ -128,7 +167,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
 
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
-      <div aria-busy={playing || undefined} className="flex flex-1 flex-col gap-[var(--gap-group)]">
+      <div aria-busy={playing || undefined} className="flex flex-1 flex-col justify-center gap-[var(--gap-group)]">
         {hero ? (
           <p className="text-text-secondary">
             <span className="font-medium text-text-body">Question:</span> {question}
@@ -206,14 +245,21 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                   ) : (
                     <>
                       <p className="font-medium text-text-primary">{entry.memo}</p>
-                      <p className="text-text-secondary">
-                        {d.amountLabel}, period {entry.period}
-                        {outcome === 'posted' ? (
-                          <>
-                            , <code>{d.nextJournalId}</code>
-                          </>
-                        ) : null}
-                      </p>
+                      {hero ? (
+                        <>
+                          <p className="text-text-secondary">Period {entry.period}</p>
+                          <JournalLines />
+                        </>
+                      ) : (
+                        <p className="text-text-secondary">
+                          {d.amountLabel}, period {entry.period}
+                          {outcome === 'posted' ? (
+                            <>
+                              , <code>{d.nextJournalId}</code>
+                            </>
+                          ) : null}
+                        </p>
+                      )}
                     </>
                   )}
                   {/* As every decision in the library (Dialog's footer, AgentPlan, Confirmation):
@@ -355,7 +401,7 @@ export function QuestionSpecimen() {
 
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
-      <div aria-busy={playing || undefined} className="flex flex-1 flex-col">
+      <div aria-busy={playing || undefined} className="flex flex-1 flex-col justify-center">
         <AskEntities answer={answer} round={round} reached={frame >= 1} onAnswer={setAnswer} />
       </div>
       {answer ? (
@@ -456,7 +502,7 @@ export function ConfirmationSpecimen() {
 
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
-      <div aria-busy={playing || undefined} className="flex flex-1 flex-col">
+      <div aria-busy={playing || undefined} className="flex flex-1 flex-col justify-center">
         <SendSummary outcome={outcome} round={round} reached={frame >= 1} onDecide={setOutcome} />
       </div>
       {outcome !== 'waiting' ? (
@@ -805,19 +851,19 @@ export function CitationSpecimen() {
 /**
  * Chat thread: the question asked, "Working…", and the answer grown in the same
  * place. Its scroller needs a bounded parent; the aspect ratio bounds it without
- * a height. The minimum is the card's 310px floor less its frame, plate and
- * Replay: it fills the floor, and a narrow card doesn't cut the answer off behind
- * "Scroll to latest". `w-full` stops the ratio turning that minimum into a 448px
- * minimum width, which scrolled the page sideways on a phone. (The floor was
- * 284px until Instrument Sans, 2026-11-07: its wider lines wrapped the answer
- * one line more at 1024px and cut it by 22px.)
+ * a height. The 224px minimum keeps a narrow card from cutting the answer off
+ * behind "Scroll to latest" (it was the card's old 310px floor less its frame,
+ * plate and Replay). `w-full` stops the ratio turning that minimum into a 448px
+ * minimum width, which scrolled the page sideways on a phone. From 1280px the
+ * card is half the rail wide (component-grid.tsx), where 2:1 grew a box taller
+ * than the thread and showed "Scroll to latest" over empty space, so it is 3:1.
  */
 export function ThreadSpecimen() {
   const answer = `Yes. ${duplicatePayment.entity} paid supplier invoice ${duplicatePayment.supplierInvoice} twice, ${duplicatePayment.amountLabel} each.`;
   return (
     <Specimen title="Chat thread" frames={2}>
       {(f) => (
-        <div className="flex aspect-[2/1] min-h-[224px] w-full flex-col">
+        <div className="flex aspect-[2/1] min-h-[224px] w-full flex-col xl:aspect-[3/1]">
           <ChatThread
             turns={[
               { id: 'q', role: 'user', text: question },

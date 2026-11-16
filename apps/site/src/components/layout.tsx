@@ -80,7 +80,7 @@ export function SectionHeader({
   return (
     <div className="flex flex-col gap-[var(--gap-group)] md:flex-row md:items-end md:justify-between">
       <div className="flex flex-col gap-[var(--gap-control-icon)]">
-        <h2 id={id} className="text-site-heading-sm font-semibold text-text-primary md:text-site-heading">
+        <h2 id={id} className="text-site-heading-sm font-medium text-text-primary md:text-site-heading">
           {title}
         </h2>
         {lead ? <p className="text-site-body text-text-secondary">{lead}</p> : null}

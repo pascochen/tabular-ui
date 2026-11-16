@@ -7,6 +7,7 @@ import { component, moments } from '../content';
 import { duplicatePayment } from '../data';
 import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/vocabulary';
+import { panel } from '../lib/styles';
 
 export const meta: Route.MetaFunction = () =>
   pageMeta({
@@ -118,10 +119,7 @@ export default function Vocabulary() {
           <SectionHeader id="vocab-moments" title={`${moments.length} moments`} />
           <ol role="list" className="grid grid-cols-1 gap-[var(--site-gap-tight)] md:grid-cols-5">
             {moments.map((m) => (
-              <li
-                key={m.id}
-                className="flex flex-col gap-[var(--gap-bonded)] border border-border bg-canvas p-[var(--site-gap-tight)]"
-              >
+              <li key={m.id} className={`flex flex-col gap-[var(--gap-bonded)] ${panel} p-[var(--site-gap-tight)]`}>
                 <h3 className="text-site-title-sm font-semibold text-text-primary">{m.title}</h3>
                 <p className="text-site-small text-text-body">{m.line}</p>
                 <p className="text-xs text-text-secondary">{m.components.map((c) => c.title).join(', ')}</p>
@@ -205,7 +203,7 @@ export default function Vocabulary() {
             </Card>
           </div>
 
-          <table className="w-full border-collapse border border-border bg-canvas text-site-small">
+          <table className={`w-full border-collapse ${panel} text-site-small`}>
             <caption className="pb-[var(--gap-inline)] text-left text-site-small text-text-secondary">
               The words Tabular UI uses, and the ones it doesn’t.
             </caption>

@@ -545,7 +545,7 @@ test.describe('the demo', () => {
     await page.goto('/');
     const band = page.locator('section[aria-labelledby="closing-title"]');
     await expect(band.getByRole('heading', { level: 2 })).toHaveText(
-      'Four agents checked a finance team’s books and raised four issues. You decide.',
+      'Four agents checked a finance team’s books and raised four issues for you to decide',
     );
     await expect(band.getByRole('paragraph')).toHaveText(
       'Kasane is a fictional printer maker. Its team works in channels, like Slack, and you play its controller.',

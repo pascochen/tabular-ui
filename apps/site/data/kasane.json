@@ -34,6 +34,10 @@
     "paid": [true, true],
     "sources": ["supplier_invoices_fy2026_h1.csv", "supplier_payments_fy2026_h1.csv"],
     "payments": ["PAY-KUS-2608-0002", "PAY-KUS-2608-0003"],
+    "reversal": [
+      { "account": "2000", "name": "Trade payables", "debit": 48216.4, "credit": 0 },
+      { "account": "6120", "name": "Freight and packing", "debit": 0, "credit": 48216.4 }
+    ],
     "nextJournalId": "JE-KUS-2610-00040"
   },
   "operatingBridge": {

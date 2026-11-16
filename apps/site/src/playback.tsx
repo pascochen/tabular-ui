@@ -46,7 +46,7 @@ export function Specimen({
   const { announce, message } = useAnnouncer();
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
-      <div aria-busy={playing || undefined} className="grid flex-1 grid-cols-1">
+      <div aria-busy={playing || undefined} className="grid flex-1 grid-cols-1 content-center">
         <div className="col-start-1 row-start-1">{children(frame)}</div>
         {frame < frames - 1 ? (
           <div aria-hidden="true" className="invisible col-start-1 row-start-1">
