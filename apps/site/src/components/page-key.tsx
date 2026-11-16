@@ -51,7 +51,7 @@ export type KeyRow = {
  */
 export function PageKey({ label, rows }: { label: string; rows: KeyRow[] }) {
   return (
-    <SpecimenFrame className="bg-canvas">
+    <SpecimenFrame>
       <ul role="list" aria-label={label} className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-[var(--site-gap)]">
         {rows.map((row) => (
           <li

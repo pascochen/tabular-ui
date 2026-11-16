@@ -26,7 +26,7 @@ export const entries: ComponentEntry[] = [
     name: 'chat-starter',
     title: 'Chat starter',
     moment: 'asking',
-    decision: 'A suggestion fills the box and never sends, so you can add the period first.',
+    decision: 'A suggestion fills the box and never sends, so you can add the period first',
     useWhen: [
       'The chat panel is empty and people need to know what they can ask.',
       'The right questions depend on the screen beside the panel: a run log asks about runs.',
@@ -40,7 +40,7 @@ export const entries: ComponentEntry[] = [
     name: 'chat-composer',
     title: 'Chat composer',
     moment: 'asking',
-    decision: 'Nothing sends while a file is still uploading, and you can stop any answer.',
+    decision: 'Nothing sends while a file is still uploading, and you can stop any answer',
     useWhen: [
       'People write to the agent, with or without files attached.',
       'Answers stream, and people may need to stop one partway.',
@@ -54,7 +54,7 @@ export const entries: ComponentEntry[] = [
     name: 'chat-thread',
     title: 'Chat thread',
     moment: 'asking',
-    decision: 'The answer’s space appears when you ask, so it grows in place.',
+    decision: 'The answer’s space appears when you ask, so it grows in place',
     useWhen: [
       'It’s the conversation in the chat panel: questions, answers, and the agent at work.',
       'Answers stream. The answer’s space appears as soon as the question is sent, so the thread doesn’t jump.',
@@ -68,7 +68,7 @@ export const entries: ComponentEntry[] = [
     name: 'agent-reasoning',
     title: 'Agent reasoning',
     moment: 'thinking',
-    decision: 'Thinking stays folded until you open it, so nothing jumps while you read.',
+    decision: 'Thinking stays folded until you open it, so nothing jumps while you read',
     useWhen: [
       'The agent’s working-out is worth checking, but not worth reading every time.',
       'The answer takes a few seconds, and people should see the agent is thinking.',
@@ -82,7 +82,7 @@ export const entries: ComponentEntry[] = [
     name: 'agent-plan',
     title: 'Agent plan',
     moment: 'thinking',
-    decision: 'The agent writes its plan where you can see it, before and while it works.',
+    decision: 'The agent writes its plan where you can see it, before and while it works',
     useWhen: [
       'The agent proposes steps before it acts, so a person can check or change them.',
       'A person will take the steps themselves, in order. Hide the buttons with `showActions={false}`.',
@@ -96,7 +96,7 @@ export const entries: ComponentEntry[] = [
     name: 'tool',
     title: 'Tool',
     moment: 'thinking',
-    decision: 'An action says it’s done only after it ran. A failure says what to do next.',
+    decision: 'An action says it’s done only after it ran, and a failure says what to do next',
     useWhen: [
       'The agent reads, searches or queries while it works, and people should see what it used.',
       'It makes several calls in a row. `ToolGroup` folds them into one line, and any failure stays in view.',
@@ -110,7 +110,7 @@ export const entries: ComponentEntry[] = [
     name: 'lineage-tree',
     title: 'Lineage tree',
     moment: 'showing',
-    decision: 'Every number opens down to the entry behind it.',
+    decision: 'Every number opens down to the entry behind it',
     useWhen: [
       'A figure or model is built from others, and people need to trace it to its source.',
       'The nesting runs deep. Each level indents 12px, so six levels still fit a panel.',
@@ -124,7 +124,7 @@ export const entries: ComponentEntry[] = [
     name: 'attachment-row',
     title: 'Attachment row',
     moment: 'showing',
-    decision: 'The file name is the link, so you can still select and copy it.',
+    decision: 'The file name is the link, so you can still select and copy it',
     useWhen: [
       'A file needs its name, size and state on one 28px line: an upload, a source, evidence on a record.',
       'People copy file names. The name stays selectable text, and only the name is the link.',
@@ -138,7 +138,7 @@ export const entries: ComponentEntry[] = [
     name: 'inline-citation',
     title: 'Inline citation',
     moment: 'showing',
-    decision: 'Each figure names what it rests on, in the line where it appears.',
+    decision: 'Each figure names what it rests on, in the line where it appears',
     useWhen: [
       'A figure or claim in an answer comes from a specific file or entry.',
       'People need to check a number without losing the line they’re reading.',
@@ -152,7 +152,7 @@ export const entries: ComponentEntry[] = [
     name: 'sources',
     title: 'Sources',
     moment: 'showing',
-    decision: 'Lists what the answer rests on, and what wasn’t checked.',
+    decision: 'Lists what the answer rests on, and what wasn’t checked',
     useWhen: [
       'An answer rests on files or records that people may want to check.',
       'Part of the question wasn’t covered, and the reader needs to know which part.',
@@ -166,7 +166,7 @@ export const entries: ComponentEntry[] = [
     name: 'question',
     title: 'Question',
     moment: 'waiting',
-    decision: 'One question, with options you can answer in a word.',
+    decision: 'One question, with options you can answer in a word',
     useWhen: [
       'The agent can’t settle a fact or a choice from the data, and one answer would.',
       'The answers fit in a word or a few: up to four as buttons, more in a list.',
@@ -180,7 +180,7 @@ export const entries: ComponentEntry[] = [
     name: 'confirmation',
     title: 'Confirmation',
     moment: 'waiting',
-    decision: 'Before an action runs, you see exactly what it changes and who it reaches.',
+    decision: 'Before an action runs, you see exactly what it changes and who it reaches',
     useWhen: [
       'The agent is about to do one thing outside the conversation: send, notify, rebuild or export.',
       'People should see what it changes and who it reaches before it runs.',
@@ -194,7 +194,7 @@ export const entries: ComponentEntry[] = [
     name: 'agent-block',
     title: 'Agent block',
     moment: 'waiting',
-    decision: 'An agent stops before anything that posts to the ledger.',
+    decision: 'An agent stops before anything that posts to the ledger',
     useWhen: [
       'The agent wrote it: an answer, a proposal, a plan.',
       'The agent proposes a change to the books. Its label says the proposal awaits review until a person decides.',
@@ -208,7 +208,7 @@ export const entries: ComponentEntry[] = [
     name: 'run-log-row',
     title: 'Run log row',
     moment: 'recording',
-    decision: 'A failed run opens its error in place, so you keep your spot.',
+    decision: 'A failed run opens its error in place, so you keep your spot',
     useWhen: [
       'People scan a list of runs: status, name, time, duration.',
       'A failure needs its error. A failed row opens its error in place.',
@@ -225,7 +225,7 @@ export const entries: ComponentEntry[] = [
     // replaced ("Status copy names the state, never the agent.") was for builders,
     // and it stays on the page as principle 3.
     moment: 'recording',
-    decision: 'Each run shows where it stands, so you can spot what failed and what needs you.',
+    decision: 'Each run shows where it stands, so you can spot what failed and what needs you',
     useWhen: [
       'Something has a state: a run, a check, a file. Queued, running, passed, failed and the rest.',
       'The same state shows on several screens, and must look the same on each.',

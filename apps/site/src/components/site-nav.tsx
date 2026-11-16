@@ -3,7 +3,7 @@ import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from
 
 import { external, newTab, pages } from '../content';
 import { cn } from '../lib/cn';
-import { focusRing } from '../lib/styles';
+import { focusRing, panel } from '../lib/styles';
 import { ExternalMark } from './layout';
 
 type Page = (typeof pages)[keyof typeof pages];
@@ -62,7 +62,7 @@ export function SiteNav() {
     <header className="px-2 pt-2 md:px-4 min-[1200px]:px-8 min-[1200px]:pt-4">
       <nav
         aria-label="Main"
-        className="mx-auto flex max-w-[calc(var(--site-w-wide)+32px)] items-center gap-[var(--site-gap)] border border-border bg-canvas px-2 py-[7px] md:px-4 md:py-[9px]"
+        className={`mx-auto flex max-w-[calc(var(--site-w-wide)+32px)] items-center gap-[var(--site-gap)] ${panel} px-2 py-2 md:px-4`}
       >
         {/* A plain link, not a ghost button: the button's hover overlay laid a grey
             wash over the brand mark (owner, 2026-10-26). No hover effect at all;

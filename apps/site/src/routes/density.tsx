@@ -5,6 +5,8 @@ import { pages } from '../content';
 import { themeToken, themeTokensWith } from '../tokens';
 import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/density';
+import { cn } from '../lib/cn';
+import { panel } from '../lib/styles';
 
 export const meta: Route.MetaFunction = () =>
   pageMeta({
@@ -177,7 +179,12 @@ export default function Density() {
           <TokenRows
             tokens={[themeToken('--border-width'), themeToken('--border-width-2'), themeToken('--ring-width')]}
           />
-          <p className="max-w-[var(--site-w-prose)] border border-dashed border-border-strong bg-canvas p-[var(--pad-card)] text-text-secondary">
+          <p
+            className={cn(
+              panel,
+              'max-w-[var(--site-w-prose)] border-dashed border-border-strong p-[var(--pad-card)] text-text-secondary',
+            )}
+          >
             A dashed frame marks something still to come: a to-build component, a slot a row will fill.
           </p>
         </Rail>

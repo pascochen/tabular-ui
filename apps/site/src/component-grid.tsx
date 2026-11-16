@@ -1,7 +1,7 @@
 import { ExternalMark, Rail, Section, SectionHeader } from './components/layout';
 import { ComponentCard } from './components/specimen';
 import { components, external, moments, newTab } from './content';
-import { standaloneLink } from './lib/styles';
+import { panel, standaloneLink } from './lib/styles';
 import {
   AgentBlockSpecimen,
   AttachmentSpecimen,
@@ -40,6 +40,17 @@ const specimens: Record<string, () => React.ReactNode> = {
 };
 
 /**
+ * Showing's four cards stay two to a row from 768px up, where the other
+ * moments take three from 1024px (owner, 2026-11-16): two rows of two, so
+ * Sources isn't left alone
+ * on a row of its own, and Lineage tree and the citations get the width their
+ * text wants. Whole class names, so Tailwind finds them.
+ */
+const columns: Record<string, string> = {
+  showing: 'md:grid-cols-2',
+};
+
+/**
  * One section per moment, a rule between each. The first drops its rule, as the
  * first section on a page does (owner, 2026-11-09): the jump index's own border
  * already ends what is above it, and 24px under that border the rule read as
@@ -55,12 +66,15 @@ function MomentSections() {
         className="flex flex-col gap-[var(--site-gap)] border-t border-border pt-[var(--site-section-y)] first:border-t-0 first:pt-0"
       >
         <div className="flex flex-col gap-[var(--gap-bonded)]">
-          <h3 id={`${moment.id}-title`} className="text-site-heading-sm font-semibold text-text-primary">
+          <h3 id={`${moment.id}-title`} className="text-site-heading-sm font-medium text-text-primary">
             {moment.title}
           </h3>
           <p className="text-site-body text-text-secondary">{moment.line}</p>
         </div>
-        <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-2 lg:grid-cols-3">
+        <ul
+          role="list"
+          className={`grid grid-cols-1 gap-[var(--site-gap)] ${columns[moment.id] ?? 'md:grid-cols-2 lg:grid-cols-3'}`}
+        >
           {moment.components.map((c) => {
             const Specimen = specimens[c.name];
             return (
@@ -103,7 +117,7 @@ export function ComponentsSection() {
             }
           />
 
-          <nav aria-label="Components by moment" className="border border-border bg-canvas p-[var(--site-gap-tight)]">
+          <nav aria-label="Components by moment" className={`${panel} p-[var(--site-gap-tight)]`}>
             <ul role="list" className="grid grid-cols-2 gap-[var(--site-gap-tight)] md:grid-cols-5">
               {moments.map((moment) => (
                 <li key={moment.id} className="flex flex-col gap-[var(--gap-control-icon)]">

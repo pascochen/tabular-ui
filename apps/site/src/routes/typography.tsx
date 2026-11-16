@@ -10,6 +10,7 @@ import { exactMoney, money } from '../lib/format';
 import { onCanvas, px, stepLabel, themeToken, tokenStep } from '../tokens';
 import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/typography';
+import { panel } from '../lib/styles';
 
 export const meta: Route.MetaFunction = () =>
   pageMeta({
@@ -130,15 +131,15 @@ export default function Typography() {
             lead="The serif applies by element: every heading, and the metric tier. Text that isn’t a heading never goes serif."
           />
           <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
+            <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-sans" detail={firstFamily('--font-sans')} />
               <p className="text-site-lead text-text-primary">Body and interface text, at every size.</p>
             </li>
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
+            <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-heading" detail={firstFamily('--font-display')} />
               <h3 className="text-site-title font-semibold text-text-primary">Every heading, by element</h3>
             </li>
-            <li className="flex flex-col gap-[var(--gap-group)] border border-border bg-canvas p-[var(--site-gap-tight)]">
+            <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-mono" detail={firstFamily('--font-mono')} />
               <p className="font-mono text-text-primary">
                 {kasane.duplicatePayment.entries[0]} {fileNamed('trial_balance_monthly.csv')}

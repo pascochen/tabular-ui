@@ -1,7 +1,7 @@
 import { Rail, Section } from '../components/layout';
 import { ComponentTag } from '../components/specimen';
 import { componentGrid, components, moments, principles } from '../content';
-import { standaloneLink } from '../lib/styles';
+import { panel, standaloneLink } from '../lib/styles';
 import { pageMeta } from '../lib/meta';
 import type { Route } from './+types/principles';
 
@@ -29,11 +29,11 @@ export default function Principles() {
         <Section key={p.title} labelledBy={`principle-${i}`}>
           <Rail size="reading" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-[1fr_240px]">
             <div className="flex flex-col gap-[var(--gap-group)]">
-              <h2 id={`principle-${i}`} className="text-site-heading-sm font-semibold text-text-primary">
+              <h2 id={`principle-${i}`} className="text-site-heading-sm font-medium text-text-primary">
                 {p.title}
               </h2>
               <p className="text-site-lead text-text-secondary">{p.why}</p>
-              <div className="flex flex-col gap-[var(--gap-bonded)] border border-border bg-canvas p-[var(--site-gap-tight)]">
+              <div className={`flex flex-col gap-[var(--gap-bonded)] ${panel} p-[var(--site-gap-tight)]`}>
                 <p className="text-site-small font-semibold text-text-secondary">Check</p>
                 <p className="text-site-body text-text-body">{p.check}</p>
               </div>

@@ -10,28 +10,16 @@ import { HeroSpecimen } from './specimens';
 /** Home's hero and closing band (wireframe `76:23`, mobile `77:96`). The component grid between them is in component-grid.tsx. */
 
 /**
- * The hero's one specimen sits on a paper plate on a sheet ruled like a
- * spreadsheet (D3, item 3). The paper behind it is the page's (D3, item 4). The rules are a decorative layer behind the
- * content, styled in index.css: one empty element per column, whose border
- * is the column's line.
+ * The hero: the headline and its actions beside one specimen, centred against
+ * it (decided 2026-11-16). The page under it is the plain warm white, and the
+ * ruled sheet that sat behind it until then is gone (D3, item 3). The paper's
+ * tooth, which covered the whole page until then, is on the specimen's frame
+ * alone (D3, item 4).
  */
-const sheetColumns = Array.from({ length: 36 }, (_, i) => i);
-
 export function HeroSection() {
   return (
-    <Section rule={false} labelledBy="hero-title" className="relative isolate">
-      <div aria-hidden="true" className="site-sheet pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <Rail className="h-full">
-          <div className="relative h-full">
-            <div className="site-sheet-rules absolute inset-y-0">
-              {sheetColumns.map((i) => (
-                <div key={i} />
-              ))}
-            </div>
-          </div>
-        </Rail>
-      </div>
-      <Rail className="grid grid-cols-1 items-start gap-[var(--site-gap)] lg:grid-cols-12">
+    <Section rule={false} labelledBy="hero-title">
+      <Rail className="grid grid-cols-1 items-center gap-[var(--site-gap)] lg:grid-cols-12">
         <div className="flex flex-col gap-[var(--site-gap)] lg:col-span-5">
           <h1
             id="hero-title"
@@ -51,7 +39,7 @@ export function HeroSection() {
             ) : null}
           </div>
         </div>
-        <SpecimenFrame className="lg:col-span-7">
+        <SpecimenFrame grain className="lg:col-span-7">
           <HeroSpecimen />
         </SpecimenFrame>
       </Rail>
@@ -72,10 +60,10 @@ export function ClosingBand() {
         <Rail size="reading" className="flex flex-col items-center gap-[var(--site-gap)] text-center">
           <h2
             id="closing-title"
-            className="text-site-heading-sm font-semibold text-balance text-text-primary md:text-site-heading"
+            className="text-site-heading-sm font-medium text-balance text-text-primary md:text-site-heading"
           >
-            {closingBand.agents} agents checked a finance team’s books and raised {closingBand.findings} issues. You
-            decide.
+            {closingBand.agents} agents checked a finance team’s books and raised {closingBand.findings} issues for you
+            to decide
           </h2>
           <p className="max-w-[var(--site-w-prose)] text-site-lead text-balance text-text-secondary">
             {kasane.company.name} is a fictional printer maker. Its team works in channels, like Slack, and you play its{' '}

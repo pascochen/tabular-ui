@@ -10,6 +10,11 @@
       "bytes": 47160,
       "sha256": "23dbda82e824f8c22f3f5881f90b412980eeebaa70fab6891fa0d215af0dfb7e"
     },
+    "tabular-serif-500.woff2": {
+      "weight": 500,
+      "bytes": 50888,
+      "sha256": "93eb2787b3707092d10689b30b9263a9eb63abcda403179f889f895ff1fb8230"
+    },
     "tabular-serif-600.woff2": {
       "weight": 600,
       "bytes": 50428,

@@ -3,7 +3,7 @@ import { PlayIcon } from '@phosphor-icons/react';
 import { Button } from 'tabular-ui';
 
 import { componentPage, type SiteComponent } from '../content';
-import { focusRing, standaloneLink } from '../lib/styles';
+import { focusRing, panel, standaloneLink } from '../lib/styles';
 import { cn } from '../lib/cn';
 import { useAnnouncer, usePlayback } from '../lib/playback';
 import { LiveRegion } from '../playback';
@@ -27,32 +27,45 @@ export type Ground = 'paper' | 'dark';
  * A component that isn't built has a dashed frame, and says so in words: dashed
  * means placeholder (§7.8), and colour or shape is never the only signal.
  *
- * The frame states its ground, as every bordered panel on the site does, so the
- * page's paper never shows inside it (D3, item 4; tests/paper.spec.ts).
+ * The frame is a panel, as every bordered panel on the site is: the paper on
+ * the warm white page, with a `--color-border` edge (D3, item 4, decided
+ * 2026-11-16; tests/paper.spec.ts). A placeholder keeps the stronger edge, so
+ * its dashes still read.
+ *
+ * `grain` lays the paper's tooth over the frame, the hero's alone (D3, item 4).
+ * The plate then draws no ground of its own, so the paper runs under the
+ * specimen edge to edge.
  */
 export function SpecimenFrame({
   ground = 'paper',
   placeholder = false,
+  grain = false,
   className,
   children,
 }: {
   ground?: Ground;
   placeholder?: boolean;
+  grain?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <div
       className={cn(
-        'flex flex-col border border-border-strong bg-canvas p-2',
-        placeholder && 'border-dashed',
+        panel,
+        'flex flex-col p-2',
+        placeholder && 'border-dashed border-border-strong',
+        grain && 'site-grain',
         className,
       )}
     >
       <div
         data-theme={ground === 'dark' ? 'dark' : undefined}
         data-plate={ground}
-        className="flex flex-1 flex-col bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
+        className={cn(
+          'flex flex-1 flex-col p-[var(--site-gap-tight)] text-base text-text-body',
+          !(grain && ground === 'paper') && 'bg-canvas',
+        )}
       >
         {children}
       </div>
@@ -65,11 +78,10 @@ export function SpecimenFrame({
  *
  * Two rows of a subgrid, so the cards in a row share one frame height and one
  * caption height (owner, 2026-11-02). The parent's `<li>` is the other half of
- * it. The frame's height is a floor, never a cap: a card that opens grows its
- * whole row. The floor, 310px, is the tallest row at 1440px (Sources apart), so
- * every moment's cards share one height there. It was 284px until the sans became
- * Instrument Sans (2026-11-07), whose wider lines wrapped three cards' copy one
- * line more. See docs/site.md, "Components".
+ * it. A row is as tall as its tallest specimen, and a card that opens grows its
+ * whole row. There is no fixed floor since 2026-11-16 (it was 310px), and each
+ * specimen sits centred in its plate, so a short one leaves no empty band under
+ * it. See docs/site.md, "Components".
  */
 export function ComponentCard({
   component,
@@ -82,7 +94,7 @@ export function ComponentCard({
 }) {
   return (
     <article className="row-span-2 grid grid-cols-1 grid-rows-subgrid gap-[var(--gap-group)]">
-      <SpecimenFrame ground={ground} placeholder={!component.built} className="min-h-[310px]">
+      <SpecimenFrame ground={ground} placeholder={!component.built}>
         {component.built ? (
           children
         ) : (
@@ -180,7 +192,7 @@ export function Pair({
   return (
     <figure className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[var(--gap-group)]">
       <div
-        className="col-span-2 grid grid-cols-1 gap-2 border border-border-strong bg-canvas p-2 md:grid-cols-2"
+        className={cn(panel, 'col-span-2 grid grid-cols-1 gap-2 p-2 md:grid-cols-2')}
         // pointermove, not pointerenter: a page scrolled under a still mouse plays nothing.
         onPointerMove={(event) => {
           // A live plate is there to select from or press, so the mouse plays nothing over it.
