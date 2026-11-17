@@ -38,6 +38,8 @@ export function usePlayback({ frames, autoplay = true }: { frames: number; autop
   const rest = frames - 1;
   const [frame, setFrame] = useState(rest);
   const [playing, setPlaying] = useState(false);
+  // Whether a run has ended since the page loaded: the button's wash leaves only after one has.
+  const [ran, setRan] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const onDone = useRef<(() => void) | undefined>(undefined);
@@ -61,6 +63,7 @@ export function usePlayback({ frames, autoplay = true }: { frames: number; autop
       const step = Math.min(STEP_MS, MAX_SEQUENCE_MS / rest);
       setFrame(0);
       setPlaying(true);
+      setRan(true);
       for (let f = 1; f <= rest; f++) {
         timers.current.push(
           setTimeout(() => {
@@ -97,5 +100,8 @@ export function usePlayback({ frames, autoplay = true }: { frames: number; autop
 
   useEffect(() => stop, [stop]);
 
-  return { ref, frame, rest, playing, play };
+  /** For the control that starts it (`runWash` in lib/styles): under way, ended, or never run. */
+  const run = playing ? ('playing' as const) : ran ? ('ended' as const) : undefined;
+
+  return { ref, frame, rest, playing, play, run };
 }

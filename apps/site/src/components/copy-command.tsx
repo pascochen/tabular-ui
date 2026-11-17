@@ -7,12 +7,21 @@ import { IconButton } from 'tabular-ui';
  * scrolls, so a phone shows all of it with nothing to scroll by keyboard. A copy
  * relabels the button "Copied" and says so once, as ContextSwitcher's does, and
  * only after the clipboard accepted it.
+ *
+ * The check is ticked in, left to right, and the copy icon fades back two
+ * seconds later (docs/site.md §7, "Motion"). With reduced motion both swap at
+ * once.
  */
 export function CopyCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false);
+  // The copy icon fades back in only after a copy: on load it is still (D6).
+  const [returned, setReturned] = useState(false);
   useEffect(() => {
     if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 2000);
+    const t = setTimeout(() => {
+      setCopied(false);
+      setReturned(true);
+    }, 2000);
     return () => clearTimeout(t);
   }, [copied]);
   return (
@@ -28,7 +37,16 @@ export function CopyCommand({ command }: { command: string }) {
           );
         }}
       >
-        {copied ? <CheckIcon /> : <CopyIcon />}
+        {/* One icon at a time, and a direct child, so IconButton still sets its
+            weight. A key remounts it, which is what starts the animation. */}
+        {copied ? (
+          <CheckIcon key="check" className="motion-safe:animate-[site-tick_140ms_ease-out]" />
+        ) : (
+          <CopyIcon
+            key={returned ? 'copy-back' : 'copy'}
+            className={returned ? 'motion-safe:animate-[site-fade-in_120ms_ease-out]' : undefined}
+          />
+        )}
       </IconButton>
       <span role="status" className="sr-only">
         {copied ? 'Copied' : ''}

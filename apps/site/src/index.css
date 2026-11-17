@@ -144,3 +144,87 @@ body {
     display: none;
   }
 }
+
+/* Motion (docs/site.md §7, "Motion", 2026-11-16). All of it is inside
+   no-preference or behind motion-safe: with reduced motion nothing here runs.
+
+   The page turns: the site's links are real page loads, and between two of its
+   pages the content crossfades while the nav and the footer hold. The old page
+   leaves faster than the new one arrives, and the whole turn is 150ms. A
+   browser without cross-document view transitions keeps the hard cut. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation-duration: 80ms;
+    animation-timing-function: linear;
+  }
+
+  ::view-transition-new(root) {
+    animation-duration: 150ms;
+    animation-timing-function: ease-out;
+  }
+
+  /* Held: no old image to fade, and the new one is in place at once. */
+  ::view-transition-group(site-nav),
+  ::view-transition-group(site-footer),
+  ::view-transition-new(site-nav),
+  ::view-transition-new(site-footer) {
+    animation: none;
+  }
+
+  ::view-transition-old(site-nav),
+  ::view-transition-old(site-footer) {
+    display: none;
+  }
+}
+
+/* Copy is ticked (components/copy-command.tsx): the check is revealed along
+   its stroke, and the copy icon fades back. */
+@keyframes site-tick {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes site-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The wash on Play and Replay (`runWash` in lib/styles.ts): in from the left
+   when a run starts, out to the right when it ends. `scale` and `translate`,
+   not `transform`: the layer rests on Tailwind's `scale-x-0`, which sets the
+   `scale` property, and a `transform` keyframe would multiply by that zero. */
+@keyframes site-wash-in {
+  from {
+    scale: 0 1;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes site-wash-out {
+  from {
+    scale: 1 1;
+    translate: 0;
+  }
+
+  to {
+    scale: 1 1;
+    translate: 100%;
+  }
+}
