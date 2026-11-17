@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { ArrowCounterClockwiseIcon, FastForwardIcon, InfoIcon } from '@phosphor-icons/react';
 import {
   Button,
@@ -75,13 +75,14 @@ export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenC
         {/* Confirmation's grid: the kind in its own column, so the three rows scan as a list. */}
         <dl className="grid grid-cols-[auto_1fr] gap-x-[var(--gap-group)] gap-y-[var(--gap-group)] text-sm">
           {whatIsWhat.map(({ kind, what }) => (
-            <div key={kind} className="contents">
+            <Fragment key={kind}>
               <dt className="font-medium text-text-primary">{kind}</dt>
               <dd className="text-text-body">{what}</dd>
-            </div>
+            </Fragment>
           ))}
         </dl>
-        <DialogFooter>
+        {/* Wraps: the two links are 314px on one row, and a 320px screen leaves the footer 262px. */}
+        <DialogFooter className="flex-wrap">
           <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
             Open Storybook
             <span className="sr-only"> (opens in a new tab)</span>

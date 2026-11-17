@@ -23,6 +23,7 @@ App-local: only the public demo needs it.
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
 | The dialog is a three-row list, not four paragraphs | Until 2026-11-16 the "You're…" line said the company was fictional and the people scripted, and two bold paragraphs said it again. The kind is now a column of its own (`Confirmation`'s grid), each fact is said once, and the body went from about 120 words to 70. What Kasane makes and where it sells is gone: nothing in the demo depends on it |
 | "Open Storybook", not "Storybook" | A link says what it does, and reads on its own in a screen reader's list of links |
+| The dialog's footer wraps | Its two links are 314px on one row, and at 320px wide the footer has 262px: the row pushed the list past the dialog's edge and clipped it. They share a row from 375px up, with 4px to spare |
 | "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
 
 ## Not tested with users
