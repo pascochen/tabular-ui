@@ -19,7 +19,9 @@ const member = (p: { id: string; name: string; initials: string }, i: number): P
 const team = [people.controller, people.payables, people.generalLedger, people.fpaAnalyst, people.usCredit].map(member);
 
 const meta = {
-  title: 'Product/PresenceStack',
+  title: 'Product/Chat/PresenceStack',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-presencestack',
   component: PresenceStack,
   parameters: { layout: 'padded' },
   args: { members: team.slice(0, 3) },

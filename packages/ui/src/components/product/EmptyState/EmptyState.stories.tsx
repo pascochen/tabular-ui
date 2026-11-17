@@ -5,7 +5,9 @@ import { Button } from '../../foundational/Button';
 import { EmptyState } from './index';
 
 const meta = {
-  title: 'Product/EmptyState',
+  title: 'Product/Shell/EmptyState',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-emptystate',
   component: EmptyState,
   parameters: { layout: 'padded' },
   args: { title: 'Nothing here yet' },

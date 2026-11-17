@@ -5,7 +5,9 @@ import type { RunStatus } from '../StatusBadge/statuses';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/RunLogRow',
+  title: 'Product/Data display/RunLogRow',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-runlogrow',
   component: RunLogRow,
   parameters: { layout: 'padded' },
   args: { status: 'passed', name: 'fct_gl_entries', timestamp: '14:22:07', duration: '4.2s' },

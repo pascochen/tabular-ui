@@ -4,7 +4,9 @@ import { Chip } from '../../foundational/Chip';
 import { CountBadge } from './index';
 
 const meta = {
-  title: 'Product/CountBadge',
+  title: 'Product/Status/CountBadge',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-countbadge',
   component: CountBadge,
   parameters: { layout: 'padded' },
   args: { label: 'Unmatched', count: 3 },

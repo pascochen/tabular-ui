@@ -6,7 +6,9 @@ import { OrgSwitcher, type Org } from './index';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/OrgSwitcher',
+  title: 'Product/Controls/OrgSwitcher',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-orgswitcher',
   component: OrgSwitcher,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof OrgSwitcher>;

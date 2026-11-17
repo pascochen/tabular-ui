@@ -24,7 +24,9 @@ const notChecked = [
  * story renders it inside one, at the chat panel's width on the panel's ground.
  */
 const meta = {
-  title: 'Product/Sources',
+  title: 'Product/Evidence/Sources',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-sources',
   component: Sources,
   parameters: { layout: 'padded' },
   args: { sources, notChecked },

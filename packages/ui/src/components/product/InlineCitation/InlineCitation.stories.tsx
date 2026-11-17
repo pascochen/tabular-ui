@@ -14,7 +14,9 @@ const payments: Source = { id: 'payments', name: 'supplier_payments_fy2026_h1.cs
  * prose, at the chat panel's width on the panel's ground.
  */
 const meta = {
-  title: 'Product/InlineCitation',
+  title: 'Product/Evidence/InlineCitation',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-inlinecitation',
   component: InlineCitation,
   parameters: { layout: 'padded' },
   args: { number: 1, source: invoices, locator: 'API-KUS-2607-00007 and API-KUS-2607-00011' },

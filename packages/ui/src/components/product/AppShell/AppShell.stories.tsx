@@ -56,7 +56,9 @@ import {
 } from './index';
 
 const meta = {
-  title: 'Product/AppShell',
+  title: 'Product/Shell/AppShell',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-appshell',
   component: AppShell,
   parameters: { layout: 'fullscreen' },
   // Every story pins a desktop viewport. Unpinned, it would render at

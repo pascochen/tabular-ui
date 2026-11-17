@@ -8,7 +8,9 @@ import { ChatThread, type ChatTurn } from '../ChatThread';
 import { ChatComposer, type ChatAttachment, type ChatComposerHandle } from './index';
 
 const meta = {
-  title: 'Product/ChatComposer',
+  title: 'Product/Chat/ChatComposer',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-chatcomposer',
   component: ChatComposer,
   parameters: { layout: 'padded' },
   args: { onSend: fn() },

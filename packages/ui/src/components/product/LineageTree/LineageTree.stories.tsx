@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { LineageTree, type LineageNode } from './index';
 
 const meta = {
-  title: 'Product/LineageTree',
+  title: 'Product/Data display/LineageTree',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-lineagetree',
   component: LineageTree,
   parameters: { layout: 'padded' },
   args: { nodes: [] },

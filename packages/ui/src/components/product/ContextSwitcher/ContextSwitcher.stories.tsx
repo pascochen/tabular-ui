@@ -10,7 +10,9 @@ import { ContextSwitcher, ContextSwitcherLabel, type ContextItem, type ContextSw
  * contract they are built from. Mode is driven by the toolbar Theme control.
  */
 const meta = {
-  title: 'Product/ContextSwitcher',
+  title: 'Product/Controls/ContextSwitcher',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-contextswitcher',
   component: ContextSwitcher,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof ContextSwitcher>;

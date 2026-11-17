@@ -80,6 +80,25 @@ const preview: Preview = {
       },
     },
 
+    // The sidebar: the tokens, then the contract, then the product layer
+    // grouped by job, in docs/components.md's order. A product story is
+    // titled `Product/<group>/<Name>` and keeps `id: 'product-<name>'`, so a
+    // regroup never moves its URL, tests or screenshots. Storybook reads this
+    // statically: it must stay an inline literal, and story-ids.spec.ts
+    // checks the order the sidebar renders. Unlisted entries keep load order,
+    // alphabetical by path.
+    options: {
+      storySort: {
+        order: [
+          'Design System',
+          'Foundational',
+          'Product',
+          ['Data display', 'Evidence', 'Status', 'Controls', 'Agent', 'Chat', 'Shell'],
+          'Lib',
+        ],
+      },
+    },
+
     a11y: {
       // 'error': any axe violation fails the story test, locally and in CI.
       // It was 'todo' until 2026-10-08, which showed violations in the panel

@@ -9,7 +9,9 @@ import avatarUrl from '../../foundational/Avatar/fixtures/avatar.svg';
 
 /** Mode starts from the toolbar Theme control; the menu's Theme group changes it. */
 const meta = {
-  title: 'Product/AccountMenu',
+  title: 'Product/Shell/AccountMenu',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-accountmenu',
   component: AccountMenu,
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof AccountMenu>;
