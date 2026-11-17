@@ -13,15 +13,25 @@ const [draft, setDraft] = useState('');
   empty={
     draft === '' ? (
       <ChatStarter
-        description="Ask about your models, runs and figures, why a run or test failed, or a file you attach. Nothing here changes your data."
-        suggestions={['Why did dim_accounts fail its last run?', 'Which models read order_total?']}
+        description="Ask about your models, runs and figures. Nothing here changes your data."
+        suggestions={[
+          'Why did dim_accounts fail its last run?',
+          'Which models read order_total?',
+        ]}
         onSelect={(text) => composer.current?.fill(text)}
       />
     ) : null
   }
 />
 <AppShellPanelFooter>
-  <ChatComposer ref={composer} value={draft} onValueChange={setDraft} onSend={ask} busy={streaming} onStop={stop} />
+  <ChatComposer
+    ref={composer}
+    value={draft}
+    onValueChange={setDraft}
+    onSend={ask}
+    busy={streaming}
+    onStop={stop}
+  />
 </AppShellPanelFooter>
 ```
 
