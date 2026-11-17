@@ -31,41 +31,24 @@ export type Ground = 'paper' | 'dark';
  * the warm white page, with a `--color-border` edge (D3, item 4, decided
  * 2026-11-16; tests/paper.spec.ts). A placeholder keeps the stronger edge, so
  * its dashes still read.
- *
- * `grain` lays the paper's tooth over the frame, the hero's alone (D3, item 4).
- * The plate then draws no ground of its own, so the paper runs under the
- * specimen edge to edge.
  */
 export function SpecimenFrame({
   ground = 'paper',
   placeholder = false,
-  grain = false,
   className,
   children,
 }: {
   ground?: Ground;
   placeholder?: boolean;
-  grain?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        panel,
-        'flex flex-col p-2',
-        placeholder && 'border-dashed border-border-strong',
-        grain && 'site-grain',
-        className,
-      )}
-    >
+    <div className={cn(panel, 'flex flex-col p-2', placeholder && 'border-dashed border-border-strong', className)}>
       <div
         data-theme={ground === 'dark' ? 'dark' : undefined}
         data-plate={ground}
-        className={cn(
-          'flex flex-1 flex-col p-[var(--site-gap-tight)] text-base text-text-body',
-          !(grain && ground === 'paper') && 'bg-canvas',
-        )}
+        className="flex flex-1 flex-col bg-canvas p-[var(--site-gap-tight)] text-base text-text-body"
       >
         {children}
       </div>
