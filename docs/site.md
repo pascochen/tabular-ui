@@ -692,6 +692,8 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - *The cell cursor and both focus rings are the system's ring* (`--color-ring`, `--ring-width`), and Post entry's sits at the system's offset. So nothing new is drawn at 2px (design-system.md §7.8).
   - *Pause is named by its label alone,* "Pause animation" then "Play animation", with no pressed state. The spec had both, which reads as "Play, pressed".
   - *Play goes on from the paused frame,* and gives that frame its full time again.
+  - *The whole frame leaves on one fade* (owner, 2026-11-17, from the preview). The question, the row outlines, the tints and the cursor fade out with the card over 200ms, where the spec had them cut. The flagged figure's weight is on the same transition: the sans is a variable font, so 600 runs down to 400 over those 200ms. (For a day it dropped in the empty frame, which read as a second, late change.)
+  - *The sheet's borders are separate, not collapsed.* Each cell draws its right and bottom edge. Collapsed, Chromium made the header row a pixel taller than the others, and the line under it read as a thicker rule (owner, 2026-11-17, from the preview).
   - *The sheet's tabs show the files' full names,* `.csv` included.
 - **The accessibility pass's five issues:**
   - *Met:* the loop no longer rebuilds what a screen reader is reading (the DOM is stable, though the card's label still changes between "Awaiting review" and "Posted"), and Pause gives one signal.
