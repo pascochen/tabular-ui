@@ -203,6 +203,18 @@ body {
   }
 }
 
+/* The hero's sound wave (hero-sheet.tsx): each bar swings between a fifth of its
+   height and all of it. `scale`, as the wash: the bar rests on Tailwind's `scale-y`. */
+@keyframes site-wave {
+  from {
+    scale: 1 0.2;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
 /* The wash on Play and Replay (`runWash` in lib/styles.ts): in from the left
    when a run starts, out to the right when it ends. `scale` and `translate`,
    not `transform`: the layer rests on Tailwind's `scale-x-0`, which sets the

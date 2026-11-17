@@ -38,7 +38,44 @@
       { "account": "2000", "name": "Trade payables", "debit": 48216.4, "credit": 0 },
       { "account": "6120", "name": "Freight and packing", "debit": 0, "credit": 48216.4 }
     ],
-    "nextJournalId": "JE-KUS-2610-00040"
+    "nextJournalId": "JE-KUS-2610-00040",
+    "sheet": [
+      {
+        "entry": "API-KUS-2607-00007",
+        "invoice": "MFL-58821",
+        "supplier": "Midwest Freight Logistics LLC",
+        "date": "2026-07-14",
+        "amount": 48216.4
+      },
+      {
+        "entry": "API-KUS-2607-00008",
+        "invoice": "FLE-80164",
+        "supplier": "FleetFuel Services",
+        "date": "2026-07-17",
+        "amount": 44448.51
+      },
+      {
+        "entry": "API-KUS-2607-00009",
+        "invoice": "HAR-87075",
+        "supplier": "Hartwell & Lowe LLP",
+        "date": "2026-07-20",
+        "amount": 36154.16
+      },
+      {
+        "entry": "API-KUS-2607-00010",
+        "invoice": "CAR-39043",
+        "supplier": "Cardinal Wireless",
+        "date": "2026-07-20",
+        "amount": 16878.53
+      },
+      {
+        "entry": "API-KUS-2607-00011",
+        "invoice": "MFL-58821",
+        "supplier": "Midwest Freight Logistics LLC",
+        "date": "2026-07-21",
+        "amount": 48216.4
+      }
+    ]
   },
   "operatingBridge": {
     "budget": 2547970754,

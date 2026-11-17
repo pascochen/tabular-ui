@@ -160,9 +160,10 @@ test.describe('Play and Replay take a wash', () => {
     expect(await computed(play, 'isolation')).toBe('isolate');
   });
 
-  test('Replay: the hero’s takes it too', async ({ page }) => {
+  // Until 2026-11-17 this was the hero's Replay. The hero loops now, with Pause (D6).
+  test('Replay: a card’s takes it too', async ({ page }) => {
     await open(page, '/');
-    const replay = page.getByRole('button', { name: 'Replay the hero’s run' });
+    const replay = page.getByRole('button', { name: 'Replay Agent plan' });
     await expect(replay).not.toHaveAttribute('data-run');
     await replay.click();
     await expect(replay).toHaveAttribute('data-run', 'playing');

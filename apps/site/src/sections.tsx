@@ -2,10 +2,9 @@ import { buttonVariants } from 'tabular-ui';
 
 import { DemoAction } from './components/demo-action';
 import { Rail, Section } from './components/layout';
-import { SpecimenFrame } from './components/specimen';
 import { componentGrid, pages } from './content';
 import { closingBand, kasane } from './data';
-import { HeroSpecimen } from './specimens';
+import { HeroSheet } from './hero-sheet';
 
 /** Home's hero and closing band (wireframe `76:23`, mobile `77:96`). The component grid between them is in component-grid.tsx. */
 
@@ -40,9 +39,7 @@ export function HeroSection() {
             ) : null}
           </div>
         </div>
-        <SpecimenFrame className="lg:col-span-7">
-          <HeroSpecimen />
-        </SpecimenFrame>
+        <HeroSheet className="lg:col-span-7" />
       </Rail>
     </Section>
   );
