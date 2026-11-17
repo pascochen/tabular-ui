@@ -2,7 +2,7 @@
 
 The demo's own controls, in one row at the foot of the sidebar, above the visitor's `AccountMenu`: **About this demo**, **Skip to the end** and **Start over**.
 
-`AboutDemoButton` opens a dialog saying who the visitor is playing, what is fictional (the company), what is scripted (the people and the agents) and what is real (the interface), with links to Storybook and to the AI components on tabularui.com. While the sidebar is collapsed, the top nav holds it too. `AboutDemoDialog` is the dialog alone: the workspace switcher opens it for the companies and the create flow the demo doesn't have.
+`AboutDemoButton` opens a dialog saying who the visitor is playing, then three rows: Fictional (the company), Scripted (the people and the agents) and Real (the interface), with links to Storybook and to the AI components on tabularui.com. While the sidebar is collapsed, the top nav holds it too. `AboutDemoDialog` is the dialog alone: the workspace switcher opens it for the companies and the create flow the demo doesn't have.
 
 Skip is disabled at the end, not hidden, so the row doesn't shift under the pointer. Start over goes back to landing from any point.
 
@@ -21,6 +21,8 @@ App-local: only the public demo needs it.
 | The announcers sit outside `AppShell` | They were in the top nav. A hidden element's live region says nothing |
 | Neutral throughout | Being a demo is context, not a state of the data (§0 rule 1) |
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
+| The dialog is a three-row list, not four paragraphs | Until 2026-11-16 the "You're…" line said the company was fictional and the people scripted, and two bold paragraphs said it again. The kind is now a column of its own (`Confirmation`'s grid), each fact is said once, and the body went from about 120 words to 70. What Kasane makes and where it sells is gone: nothing in the demo depends on it |
+| "Open Storybook", not "Storybook" | A link says what it does, and reads on its own in a screen reader's list of links |
 | "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
 
 ## Not tested with users

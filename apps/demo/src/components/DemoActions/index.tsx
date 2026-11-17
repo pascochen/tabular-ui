@@ -18,11 +18,28 @@ import { kasaneCompany, visitor } from '../../lib/kasane';
 import { AI_COMPONENTS_URL, STORYBOOK_URL } from '../../lib/links';
 import { useStartOver } from '../../lib/start-over';
 
-const whoYouAre = `You’re ${visitor.name}, ${visitor.title} at ${kasaneCompany.legalName}, a fictional company. The people and the agents are scripted.`;
+/**
+ * What the dialog sorts the demo into, one row each: the kind first, so a
+ * visitor can read the three words and stop.
+ */
+const whatIsWhat = [
+  {
+    kind: 'Fictional',
+    what: `${kasaneCompany.name}, its people and its numbers. The books balance to the yen, and every figure quoted is computed from them.`,
+  },
+  {
+    kind: 'Scripted',
+    what: 'The people and the agents. You make one decision, and only what it touches changes.',
+  },
+  {
+    kind: 'Real',
+    what: 'The interface. Every screen is built from Tabular UI, a design system for dense finance and data tools.',
+  },
+];
 
 /**
- * About this demo, and its dialog: what is fictional, what is scripted, what is
- * real, and the demo's only links out to the components. It has to stay on
+ * About this demo, and its dialog: who the visitor plays, what is fictional,
+ * scripted and real, and the demo's only links out to the components. It has to stay on
  * screen, so it's in the sidebar's row and, while the sidebar is collapsed, in
  * the top nav.
  */
@@ -52,28 +69,21 @@ export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenC
         <DialogHeader>
           <DialogTitle>About this demo</DialogTitle>
           <DialogDescription>
-            The month-end close of an AI finance tool, built from Tabular UI&rsquo;s components.
+            You play {visitor.name}, {visitor.title} at {kasaneCompany.legalName}, in its month-end close.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
-          <p>{whoYouAre}</p>
-          <p>
-            <span className="font-medium text-text-primary">The company is fictional.</span> {kasaneCompany.legalName}{' '}
-            makes stencil duplicators and inkjet printers in Tokyo and sells through subsidiaries in the US, Germany,
-            the UK and China. Its people, customers and numbers were generated, and its books balance to the yen.
-          </p>
-          <p>
-            <span className="font-medium text-text-primary">The people and the agents are scripted.</span> Every figure
-            they quote is computed from Kasane&rsquo;s books. You make one decision, and only what it touches changes.
-          </p>
-          <p>
-            <span className="font-medium text-text-primary">The interface is real.</span> Every control, colour and
-            spacing on these screens comes from Tabular UI, a design system for dense finance and data tools.
-          </p>
-        </div>
+        {/* Confirmation's grid: the kind in its own column, so the three rows scan as a list. */}
+        <dl className="grid grid-cols-[auto_1fr] gap-x-[var(--gap-group)] gap-y-[var(--gap-group)] text-sm">
+          {whatIsWhat.map(({ kind, what }) => (
+            <div key={kind} className="contents">
+              <dt className="font-medium text-text-primary">{kind}</dt>
+              <dd className="text-text-body">{what}</dd>
+            </div>
+          ))}
+        </dl>
         <DialogFooter>
           <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
-            Storybook
+            Open Storybook
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
           <a className={buttonVariants()} href={AI_COMPONENTS_URL} target="_blank" rel="noreferrer">
