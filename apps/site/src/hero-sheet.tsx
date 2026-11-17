@@ -108,6 +108,9 @@ function script(rows: number): Shot[] {
 /** The system's focus ring, drawn on the control the animation is about to press. */
 const ring = 'outline-solid outline-ring outline-[length:var(--ring-width)]';
 
+/** How the card leaves, and with it the question and the sheet's marks: 200ms, as it arrives. */
+const fadeOut = 'opacity-0 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out';
+
 /** A cell: the row's height is on the cell (docs/failure-log.md), and the text truncates in a block child. */
 const cell = 'relative h-[var(--h-row-sm)] border border-border px-[var(--pad-cell-x)] align-middle';
 /** Hidden while the sheet is narrow, as a spreadsheet hides columns. The evidence, B and E, never is. */
@@ -176,6 +179,9 @@ export function HeroSheet({ className }: { className?: string }) {
   const shot = shots[index];
   const posted = shot.card === 'posted' || shot.card === 'leaving';
   const cardShown = shot.card !== 'hidden' && shot.card !== 'leaving';
+  // The question and the sheet's marks leave with the card, on its fade (owner, 2026-11-17): the
+  // frame after is the empty one, and by then nothing is left to cut.
+  const leaving = shot.card === 'leaving';
   const [invoices, payments] = d.sources.map(fileNamed);
 
   return (
@@ -187,7 +193,7 @@ export function HeroSheet({ className }: { className?: string }) {
       >
         {/* The question bar: the question as it was heard, the sound wave, the mic. */}
         <div className="flex items-center border-b border-border bg-surface-raised pl-[var(--pad-card)]">
-          <p className="min-w-0 flex-1 truncate text-text-secondary">
+          <p data-question="" className={cn('min-w-0 flex-1 truncate text-text-secondary', leaving && fadeOut)}>
             <span className={cn('font-medium text-text-body', shot.words < 1 && 'opacity-0')}>Question:</span>
             {QUESTION.map((word, i) => (
               <span key={word} className={cn(shot.words < i + 2 && 'opacity-0')}>
@@ -274,14 +280,16 @@ export function HeroSheet({ className }: { className?: string }) {
                       {i === 0 || lastRow ? (
                         // The dashed outline around a row the agent is reading (design-system.md §7.8).
                         // It hangs from the row's number, the one cell every width shows, and is
-                        // drawn left to right. It leaves as a cut: the transition is on the drawn state.
+                        // drawn left to right. It is drawn by its clip, and leaves by fading.
                         <span
                           data-outline={outlined ? 'on' : 'off'}
                           className={cn(
                             'pointer-events-none absolute top-0 left-full z-10 h-full w-[calc(100cqw-var(--sheet-axis))] border border-dashed border-border-strong',
-                            outlined
-                              ? '[clip-path:inset(0)] motion-safe:transition-[clip-path] motion-safe:duration-200 motion-safe:ease-out'
-                              : '[clip-path:inset(0_100%_0_0)]',
+                            !outlined
+                              ? '[clip-path:inset(0_100%_0_0)]'
+                              : leaving
+                                ? fadeOut
+                                : '[clip-path:inset(0)] motion-safe:transition-[clip-path] motion-safe:duration-200 motion-safe:ease-out',
                           )}
                         />
                       ) : null}
@@ -300,20 +308,33 @@ export function HeroSheet({ className }: { className?: string }) {
                       <code className="block truncate text-xs">{row.date}</code>
                     </td>
                     <td
-                      data-cell={lastRow && shot.flag ? 'flagged' : i === 0 && shot.first ? 'looked' : undefined}
+                      data-cell={
+                        leaving
+                          ? undefined
+                          : lastRow && shot.flag
+                            ? 'flagged'
+                            : i === 0 && shot.first
+                              ? 'looked'
+                              : undefined
+                      }
                       data-cursor={shot.cursor === i ? '' : undefined}
                       className={cn(
                         cell,
                         edge,
                         'border-r-0 text-right tabular-nums motion-safe:transition-colors motion-safe:duration-[140ms] motion-safe:ease-out',
-                        lastRow && shot.flag
-                          ? 'bg-bg-danger font-semibold text-text-danger'
-                          : i === 0 && shot.first
-                            ? 'bg-bg-hover'
-                            : tint,
+                        // Leaving, the tints and the cursor's ring fade to the plain cell. The weight
+                        // can't fade, so the flagged figure keeps it until the frame is empty.
+                        leaving
+                          ? cn('bg-surface-raised motion-safe:duration-200', lastRow && shot.flag && 'font-semibold')
+                          : lastRow && shot.flag
+                            ? 'bg-bg-danger font-semibold text-text-danger'
+                            : i === 0 && shot.first
+                              ? 'bg-bg-hover'
+                              : tint,
                         // The cell cursor is the sheet's focus ring, drawn inside its cell: the amounts
                         // are the last column, against the sheet's edge. It steps, and never glides.
-                        shot.cursor === i && cn(ring, 'outline-offset-[calc(var(--ring-width)*-1)]'),
+                        shot.cursor === i &&
+                          cn(ring, 'outline-offset-[calc(var(--ring-width)*-1)]', leaving && 'outline-transparent'),
                       )}
                     >
                       {money(row.amount, d.currency)}

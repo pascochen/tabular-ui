@@ -126,7 +126,7 @@ Durations are ranges. The prototype's value is in brackets.
 - Edit entry, the card's third action, is left out to keep the hero quiet.
 
 **8. The restart.** Purpose: none of the three. It is what a loop costs.
-- The answer fades out, as in part 6. Then the question, the marks and the cursor are cut to Empty together.
+- The answer fades out, as in part 6, and the question, the row outlines, the two tints and the cursor fade out with it, over the same 200ms (owner, 2026-11-17, after watching the built page: the cut read as a jump beside the fading card). The frame after is Empty, and by then nothing is left to cut.
 
 ### Sequence
 
@@ -247,7 +247,7 @@ Durations and easings are written in place, as the site's other motions are. The
 
 ## To check before building
 
-- **The restart.** The answer now fades out, but the question and the marks are still cut. The change from the full answer to an empty bar is the rewind D6 was written to avoid. It needs a real look over several cycles on the built page. If it reads as a jump, the fallback is to play once and rest, with Replay, which is prototype A's behaviour.
+- **The restart.** Everything now fades out together (part 8). The change from the full answer to an empty bar is the rewind D6 was written to avoid. It needs a real look over several cycles on the built page. If it reads as a jump, the fallback is to play once and rest, with Replay, which is prototype A's behaviour.
 - **Layout shift.** The frame's height must be the same in every state at every width. The prototype holds it at 375px and 1280px.
 - **The cursor at the sheet's edge.** E2 and E6 are in the last column, and E6 is in the last row. An outline drawn outside the cell is clipped there, which the prototype did until it was fixed. Draw it inside.
 - **Hydration.** `lib/defer-hydration.ts` delays the hero. The loop starts from the hold (decision 13), so hydration changes nothing on screen. Check that the opening 2.5s is counted from when the hero is in view, not from when the script loads.

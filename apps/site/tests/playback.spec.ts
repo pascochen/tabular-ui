@@ -78,6 +78,20 @@ test.describe('the hero', () => {
     const plate = 'section[aria-labelledby="hero-title"] [data-plate]';
     const atRest = await height(page, plate);
     const started = Date.now();
+    // The frame that leaves lasts 200ms, too short to wait for: the page notes what it
+    // looked like when it began.
+    await sheet(page).evaluate((el) => {
+      new MutationObserver(() => {
+        if (el.getAttribute('data-hero') !== 'leaving') return;
+        const question = getComputedStyle(el.querySelector('[data-question]')!);
+        const outline = getComputedStyle(el.querySelector('[data-outline="on"]')!);
+        (window as unknown as { leaving: unknown }).leaving = {
+          question: [question.transitionProperty, question.transitionDuration],
+          outline: [outline.transitionProperty, outline.transitionDuration, outline.clipPath],
+          marks: el.querySelectorAll('[data-cell]').length,
+        };
+      }).observe(el, { attributes: true, attributeFilter: ['data-hero'] });
+    });
     await reaches(page, 'post-ring');
     expect(Date.now() - started).toBeGreaterThan(2000);
     // The ring is the system's, drawn: nothing in the frame holds focus.
@@ -95,6 +109,12 @@ test.describe('the hero', () => {
 
     // The pass: the mic, the wave and the words, then the two amounts.
     await reaches(page, 'listening');
+    // The question and the sheet's marks left on the card's fade, not on a cut (owner, 2026-11-17).
+    expect(await page.evaluate(() => (window as unknown as { leaving: unknown }).leaving)).toEqual({
+      question: ['opacity', '0.2s'],
+      outline: ['opacity', '0.2s', 'none'],
+      marks: 0,
+    });
     await expect(sheet(page).locator('[data-wave]')).toBeVisible();
     await expect(sheet(page).locator('[data-mic]')).toHaveAttribute('data-mic', 'on');
     await expect(sheet(page).locator('[data-cell], [data-cursor], [data-outline="on"]')).toHaveCount(0);
