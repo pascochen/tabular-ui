@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero prototype: the sheet settles</title>
+<!--
+  A throwaway prototype for docs/site.md D6 (reopened 2026-11-17). Not site code.
+  - Colours are copied from packages/ui/src/styles/palette.css (light mode).
+  - Fonts are system stand-ins.
+  - Rows 4 and 8 are the hero's real story (kasane.json's duplicatePayment).
+    Every other row is placeholder data and must come from the export if this is built.
+-->
+<style>
+  :root {
+    --ledger-25: oklch(99.0% 0.003 85.0);
+    --ledger-50: oklch(97.5% 0.006 85.0);
+    --ledger-100: oklch(94.5% 0.007 85.0);
+    --ledger-200: oklch(89.0% 0.008 85.0);
+    --ledger-300: oklch(82.0% 0.007 85.0);
+    --ledger-600: oklch(53.0% 0.005 264.1);
+    --ledger-700: oklch(46.0% 0.010 264.1);
+    --ledger-950: oklch(21.0% 0.018 264.1);
+    --vermilion-500: oklch(62.5% 0.171 28.2);
+    --vermilion-700: oklch(46.0% 0.154 28.2);
+    --orchid-500: oklch(62.5% 0.158 318.4);
+    --orchid-700: oklch(46.0% 0.142 318.4);
+    --row: 28px;
+    --step: 100ms;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ledger-25); color: var(--ledger-950);
+    font: 13px/20px "Golos Text", system-ui, sans-serif;
+  }
+  .page { max-width: 1200px; margin: 0 auto; padding: 48px 32px; }
+  .hero { display: grid; grid-template-columns: 5fr 7fr; gap: 32px; align-items: center; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+  h1 { font: 500 44px/1.1 Georgia, serif; margin: 0 0 16px; text-wrap: balance; }
+  .lead { font-size: 18px; line-height: 28px; color: var(--ledger-700); margin: 0; }
+
+  .frame { border: 1px solid var(--ledger-200); background: var(--ledger-25); }
+  .question { padding: 8px 12px; border-bottom: 1px solid var(--ledger-200); color: var(--ledger-700); }
+  .question b { font-weight: 500; color: var(--ledger-950); }
+
+  .sheet { position: relative; overflow: hidden; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; font-variant-numeric: tabular-nums; }
+  th, td {
+    height: var(--row); padding: 0 8px; border: 1px solid var(--ledger-200);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+    transition: background-color 400ms ease-out;
+  }
+  tr > :first-child { border-left: 0; } tr > :last-child { border-right: 0; }
+  thead tr:first-child th { border-top: 0; }
+  .axis { background: var(--ledger-50); color: var(--ledger-600); text-align: center; font-weight: 400; font-size: 12px; }
+  col.n { width: 32px; }
+  .head th { font-weight: 600; }
+  td.num, th.num { text-align: right; }
+  td.mono { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+  /* Under the pointer: the tint arrives at once and fades over 400ms. */
+  tbody td:not(.axis):hover { background: var(--ledger-100); transition-duration: 0ms; }
+  td.flag { background: color-mix(in oklch, var(--vermilion-500) 10%, transparent); color: var(--vermilion-700); font-weight: 600; transition: background-color 140ms ease-out, color 140ms ease-out; }
+
+  .cursor { position: absolute; outline: 2px solid var(--ledger-950); outline-offset: -1px; pointer-events: none; }
+  .range {
+    position: absolute; border: 1px dashed var(--ledger-700); pointer-events: none;
+    clip-path: inset(0 100% 0 0);
+  }
+  .range.on { clip-path: inset(0 0 0 0); transition: clip-path 250ms ease-out; }
+
+  .note {
+    position: absolute; right: 12px; width: min(380px, calc(100% - 56px));
+    background: var(--ledger-25); border: 1px solid var(--ledger-300); border-left: 2px solid var(--orchid-500);
+    padding: 8px 12px; display: grid; gap: 4px;
+    opacity: 0; transform: translateY(-4px);
+  }
+  .note.on { opacity: 1; transform: none; transition: opacity 200ms ease-out, transform 200ms ease-out; }
+  .note .who { font-size: 12px; font-weight: 600; color: var(--orchid-700); }
+  .note p { margin: 0; } .note .sub { color: var(--ledger-700); }
+  code { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+
+  .tabs { display: flex; border-top: 1px solid var(--ledger-200); background: var(--ledger-50); font-size: 12px; }
+  .tab { padding: 4px 12px; border-right: 1px solid var(--ledger-200); color: var(--ledger-700); }
+  .tab.active { background: var(--ledger-25); color: var(--ledger-950); font-weight: 600; margin-top: -1px; }
+
+  .bar { margin-top: 24px; display: flex; gap: 16px; align-items: center; color: var(--ledger-700); }
+  button { height: 32px; padding: 0 12px; border: 1px solid var(--ledger-300); background: none; font: inherit; color: var(--ledger-950); cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--ledger-950); outline-offset: 2px; }
+  .instant .range.on, .instant .note.on, .instant td.flag { transition: none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div>
+      <h1>A design system for the human in the loop</h1>
+      <p class="lead">Components that show how the agent reasoned, what it proposes and what a person approved.</p>
+    </div>
+
+    <div class="frame" id="frame">
+      <div class="question"><b>Question:</b> Did we pay any invoice twice?</div>
+      <div class="sheet" id="sheet">
+        <table>
+          <colgroup><col class="n"><col style="width:26%"><col style="width:17%"><col><col style="width:14%"><col style="width:17%"></colgroup>
+          <thead>
+            <tr><th class="axis"></th><th class="axis">A</th><th class="axis">B</th><th class="axis">C</th><th class="axis">D</th><th class="axis">E</th></tr>
+            <tr class="head"><th class="axis">1</th><th>Entry</th><th>Supplier invoice</th><th>Supplier</th><th>Date</th><th class="num">Amount</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="range" id="r1"></div>
+        <div class="range" id="r2"></div>
+        <div class="cursor" id="cursor"></div>
+        <div class="note" id="note">
+          <span class="who">AI · Awaiting review</span>
+          <p>Yes. Invoice <code>MFL-58821</code> was entered twice and paid twice, $48,216.40 each time.</p>
+          <p class="sub">I can reverse the second entry, <code>API-KUS-2607-00011</code>, so the supplier owes it back.</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <span class="tab active">supplier_invoices_fy2026_h1</span>
+        <span class="tab">supplier_payments_fy2026_h1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button id="replay">Replay</button>
+    <label><input type="checkbox" id="reduced"> Preview reduced motion</label>
+    <label>Step <select id="speed"><option>80</option><option selected>100</option><option>120</option><option>160</option></select> ms</label>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<script>
+// Rows 4 and 8 (00007 and 00011) are real. The rest are placeholders.
+const data = [
+  ['API-KUS-2607-00005', 'HRT-20417', 'Hartwell Components', '2026-07-03', '12,480.00'],
+  ['API-KUS-2607-00006', 'NPK-00932', 'Northpark Logistics', '2026-07-08', '6,915.75'],
+  ['API-KUS-2607-00007', 'MFL-58821', 'Meridian Freight Lines', '2026-07-14', '48,216.40'],
+  ['API-KUS-2607-00008', 'SOL-77105', 'Solano Packaging', '2026-07-15', '3,204.10'],
+  ['API-KUS-2607-00009', 'HRT-20466', 'Hartwell Components', '2026-07-21', '18,730.00'],
+  ['API-KUS-2607-00010', 'QTX-31188', 'Quartex Toner Supply', '2026-07-22', '27,051.90'],
+  ['API-KUS-2607-00011', 'MFL-58821', 'Meridian Freight Lines', '2026-07-28', '48,216.40'],
+  ['API-KUS-2607-00012', 'NPK-00987', 'Northpark Logistics', '2026-07-29', '7,340.25'],
+  ['API-KUS-2607-00013', 'SOL-77162', 'Solano Packaging', '2026-07-30', '2,988.60'],
+  ['API-KUS-2607-00014', 'QTX-31240', 'Quartex Toner Supply', '2026-07-31', '19,402.35'],
+  ['API-KUS-2608-00001', 'HRT-20511', 'Hartwell Components', '2026-08-04', '14,125.00'],
+  ['API-KUS-2608-00002', 'NPK-01024', 'Northpark Logistics', '2026-08-06', '5,870.40'],
+  ['API-KUS-2608-00003', 'SOL-77230', 'Solano Packaging', '2026-08-11', '3,611.85'],
+];
+const rows = document.getElementById('rows');
+rows.innerHTML = data.map((r, i) =>
+  `<tr><td class="axis">${i + 2}</td><td class="mono">${r[0]}</td><td class="mono">${r[1]}</td><td>${r[2]}</td><td class="mono">${r[3]}</td><td class="num">${r[4]}</td></tr>`
+).join('');
+
+const $ = (id) => document.getElementById(id);
+const sheet = $('sheet'), cursor = $('cursor'), note = $('note'), frame = $('frame');
+// cell(col, row): col 1–5 is A–E, row is the sheet's row number (2 = first data row).
+const cell = (col, row) => rows.children[row - 2].children[col];
+const FIRST = 4, SECOND = 8, AMOUNT = 5, INVOICE = 2;
+
+function box(el, target, wholeRow) {
+  const s = sheet.getBoundingClientRect();
+  const a = (wholeRow ? target.parentElement.children[1] : target).getBoundingClientRect();
+  const b = (wholeRow ? target.parentElement.lastElementChild : target).getBoundingClientRect();
+  Object.assign(el.style, { left: a.left - s.left + 'px', top: a.top - s.top + 'px', width: b.right - a.left + 'px', height: a.height + 'px' });
+}
+function placeNote() {
+  const s = sheet.getBoundingClientRect(), c = cell(AMOUNT, SECOND).getBoundingClientRect();
+  note.style.top = c.bottom - s.top + 4 + 'px';
+}
+function reset() {
+  frame.classList.remove('instant');
+  $('r1').classList.remove('on'); $('r2').classList.remove('on'); note.classList.remove('on');
+  cell(AMOUNT, SECOND).classList.remove('flag');
+  box($('r1'), cell(1, FIRST), true); box($('r2'), cell(1, SECOND), true);
+  placeNote();
+  box(cursor, cell(1, 2));
+}
+function rest() {
+  reset();
+  frame.classList.add('instant');
+  box(cursor, cell(AMOUNT, SECOND));
+  $('r1').classList.add('on'); $('r2').classList.add('on');
+  cell(AMOUNT, SECOND).classList.add('flag'); note.classList.add('on');
+}
+
+let run = 0;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function play() {
+  const id = ++run;
+  const reduced = $('reduced').checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { rest(); $('clock').textContent = 'Reduced motion: the rest frame, no run.'; return; }
+  const step = +$('speed').value, t0 = performance.now();
+  reset();
+  const go = async (col, row) => { await wait(step); if (id !== run) throw 0; box(cursor, cell(col, row)); };
+  try {
+    await wait(400);
+    await go(INVOICE, 2);                                   // A2 → B2
+    for (let r = 3; r <= FIRST; r++) await go(INVOICE, r);  // down to the first MFL-58821
+    await wait(300); if (id !== run) return;
+    $('r1').classList.add('on');
+    for (let r = FIRST + 1; r <= SECOND; r++) await go(INVOICE, r); // down to the second
+    await wait(300); if (id !== run) return;
+    $('r2').classList.add('on');
+    await wait(250);
+    for (let c = INVOICE + 1; c <= AMOUNT; c++) await go(c, SECOND); // across to the amount
+    cell(AMOUNT, SECOND).classList.add('flag');
+    await wait(300); if (id !== run) return;
+    note.classList.add('on');
+    await wait(200);
+    $('clock').textContent = `Run: ${((performance.now() - t0) / 1000).toFixed(1)}s`;
+  } catch { /* a newer run took over */ }
+}
+$('replay').onclick = play;
+$('reduced').onchange = play;
+$('speed').onchange = play;
+addEventListener('resize', () => { run++; rest(); });
+play();
+</script>
+</body>
+</html>
