@@ -111,20 +111,10 @@
 /* The page is the warm white canvas, plain, with no paper tile (docs/site.md
    D3, item 4; decided 2026-11-16). Cards, the nav and every other bordered
    panel are the paper, --color-surface-sunken, with a --color-border edge
-   (`panel` in lib/styles.ts). */
+   (`panel` in lib/styles.ts), the hero's specimen frame too: its paper tile
+   came off the same day. */
 body {
   background-color: var(--color-canvas);
-}
-
-/* The hero specimen's paper (D3, item 4): ledger bond, one seamless tile.
-   scripts/paper-tile.mjs draws it and bakes it on the panel's ground, the
-   paper, read from the palette, so the frame's colour stays the token and
-   shows until the tile arrives. A file per pixel density, because a 3px mesh
-   scaled down from the 2× file would blur. The size is the tile's side in the
-   script. It was the whole page's paper until 2026-11-16. */
-.site-grain {
-  background-image: image-set(url('./paper/paper-1x.webp') 1x, url('./paper/paper-2x.webp') 2x);
-  background-size: 426px 426px;
 }
 
 /* The closing band's ink (D3): a paper's tooth showing through a flood of ink,
@@ -148,14 +138,9 @@ body {
   }
 }
 
-/* Decoration only: forced colours drop the closing band's ink and the hero's
-   paper. */
+/* Decoration only: forced colours drop the closing band's ink. */
 @media (forced-colors: active) {
   .site-ink::before {
     display: none;
-  }
-
-  .site-grain {
-    background-image: none;
   }
 }
