@@ -1,5 +1,13 @@
 import { useEffect, useReducer, useState } from 'react';
-import { AppBar, AppShell, AppShellPageHeader, AppShellSidebarToggle, useTheme } from 'tabular-ui';
+import {
+  AppBar,
+  AppShell,
+  AppShellPageHeader,
+  AppShellSidebarToggle,
+  Breadcrumb,
+  BreadcrumbItem,
+  useTheme,
+} from 'tabular-ui';
 
 import { AboutDemoButton } from './components/DemoActions';
 import { HeroAnnouncer } from './components/HeroThread/Announcer';
@@ -10,7 +18,7 @@ import { closeReducer, endState, landingState, repliesIn } from './lib/close-sta
 import { useHeroScript } from './lib/hero-script';
 import { PanelSheetContext } from './lib/panel-sheet';
 import { useTimeline } from './lib/timeline-script';
-import { parseAtEnd, placeOf, useView } from './lib/view';
+import { DEFAULT_VIEW, PROJECT, hrefFor, inProject, onViewLinkClick, parseAtEnd, placeOf, useView } from './lib/view';
 import { useNoRoomForPanel } from './lib/viewport';
 import { PanelSheet } from './shell/PanelSheet';
 import { Sidebar, SidebarFooter, SidebarHeader } from './shell/Sidebar';
@@ -69,6 +77,16 @@ export function App() {
           pageHeader={
             <AppShellPageHeader
               title={slots.title}
+              breadcrumb={
+                // The project's pages only. The name leads to its home, New chat.
+                inProject(view) ? (
+                  <Breadcrumb>
+                    <BreadcrumbItem href={hrefFor(DEFAULT_VIEW)} onClick={onViewLinkClick(DEFAULT_VIEW)}>
+                      {PROJECT}
+                    </BreadcrumbItem>
+                  </Breadcrumb>
+                ) : undefined
+              }
               actions={
                 panelAsSheet ? (
                   <>

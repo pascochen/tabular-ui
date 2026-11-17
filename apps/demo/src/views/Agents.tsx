@@ -3,11 +3,11 @@ import { linkClassName } from '../lib/link';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 
 /**
- * Every agent, from the sidebar's More: what each checks and how many files it
+ * Every agent, from the sidebar's All agents: what each checks and how many files it
  * reads, each a link to its own view. The Accountant Workspace story ends the
  * Agents group with More, for adding an agent. The demo has no such flow, and
  * a sidebar item that opens nothing is where a visitor leaves (`lib/view.ts`),
- * so More opens this page and says so.
+ * so All agents opens this page and says so.
  */
 export function AgentsView() {
   return (

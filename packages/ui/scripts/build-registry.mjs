@@ -67,6 +67,7 @@ const descriptions = {
   AgentPlan: 'An agent’s plan and each step’s status. Sits inside an AgentBlock.',
   AgentReasoning: 'An agent’s collapsible reasoning, with a working state. Sits inside an AgentBlock.',
   AppBar: 'The top bar: brand, navigation and actions.',
+  Breadcrumb: 'The trail of pages above the current one.',
   AppShell: 'The page frame: sidebar, page header, panels and content width.',
   AttachmentRow: 'A file in a list: type icon, name, size and status.',
   ChannelMessage: 'A member’s message in a multi-person channel, with inline replies.',

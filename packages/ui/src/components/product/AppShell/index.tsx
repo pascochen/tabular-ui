@@ -948,6 +948,12 @@ export type AppShellPageHeaderProps = Omit<React.ComponentProps<'div'>, 'title'>
    * (`TruncatedText`).
    */
   title: string;
+  /**
+   * The page's ancestors: a `Breadcrumb` of `BreadcrumbItem`s, with no
+   * `BreadcrumbPage`. It leads the title on the same line, at the title's
+   * size, and the `<h1>` stays the current page.
+   */
+  breadcrumb?: React.ReactNode;
   /** Trailing page-level controls — share, overflow menu. */
   actions?: React.ReactNode;
 };
@@ -965,10 +971,14 @@ export type AppShellPageHeaderProps = Omit<React.ComponentProps<'div'>, 'title'>
  * the title starts on the same x as the page body below it, centred column
  * included. The rule still spans main.
  *
+ * `breadcrumb` puts the page's ancestors in front of the title, for a page
+ * that belongs to something the rest of the app's pages don't. The top nav
+ * is the trail's other home (README, "Breadcrumb").
+ *
  * Tabs stay in the page body, not here: they belong to the content they
  * switch, and a band holds one --h-control row.
  */
-function AppShellPageHeader({ title, actions, className, ...props }: AppShellPageHeaderProps) {
+function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }: AppShellPageHeaderProps) {
   // Outside a shell (a story rendering the band alone), the default.
   const contentWidth = useContext(AppShellContext)?.contentWidth ?? 'contained';
   return (
@@ -977,6 +987,20 @@ function AppShellPageHeader({ title, actions, className, ...props }: AppShellPag
       className={cn(headerBand, 'gap-[var(--gap-inline)]', mainGutter[contentWidth], className)}
       {...props}
     >
+      {/*
+        The title's size and tracking, so the trail and the title share a
+        baseline and read as one line, in one typeface: the title gives up
+        the heading serif for the trail's sans (§8.3). The weight stays the
+        trail's own: the title is the one 600 on the line.
+      */}
+      {breadcrumb ? (
+        <div
+          data-slot="app-shell-page-breadcrumb"
+          className="flex min-h-[var(--h-control)] min-w-0 items-center text-lg tracking-[var(--tracking-tight)]"
+        >
+          {breadcrumb}
+        </div>
+      ) : null}
       {/* min-h --h-control: the 32px child the band's 49px is built around. */}
       {/*
         The ellipsis lives on an inner element: `text-overflow` applies to
@@ -984,7 +1008,14 @@ function AppShellPageHeader({ title, actions, className, ...props }: AppShellPag
         with no ellipsis. TruncatedText adds the full title in a tooltip,
         below the title, only when it is cut off.
       */}
-      <h1 className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-lg font-semibold tracking-[var(--tracking-tight)] text-text-primary">
+      <h1
+        className={cn(
+          'flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-lg font-semibold tracking-[var(--tracking-tight)] text-text-primary',
+          // §8.3's one exception to the serif heading: behind a trail the
+          // title takes the trail's sans, so the line is one typeface.
+          breadcrumb ? 'font-sans' : null,
+        )}
+      >
         <TruncatedText side="bottom">{title}</TruncatedText>
       </h1>
       {actions ? <div className="flex shrink-0 items-center gap-[var(--gap-inline)]">{actions}</div> : null}

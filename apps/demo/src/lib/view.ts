@@ -51,6 +51,20 @@ export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['searc
  */
 export const SIDEBAR_PLACES: readonly ('tasks' | 'sources')[] = ['tasks', 'sources'];
 
+/**
+ * The one project the demo shows. New chat, Tasks and Sources are its pages:
+ * the sidebar lists them under its name and each page's header leads with it
+ * as a breadcrumb. Agents, channels and direct messages belong to the
+ * workspace and outlive any one close, so they carry neither. There is no
+ * page listing projects: the name leads to New chat, the project's home.
+ */
+export const PROJECT = 'Month-end close';
+
+/** Whether a view is one of the project's pages, and so carries its breadcrumb. */
+export function inProject(view: View): boolean {
+  return view.kind === 'new-chat' || view.kind === 'tasks' || view.kind === 'sources';
+}
+
 /** Where the visitor lands, and where an old or unknown URL opens: New chat (owner, 2026-11-12; #revenue until then). */
 export const DEFAULT_VIEW: View = { kind: 'new-chat' };
 

@@ -31,6 +31,7 @@ import avatarUrl from '../../foundational/Avatar/fixtures/avatar.svg';
 import { AccountMenu } from '../AccountMenu';
 import { AgentBlock } from '../AgentBlock';
 import { AppBar } from '../AppBar';
+import { Breadcrumb, BreadcrumbItem } from '../Breadcrumb';
 import { ChatComposer } from '../ChatComposer';
 import { DataTable } from '../DataTable';
 import { ContextSwitcherLabel } from '../ContextSwitcher';
@@ -76,7 +77,7 @@ type Story = StoryObj<typeof meta>;
 /* --------------------------------------------------------------- fixtures */
 /*
   Everything below is story content, built from existing components where
-  one exists. Breadcrumb and the chat thread are fixtures, not components —
+  one exists. The page switcher and the chat thread are fixtures, not components —
   see README "Not implemented".
 */
 
@@ -185,44 +186,35 @@ function AccountFooter() {
 }
 
 /**
- * Breadcrumb fixture. With the sidebar pinned, company and project are
+ * The top nav's trail, a `Breadcrumb`. With the sidebar pinned, company and project are
  * already on screen, so the trail is the page alone. Collapsed, the trail
  * takes them over. This is what `useAppShell()` is for.
  */
-function Breadcrumb() {
+function ShellBreadcrumb() {
   const { sidebarOpen } = useAppShell();
   const ancestors = sidebarOpen ? [] : [orgs[0].name, projects[0].name];
   return (
-    <nav aria-label="Breadcrumb">
-      <ol role="list" className="flex items-center gap-[var(--gap-inline)] text-base">
-        {ancestors.map((crumb) => (
-          <li key={crumb} className="flex items-center gap-[var(--gap-inline)]">
-            <a href="#" className="text-text-secondary hover:text-text-body">
-              {crumb}
-            </a>
-            <span aria-hidden="true" className="text-text-tertiary">
-              /
-            </span>
-          </li>
-        ))}
-        <li>
-          <Menu>
-            <MenuTrigger
-              render={<Button variant="ghost" aria-current="page" className="px-[var(--pad-sidebar-item)]" />}
-            >
-              Analysis
-              <CaretUpDownIcon />
-            </MenuTrigger>
-            <MenuContent align="start">
-              <MenuItem>Analysis</MenuItem>
-              <MenuItem>Questions</MenuItem>
-              <MenuItem>Dataset</MenuItem>
-              <MenuItem>Specs</MenuItem>
-            </MenuContent>
-          </Menu>
-        </li>
-      </ol>
-    </nav>
+    <Breadcrumb>
+      {ancestors.map((crumb) => (
+        <BreadcrumbItem key={crumb} href="#">
+          {crumb}
+        </BreadcrumbItem>
+      ))}
+      <li>
+        <Menu>
+          <MenuTrigger render={<Button variant="ghost" aria-current="page" className="px-[var(--pad-sidebar-item)]" />}>
+            Analysis
+            <CaretUpDownIcon />
+          </MenuTrigger>
+          <MenuContent align="start">
+            <MenuItem>Analysis</MenuItem>
+            <MenuItem>Questions</MenuItem>
+            <MenuItem>Dataset</MenuItem>
+            <MenuItem>Specs</MenuItem>
+          </MenuContent>
+        </Menu>
+      </li>
+    </Breadcrumb>
   );
 }
 
@@ -243,7 +235,7 @@ function TopNav() {
       brand={
         <span className="flex items-center gap-[var(--gap-inline)]">
           <AppShellSidebarToggle />
-          <Breadcrumb />
+          <ShellBreadcrumb />
         </span>
       }
       actions={

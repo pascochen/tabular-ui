@@ -1115,7 +1115,7 @@ Golos Text for body and UI text, Source Serif 4 for headings and the metric tier
 **Where the serif applies, and nowhere else:**
 
 - **`--font-display`: the metric tier**, `--text-metric-sm` and `--text-metric`, through the `font-display` utility. `MetricTile` is the only consumer.
-- **`--font-heading`: every `<h1>`–`<h6>`**, set once in `theme.css`'s base layer. No component sets a heading family. Base UI's `Dialog.Title` and `Popover.Title` render `<h2>`, so dialog and popover titles are covered. Text that should read as a heading is a heading element, which is right for assistive technology anyway. Text that is not a heading never goes serif: `EmptyState`'s title is a `<span>` and stays sans.
+- **`--font-heading`: every `<h1>`–`<h6>`**, set once in `theme.css`'s base layer. No component sets a heading family, with one exception (owner, 2026-11-17): `AppShellPageHeader`'s `<h1>` is sans when a `Breadcrumb` leads it, because the trail is navigation and stays sans, and one line reads better in one typeface. Base UI's `Dialog.Title` and `Popover.Title` render `<h2>`, so dialog and popover titles are covered. Text that should read as a heading is a heading element, which is right for assistive technology anyway. Text that is not a heading never goes serif: `EmptyState`'s title is a `<span>` and stays sans.
 
 **Rule change, 2026-10-16.** Until then `--font-display` applied to the metric tier only, and headings used the sans. The owner moved every heading to the serif. `--font-heading` is the token for it. It reads from `--font-display`, so the two cannot drift apart. It had existed since the shadcn init as an unused alias of `--font-sans` in `shadcn.css`, and it now lives in `theme.css`.
 
