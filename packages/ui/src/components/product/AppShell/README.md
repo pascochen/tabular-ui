@@ -203,7 +203,7 @@ Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's
 <AppShell pageHeader={<AppShellPageHeader title="Analysis" actions={<PageActions />} />} …>
 ```
 
-`breadcrumb` takes the page's ancestors, a `Breadcrumb` of `BreadcrumbItem`s with no `BreadcrumbPage`: the `<h1>` is the current page. The trail sits in front of the title at the title's size, in secondary text at 400, so the title is still where the eye starts. **With a trail, the title is sans** (owner, 2026-11-17): a line in two typefaces is harder to read than a line in one, and the trail is navigation, so it never takes the serif. This is §8.3's one exception to the serif heading. A title with no trail keeps the serif.
+`breadcrumb` takes the page's ancestors, a `Breadcrumb` of `BreadcrumbItem`s with no `BreadcrumbPage`: the `<h1>` is the current page. The trail sits in front of the title at the title's size, in secondary text at 400, so the title is still where the eye starts. The trail and the title are both the sans, as every heading is since 2026-11-17 (§8.3), so the line reads in one typeface.
 
 ```tsx
 <AppShellPageHeader

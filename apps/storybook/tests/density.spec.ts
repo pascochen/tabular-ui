@@ -607,37 +607,53 @@ test('a figure column at the table edge lines up without a sideways scroll', asy
 });
 
 /**
- * §8.2 / §8.3 — the serif belongs to the metric tier (--font-display) and to
- * h1–h6 (--font-heading), and nothing else. Detected by the computed family,
- * since the display tier no longer carries a variation setting. Each story
- * must also show the serif somewhere it belongs, or a stack that silently
- * fell back to the sans would pass with nothing to check.
+ * §8.2 / §8.3 — the serif is the metric tier's (--font-display), and nothing
+ * else's: every h1–h6 is the sans (--font-heading, since 2026-11-17).
+ * Detected by the computed family, since the display tier no longer carries a
+ * variation setting. A story marked for the serif must show it, or a stack
+ * that silently fell back to the sans would pass with nothing to check, and a
+ * story marked for headings must render one, or the heading check would pass
+ * on none. The four agent and chat stories are the ones whose headings moved.
  */
-test('the serif appears only at the metric tier and in headings', async ({ page }) => {
-  const stories: [string, boolean][] = [
-    ['product-metrictile--sizes', true],
-    ['product-appshell--expanded', true],
-    ['product-datatable--default', false],
-    ['foundational-button--variants', false],
+test('the serif appears only at the metric tier, and every heading is the sans', async ({ page }) => {
+  const stories: [string, { serif: boolean; headings: boolean }][] = [
+    ['product-metrictile--sizes', { serif: true, headings: false }],
+    ['product-appshell--expanded', { serif: false, headings: true }],
+    ['product-confirmation--waiting', { serif: false, headings: true }],
+    ['product-question--waiting', { serif: false, headings: true }],
+    ['product-agentplan--ready', { serif: false, headings: true }],
+    ['product-chatstarter--long-question', { serif: false, headings: true }],
+    ['product-datatable--default', { serif: false, headings: false }],
+    ['foundational-button--variants', { serif: false, headings: false }],
   ];
-  for (const [id, expectSerif] of stories) {
+  for (const [id, expected] of stories) {
     await gotoStory(page, id);
-    const { offenders, serifCount } = await page.evaluate(() => {
+    const { offenders, serifCount, serifHeadings, headingCount } = await page.evaluate(() => {
       const bad: string[] = [];
+      const headed: string[] = [];
       let count = 0;
+      let headingLeaves = 0;
       // The story root only: Storybook's own (hidden) error page has an <h1>.
       for (const el of Array.from(document.querySelectorAll<HTMLElement>('#storybook-root *'))) {
         if (el.children.length > 0 || !el.textContent?.trim()) continue; // leaf nodes carry the text
         const s = getComputedStyle(el);
+        const inHeading = el.closest('h1, h2, h3, h4, h5, h6') != null;
+        if (inHeading) {
+          headingLeaves++;
+          if (!s.fontFamily.startsWith('"Golos Text Variable"'))
+            headed.push(`${s.fontFamily.split(',')[0]}: ${el.textContent.slice(0, 20)}`);
+        }
         if (!s.fontFamily.startsWith('"Source Serif 4 Variable"')) continue;
         count++;
         const size = parseFloat(s.fontSize);
-        if (size < 24 && !el.closest('h1, h2, h3, h4, h5, h6')) bad.push(`${size}px: ${el.textContent.slice(0, 20)}`);
+        if (size < 24) bad.push(`${size}px: ${el.textContent.slice(0, 20)}`);
       }
-      return { offenders: bad, serifCount: count };
+      return { offenders: bad, serifCount: count, serifHeadings: headed, headingCount: headingLeaves };
     });
-    expect(offenders, `serif outside the metric tier and headings in ${id}`).toEqual([]);
-    if (expectSerif) expect(serifCount, `no serif text rendered in ${id}`).toBeGreaterThan(0);
+    expect(offenders, `serif outside the metric tier in ${id}`).toEqual([]);
+    expect(serifHeadings, `a heading not in the sans in ${id}`).toEqual([]);
+    if (expected.serif) expect(serifCount, `no serif text rendered in ${id}`).toBeGreaterThan(0);
+    if (expected.headings) expect(headingCount, `no heading rendered in ${id}`).toBeGreaterThan(0);
   }
 });
 

@@ -20,7 +20,7 @@ Product. Composes `TruncatedText`. Where the page sits: its ancestors, each a li
 
 ## Two homes
 
-**The page header.** Pass ancestors only to `AppShellPageHeader`'s `breadcrumb`. The band's `<h1>` is the current page, so a `BreadcrumbPage` there would name it twice. The trail takes the title's size and tracking, and the last slash leads into the title. The title takes the trail's typeface: behind a trail the `<h1>` is sans, not the heading serif, so the line reads in one face (§8.3's one exception).
+**The page header.** Pass ancestors only to `AppShellPageHeader`'s `breadcrumb`. The band's `<h1>` is the current page, so a `BreadcrumbPage` there would name it twice. The trail takes the title's size and tracking, and the last slash leads into the title. The trail and the `<h1>` are both the sans, as every heading is (§8.3), so the line reads in one face.
 
 ```tsx
 <AppShellPageHeader

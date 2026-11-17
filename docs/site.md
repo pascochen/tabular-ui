@@ -535,7 +535,7 @@ The site is a reading page, not dense product UI, so it keeps a few values of it
 --site-w-prose      680px
 ```
 
-**Type.** Headings are serif with no extra work: `theme.css` sets every `<h1>`–`<h6>` in `--font-heading` (§8.3). The library's scale stops at 32px (§8.1), so the site adds reading sizes in `apps/site`, in rem (§0 rule 10):
+**Type.** Headings are serif by one line: `theme.css` sets every `<h1>`–`<h6>` in `--font-heading`, which is the sans in the library since 2026-11-17, and the site's stylesheet points it at `--font-display` (§8.3). The site's headings are display text on reading pages; the product's are not. A specimen's plate (`[data-plate]` on the cards and the hero, `[data-pair-plate]` on a component page's pair) points it back at `--font-sans`, so a component's headings show as the library draws them (`tests/quality.spec.ts`). The library's scale stops at 32px (§8.1), so the site adds reading sizes in `apps/site`, in rem (§0 rule 10):
 - Display: 64px desktop, 40px mobile.
 - Section heading: 44px and 30px.
 - Card title: 20px and 18px.

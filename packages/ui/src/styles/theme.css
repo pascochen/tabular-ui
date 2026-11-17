@@ -114,6 +114,10 @@
    --w-main-min added from §7.9 "Resizing the sidebar and the panel"
    (2026-11-13, user-approved): the range AppShell's resize handles
    clamp to. Read by AppShell at runtime.
+   --font-heading → var(--font-sans), from §8.2 and §8.3 "Rule change,
+   2026-11-17" (owner decision): every h1–h6 is the sans, and the serif is
+   the metric tier's. An app whose headings are display text points the
+   token back at --font-display in its own @theme, as tabularui.com does.
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -308,8 +312,9 @@
   --w-panel-max: 640px;    /* widest panel */
   --w-main-min: 600px;     /* what a resize always leaves <main> */
 
-  /* §8.3 — families. --font-display is the metric tier; --font-heading is
-     every h1–h6, applied once in the base layer below. Both are the serif.
+  /* §8.3 — families. --font-display is the metric tier, the one serif;
+     --font-heading is every h1–h6, applied once in the base layer below,
+     and reads the sans (2026-11-17). An app may point it at --font-display.
      The variable stacks lead with the 'Variable' name, because that is the
      family @fontsource-variable/* registers: a stack naming only the plain
      form falls through to the fallback and renders the wrong face, silently.
@@ -318,7 +323,7 @@
      under the same 'Golos Text Variable' name (§8.3). */
   --font-sans: 'Golos Text Variable', 'Golos Text', system-ui, sans-serif;
   --font-display: 'Source Serif 4 Variable', 'Source Serif 4', 'Georgia', serif;
-  --font-heading: var(--font-display);
+  --font-heading: var(--font-sans);
   --font-mono: 'IBM Plex Mono', 'SF Mono', ui-monospace, monospace;
   /* §8.7 — slashed zero. The `font-mono` utility emits it with the family,
      and Tailwind passes it to Preflight as --default-mono-font-feature-settings
@@ -684,8 +689,8 @@
   --color-text-identity-4: var(--tui-text-identity-4);
 }
 
-/* §8.4 — Source Serif 4 picks its optical size from the font size: the text
-   cut for 13–16px headings, the display cut for the metric tier.
+/* §8.4 — Source Serif 4 picks its optical size from the font size: the
+   display cut for the metric tier, the text cut for an app's serif headings.
    §8.6 — tabular, lining figures everywhere, prose included; inherited.
    §8.3 — headings take --font-heading here, once, so no component sets a
    heading family. Base UI's Dialog and Popover titles render <h2>.

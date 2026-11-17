@@ -9,7 +9,7 @@ Product. A KPI figure.
 
 ## The only user of the display tier
 
-`--font-display` (Source Serif 4) applies here and **nowhere else** (§8.3). Headings share the serif through `--font-heading`, which reads from it. Spacing drawn for 13px text reads airy at 32px, and tabular figures compound it. With `font-optical-sizing: auto` the browser picks the serif's display cut at this size, which is drawn tighter, per glyph: `$847.2M` at 32px/600 measures 118.75px against 127.78px in the text cut (§8.4).
+`--font-display` (Source Serif 4) applies here and **nowhere else** (§8.3). Headings are the sans since 2026-11-17: `--font-heading` reads `--font-sans`, and only an app whose headings are display text points it here. Spacing drawn for 13px text reads airy at 32px, and tabular figures compound it. With `font-optical-sizing: auto` the browser picks the serif's display cut at this size, which is drawn tighter, per glyph: `$847.2M` at 32px/600 measures 118.75px against 127.78px in the text cut (§8.4).
 
 Set the family with the `font-display` utility, as every other family is set, and not with an inline `fontFamily`.
 
