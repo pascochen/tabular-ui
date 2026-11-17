@@ -1,5 +1,5 @@
 import { useState, type ReactElement, type ReactNode } from 'react';
-import { DotsThreeIcon, FilesIcon, HashIcon, ListChecksIcon, PlusIcon, RobotIcon } from '@phosphor-icons/react';
+import { CirclesFourIcon, FilesIcon, HashIcon, ListChecksIcon, PlusIcon, RobotIcon } from '@phosphor-icons/react';
 import {
   AccountMenu,
   AppShellNav,
@@ -13,7 +13,16 @@ import {
 
 import { agents, channels, directMessages, memberName, visitor } from '../lib/kasane';
 import { SITE_URL } from '../lib/links';
-import { BUILT_CHANNELS, SIDEBAR_PLACES, hrefFor, onViewLinkClick, placeOf, useView, type View } from '../lib/view';
+import {
+  BUILT_CHANNELS,
+  PROJECT,
+  SIDEBAR_PLACES,
+  hrefFor,
+  onViewLinkClick,
+  placeOf,
+  useView,
+  type View,
+} from '../lib/view';
 import { useClose } from '../lib/close-context';
 import { channelMark, channelMarkText, isUnread, openCount } from '../lib/close-state';
 import { AboutDemoDialog, DemoActions } from '../components/DemoActions';
@@ -59,10 +68,18 @@ const PLACES = {
 /**
  * The sidebar: one home for everything. New chat and the places, the agents,
  * the channels and the direct messages, in that order, with the Accountant
- * Workspace story's icons and its More (since 2026-11-13). Every item opens a
+ * Workspace story's icons and its More, here "All agents" (since 2026-11-13;
+ * renamed 2026-11-17, since "More" didn't say more of what). Every item opens a
  * built view (`lib/view.ts`), because a dead link is where a three-minute
- * visitor leaves, so a section with nothing built isn't drawn, and More opens
+ * visitor leaves, so a section with nothing built isn't drawn, and All agents opens
  * the Agents page rather than an add-an-agent flow that doesn't exist.
+ *
+ * All agents takes four circles, not the story's three dots: the set, whole,
+ * where dots say "more of something" (owner, 2026-11-17).
+ *
+ * The first group is the project's, under its name (since 2026-11-17): the
+ * three pages that carry its breadcrumb. The groups below it are the
+ * workspace's.
  *
  * The agents are the one departure from the story: it gives every agent one
  * currency icon, and here each takes its own glyph (`agentIcons`), the one its
@@ -74,7 +91,7 @@ export function Sidebar() {
   return (
     <AppShellNav aria-label="Workspace">
       {SIDEBAR_PLACES.length ? (
-        <AppShellNavGroup>
+        <AppShellNavGroup label={PROJECT}>
           <NavLink view={{ kind: 'new-chat' }} icon={<PlusIcon />}>
             New chat
           </NavLink>
@@ -106,8 +123,8 @@ export function Sidebar() {
             </NavLink>
           );
         })}
-        <NavLink view={{ kind: 'agents' }} icon={<DotsThreeIcon />}>
-          More
+        <NavLink view={{ kind: 'agents' }} icon={<CirclesFourIcon />}>
+          All agents
         </NavLink>
       </AppShellNavGroup>
       <AppShellNavGroup label="Channels">

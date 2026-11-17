@@ -8,3 +8,13 @@
    or every utility a component uses and the app does not is silently absent
    from the build. The same line any app installing the package adds. */
 @source '../node_modules/tabular-ui/dist';
+
+/* Every heading in the demo is the sans (owner, 2026-11-17). The library sets
+   h1 to h6 in the serif through --font-heading (design-system.md §8.3), which
+   suits tabularui.com's reading sizes. Here the headings are 10 to 16px in
+   dense panels, some of them uppercase labels, and one typeface reads better
+   at that size. One line, at the token, so no heading is restyled by hand.
+   The metric tier keeps the serif: it reads --font-display, not this. */
+@theme {
+  --font-heading: var(--font-sans);
+}

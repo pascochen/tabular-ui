@@ -33,9 +33,9 @@ Look elsewhere if you:
 | Data display | DataTable, MetricTile, RunLogRow, LineageTree, CodeView, AttachmentRow, TruncatedText |
 | Status       | StatusBadge, StatusDot, ProgressBar, CountBadge                                      |
 | Controls     | FilterChip, Toolbar, Field, ContextSwitcher, OrgSwitcher, ProjectSwitcher            |
-| Shell        | AppShell, AppBar, AccountMenu, EmptyState                                            |
+| Shell        | AppShell, AppBar, Breadcrumb, AccountMenu, EmptyState                                         |
 
-Those are the 34 product components. Under them are 18 foundational ones (Button, Input, Select, Dialog, Tabs and the rest) and one set of design tokens: the named colours, spacing and type sizes every component reads. Dark and light modes are both specified, and the five hues are used only to show state.
+Those are the 35 product components. Under them are 18 foundational ones (Button, Input, Select, Dialog, Tabs and the rest) and one set of design tokens: the named colours, spacing and type sizes every component reads. Dark and light modes are both specified, and the five hues are used only to show state.
 
 The full list, with what each component is for, is in [docs/components.md](docs/components.md).
 

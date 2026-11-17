@@ -203,6 +203,21 @@ Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's
 <AppShell pageHeader={<AppShellPageHeader title="Analysis" actions={<PageActions />} />} …>
 ```
 
+`breadcrumb` takes the page's ancestors, a `Breadcrumb` of `BreadcrumbItem`s with no `BreadcrumbPage`: the `<h1>` is the current page. The trail sits in front of the title at the title's size, in secondary text at 400, so the title is still where the eye starts. **With a trail, the title is sans** (owner, 2026-11-17): a line in two typefaces is harder to read than a line in one, and the trail is navigation, so it never takes the serif. This is §8.3's one exception to the serif heading. A title with no trail keeps the serif.
+
+```tsx
+<AppShellPageHeader
+  title="Tasks"
+  breadcrumb={
+    <Breadcrumb>
+      <BreadcrumbItem href="/close">Month-end close</BreadcrumbItem>
+    </Breadcrumb>
+  }
+/>
+```
+
+This is the trail's second home. The top nav's trail names company and project only while the sidebar is collapsed, because a pinned sidebar already shows both. The page header's is for an app that hides the top nav while the sidebar is pinned, as the Kasane demo does, and it marks the pages that belong to a project among pages that don't. There the name is on screen twice, in the sidebar's group label and in the trail, on purpose: the label says what the group is and the trail says where this page is.
+
 **Why it's a shell part, not a component the page drops into its content.** The band's rule lines up with the panel header's because the shell places both directly under the top nav. A page header inside the scrolling body would only line up when scrolled to the top, and only if main's padding happened to add up to the band height. Before this part existed, the tab underline sat on the panel rule by exactly that kind of coincidence. The same placement keeps the title visible while the body scrolls.
 
 **`<main>` is a column**: the page header, then `app-shell-main-body`, the region that scrolls. The title stays inside the `main` landmark, so the skip link and a screen reader's landmark navigation land on it.
@@ -253,7 +268,7 @@ It isn't semibold. `active` already draws semibold in `--color-text-primary`, an
 
 These are needed by the sketch but fall outside the shell. The stories use fixtures for them:
 
-- **Breadcrumb.** The story builds one inline from `Button`/`Menu`, including the page switcher (`Analysis ⇕`). It should become a product component.
+- **The page switcher.** The trail is a `Breadcrumb` (since 2026-11-17). Its last crumb in the story, `Analysis ⇕`, is a `Menu` built inline.
 
 These shell features are also not built yet:
 

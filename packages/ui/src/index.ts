@@ -234,6 +234,14 @@ export {
   type AppBarNavItemProps,
 } from './components/product/AppBar';
 export {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  type BreadcrumbProps,
+  type BreadcrumbItemProps,
+  type BreadcrumbPageProps,
+} from './components/product/Breadcrumb';
+export {
   AppShell,
   AppShellNav,
   AppShellNavGroup,

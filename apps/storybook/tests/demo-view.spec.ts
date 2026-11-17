@@ -89,7 +89,7 @@ test('Search is out of the sidebar since 2026-11-13, and still opens by its URL'
   expect(BUILT_PLACES).toContain('search');
 });
 
-test('More’s Agents page round-trips through its URL', () => {
+test('All agents’ page round-trips through its URL', () => {
   expect(parseView('?view=agents')).toEqual({ kind: 'agents' });
   expect(hrefFor({ kind: 'agents' })).toBe('?view=agents');
   expect(placeOf({ kind: 'agents' })).not.toBe(placeOf({ kind: 'dm', member: 'cutoff-ai' }));

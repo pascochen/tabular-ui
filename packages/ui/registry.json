@@ -630,6 +630,26 @@
       ]
     },
     {
+      "name": "breadcrumb",
+      "type": "registry:component",
+      "title": "Breadcrumb",
+      "description": "The trail of pages above the current one.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "registryDependencies": [
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/Breadcrumb/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/Breadcrumb/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "channel-message",
       "type": "registry:component",
       "title": "ChannelMessage",
@@ -812,7 +832,7 @@
       "dependencies": [
         "@phosphor-icons/react@^2.1.10",
         "@tanstack/react-table@^8.21.3",
-        "@tanstack/react-virtual@^3.14.25"
+        "@tanstack/react-virtual@^3.14.26"
       ],
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
@@ -1347,6 +1367,7 @@
         "https://tabularui.com/r/attachment-row.json",
         "https://tabularui.com/r/avatar.json",
         "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/breadcrumb.json",
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/channel-message.json",
         "https://tabularui.com/r/chat-composer.json",
