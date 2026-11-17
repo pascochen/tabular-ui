@@ -12,9 +12,10 @@ import { HeroSpecimen } from './specimens';
 /**
  * The hero: the headline and its actions beside one specimen, centred against
  * it (decided 2026-11-16). The page under it is the plain warm white, and the
- * ruled sheet that sat behind it until then is gone (D3, item 3). The paper's
- * tooth, which covered the whole page until then, is on the specimen's frame
- * alone (D3, item 4).
+ * ruled sheet that sat behind it until then is gone (D3, item 3). The
+ * specimen's frame is a plain panel, as every card is: the paper's tooth, which
+ * covered the whole page and then this frame alone, came off it the same day
+ * (D3, item 4).
  */
 export function HeroSection() {
   return (
@@ -39,7 +40,7 @@ export function HeroSection() {
             ) : null}
           </div>
         </div>
-        <SpecimenFrame grain className="lg:col-span-7">
+        <SpecimenFrame className="lg:col-span-7">
           <HeroSpecimen />
         </SpecimenFrame>
       </Rail>
