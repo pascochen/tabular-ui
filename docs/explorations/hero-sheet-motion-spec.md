@@ -126,7 +126,7 @@ Durations are ranges. The prototype's value is in brackets.
 - Edit entry, the card's third action, is left out to keep the hero quiet.
 
 **8. The restart.** Purpose: none of the three. It is what a loop costs.
-- The answer fades out, as in part 6, and the question, the row outlines, the two tints and the cursor fade out with it, over the same 200ms (owner, 2026-11-17, after watching the built page: the cut read as a jump beside the fading card). The frame after is Empty, and by then nothing is left to cut.
+- The answer fades out, as in part 6, and the question, the row outlines, the two tints and the cursor fade out with it, over the same 200ms (owner, 2026-11-17, after watching the built page: the cut read as a jump beside the fading card). The frame after is Empty, and by then nothing is left to cut. The flagged figure's weight is part of the fade too, 600 to 400.
 
 ### Sequence
 

@@ -85,10 +85,14 @@ test.describe('the hero', () => {
         if (el.getAttribute('data-hero') !== 'leaving') return;
         const question = getComputedStyle(el.querySelector('[data-question]')!);
         const outline = getComputedStyle(el.querySelector('[data-outline="on"]')!);
+        const amount = getComputedStyle(el.querySelector('tbody tr:last-child td:last-child')!);
         (window as unknown as { leaving: unknown }).leaving = {
           question: [question.transitionProperty, question.transitionDuration],
           outline: [outline.transitionProperty, outline.transitionDuration, outline.clipPath],
           marks: el.querySelectorAll('[data-cell]').length,
+          // The flagged figure's weight leaves on the same fade (owner, 2026-11-17): a weight
+          // that dropped a frame later read as a second, late change.
+          figure: [amount.transitionProperty.includes('font-weight'), amount.transitionDuration],
         };
       }).observe(el, { attributes: true, attributeFilter: ['data-hero'] });
     });
@@ -114,6 +118,7 @@ test.describe('the hero', () => {
       question: ['opacity', '0.2s'],
       outline: ['opacity', '0.2s', 'none'],
       marks: 0,
+      figure: [true, '0.2s'],
     });
     await expect(sheet(page).locator('[data-wave]')).toBeVisible();
     await expect(sheet(page).locator('[data-mic]')).toHaveAttribute('data-mic', 'on');
@@ -146,6 +151,17 @@ test.describe('the hero', () => {
     await reaches(page, 'waiting', 100);
     await play.click();
     await reaches(page, 'post-ring', 4000);
+  });
+
+  // One line between every two rows. Chromium drew the header's bottom edge and the first
+  // row's top edge both, so that one line was 2px (owner, 2026-11-17, from the preview).
+  test('every row of the sheet is one height, the header’s included', async ({ page }) => {
+    await open(page, '/');
+    const tops = await sheet(page)
+      .locator('tr')
+      .evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().top));
+    const steps = tops.slice(1).map((top, i) => top - tops[i]);
+    expect(new Set(steps).size, `row steps: ${steps.join(', ')}`).toBe(1);
   });
 
   // The outline's width is the sheet's, less its row numbers: it is drawn by CSS

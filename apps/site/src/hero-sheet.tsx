@@ -111,8 +111,13 @@ const ring = 'outline-solid outline-ring outline-[length:var(--ring-width)]';
 /** How the card leaves, and with it the question and the sheet's marks: 200ms, as it arrives. */
 const fadeOut = 'opacity-0 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out';
 
-/** A cell: the row's height is on the cell (docs/failure-log.md), and the text truncates in a block child. */
-const cell = 'relative h-[var(--h-row-sm)] border border-border px-[var(--pad-cell-x)] align-middle';
+/**
+ * A cell: the row's height is on the cell (docs/failure-log.md), and the text truncates in a
+ * block child. Each cell draws its right and bottom edge only, in a table with separate borders:
+ * collapsed, Chromium gave the line between the thead and the tbody an extra half pixel or more,
+ * and it read as a thicker rule under the header (owner, 2026-11-17).
+ */
+const cell = 'relative h-[var(--h-row-sm)] border-r border-b border-border px-[var(--pad-cell-x)] align-middle';
 /** Hidden while the sheet is narrow, as a spreadsheet hides columns. The evidence, B and E, never is. */
 const wide = 'hidden @lg:table-cell';
 /** Under the pointer a cell takes the neutral tint at once, and it fades over 400ms. */
@@ -237,19 +242,19 @@ export function HeroSheet({ className }: { className?: string }) {
         {/* The sheet. Its letters and row numbers are a spreadsheet's dress, and say nothing a
             screen reader needs. */}
         <div className="[--sheet-axis:28px] @lg:[--sheet-axis:32px]">
-          <table className="w-full table-fixed border-collapse text-sm tabular-nums">
+          <table className="w-full table-fixed border-separate border-spacing-0 text-sm tabular-nums">
             <caption className="sr-only">{invoices}</caption>
             <thead>
               <tr aria-hidden="true" className="text-xs text-text-secondary">
-                <td className={cn(cell, axis, 'w-[var(--sheet-axis)] border-t-0 border-l-0')} />
-                <td className={cn(cell, axis, wide, 'border-t-0 @lg:w-[27%]')}>A</td>
-                <td className={cn(cell, axis, 'w-24 border-t-0 @lg:w-[17%]')}>B</td>
-                <td className={cn(cell, axis, 'border-t-0')}>C</td>
-                <td className={cn(cell, axis, wide, 'border-t-0 @lg:w-[15%]')}>D</td>
-                <td className={cn(cell, axis, 'w-24 border-t-0 border-r-0 @lg:w-[16%]')}>E</td>
+                <td className={cn(cell, axis, 'w-[var(--sheet-axis)]')} />
+                <td className={cn(cell, axis, wide, '@lg:w-[27%]')}>A</td>
+                <td className={cn(cell, axis, 'w-24 @lg:w-[17%]')}>B</td>
+                <td className={cn(cell, axis)}>C</td>
+                <td className={cn(cell, axis, wide, '@lg:w-[15%]')}>D</td>
+                <td className={cn(cell, axis, 'w-24 border-r-0 @lg:w-[16%]')}>E</td>
               </tr>
               <tr>
-                <td aria-hidden="true" className={cn(cell, axis, 'border-l-0 text-xs text-text-secondary')}>
+                <td aria-hidden="true" className={cn(cell, axis, 'text-xs text-text-secondary')}>
                   1
                 </td>
                 {(['Entry', 'Invoice', 'Supplier', 'Date', 'Amount'] as const).map((label) => (
@@ -275,7 +280,7 @@ export function HeroSheet({ className }: { className?: string }) {
                 const edge = lastRow && 'border-b-0';
                 return (
                   <tr key={row.entry}>
-                    <td aria-hidden="true" className={cn(cell, axis, edge, 'border-l-0 text-xs text-text-secondary')}>
+                    <td aria-hidden="true" className={cn(cell, axis, edge, 'text-xs text-text-secondary')}>
                       {i + 2}
                       {i === 0 || lastRow ? (
                         // The dashed outline around a row the agent is reading (design-system.md §7.8).
@@ -284,7 +289,9 @@ export function HeroSheet({ className }: { className?: string }) {
                         <span
                           data-outline={outlined ? 'on' : 'off'}
                           className={cn(
-                            'pointer-events-none absolute top-0 left-full z-10 h-full w-[calc(100cqw-var(--sheet-axis))] border border-dashed border-border-strong',
+                            // Placed from the number cell's padding box, which stops short of its right and
+                            // bottom edge: one border's width is added back, so the outline sits on the row.
+                            'pointer-events-none absolute top-0 left-[calc(100%+var(--border-width))] z-10 h-[calc(100%+var(--border-width))] w-[calc(100cqw-var(--sheet-axis))] border border-dashed border-border-strong',
                             !outlined
                               ? '[clip-path:inset(0_100%_0_0)]'
                               : leaving
@@ -321,11 +328,12 @@ export function HeroSheet({ className }: { className?: string }) {
                       className={cn(
                         cell,
                         edge,
-                        'border-r-0 text-right tabular-nums motion-safe:transition-colors motion-safe:duration-[140ms] motion-safe:ease-out',
-                        // Leaving, the tints and the cursor's ring fade to the plain cell. The weight
-                        // can't fade, so the flagged figure keeps it until the frame is empty.
+                        // The weight is in the transition: the sans is a variable font, so the flagged figure's
+                        // weight arrives and leaves with its colour, not on a cut after it.
+                        'border-r-0 text-right tabular-nums motion-safe:transition-[color,background-color,outline-color,font-weight] motion-safe:duration-[140ms] motion-safe:ease-out',
+                        // Leaving, the tints, the weight and the cursor's ring fade to the plain cell.
                         leaving
-                          ? cn('bg-surface-raised motion-safe:duration-200', lastRow && shot.flag && 'font-semibold')
+                          ? 'bg-surface-raised motion-safe:duration-200'
                           : lastRow && shot.flag
                             ? 'bg-bg-danger font-semibold text-text-danger'
                             : i === 0 && shot.first
