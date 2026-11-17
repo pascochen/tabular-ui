@@ -85,6 +85,8 @@ Consult `docs/design-system.md` for values. Do not guess a token — look it up.
 
 ## Step 6 — Story
 
+Title a product story `Product/<group>/<Name>`, with the group from `docs/components.md`'s product table (the sidebar orders them in `apps/storybook/.storybook/preview.tsx`), and set `id: 'product-<name in lower case>'`, so a later regroup leaves its URL and tests where they are. `apps/storybook/tests/story-ids.spec.ts` fails without both. A foundational story stays `Foundational/<Name>`.
+
 Cover, at minimum:
 - **Both modes.** Dark is canonical; a light-only story is incomplete.
 - **All five semantic roles**, if the component takes a state — interactive, danger, warning, success, agent.

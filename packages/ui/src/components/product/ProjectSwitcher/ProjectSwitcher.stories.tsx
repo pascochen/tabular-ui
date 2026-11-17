@@ -7,7 +7,9 @@ import { ProjectSwitcher, type Project } from './index';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/ProjectSwitcher',
+  title: 'Product/Controls/ProjectSwitcher',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-projectswitcher',
   component: ProjectSwitcher,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof ProjectSwitcher>;

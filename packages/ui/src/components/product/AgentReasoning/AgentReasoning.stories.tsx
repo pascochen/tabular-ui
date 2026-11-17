@@ -35,7 +35,9 @@ Tax gets its own column so the monthly totals still reconcile.`;
  * one, at the chat panel's width (--w-panel) on the panel's ground.
  */
 const meta = {
-  title: 'Product/AgentReasoning',
+  title: 'Product/Agent/AgentReasoning',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-agentreasoning',
   component: AgentReasoning,
   parameters: { layout: 'padded' },
   args: { text: mono(reasoning), status: 'done', durationSeconds: 4 },

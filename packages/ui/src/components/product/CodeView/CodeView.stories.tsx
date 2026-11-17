@@ -4,7 +4,9 @@ import { expect, within } from 'storybook/test';
 import { CodeView } from './index';
 
 const meta = {
-  title: 'Product/CodeView',
+  title: 'Product/Data display/CodeView',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-codeview',
   component: CodeView,
   parameters: { layout: 'padded' },
   args: { children: '' },

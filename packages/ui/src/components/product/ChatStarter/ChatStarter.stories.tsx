@@ -20,7 +20,9 @@ const runSuggestions = [
 ];
 
 const meta = {
-  title: 'Product/ChatStarter',
+  title: 'Product/Chat/ChatStarter',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-chatstarter',
   component: ChatStarter,
   parameters: { layout: 'padded' },
   args: { description, suggestions: runSuggestions, onSelect: fn() },

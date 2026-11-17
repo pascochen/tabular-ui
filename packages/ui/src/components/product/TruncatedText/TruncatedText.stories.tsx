@@ -7,7 +7,9 @@ import { TruncatedText } from './index';
  * Hover a cut-off line to see the full text; a line that fits gets no tooltip.
  */
 const meta = {
-  title: 'Product/TruncatedText',
+  title: 'Product/Data display/TruncatedText',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-truncatedtext',
   component: TruncatedText,
   parameters: { layout: 'padded' },
   args: { children: 'fct_gl_entries_reconciliation_daily_v2' },

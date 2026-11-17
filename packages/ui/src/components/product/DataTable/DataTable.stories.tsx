@@ -20,7 +20,9 @@ import { DotsThreeIcon } from '@phosphor-icons/react';
  * demands `args` on every story. All stories render explicitly anyway.
  */
 const meta = {
-  title: 'Product/DataTable',
+  title: 'Product/Data display/DataTable',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-datatable',
   parameters: { layout: 'padded' },
 } satisfies Meta;
 

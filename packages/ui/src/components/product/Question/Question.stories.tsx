@@ -18,7 +18,9 @@ const answered = 'Answered by you: KJP only.';
  * the block's label with `parameters.authorship`.
  */
 const meta = {
-  title: 'Product/Question',
+  title: 'Product/Agent/Question',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-question',
   component: Question,
   parameters: { layout: 'padded', authorship: 'AI · Awaiting your answer' },
   args: {

@@ -8,7 +8,9 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbPage } from './index';
  * Entirely neutral: a trail is structure, and takes no hue in either mode.
  */
 const meta = {
-  title: 'Product/Breadcrumb',
+  title: 'Product/Shell/Breadcrumb',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-breadcrumb',
   component: Breadcrumb,
   parameters: { layout: 'padded' },
   decorators: [

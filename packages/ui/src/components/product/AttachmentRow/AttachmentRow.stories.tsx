@@ -9,7 +9,9 @@ import { IconButton } from '../../foundational/IconButton';
 import { AttachmentRow } from './index';
 
 const meta = {
-  title: 'Product/AttachmentRow',
+  title: 'Product/Data display/AttachmentRow',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-attachmentrow',
   component: AttachmentRow,
   parameters: { layout: 'padded' },
   args: { name: 'bank_reconciliation_2026-09.xlsx', size: '2.4 MB', timestamp: '14:02' },

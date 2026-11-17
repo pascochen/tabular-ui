@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { FilterChip } from './index';
 
 const meta = {
-  title: 'Product/FilterChip',
+  title: 'Product/Controls/FilterChip',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-filterchip',
   component: FilterChip,
   parameters: { layout: 'padded' },
   args: { field: 'Owner', value: 'a.kanzaki' },

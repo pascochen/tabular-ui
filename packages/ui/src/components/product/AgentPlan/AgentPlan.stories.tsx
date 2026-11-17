@@ -42,7 +42,9 @@ const steps: AgentPlanStep[] = [
  * at the chat panel's width (--w-panel) on the panel's ground.
  */
 const meta = {
-  title: 'Product/AgentPlan',
+  title: 'Product/Agent/AgentPlan',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-agentplan',
   component: AgentPlan,
   parameters: { layout: 'padded' },
   args: {

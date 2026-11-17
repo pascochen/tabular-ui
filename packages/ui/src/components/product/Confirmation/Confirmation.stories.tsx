@@ -22,7 +22,9 @@ const sent = 'Sent once, by you. The next send asks again.';
  * when that changes (`docs/agent-voice.md`, *Fixed strings*).
  */
 const meta = {
-  title: 'Product/Confirmation',
+  title: 'Product/Agent/Confirmation',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-confirmation',
   component: Confirmation,
   parameters: { layout: 'padded', authorship: 'AI · Awaiting confirmation' },
   args: {

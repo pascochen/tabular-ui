@@ -4,7 +4,9 @@ import { expect, within } from 'storybook/test';
 import { ProgressBar } from './index';
 
 const meta = {
-  title: 'Product/ProgressBar',
+  title: 'Product/Status/ProgressBar',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-progressbar',
   component: ProgressBar,
   parameters: { layout: 'padded' },
   args: { label: 'Progress' },

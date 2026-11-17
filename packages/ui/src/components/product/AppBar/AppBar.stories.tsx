@@ -11,7 +11,9 @@ import type { RunStatus } from '../StatusBadge/statuses';
 import { AppBar, AppBarNav, AppBarNavItem } from './index';
 
 const meta = {
-  title: 'Product/AppBar',
+  title: 'Product/Shell/AppBar',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-appbar',
   component: AppBar,
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof AppBar>;

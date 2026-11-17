@@ -8,9 +8,13 @@ import { Input } from '../../foundational/Input';
 import { FilterChip } from '../FilterChip';
 import { Toolbar, ToolbarSeparator, ToolbarSpacer } from './index';
 
-const meta = { title: 'Product/Toolbar', component: Toolbar, parameters: { layout: 'padded' } } satisfies Meta<
-  typeof Toolbar
->;
+const meta = {
+  title: 'Product/Controls/Toolbar',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-toolbar',
+  component: Toolbar,
+  parameters: { layout: 'padded' },
+} satisfies Meta<typeof Toolbar>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

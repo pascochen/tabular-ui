@@ -7,7 +7,9 @@ import { cn } from '../../../lib/utils';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/StatusBadge',
+  title: 'Product/Status/StatusBadge',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-statusbadge',
   component: StatusBadge,
   parameters: { layout: 'padded' },
   args: { status: 'passed' },

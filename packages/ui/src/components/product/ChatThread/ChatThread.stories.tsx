@@ -146,7 +146,9 @@ function Panel({ children }: { children: React.ReactNode }) {
 }
 
 const meta = {
-  title: 'Product/ChatThread',
+  title: 'Product/Chat/ChatThread',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-chatthread',
   component: ChatThread,
   parameters: { layout: 'padded' },
   args: { turns: [] },

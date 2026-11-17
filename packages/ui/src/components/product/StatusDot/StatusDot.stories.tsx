@@ -6,7 +6,9 @@ import { StatusDot, type StatusDotStatus } from './index';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/StatusDot',
+  title: 'Product/Status/StatusDot',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-statusdot',
   component: StatusDot,
   parameters: { layout: 'padded' },
   args: { status: 'needs-review' },

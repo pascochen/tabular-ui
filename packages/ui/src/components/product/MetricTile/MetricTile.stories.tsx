@@ -16,7 +16,9 @@ const priorYear = 'vs. H1 FY2025';
 
 /** Mode is driven by the toolbar Theme control. Dark is canonical. */
 const meta = {
-  title: 'Product/MetricTile',
+  title: 'Product/Data display/MetricTile',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-metrictile',
   component: MetricTile,
   parameters: { layout: 'padded' },
   args: { label: 'Net sales', value: netSales },

@@ -31,7 +31,9 @@ const agent = { name: 'Close agent', avatar: agentAvatar };
 const Ident = ({ children }: { children: string }) => <code className="font-mono text-sm">{children}</code>;
 
 const meta = {
-  title: 'Product/ChannelMessage',
+  title: 'Product/Chat/ChannelMessage',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-channelmessage',
   component: ChannelMessage,
   parameters: { layout: 'padded' },
   // A channel is main's column, 720px: a laptop with the sidebar and the

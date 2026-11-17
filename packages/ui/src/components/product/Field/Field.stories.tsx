@@ -7,7 +7,9 @@ import { Field } from './index';
 import { placeholderText } from '../../../fixtures/a11y-exceptions';
 
 const meta = {
-  title: 'Product/Field',
+  title: 'Product/Controls/Field',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-field',
   component: Field,
   parameters: { layout: 'padded' },
   args: { label: 'Label', children: () => null },

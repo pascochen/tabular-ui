@@ -85,7 +85,9 @@ const withFailure: GroupCall[] = [...allDone, { ...readBank, id: 'bank', status:
  * the chat panel's width (--w-panel) on the panel's ground.
  */
 const meta: Meta = {
-  title: 'Product/Tool',
+  title: 'Product/Agent/Tool',
+  // The ID predates the group: tests, screenshots and links use it.
+  id: 'product-tool',
   component: Tool,
   parameters: { layout: 'padded' },
   decorators: [
