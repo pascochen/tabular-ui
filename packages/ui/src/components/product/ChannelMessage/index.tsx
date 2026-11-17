@@ -263,8 +263,10 @@ function ChannelMessage({
                   aria-label={`Replies to ${message.author.name}`}
                   data-slot="channel-message-replies"
                   // The thread's rule: 1px neutral, structure not state (§0
-                  // rule 1). Replies sit --gap-group in from it.
-                  className="flex w-full flex-col gap-[var(--gap-field)] border-l border-border pl-[var(--gap-group)]"
+                  // rule 1). It drops from the caret's centre: the caret is
+                  // 1em of the toggle's --text-sm, so half of that, less half
+                  // the rule's own 1px. Replies sit --gap-group in from it.
+                  className="ml-[calc(var(--text-sm)/2_-_0.5px)] flex flex-col gap-[var(--gap-field)] self-stretch border-l border-border pl-[var(--gap-group)]"
                 >
                   {replies}
                 </ol>

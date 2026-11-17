@@ -279,6 +279,7 @@ The log was a section of this file until 2026-11-11. It is 120 entries, and it w
 - A shell band is 49px only if its child is at least `--h-control` tall. Measure both rules in the app, not only in the story.
 - A client-rendered view lands its own URL fragment on mount. Test a link by loading it from another URL.
 - A scroll that runs on mount runs on every mount. Check it on each way into the view.
+- A rule that hangs from a mark (a thread's rule under its caret) is placed against that mark's centre, not the edge they share. Held by `channel-message.spec.ts`.
 
 ### Accessibility
 
