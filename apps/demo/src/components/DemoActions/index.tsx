@@ -68,8 +68,12 @@ export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenC
       {/*
         Since 2026-11-16: 16px in place of Dialog's 12px (--pad-panel), so the edge sits further
         from the text than the rows sit from each other. No token names a dialog's padding yet.
+        Since 2026-11-17: 24px between the header, the list and the footer in place of Dialog's
+        12px (--gap-group), which the list's rows also use: at one value the description read as a
+        fourth row and the links as part of the last one. 2× the row gap, as --gap-nav-group is to
+        a nav's rows (§7.4). No token names a dialog's section gap yet.
       */}
-      <DialogContent className="p-4 sm:max-w-md">
+      <DialogContent className="gap-6 p-4 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>About this demo</DialogTitle>
           <DialogDescription>
