@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is built: `DataTable`'s totals row in the library, and its one use on the site (§13, 6a). D6 was reopened on 2026-11-17: the hero's new motion is decided and **not built**.
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is built: `DataTable`'s totals row in the library, and its one use on the site (§13, 6a). D6 was reopened on 2026-11-17, and the hero's new motion was built the same day (§13, "The hero, as built").
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -25,7 +25,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D3 | Grounds | Bands: rules only. Every page is the plain canvas, and every bordered panel is the paper (`--color-surface-sunken`) with a `--color-border` edge; the hero specimen's frame is one of them, with no texture (*changed 2026-11-16*: the page's tile, the hero's ruled sheet and then the hero's tile are gone). Plates: paper on the hero and in grids, dark on component pages. Closing band dark, ink on paper (*changed 2026-11-05*) |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
-| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live. *Reopened 2026-11-17, not built:* the hero is a sheet that plays on load and loops, with Pause |
+| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live. *Reopened 2026-11-17, built:* the hero is a sheet that plays on load and loops, with Pause |
 | D7 | Closing band | "Four agents checked a finance team's books and raised four issues for you to decide"; Home only (*changed 2026-11-16*) |
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
@@ -179,7 +179,7 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 
 *Changed 2026-10-26 (owner review):* the hero is a teaser. Website heroes are rarely interactive, and visitors miss it. It rests on the waiting proposal with no buttons, and Replay, always shown, plays the run back to it. Post entry, Edit entry and Don't post (items 1–3) stay on the Agent block card. The dashed slot (item 4) is removed everywhere, because readers didn't understand it.
 
-*Reopened 2026-11-17 (owner). Decided, not built:* the hero moves on load and loops. Until it is built, the hero on the site is the teaser described above. The full motion spec, its sixteen decisions and the prototype are in `docs/explorations/hero-sheet-motion-spec.md`.
+*Reopened 2026-11-17 (owner), and built the same day:* the hero moves on load and loops. The teaser described above is gone. What was built, and where it differs from the spec, is in §13, "The hero, as built". The full motion spec, its sixteen decisions and the prototype are in `docs/explorations/hero-sheet-motion-spec.md`.
 
 - **What it shows.** The same story (D5) on a spreadsheet, because Excel and Google Sheets are what accountants and analysts already know. A mic is pressed, a sound wave runs while "Question: Did we pay any invoice twice?" arrives, the agent looks at one amount, reads down to its duplicate and flags it, and its card opens: "AI · Awaiting review", with Post entry and Don't post. Then Post entry is pressed, and the card reads "AI · Posted", "posted by you".
 - **Both of this decision's reasons still hold, differently.**
@@ -192,12 +192,11 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 - **What leaves the hero:** the proposed journal entry's table and the citation of the source file in the card. Both stay on the Agent block card.
 - **With reduced motion, without JavaScript and in the HTML,** the hero is the waiting card, and there is no Pause button.
 
-Before it is built:
-1. **The sheet's rows come from the export** (§5). Three of the five are placeholders typed for the prototype, as are the dates.
-2. **The dates and the IDs disagree.** The owner set the dates to December 2026. The entry IDs are July's and the card posts to period 2026-10, both real values from the dataset.
-3. **`docs/design-system.md` §7.8 needs a line** for the dashed outline around a row the agent is reading. Dashed means placeholder there today, and the owner accepted the second use.
-4. **An accessibility quick pass (2026-11-17) found five issues, and the owner set them aside for now.** The largest: the loop rebuilds content a screen reader may be reading. They are not in the motion spec and need a decision before §11 can be claimed for the hero.
-5. **§6, §7 "Motion" and the tests in §13** describe the hero as built. They change when it is.
+What was open when it was decided, and where each stands:
+1. **The sheet's rows come from the export** (§5). Done: `duplicatePayment.sheet` in `kasane.json`.
+2. **The dates and the IDs disagreed** in the prototype. Settled by the data: the built sheet shows the dataset's own dates, July 2026, and its own suppliers.
+3. **`docs/design-system.md` §7.8** has its line for the dashed outline.
+4. **The accessibility quick pass's five issues**, which the owner set aside. Two were met in passing and three are open: see §13.
 
 Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
@@ -470,14 +469,14 @@ A test checks that every displayed total in an exact view equals the sum of its 
 **One player for every live specimen.** A specimen is a list of states, each with a time, rendered with real components. The last state is the **rest frame**: the decision the specimen exists to show.
 
 - **The prerendered HTML is the rest frame.** Visitors without JavaScript, search crawlers, link previews and reduced-motion users all see the decision.
-- **A specimen below the first screen plays once** when half of it first enters the viewport, from the first state to the rest frame, and then stops. Nothing loops. *(The hero will be the one exception: D6, reopened 2026-11-17, not built.)*
+- **A specimen below the first screen plays once** when half of it first enters the viewport, from the first state to the rest frame, and then stops. Nothing loops. *(The hero is the one exception: D6, reopened 2026-11-17.)*
 - **5 seconds or less.** A sequence that starts on its own and runs over 5 seconds needs a pause control (WCAG 2.2.2). Under 5 seconds it doesn't, so the cap removes the control instead of adding one. *(The hero's loop, D6 as reopened, runs about 10.9 seconds and so carries a Pause button.)*
 - **Replay** is a library `Button`, `variant="outline"` `size="sm"`, inside the plate at the bottom right, named for its specimen: "Replay Agent block".
 - **Reduced motion:** the rest frame only. Replay jumps to the rest frame.
 - **One announcement.** A polite live region announces the final state once ("Posted"), never each step. It empties after it has been read, as `AgentReasoning` does with its own region.
 - **No randomness, no network, no AI.** A specimen is a script.
 
-**The hero** (D5, D6) is a teaser since 2026-10-26: it rests on the question and the waiting proposal, with no buttons and no slot, and Replay plays the run back to it. Everything below describes the **Agent block card**, which keeps the decision. (Until then it described the hero, and a dashed slot held the run log row's space.) *Reopened 2026-11-17, not built:* the hero becomes a looping sheet with Pause in place of Replay (D6).
+**The hero** (D5, D6) is a teaser since 2026-10-26: it rests on the question and the waiting proposal, with no buttons and no slot, and Replay plays the run back to it. Everything below describes the **Agent block card**, which keeps the decision. (Until then it described the hero, and a dashed slot held the run log row's space.) *Reopened 2026-11-17:* the hero is a looping sheet with Pause in place of Replay (D6), in its own file, `src/hero-sheet.tsx`. It is not a list of frames for the player below: it has its own script and timer, because it loops and pauses.
 - Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row beneath it, `passed` (D1, D2).
 - Replay then plays the run from the question back to the waiting proposal, in 5 seconds or less.
 - **Don't post** (decided 2026-10-26, owner) declines as Post accepts:
@@ -550,7 +549,7 @@ Every heading the site sets, `<h1>` to `<h4>`, is 500 since 2026-11-16 (owner): 
 
 **Mono shows data only:** IDs, file names, tokens and times. Labels are sans.
 
-**Motion** (built 2026-11-16, from `docs/explorations/site-motion-brainstorm.md`). Four small motions, beside the specimens' player (§6). Each answers something the visitor did, none plays on load or on scroll, and none loops. *(The hero's loop is a separate decision, D6 as reopened on 2026-11-17, and is not built. It is the only motion that will start on load.)* The values are written in place, as the library's are: there is no motion token.
+**Motion** (built 2026-11-16, from `docs/explorations/site-motion-brainstorm.md`). Four small motions, beside the specimens' player (§6). Each answers something the visitor did, none plays on load or on scroll, and none loops. *(The hero's loop is a separate decision, D6 as reopened on 2026-11-17. It is the only motion that starts on load.)* The values are written in place, as the library's are: there is no motion token.
 - **A standalone link's word takes the ink** (owner, 2026-11-16, after two rounds of variants). The link rests at `--color-text-secondary`, as the nav's links do. On hover the underline appears at once, and the text darkens to `--color-text-primary` over 240ms, `ease-out`. The line is the first frame, so the hover never reads as late. The first version built that day drew the line in from transparent over 120ms, and people who tried it read the empty first frames as a latency bug. Both colours are neutral steps, so no hue arrives. A title that is a link (a card's title, previous and next) keeps its ink and only takes the underline (`titleLink`). `standaloneLink` in `src/lib/styles.ts`.
 - **Copy is ticked.** After a copy the check is revealed left to right in 140ms, and two seconds later the copy icon fades back in 120ms. One icon is in the DOM at a time, and the label and the announcement are unchanged.
 - **Play and Replay take a wash** (owner, 2026-11-16, chosen from five icon and five background candidates). When a run starts, the press tone (`--color-bg-active`) wipes across the button from the left in 140ms, the tick's own motion. It holds while the specimen plays and leaves to the right in 200ms when the run ends. It shows for every run, whether the button, the mouse over a pair or a card scrolling into view started it: the wash says a run is under way. It is the site's layer on the button's `::before` (`runWash` in `src/lib/styles.ts`), and the library's `Button` is unchanged. It is decoration: the plate shows the run and the live region says when it ends, so forced colours lose nothing.
@@ -680,6 +679,25 @@ Each step is one PR, ending with the preview URL, screenshots at 1440 and 390 be
   - a card rewinding unseen and playing on scroll;
   - a card's Replay and its announcement;
   - and under reduced motion, every card at rest, no running animation, and Replay jumping to rest.
+
+**The hero, as built (2026-11-17, owner; D6 reopened):** `src/hero-sheet.tsx`, in place of the teaser. The sections above that describe the hero as a teaser with Replay are history.
+- **It is its own component with its own script**, a list of frames each with a duration, and one timer. It runs once the page has hydrated, the hero is at least half on screen and the tab is visible, and never with reduced motion.
+- **The HTML is the waiting card**, and nothing moves for 2.5 seconds after the loop starts. The Pause button is added on hydration, so the HTML and a reduced-motion visitor have none.
+- **The DOM never changes shape.** A pass changes classes and the card's two labels. Words not yet heard, and the card before it opens, are transparent, not removed, so the frame holds one height and the page's text is always the finding.
+- **The data** is `duplicatePayment.sheet`: the entity's supplier invoices from the duplicate's first entry to its second, five rows. The export fails if they are more than seven.
+- **Where it differs from the motion spec and its prototype:**
+  - *The rows are the dataset's.* The prototype's suppliers and its December dates were placeholders. The sheet shows each real supplier's first word (the owner's rule for the names) and the real dates, July 2026, which now agree with the entry IDs.
+  - *The amounts carry their currency sign,* as the card's sentence does.
+  - *The buttons are right-aligned, the action last and Don't post a ghost,* as every decision in the library is. The prototype had them at the left.
+  - *The cell cursor and both focus rings are the system's ring* (`--color-ring`, `--ring-width`), and Post entry's sits at the system's offset. So nothing new is drawn at 2px (design-system.md §7.8).
+  - *Pause is named by its label alone,* "Pause animation" then "Play animation", with no pressed state. The spec had both, which reads as "Play, pressed".
+  - *Play goes on from the paused frame,* and gives that frame its full time again.
+  - *The sheet's tabs show the files' full names,* `.csv` included.
+- **The accessibility pass's five issues:**
+  - *Met:* the loop no longer rebuilds what a screen reader is reading (the DOM is stable, though the card's label still changes between "Awaiting review" and "Posted"), and Pause gives one signal.
+  - *Open:* the card can change before a slow reader finishes it; the drawn focus rings appear where keyboard focus is not; and the mic, Post entry, Don't post and the tabs look operable and are not.
+- **`tests/playback.spec.ts` covers:** the HTML and the first frame; the rows against the data; nothing moving for 2.5 seconds, then the whole cycle at one height; Pause and Play; a row's outline spanning its cells at 1280px and 375px with the evidence never cut; and reduced motion. `tests/motion.spec.ts`'s wash check moved from the hero's Replay to a card's.
+- **Not done:** no screen reader was run, the new checks were not each proved to fail, and the loop's restart has not been judged by the owner on the built page.
 
 **Component pages, decision first, as built (2026-10-27, owner):** from a navigation critique, How Might We questions and eight rough takes. Components in the nav had gone to Home's own grid, so it read as a link to the page you were on. Now it opens the first component page, and `/components` redirects there with a 307 (a 308 is cached by browsers, and the first component could change). Home's grid stays the overview, reached from the hero's "Browse components" and Principles' onward link. Get started joined the nav after Components (it moved to the right of the bar later that day), and the footer's Guide uses the nav's names and destinations. Each component page leads with when to use it and when not, and shows its README's usage example under the install command. The draft was reviewed as `docs/site-component-pages.md` and approved as written. Tests check the nav route and its redirect, the nav and footer labels, both lists before the pair on every component page, and that the usage comes from the README.
 

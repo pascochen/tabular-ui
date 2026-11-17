@@ -1,6 +1,6 @@
 # Hero motion: "asked aloud", a motion spec
 
-2026-11-17. An exploration for the hero of tabularui.com (`apps/site`). **Nothing here is built.** It contradicts the hero that `docs/site.md` describes as built (D6, §6 and §7 "Motion"). D6 there records this as reopened and decided, not built.
+2026-11-17. An exploration for the hero of tabularui.com (`apps/site`). **Built the same day** as `apps/site/src/hero-sheet.tsx`. Where the build differs from this spec, `docs/site.md` §13, "The hero, as built", says so and wins: the rows and dates are the dataset's, the buttons are right-aligned, and Pause has no pressed state.
 
 One method from the UX + AI library was run: **Motion spec** (trigger, states, what moves, timing, purpose, reduced-motion fallback). The values below are the ones in the prototype, each with the range it was tried in.
 

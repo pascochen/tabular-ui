@@ -39,59 +39,20 @@ import { LiveRegion, ReplayButton, Specimen } from './playback';
  */
 
 /** The question the hero and the chat specimens answer (D5). Owner copy, 2026-10-26. */
-const question = 'Did we pay any invoice twice?';
+export const question = 'Did we pay any invoice twice?';
 
 const noop = () => {};
 
 // ---------------------------------------------------------------------------
-// The proposal: the hero (D5, D6) and the Agent block card
+// The proposal: the Agent block card and its pair. (The hero's own telling is hero-sheet.tsx, D6.)
 // ---------------------------------------------------------------------------
 
 type Outcome = 'waiting' | 'editing' | 'posted' | 'declined';
 type FocusTarget = 'post' | 'edit' | 'period' | 'replay' | null;
 
 /**
- * The hero's journal entry as its ledger lines (owner, 2026-11-16): each account
- * from the chart of accounts, debit and credit in their own right-aligned
- * columns, from kasane.json. No totals row: the site's one double rule is on
- * Lineage tree's page (D11), and two lines read as balanced without one.
- */
-function JournalLines() {
-  const { reversal, currency } = duplicatePayment;
-  const figure = (n: number) => (n === 0 ? '' : money(n, currency));
-  return (
-    <table className="mt-1 w-full border-collapse text-sm">
-      <thead>
-        <tr className="text-xs text-text-secondary">
-          <th scope="col" className="pb-1 text-left font-medium">
-            Account
-          </th>
-          <th scope="col" className="pb-1 text-right font-medium">
-            Debit
-          </th>
-          <th scope="col" className="pb-1 pl-4 text-right font-medium">
-            Credit
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {reversal.map((line) => (
-          <tr key={line.account} className="border-t border-border">
-            <th scope="row" className="py-1 text-left font-normal text-text-body">
-              <code className="text-xs">{line.account}</code> {line.name}
-            </th>
-            <td className="py-1 text-right text-text-body">{figure(line.debit)}</td>
-            <td className="py-1 pl-4 text-right text-text-body">{figure(line.credit)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-/**
- * The agent's proposal. In the hero it's a teaser (owner, 2026-10-26): it rests
- * on the waiting proposal with no buttons, and Replay plays the run back to it.
+ * The agent's proposal. Until 2026-11-17 the hero was this too, as a teaser with
+ * no buttons; it is now the sheet in hero-sheet.tsx (D6, reopened).
  * On the Agent block card it's live: it stops and waits, and the visitor is the
  * person it waits for (D6). On Agent block's pair it's fixed: the waiting plate
  * shows the three buttons, and the plate is inert, so they can't be pressed.
@@ -106,25 +67,21 @@ function JournalLines() {
  *
  * Each outcome is announced once, and focus moves to the control that replaces
  * the one pressed, so it is never dropped on the page.
- *
- * In the hero the question is a plain line, not a ChatThread user turn:
- * ChatThread's assistant turn takes no actions, and the proposal can't be a
- * second block inside it. A library gap, raised in PR 2.
  */
-function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' | 'posted' }) {
+function Proposal({ fixed }: { fixed?: 'waiting' | 'posted' }) {
   const d = duplicatePayment;
   const invoices = d.sources.find((s) => s.endsWith('.csv'));
   if (!invoices) throw new Error('kasane.json’s duplicate payment cites no invoice file');
   const defaults = { period: kasane.company.openPeriod, memo: 'Reverse the duplicate payment' };
-  // The hero is a teaser, and a fixed proposal is a pair's plate: neither takes a decision.
+  // A fixed proposal is a pair's plate, and takes no decision.
   // A fixed proposal still shows its buttons while it waits (owner, 2026-10-28): they are
   // the component's point, and the pair's plate is inert.
-  const live = !hero && !fixed;
+  const live = !fixed;
 
-  // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
+  // A pair's plate has up to four frames, ending on the entry.
   // The Agent block card leaves out the sources, to keep its row's height (owner, 2026-11-02).
   const frames = live ? 3 : 4;
-  const { ref, frame, playing, play, run } = usePlayback({ frames, autoplay: !hero && !fixed });
+  const { ref, frame, playing, play, run } = usePlayback({ frames, autoplay: !fixed });
   const { announce, message } = useAnnouncer();
   const [outcome, setOutcome] = useState<Outcome>(fixed ?? 'waiting');
   const [entry, setEntry] = useState(defaults);
@@ -168,14 +125,9 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
       <div aria-busy={playing || undefined} className="flex flex-1 flex-col justify-center gap-[var(--gap-group)]">
-        {hero ? (
-          <p className="text-text-secondary">
-            <span className="font-medium text-text-body">Question:</span> {question}
-          </p>
-        ) : null}
         {/* A part the run hasn't reached yet is hidden, not absent, so the plate
             keeps its rest height while it plays and Replay never makes it jump. */}
-        <div {...unreached(frame < 1 && hero)}>
+        <div>
           <AgentBlock authorship={authorship} meta={meta}>
             <div className="flex flex-col gap-[var(--gap-group)]">
               <p>
@@ -245,26 +197,19 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
                   ) : (
                     <>
                       <p className="font-medium text-text-primary">{entry.memo}</p>
-                      {hero ? (
-                        <>
-                          <p className="text-text-secondary">Period {entry.period}</p>
-                          <JournalLines />
-                        </>
-                      ) : (
-                        <p className="text-text-secondary">
-                          {d.amountLabel}, period {entry.period}
-                          {outcome === 'posted' ? (
-                            <>
-                              , <code>{d.nextJournalId}</code>
-                            </>
-                          ) : null}
-                        </p>
-                      )}
+                      <p className="text-text-secondary">
+                        {d.amountLabel}, period {entry.period}
+                        {outcome === 'posted' ? (
+                          <>
+                            , <code>{d.nextJournalId}</code>
+                          </>
+                        ) : null}
+                      </p>
                     </>
                   )}
                   {/* As every decision in the library (Dialog's footer, AgentPlan, Confirmation):
                       right-aligned, the action last, the others ghost. */}
-                  {outcome === 'waiting' && !hero ? (
+                  {outcome === 'waiting' ? (
                     <div className="mt-2 flex flex-wrap justify-end gap-[var(--gap-inline)]">
                       <Button size="sm" variant="ghost" onClick={() => decide('declined')}>
                         Don’t post
@@ -299,9 +244,9 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
           <RunLogRow status="skipped" name={d.reverse} />
         ) : null}
       </div>
-      {hero || (decided && live) ? (
+      {decided && live ? (
         <div ref={replayRef} className="flex justify-end">
-          <ReplayButton title={hero ? 'the hero’s run' : 'Agent block'} run={run} onClick={replay} />
+          <ReplayButton title="Agent block" run={run} onClick={replay} />
         </div>
       ) : null}
       <LiveRegion message={message} />
@@ -312,10 +257,6 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
 /** Hides a part the run hasn't reached: invisible, so it holds its space, and out of the accessibility tree. */
 function unreached(hidden: boolean) {
   return hidden ? { className: 'invisible', 'aria-hidden': true as const } : {};
-}
-
-export function HeroSpecimen() {
-  return <Proposal hero />;
 }
 
 export function AgentBlockSpecimen() {

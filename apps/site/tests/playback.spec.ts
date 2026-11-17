@@ -4,13 +4,14 @@ import { expect, test, type Page } from '@playwright/test';
 
 import { componentPages, routes } from './routes';
 
-/** The specimens' playback, the hero teaser, and the Agent block card's choices (docs/site.md §6, D6). */
+/** The specimens' playback, the hero's loop, and the Agent block card's choices (docs/site.md §6, D6). */
 
 const kasane = JSON.parse(readFileSync(new URL('../data/kasane.json', import.meta.url), 'utf8')) as {
   duplicatePayment: {
     nextJournalId: string;
     entries: string[];
-    reversal: { account: string; name: string; debit: number; credit: number }[];
+    supplierInvoice: string;
+    sheet: { entry: string; invoice: string; supplier: string }[];
   };
 };
 const journalId = kasane.duplicatePayment.nextJournalId;
@@ -29,44 +30,141 @@ const card = (page: Page, name: string) => page.locator(`#${name}`);
 const height = async (page: Page, selector: string) =>
   page.locator(selector).evaluate((el) => Math.round(el.getBoundingClientRect().height));
 
+/** The hero's frame, and where its loop is: `data-hero` names the frame on show. */
+const sheet = (page: Page) => hero(page).locator('[data-hero]');
+const reaches = (page: Page, frame: string, timeout = 12_000) =>
+  expect(sheet(page)).toHaveAttribute('data-hero', frame, { timeout });
+
 test.describe('the hero', () => {
-  test('is a teaser: it rests on the waiting proposal, and offers only Replay', async ({ page }) => {
+  test('opens on the finding, with the agent waiting, and its only button is Pause', async ({ page, request }) => {
+    // The HTML is the rest frame, and has no Pause: without script nothing moves.
+    const html = await (await request.get('/')).text();
+    expect(html).toContain('data-hero="waiting"');
+    expect(html).not.toContain('Pause animation');
+
     await open(page, '/');
-    await expect(hero(page).getByText('Did we pay any invoice twice?')).toBeVisible();
+    await reaches(page, 'waiting', 1000);
+    await expect(hero(page).getByText('Question: Did we pay any invoice twice?')).toBeVisible();
     await expect(hero(page).getByText('AI · Awaiting review')).toBeVisible();
-    // No decision to take, and no dashed placeholder (owner, 2026-10-26).
-    // The specimen's only button is Replay. (The section's own Demo action is not the specimen's.)
-    await expect(hero(page).getByRole('button').filter({ hasNotText: 'Demo' })).toHaveCount(1);
-    await expect(hero(page).getByRole('button', { name: 'Replay the hero’s run' })).toBeVisible();
-    await expect(hero(page).getByText('Run log row', { exact: false })).toHaveCount(0);
+    await expect(sheet(page).locator('[data-cell="flagged"]')).toHaveCount(1);
+    // The mic, Post entry and Don’t post are drawn as controls and are not ones (owner, 2026-11-17).
+    await expect(sheet(page).getByRole('button')).toHaveCount(1);
+    await expect(sheet(page).getByRole('button', { name: 'Pause animation' })).toBeVisible();
+    await expect(sheet(page).getByText('Post entry')).toBeVisible();
   });
 
-  // The entry as its ledger lines (owner, 2026-11-16), one row per account, from
-  // data. They balance, and there is no totals row: D11 keeps the site's one
-  // double rule on Lineage tree's page.
-  test('shows the entry as its ledger lines, balanced, from the data', async ({ page }) => {
+  // Every row is the data's (§5): the entity's invoices from the duplicate's first
+  // entry to its second, so the sheet opens and closes on the finding.
+  test('the sheet is the invoices between the duplicate’s two entries, from the data', async ({ page }) => {
     await open(page, '/');
-    const { reversal } = kasane.duplicatePayment;
-    const rows = hero(page).locator('table tbody tr');
-    await expect(rows).toHaveCount(reversal.length);
-    for (const [i, line] of reversal.entries()) {
-      await expect(rows.nth(i).getByRole('rowheader')).toHaveText(`${line.account} ${line.name}`);
+    const { sheet: rows, entries, supplierInvoice } = kasane.duplicatePayment;
+    expect(rows.length).toBeLessThanOrEqual(7);
+    expect([rows[0].entry, rows.at(-1)!.entry]).toEqual(entries);
+    const body = sheet(page).locator('tbody tr');
+    await expect(body).toHaveCount(rows.length);
+    for (const [i, row] of rows.entries()) {
+      await expect(body.nth(i)).toContainText(row.entry);
+      await expect(body.nth(i)).toContainText(row.invoice);
+      await expect(body.nth(i)).toContainText(row.supplier.split(' ')[0]);
     }
-    const sum = (key: 'debit' | 'credit') => reversal.reduce((total, line) => total + line[key], 0);
-    expect(sum('debit')).toBe(sum('credit'));
+    for (const i of [0, rows.length - 1]) await expect(body.nth(i)).toContainText(supplierInvoice);
   });
 
-  test('Replay plays the run back to the proposal, at the same height, and says so once', async ({ page }) => {
+  test('nothing moves for 2.5 seconds, then the entry is posted, the question is heard and the duplicate is found again', async ({
+    page,
+  }) => {
+    test.setTimeout(40_000);
     await open(page, '/');
     const plate = 'section[aria-labelledby="hero-title"] [data-plate]';
     const atRest = await height(page, plate);
-    await hero(page).getByRole('button', { name: 'Replay the hero’s run' }).click();
-    // Mid-run, the content is busy, so a screen reader doesn't read a half-built frame.
-    await expect(hero(page).locator('[aria-busy="true"]')).toHaveCount(1);
+    const started = Date.now();
+    await reaches(page, 'post-ring');
+    expect(Date.now() - started).toBeGreaterThan(2000);
+    // The ring is the system's, drawn: nothing in the frame holds focus.
+    expect(
+      await sheet(page)
+        .locator('[data-post]')
+        .evaluate((el) => getComputedStyle(el).outlineStyle),
+    ).toBe('solid');
+
+    await reaches(page, 'posted');
+    await expect(hero(page).getByText('AI · Posted')).toBeVisible();
+    await expect(hero(page).getByText('posted by you')).toBeVisible();
+    await expect(hero(page).getByText(`Posted as ${journalId}.`)).toBeVisible();
     expect(await height(page, plate)).toBe(atRest);
-    await expect(hero(page).getByRole('status')).toHaveText('Awaiting review.', { timeout: 6000 });
-    await expect(hero(page).locator('[aria-busy="true"]')).toHaveCount(0);
-    await expect(hero(page).getByRole('button', { name: 'Replay the hero’s run' })).toBeFocused();
+
+    // The pass: the mic, the wave and the words, then the two amounts.
+    await reaches(page, 'listening');
+    await expect(sheet(page).locator('[data-wave]')).toBeVisible();
+    await expect(sheet(page).locator('[data-mic]')).toHaveAttribute('data-mic', 'on');
+    await expect(sheet(page).locator('[data-cell], [data-cursor], [data-outline="on"]')).toHaveCount(0);
+    expect(await height(page, plate)).toBe(atRest);
+
+    await reaches(page, 'looking');
+    const amounts = sheet(page).locator('tbody tr td:last-child');
+    await expect(amounts.first()).toHaveAttribute('data-cell', 'looked');
+    await expect(amounts.first()).toHaveAttribute('data-cursor', '');
+    await expect(sheet(page).locator('[data-outline="on"]')).toHaveCount(1);
+
+    await reaches(page, 'waiting');
+    await expect(amounts.last()).toHaveAttribute('data-cell', 'flagged');
+    await expect(amounts.last()).toHaveAttribute('data-cursor', '');
+    await expect(amounts.first()).toHaveAttribute('data-cell', 'looked');
+    await expect(sheet(page).locator('[data-outline="on"]')).toHaveCount(2);
+    await expect(hero(page).getByText('AI · Awaiting review')).toBeVisible();
+    expect(await height(page, plate)).toBe(atRest);
+  });
+
+  test('Pause holds the frame, and Play goes on from it', async ({ page }) => {
+    await open(page, '/');
+    await sheet(page).getByRole('button', { name: 'Pause animation' }).click();
+    const play = sheet(page).getByRole('button', { name: 'Play animation' });
+    await expect(play).toBeVisible();
+    await expect(play).toBeFocused();
+    // Longer than the 2.5s the frame waits when it runs.
+    await page.waitForTimeout(3500);
+    await reaches(page, 'waiting', 100);
+    await play.click();
+    await reaches(page, 'post-ring', 4000);
+  });
+
+  // The outline's width is the sheet's, less its row numbers: it is drawn by CSS
+  // from the first cell, with nothing measured in script.
+  test('a row’s outline spans its data cells, at a phone’s width too', async ({ page }) => {
+    for (const width of [1280, 375]) {
+      await page.setViewportSize({ width, height: 800 });
+      await open(page, '/');
+      const box = await sheet(page)
+        .locator('tbody tr')
+        .first()
+        .evaluate((row) => {
+          const outline = row.querySelector('[data-outline]')!.getBoundingClientRect();
+          const cells = [...row.querySelectorAll('td')].filter((td) => td.getBoundingClientRect().width > 0);
+          return {
+            // Math.abs: a rounded -0.2 is -0, which is not 0 to toEqual.
+            left: Math.abs(Math.round(outline.left - cells[1].getBoundingClientRect().left)),
+            right: Math.abs(Math.round(outline.right - cells.at(-1)!.getBoundingClientRect().right)),
+            shown: cells.length - 1,
+          };
+        });
+      expect(box, `at ${width}px`).toEqual({ left: 0, right: 0, shown: width < 600 ? 3 : 5 });
+      // Nothing the finding rests on is cut short: the invoice number and the amount.
+      const clipped = await sheet(page)
+        .locator('tbody td:nth-child(3) > *, tbody td:last-child')
+        .evaluateAll((els) => els.filter((el) => el.scrollWidth > el.clientWidth).length);
+      expect(clipped, `at ${width}px`).toBe(0);
+    }
+  });
+
+  test.describe('with reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+    test('it is the waiting card, with nothing running and no Pause', async ({ page }) => {
+      await open(page, '/');
+      await page.waitForTimeout(3500);
+      await reaches(page, 'waiting', 100);
+      await expect(sheet(page).getByRole('button')).toHaveCount(0);
+      expect(await sheet(page).evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
+    });
   });
 });
 

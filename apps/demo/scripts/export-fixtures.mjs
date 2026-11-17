@@ -1485,6 +1485,25 @@ must(
 );
 const jePrefix = `JE-${dup[0].entity_id}-${OPEN.period.slice(2, 4)}${OPEN.period.slice(5, 7)}-`;
 const openNumbers = journal.filter((l) => l.je_id.startsWith(jePrefix)).map((l) => Number(l.je_id.slice(-5)));
+// The hero's sheet (docs/site.md D6, reopened 2026-11-17): the entity's supplier invoices from the
+// first entry of the duplicate to the second, in entry order, so the sheet opens and closes on the
+// finding. Short enough to read at a glance, or the hero needs another story.
+const supplierNames = Object.fromEntries(
+  readCsv('01_master_data/suppliers.csv').map((s) => [s.supplier_id, s.supplier_name]),
+);
+const dupEntityInvoices = supplierInvoices
+  .filter((r) => r.entity_id === dup[0].entity_id)
+  .sort((x, y) => x.ap_invoice_id.localeCompare(y.ap_invoice_id));
+const dupSheet = dupEntityInvoices.slice(dupEntityInvoices.indexOf(dup[0]), dupEntityInvoices.indexOf(dup.at(-1)) + 1);
+must(
+  dup.length === 2 && dupSheet[0] === dup[0] && dupSheet.at(-1) === dup[1],
+  'the duplicate is two entries, in order',
+);
+must(dupSheet.length <= 7, `the duplicate's two entries are at most five invoices apart (${dupSheet.length - 2})`);
+must(
+  dupSheet.every((r) => r.currency === dup[0].currency && supplierNames[r.supplier_id]),
+  "every invoice on the hero's sheet is in the duplicate's currency, from a named supplier",
+);
 await writeJson('apps/site/data/kasane.json', {
   company: {
     name: fixtures.company.name,
@@ -1507,6 +1526,13 @@ await writeJson('apps/site/data/kasane.json', {
     payments: dupPayments.map((p) => p.payment_id),
     reversal: dupReversal,
     nextJournalId: `${jePrefix}${String(Math.max(0, ...openNumbers) + 1).padStart(5, '0')}`,
+    sheet: dupSheet.map((r) => ({
+      entry: r.ap_invoice_id,
+      invoice: r.supplier_invoice_number,
+      supplier: supplierNames[r.supplier_id],
+      date: r.invoice_date,
+      amount: num(r.gross_amount),
+    })),
   },
   operatingBridge: fixtures.operatingBridge,
 });

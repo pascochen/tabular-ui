@@ -927,6 +927,8 @@ utility and a token would imply the style varies independently, which it does no
 
 Added 2026-08-23 with `AttachmentRow`'s upload target, the first and so far only user.
 
+**One other use, on the site only** (owner, 2026-11-17). The hero of tabularui.com draws a dashed outline around a sheet row the agent is reading: a spreadsheet's own mark for a copied range. It is an illustration on the site (`apps/site/src/hero-sheet.tsx`, `docs/site.md` D6), in `--color-border-strong` so it reads on a white cell. No library component draws it, and it is not a precedent for one: in the product, dashed still means only a placeholder.
+
 **Double is reserved for a total that adds up.** `DataTable` draws it, `3px double` in `--color-text-primary`, under a total figure when the rows on display sum to the total it was given, at the precision printed. No prop sets it: a mark that states a fact comes from a check. If the check fails, can't run, or rows are hidden, the figure keeps only the single rule above it. There is no token: 3px is the least a double can draw, not a step in the width scale. Nothing else draws a double rule, section dividers included. Added 2026-11-02 with `DataTable`'s totals row.
 
 ### 7.9 Shell widths
