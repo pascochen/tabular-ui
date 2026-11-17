@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero prototype: the looping sheet</title>
+<!--
+  A throwaway prototype for docs/site.md D6 (reopened 2026-11-17). Not site code.
+  Direction B: three sheets on a loop, with a pause control (WCAG 2.2.2).
+  - Colours are copied from packages/ui/src/styles/palette.css (light mode).
+  - Fonts are system stand-ins.
+  - Real, from kasane.json's duplicatePayment: the two MFL-58821 entries, the two
+    payments' IDs, and every line of the proposed entry. Every other row, and the
+    dates, are placeholders and must come from the export if this is built.
+-->
+<style>
+  :root {
+    --ledger-25: oklch(99.0% 0.003 85.0);
+    --ledger-50: oklch(97.5% 0.006 85.0);
+    --ledger-100: oklch(94.5% 0.007 85.0);
+    --ledger-200: oklch(89.0% 0.008 85.0);
+    --ledger-300: oklch(82.0% 0.007 85.0);
+    --ledger-600: oklch(53.0% 0.005 264.1);
+    --ledger-700: oklch(46.0% 0.010 264.1);
+    --ledger-950: oklch(21.0% 0.018 264.1);
+    --vermilion-500: oklch(62.5% 0.171 28.2);
+    --vermilion-700: oklch(46.0% 0.154 28.2);
+    --orchid-500: oklch(62.5% 0.158 318.4);
+    --orchid-700: oklch(46.0% 0.142 318.4);
+    --row: 28px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ledger-25); color: var(--ledger-950); font: 13px/20px "Golos Text", system-ui, sans-serif; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 48px 32px; }
+  .hero { display: grid; grid-template-columns: 5fr 7fr; gap: 32px; align-items: center; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+  h1 { font: 500 44px/1.1 Georgia, serif; margin: 0 0 16px; text-wrap: balance; }
+  .lead { font-size: 18px; line-height: 28px; color: var(--ledger-700); margin: 0; }
+
+  .frame { border: 1px solid var(--ledger-200); background: var(--ledger-25); }
+  .question { padding: 8px 12px; border-bottom: 1px solid var(--ledger-200); color: var(--ledger-700); }
+  .question b { font-weight: 500; color: var(--ledger-950); }
+
+  .sheet { position: relative; overflow: hidden; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; font-variant-numeric: tabular-nums; }
+  th, td {
+    height: var(--row); padding: 0 8px; border: 1px solid var(--ledger-200);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+    transition: background-color 400ms ease-out;
+  }
+  tr > :first-child { border-left: 0; } tr > :last-child { border-right: 0; }
+  thead tr:first-child th { border-top: 0; }
+  .axis { background: var(--ledger-50); color: var(--ledger-600); text-align: center; font-weight: 400; font-size: 12px; width: 32px; }
+  .head th { font-weight: 600; }
+  .num { text-align: right; }
+  td.mono { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+  td.total { font-weight: 600; }
+  tbody td:not(.axis):hover { background: var(--ledger-100); transition-duration: 0ms; }
+  td.flag { background: color-mix(in oklch, var(--vermilion-500) 10%, transparent); color: var(--vermilion-700); font-weight: 600; transition: background-color 140ms ease-out, color 140ms ease-out; }
+
+  .cursor { position: absolute; outline: 2px solid var(--ledger-950); outline-offset: -1px; pointer-events: none; }
+  .range, .rule { position: absolute; pointer-events: none; clip-path: inset(0 100% 0 0); }
+  .range { border: 1px dashed var(--ledger-700); }
+  .rule { border-top: 3px double var(--ledger-950); }
+  .range.on, .rule.on { clip-path: inset(0 0 0 0); transition: clip-path 250ms ease-out; }
+
+  .note {
+    position: absolute; right: 12px; width: min(380px, calc(100% - 56px));
+    background: var(--ledger-25); border: 1px solid var(--ledger-300); border-left: 2px solid var(--orchid-500);
+    padding: 8px 12px; display: grid; gap: 4px; opacity: 0; transform: translateY(-4px); pointer-events: none;
+  }
+  .note.on { opacity: 1; transform: none; transition: opacity 200ms ease-out, transform 200ms ease-out; }
+  .note .who { font-size: 12px; font-weight: 600; color: var(--orchid-700); }
+  .note p { margin: 0; } .note .sub { color: var(--ledger-700); }
+  code { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+
+  .tabs { display: flex; align-items: stretch; border-top: 1px solid var(--ledger-200); background: var(--ledger-50); font-size: 12px; }
+  .tab { height: 28px; padding: 0 12px; border: 0; border-right: 1px solid var(--ledger-200); background: none; color: var(--ledger-700); font: inherit; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tab[aria-selected="true"] { background: var(--ledger-25); color: var(--ledger-950); font-weight: 600; margin-top: -1px; height: 29px; }
+  .pause { margin-left: auto; border: 0; border-left: 1px solid var(--ledger-200); min-width: 64px; }
+  button:focus-visible { outline: 2px solid var(--ledger-950); outline-offset: -2px; }
+
+  .bar { margin-top: 24px; display: flex; gap: 16px; align-items: center; color: var(--ledger-700); }
+  .instant .range.on, .instant .rule.on, .instant .note.on, .instant td.flag { transition: none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div>
+      <h1>A design system for the human in the loop</h1>
+      <p class="lead">Components that show how the agent reasoned, what it proposes and what a person approved.</p>
+    </div>
+
+    <div class="frame" id="frame">
+      <div class="question"><b>Question:</b> Did we pay any invoice twice?</div>
+      <div class="sheet" id="sheet">
+        <table id="table"></table>
+        <div id="marks"></div>
+        <div class="cursor" id="cursor"></div>
+        <div class="note" id="note">
+          <span class="who">AI · Awaiting review</span>
+          <p>Yes. Invoice <code>MFL-58821</code> was entered twice and paid twice, $48,216.40 each time.</p>
+          <p class="sub">I can reverse the second entry, <code>API-KUS-2607-00011</code>, so the supplier owes it back.</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" id="tabs"></div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <label><input type="checkbox" id="reduced"> Preview reduced motion</label>
+    <label>Hold on the proposal <select id="hold"><option>3000</option><option selected>5500</option><option>8000</option></select> ms</label>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<script>
+const ROWS = 13; // every sheet is padded to the same height, as a spreadsheet is
+const sheets = [
+  {
+    name: 'supplier_invoices_fy2026_h1',
+    widths: [26, 17, null, 14, 17],
+    head: ['Entry', 'Supplier invoice', 'Supplier', 'Date', 'Amount'],
+    kinds: ['mono', 'mono', '', 'mono', 'num'],
+    rows: [
+      ['API-KUS-2607-00005', 'HRT-20417', 'Hartwell Components', '2026-07-03', '12,480.00'],
+      ['API-KUS-2607-00006', 'NPK-00932', 'Northpark Logistics', '2026-07-08', '6,915.75'],
+      ['API-KUS-2607-00007', 'MFL-58821', 'Meridian Freight Lines', '2026-07-14', '48,216.40'],
+      ['API-KUS-2607-00008', 'SOL-77105', 'Solano Packaging', '2026-07-15', '3,204.10'],
+      ['API-KUS-2607-00009', 'HRT-20466', 'Hartwell Components', '2026-07-21', '18,730.00'],
+      ['API-KUS-2607-00010', 'QTX-31188', 'Quartex Toner Supply', '2026-07-22', '27,051.90'],
+      ['API-KUS-2607-00011', 'MFL-58821', 'Meridian Freight Lines', '2026-07-28', '48,216.40'],
+      ['API-KUS-2607-00012', 'NPK-00987', 'Northpark Logistics', '2026-07-29', '7,340.25'],
+      ['API-KUS-2607-00013', 'SOL-77162', 'Solano Packaging', '2026-07-30', '2,988.60'],
+      ['API-KUS-2607-00014', 'QTX-31240', 'Quartex Toner Supply', '2026-07-31', '19,402.35'],
+    ],
+    // Two entries share one supplier invoice number.
+    async play(s) {
+      s.cursor(1, 2);
+      await s.wait(400);
+      await s.walk([[2, 2], [2, 3], [2, 4]]);
+      await s.wait(250); s.range(4);
+      await s.walk([[2, 5], [2, 6], [2, 7], [2, 8]]);
+      await s.wait(250); s.range(8);
+      await s.wait(250);
+      await s.walk([[3, 8], [4, 8], [5, 8]]);
+      s.flag(5, 8);
+      await s.wait(700);
+    },
+  },
+  {
+    name: 'supplier_payments_fy2026_h1',
+    widths: [24, 26, null, 14, 17],
+    head: ['Payment', 'Entry', 'Supplier', 'Date', 'Amount'],
+    kinds: ['mono', 'mono', '', 'mono', 'num'],
+    rows: [
+      ['PAY-KUS-2608-0001', 'API-KUS-2607-00005', 'Hartwell Components', '2026-08-03', '12,480.00'],
+      ['PAY-KUS-2608-0002', 'API-KUS-2607-00007', 'Meridian Freight Lines', '2026-08-12', '48,216.40'],
+      ['PAY-KUS-2608-0003', 'API-KUS-2607-00011', 'Meridian Freight Lines', '2026-08-26', '48,216.40'],
+      ['PAY-KUS-2608-0004', 'API-KUS-2607-00008', 'Solano Packaging', '2026-08-26', '3,204.10'],
+      ['PAY-KUS-2608-0005', 'API-KUS-2607-00009', 'Hartwell Components', '2026-08-27', '18,730.00'],
+      ['PAY-KUS-2608-0006', 'API-KUS-2607-00010', 'Quartex Toner Supply', '2026-08-28', '27,051.90'],
+    ],
+    // Both entries were paid.
+    async play(s) {
+      s.cursor(2, 2);
+      await s.wait(400);
+      await s.walk([[2, 3]]);
+      await s.wait(250); s.range(3);
+      await s.walk([[2, 4]]);
+      await s.wait(250); s.range(4);
+      await s.wait(250);
+      await s.walk([[3, 4], [4, 4], [5, 4]]);
+      s.flag(5, 3); s.flag(5, 4);
+      await s.wait(700);
+    },
+  },
+  {
+    name: 'JE-KUS-2610-00040 (draft)',
+    widths: [16, null, 22, 22],
+    head: ['Account', 'Name', 'Debit', 'Credit'],
+    kinds: ['mono', '', 'num', 'num'],
+    rows: [
+      ['2000', 'Trade payables', '48,216.40', ''],
+      ['6120', 'Freight and packing', '', '48,216.40'],
+      ['', 'Total', '48,216.40', '48,216.40'],
+    ],
+    totalRow: 4,
+    // The reversal, footed, and then the agent stops.
+    async play(s) {
+      s.cursor(1, 2);
+      await s.wait(400);
+      await s.walk([[2, 2], [3, 2]]);
+      await s.wait(250);
+      await s.walk([[4, 2], [4, 3]]);
+      await s.wait(250);
+      s.rule(4);
+      await s.wait(350);
+      s.note(4);
+      await s.wait(200);
+      await s.wait(+document.getElementById('hold').value, true);
+    },
+  },
+];
+
+const $ = (id) => document.getElementById(id);
+const frame = $('frame'), sheetEl = $('sheet'), table = $('table'), marks = $('marks'), cursor = $('cursor'), note = $('note'), tabs = $('tabs');
+const STEP = 100;
+let run = 0, paused = false, stopped = false, current = 0, instant = false, cycleStart = 0;
+
+tabs.innerHTML = sheets.map((s, i) => `<button class="tab" role="tab" data-i="${i}">${s.name}</button>`).join('')
+  + '<button class="tab pause" id="pause" aria-pressed="false">Pause</button>';
+const pauseBtn = $('pause');
+
+function render(i) {
+  const s = sheets[i];
+  const letters = 'ABCDEF';
+  const cols = s.head.length;
+  let html = '<colgroup><col style="width:32px">' + s.widths.map((w) => `<col${w ? ` style="width:${w}%"` : ''}>`).join('') + '</colgroup>';
+  html += '<thead><tr><th class="axis"></th>' + s.head.map((_, c) => `<th class="axis">${letters[c]}</th>`).join('') + '</tr>';
+  html += '<tr class="head"><th class="axis">1</th>' + s.head.map((h, c) => `<th class="${s.kinds[c] === 'num' ? 'num' : ''}">${h}</th>`).join('') + '</tr></thead><tbody>';
+  for (let r = 0; r < ROWS; r++) {
+    const row = s.rows[r] || Array(cols).fill('');
+    const total = s.totalRow === r + 2 ? ' total' : '';
+    html += `<tr><td class="axis">${r + 2}</td>` + row.map((v, c) => `<td class="${s.kinds[c]}${total}">${v}</td>`).join('') + '</tr>';
+  }
+  table.innerHTML = html + '</tbody>';
+  marks.innerHTML = '';
+  note.classList.remove('on');
+  [...tabs.querySelectorAll('[role=tab]')].forEach((t, k) => t.setAttribute('aria-selected', k === i));
+  current = i;
+}
+const cell = (col, row) => table.tBodies[0].rows[row - 2].cells[col];
+function place(el, a, b = a) {
+  const s = sheetEl.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+  Object.assign(el.style, { left: ra.left - s.left + 'px', top: ra.top - s.top + 'px', width: rb.right - ra.left + 'px', height: ra.height + 'px' });
+}
+function mark(cls, row) {
+  const el = document.createElement('div');
+  el.className = cls;
+  const tr = table.tBodies[0].rows[row - 2];
+  place(el, tr.cells[1], tr.lastElementChild);
+  marks.append(el);
+  el.getBoundingClientRect(); // commit the clipped frame before revealing it
+  el.classList.add('on');
+}
+
+function stage(id) {
+  // A wait counts only unpaused time, and gives up when a newer run starts.
+  const wait = async (ms) => {
+    if (instant) return;
+    let left = ms, last = performance.now();
+    while (left > 0) {
+      await new Promise((r) => setTimeout(r, Math.min(left, 40)));
+      if (id !== run) throw 0;
+      const now = performance.now();
+      if (!paused) left -= now - last;
+      last = now;
+    }
+  };
+  return {
+    wait,
+    cursor: (c, r) => place(cursor, cell(c, r)),
+    walk: async (path) => { for (const [c, r] of path) { await wait(STEP); place(cursor, cell(c, r)); } },
+    range: (r) => mark('range', r),
+    rule: (r) => mark('rule', r),
+    flag: (c, r) => cell(c, r).classList.add('flag'),
+    note: (r) => {
+      const s = sheetEl.getBoundingClientRect(), b = table.tBodies[0].rows[r - 2].getBoundingClientRect();
+      note.style.top = b.bottom - s.top + 4 + 'px';
+      note.classList.add('on');
+    },
+  };
+}
+
+// Show a sheet's last frame with no motion.
+async function rest(i) {
+  run++; instant = true; frame.classList.add('instant');
+  render(i);
+  await sheets[i].play(stage(run));
+  instant = false;
+}
+async function loop(from = 0) {
+  const id = ++run;
+  stopped = false; paused = false; setPause();
+  frame.classList.remove('instant');
+  try {
+    for (let i = from; ; i = (i + 1) % sheets.length) {
+      if (i === 0) cycleStart = performance.now();
+      render(i);
+      await sheets[i].play(stage(id));
+      if (i === sheets.length - 1 && from === 0) $('clock').textContent = `Last cycle: ${((performance.now() - cycleStart) / 1000).toFixed(1)}s`;
+      from = 0;
+    }
+  } catch { /* a newer run took over */ }
+}
+function setPause() {
+  const held = paused || stopped;
+  pauseBtn.textContent = held ? 'Play' : 'Pause';
+  pauseBtn.setAttribute('aria-pressed', held);
+}
+const reduced = () => $('reduced').checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
+async function start() {
+  if (reduced()) { await rest(sheets.length - 1); stopped = true; setPause(); $('clock').textContent = 'Reduced motion: the proposal, no cycle.'; return; }
+  loop(0);
+}
+
+pauseBtn.onclick = () => {
+  if (stopped) { reduced() ? null : loop(current === sheets.length - 1 ? 0 : current); return; }
+  paused = !paused; setPause();
+};
+// A tab press stops the loop on that sheet's last frame.
+tabs.addEventListener('click', async (e) => {
+  const t = e.target.closest('[role=tab]');
+  if (!t) return;
+  await rest(+t.dataset.i);
+  stopped = true; setPause();
+});
+$('reduced').onchange = start;
+addEventListener('resize', async () => { await rest(current); stopped = true; setPause(); });
+start();
+</script>
+</body>
+</html>

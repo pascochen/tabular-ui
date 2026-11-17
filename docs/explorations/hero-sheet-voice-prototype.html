@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero prototype: asked aloud</title>
+<!--
+  A throwaway prototype for docs/site.md D6 (reopened 2026-11-17). Not site code.
+  "Asked aloud" (owner's sketch, 2026-11-17): the mic is pressed, the question is
+  heard, the agent looks at E2, flags E6, and stops with its answer. It loops,
+  with a Pause button at the bottom right (WCAG 2.2.2).
+  Mobile first: one column, three sheet columns, under 600px.
+  - Colours are copied from packages/ui/src/styles/palette.css (light mode).
+  - Fonts are system stand-ins, and the mic is a stand-in for Phosphor's Microphone.
+  - Rows 2 and 6 are real (kasane.json's duplicatePayment). The three rows between,
+    and the dates, are placeholders.
+-->
+<style>
+  :root {
+    --ledger-25: oklch(99.0% 0.003 85.0);
+    --ledger-50: oklch(97.5% 0.006 85.0);
+    --ledger-100: oklch(94.5% 0.007 85.0);
+    --ledger-200: oklch(89.0% 0.008 85.0);
+    --ledger-300: oklch(82.0% 0.007 85.0);
+    --ledger-600: oklch(53.0% 0.005 264.1);
+    --ledger-700: oklch(46.0% 0.010 264.1);
+    --ledger-800: oklch(38.5% 0.014 264.1);
+    --ledger-950: oklch(21.0% 0.018 264.1);
+    --vermilion-500: oklch(62.5% 0.171 28.2);
+    --vermilion-700: oklch(46.0% 0.154 28.2);
+    --orchid-500: oklch(62.5% 0.158 318.4);
+    --orchid-700: oklch(46.0% 0.142 318.4);
+    --row: 28px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ledger-25); color: var(--ledger-950); font: 13px/20px "Golos Text", system-ui, sans-serif; }
+
+  /* Mobile first: one column. Two from 900px. */
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 16px; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: center; }
+  h1 { font: 500 32px/1.1 Georgia, serif; margin: 0 0 12px; text-wrap: balance; }
+  .lead { font-size: 16px; line-height: 24px; color: var(--ledger-700); margin: 0 0 20px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn { height: 36px; padding: 0 14px; border: 1px solid var(--ledger-300); background: var(--ledger-25); font: 500 13px/1 inherit; color: var(--ledger-950); }
+  .btn.primary { background: var(--ledger-950); border-color: var(--ledger-950); color: var(--ledger-25); }
+  @media (min-width: 900px) {
+    .page { padding: 64px 32px; }
+    .hero { grid-template-columns: 5fr 7fr; gap: 32px; }
+    h1 { font-size: 44px; margin-bottom: 16px; }
+    .lead { font-size: 18px; line-height: 28px; }
+  }
+
+  .frame { border: 1px solid var(--ledger-200); background: var(--ledger-25); min-width: 0; }
+
+  /* The question bar: the transcript, the sound wave, the mic. */
+  .ask { display: flex; align-items: center; height: 36px; border-bottom: 1px solid var(--ledger-200); padding-left: 12px; gap: 8px; }
+  .question { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ledger-700); }
+  .question b { font-weight: 500; color: var(--ledger-950); }
+  .question .w { visibility: hidden; }
+  .question .w.on { visibility: visible; }
+  /* The wave takes space only while it runs. The question never wraps, so nothing reflows. */
+  .wave { display: none; align-items: center; gap: 2px; height: 20px; }
+  .listening .wave { display: flex; }
+  @media (max-width: 599px) { .wave i:nth-child(n + 7) { display: none; } }
+  .pause[hidden] { display: none; }
+  .wave i { width: 2px; height: 16px; background: var(--ledger-950); transform: scaleY(0.2); }
+  .listening .wave i { animation: wave 560ms ease-in-out infinite alternate; }
+  .wave i:nth-child(1) { animation-delay: -120ms; } .wave i:nth-child(2) { animation-delay: -380ms; }
+  .wave i:nth-child(3) { animation-delay: -40ms; }  .wave i:nth-child(4) { animation-delay: -460ms; }
+  .wave i:nth-child(5) { animation-delay: -220ms; } .wave i:nth-child(6) { animation-delay: -520ms; }
+  .wave i:nth-child(7) { animation-delay: -300ms; } .wave i:nth-child(8) { animation-delay: -160ms; }
+  .wave i:nth-child(9) { animation-delay: -420ms; } .wave i:nth-child(10) { animation-delay: -80ms; }
+  @keyframes wave { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+  .paused .wave i { animation-play-state: paused; }
+  .mic { width: 36px; height: 35px; display: grid; place-items: center; border-left: 1px solid var(--ledger-200); color: var(--ledger-950); transition: background-color 140ms ease-out, color 140ms ease-out; }
+  /* The demo's focus ring: the system's ring (2px, one step softer than ink), shown on the
+     control the animation is about to press. The mic sits against the frame's edge, so its
+     ring is drawn inside. */
+  .ring { outline: 2px solid var(--ledger-800); outline-offset: 2px; }
+  .mic.ring { outline-offset: -2px; }
+  .mic.pressed { background: var(--ledger-200); transition: none; }
+  .listening .mic { background: var(--ledger-950); color: var(--ledger-25); }
+
+  .sheet { position: relative; overflow: hidden; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; font-variant-numeric: tabular-nums; }
+  th, td {
+    height: var(--row); padding: 0 8px; border: 1px solid var(--ledger-200);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+    transition: background-color 400ms ease-out;
+  }
+  tr > :first-child { border-left: 0; } tr > :last-child { border-right: 0; }
+  thead tr:first-child th { border-top: 0; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .axis { background: var(--ledger-50); color: var(--ledger-600); text-align: center; font-weight: 400; font-size: 12px; }
+  .head th { font-weight: 600; }
+  .num { text-align: right; }
+  td.mono { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+  /* Column widths, from the letter row. Under 600px the sheet hides A and D, as a
+     spreadsheet hides columns: the invoice number and the amount are the evidence,
+     so they are never cut. */
+  .c0 { width: 28px; } .c2 { width: 96px; } .c5 { width: 96px; }
+  .c1, .c4 { display: none; }
+  @media (min-width: 600px) {
+    .c0 { width: 32px; } .c1 { width: 27%; } .c2 { width: 17%; } .c4 { width: 15%; } .c5 { width: 16%; }
+    .c1, .c4 { display: table-cell; }
+  }
+  tbody td:not(.axis):hover { background: var(--ledger-100); transition-duration: 0ms; }
+  td.look { background: var(--ledger-100); transition: background-color 140ms ease-out; }
+  td.flag { background: color-mix(in oklch, var(--vermilion-500) 10%, transparent); color: var(--vermilion-700); font-weight: 600; transition: background-color 140ms ease-out, color 140ms ease-out; }
+
+  .cursor { position: absolute; outline: 2px solid var(--ledger-950); outline-offset: -2px; pointer-events: none; visibility: hidden; }
+  .cursor.on { visibility: visible; }
+  .range { position: absolute; pointer-events: none; border: 1px dashed var(--ledger-700); clip-path: inset(0 100% 0 0); }
+  .range.on { clip-path: inset(0 0 0 0); transition: clip-path 200ms ease-out; }
+
+  /* The agent's answer sits under the sheet, in its own space: it is hidden until
+     the run reaches it, not absent, so the frame never changes height. */
+  .answer { border-top: 1px solid var(--ledger-200); padding: 12px; }
+  .note { border: 1px solid var(--ledger-200); border-left: 2px solid var(--orchid-500); padding: 8px 12px; display: grid; gap: 4px; opacity: 0; transform: translateY(-4px); transition: opacity 200ms ease-out, transform 200ms ease-out; }
+  .note.on { opacity: 1; transform: none; }
+  .note .who { font-size: 12px; font-weight: 600; color: var(--orchid-700); }
+  .note p { margin: 0; } .note .sub { color: var(--ledger-700); }
+  .note .who { display: flex; justify-content: space-between; gap: 8px; }
+  .note .meta { font-weight: 400; color: var(--ledger-700); }
+  .decide { display: grid; margin-top: 4px; height: 28px; align-items: center; }
+  .decide > * { grid-area: 1 / 1; }
+  .acts { display: flex; gap: 8px; }
+  .b { height: 28px; padding: 0 10px; display: inline-grid; place-items: center; border: 1px solid var(--ledger-300); font-size: 12px; font-weight: 500; }
+  .b.primary { background: var(--ledger-950); border-color: var(--ledger-950); color: var(--ledger-25); }
+  .b.primary.pressed { background: var(--ledger-700); border-color: var(--ledger-700); }
+  .outcome { color: var(--ledger-700); visibility: hidden; }
+  .note.posted .acts { visibility: hidden; }
+  .note.posted .outcome { visibility: visible; }
+  code { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+
+  .tabs { display: flex; align-items: stretch; border-top: 1px solid var(--ledger-200); background: var(--ledger-50); font-size: 12px; height: 32px; }
+  .tab { min-width: 0; padding: 0 12px; border-right: 1px solid var(--ledger-200); color: var(--ledger-700); display: flex; align-items: center; }
+  .tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tab.active { background: var(--ledger-25); color: var(--ledger-950); font-weight: 600; margin-top: -1px; flex-shrink: 0; max-width: 60%; }
+  .pause { margin-left: auto; flex-shrink: 0; height: 100%; min-width: 76px; border: 0; border-left: 1px solid var(--ledger-200); background: none; font: inherit; color: var(--ledger-950); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .pause:hover { background: var(--ledger-100); }
+  button:focus-visible { outline: 2px solid var(--ledger-950); outline-offset: -2px; }
+  .pause svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 24; stroke-linecap: round; stroke-linejoin: round; }
+  .pause .i-play, .pause[aria-pressed="true"] .i-pause { display: none; }
+  .pause[aria-pressed="true"] .i-play { display: block; }
+
+  .bar { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; color: var(--ledger-700); }
+  .instant .range.on, .instant .note, .instant td.flag, .instant td.look, .instant .mic { transition: none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div>
+      <h1>A design system for the human in the loop</h1>
+      <p class="lead">Components that show how the agent reasoned, what it proposes and what a person approved.</p>
+      <div class="actions"><span class="btn primary" style="display:inline-grid;place-items:center">Open the demo ↗</span><span class="btn" style="display:inline-grid;place-items:center">Browse components</span></div>
+    </div>
+
+    <div class="frame" id="frame">
+      <div class="ask">
+        <div class="question" id="question"></div>
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mic" id="mic" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.75" y="1.75" width="4.5" height="8" rx="2.25"/><path d="M3.25 7.5a4.75 4.75 0 0 0 9.5 0M8 12.25v2"/></svg>
+        </div>
+      </div>
+      <div class="sheet" id="sheet">
+        <table id="table"></table>
+        <div id="marks"></div>
+        <div class="cursor" id="cursor"></div>
+      </div>
+      <div class="answer">
+        <div class="note" id="note">
+          <div class="who"><span id="auth">AI · Awaiting review</span><span class="meta" id="meta"></span></div>
+          <p>Yes. Invoice <code>MFL-58821</code> was entered twice and paid twice, $48,216.40 each time.</p>
+          <p class="sub">I can reverse the second entry, <code>API-KUS-2607-00011</code>, so the supplier owes it back.</p>
+          <!-- The person's part. The buttons are drawn as controls and are inert, like the mic:
+               the animation presses Post entry. The outcome takes the buttons' place, at the same height. -->
+          <div class="decide">
+            <div class="acts" aria-hidden="true"><span class="b primary" id="post">Post entry</span><span class="b">Don’t post</span></div>
+            <p class="outcome">Posted as <code>JE-KUS-2610-00040</code>.</p>
+          </div>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active"><span>supplier_invoices_fy2026_h1</span></div>
+        <div class="tab"><span>supplier_payments_fy2026_h1</span></div>
+        <button class="pause" id="pause" aria-pressed="false"><svg class="i-pause" viewBox="0 0 256 256" aria-hidden="true"><rect x="152" y="40" width="56" height="176" rx="8"/><rect x="48" y="40" width="56" height="176" rx="8"/></svg><svg class="i-play" viewBox="0 0 256 256" aria-hidden="true"><path d="M72 39.9v176.2a8 8 0 0 0 12.2 6.7l144-88.1a7.8 7.8 0 0 0 0-13.4l-144-88.1A8 8 0 0 0 72 39.9Z"/></svg><span id="pauseLabel">Pause</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <label>Still before Post entry <select id="hold"><option>1500</option><option selected>2500</option><option>5500</option></select> ms</label>
+    <label>Hold after posting <select id="after"><option>1500</option><option selected>2500</option><option>4000</option></select> ms</label>
+    <label>Word every <select id="word"><option>130</option><option selected>170</option><option>220</option></select> ms</label>
+    <label><input type="checkbox" id="reduced"> Preview reduced motion</label>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<script>
+// Sheet rows 1–6: the header and five entries. Rows 2 and 6 are the real duplicate, and the sheet shows only them and what lies between.
+const head = ['Entry', 'Invoice', 'Supplier', 'Date', 'Amount'];
+const kinds = ['mono', 'mono', '', 'mono', 'num'];
+const data = [
+  ['API-KUS-2607-00007', 'MFL-58821', 'Meridian', '2026-12-14', '48,216.40'],
+  ['API-KUS-2607-00008', 'SOL-77105', 'Solano', '2026-12-15', '3,204.10'],
+  ['API-KUS-2607-00009', 'HRT-20466', 'Hartwell', '2026-12-21', '18,730.00'],
+  ['API-KUS-2607-00010', 'QTX-31188', 'Quartex Toner', '2026-12-22', '27,051.90'],
+  ['API-KUS-2607-00011', 'MFL-58821', 'Meridian', '2026-12-28', '48,216.40'],
+];
+const WORDS = ['<b>Question:</b>', 'Did', 'we', 'pay', 'any', 'invoice', 'twice?'];
+const E = 5, FIRST = 2, SECOND = 6;
+
+const $ = (id) => document.getElementById(id);
+const frame = $('frame'), sheetEl = $('sheet'), table = $('table'), marks = $('marks'), cursor = $('cursor'), note = $('note'), mic = $('mic'), question = $('question');
+let run = 0, paused = false, instant = false;
+
+function render() {
+  let html = '<thead><tr><th class="axis c0"></th>' + head.map((_, c) => `<th class="axis c${c + 1}">${'ABCDE'[c]}</th>`).join('') + '</tr>';
+  html += '<tr class="head"><th class="axis">1</th>' + head.map((h, c) => `<th class="c${c + 1} ${kinds[c] === 'num' ? 'num' : ''}">${h}</th>`).join('') + '</tr></thead><tbody>';
+  data.forEach((row, r) => { html += `<tr><td class="axis">${r + 2}</td>` + row.map((v, c) => `<td class="c${c + 1} ${kinds[c]}">${v}</td>`).join('') + '</tr>'; });
+  table.innerHTML = html + '</tbody>';
+  marks.innerHTML = '';
+  note.classList.remove('on', 'posted'); cursor.classList.remove('on');
+  $('auth').textContent = 'AI · Awaiting review'; $('meta').textContent = ''; $('post').classList.remove('pressed', 'ring');
+  frame.classList.remove('listening'); mic.classList.remove('pressed', 'ring');
+  // Every word is laid out from the start and only shown later, so the line never reflows.
+  question.innerHTML = WORDS.map((w) => `<span class="w">${w}</span>`).join(' ');
+}
+const cell = (col, row) => table.tBodies[0].rows[row - 2].cells[col];
+function place(el, a, b = a) {
+  const s = sheetEl.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+  Object.assign(el.style, { left: ra.left - s.left + 'px', top: ra.top - s.top + 'px', width: rb.right - ra.left + 'px', height: ra.height + 'px' });
+}
+function range(row) {
+  const el = document.createElement('div');
+  el.className = 'range';
+  const tr = table.tBodies[0].rows[row - 2];
+  const shown = [...tr.cells].filter((c) => !c.classList.contains('axis') && getComputedStyle(c).display !== 'none');
+  place(el, shown[0], shown.at(-1));
+  marks.append(el);
+  el.getBoundingClientRect();
+  el.classList.add('on');
+}
+const look = (row) => { place(cursor, cell(E, row)); cursor.classList.add('on'); };
+
+/** One pass. A wait counts only unpaused time, and gives up when a newer run starts. */
+async function pass(id) {
+  const wait = async (ms) => {
+    if (instant) return;
+    let left = ms, last = performance.now();
+    while (left > 0) {
+      await new Promise((r) => setTimeout(r, Math.min(left, 40)));
+      if (id !== run) throw 0;
+      const now = performance.now();
+      if (!paused) left -= now - last;
+      last = now;
+    }
+  };
+  render();
+  await wait(300);
+  // 1. The mic is selected, then pressed.
+  if (!instant) mic.classList.add('ring');
+  await wait(400);
+  mic.classList.add('pressed');
+  await wait(150);
+  mic.classList.remove('pressed', 'ring');
+  // 2. The question is heard: the wave runs while the words arrive.
+  if (!instant) frame.classList.add('listening');
+  await wait(350);
+  for (const w of question.children) { w.classList.add('on'); await wait(+$('word').value); }
+  await wait(300);
+  frame.classList.remove('listening');
+  await wait(350);
+  // 3. The agent looks at E2.
+  range(FIRST); look(FIRST); cell(E, FIRST).classList.add('look');
+  await wait(650);
+  // 4. It reads down to E6 and flags it.
+  for (let r = FIRST + 1; r <= SECOND; r++) { await wait(90); look(r); }
+  range(SECOND);
+  await wait(200);
+  cell(E, SECOND).classList.add('flag');
+  await wait(350);
+  // The answer, and the agent stops.
+  note.classList.add('on');
+  await wait(200);
+}
+
+const reduced = () => $('reduced').checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
+async function rest() {
+  run++; instant = true; frame.classList.add('instant');
+  await pass(run);
+  instant = false;
+}
+/** A wait that counts only unpaused time, and gives up when a newer run starts. */
+async function hold(ms, id) {
+  let left = ms, last = performance.now();
+  while (left > 0) {
+    await new Promise((r) => setTimeout(r, 40));
+    if (id !== run) throw 0;
+    const now = performance.now();
+    if (!paused) left -= now - last;
+    last = now;
+  }
+}
+async function loop() {
+  const id = ++run;
+  try {
+    // On load the frame is the answer, as the HTML ships it. It holds, and only then does the loop begin.
+    for (let first = true; ; first = false) {
+      const t0 = performance.now();
+      instant = first;
+      frame.classList.toggle('instant', first);
+      await pass(id);
+      if (first) { instant = false; frame.getBoundingClientRect(); frame.classList.remove('instant'); }
+      $('clock').textContent = first
+        ? `On load: nothing moves for ${$('hold').value / 1000}s. Then Post entry, and the loop.`
+        : `Answer after ${((performance.now() - t0) / 1000).toFixed(1)}s, then still for ${$('hold').value / 1000}s.`;
+      // The agent waits for the full hold. Then the person posts the entry, and that holds too.
+      // Nothing moves for 2.5s once the card is up, on load and in every cycle.
+      await hold(+$('hold').value, id);
+      $('post').classList.add('ring');
+      await hold(600, id);
+      $('post').classList.add('pressed');
+      await hold(150, id);
+      note.classList.add('posted');
+      $('auth').textContent = 'AI · Posted'; $('meta').textContent = 'posted by you';
+      await hold(+$('after').value, id);
+      // The answer leaves with the fade it arrived with, then the pass starts again.
+      note.classList.remove('on');
+      await new Promise((r) => setTimeout(r, 200));
+      if (id !== run) return;
+    }
+  } catch { /* a newer run took over */ }
+}
+function setPause(p) {
+  paused = p;
+  frame.classList.toggle('paused', p);
+  $('pause').setAttribute('aria-pressed', p);
+  $('pauseLabel').textContent = p ? 'Play' : 'Pause';
+}
+async function start() {
+  setPause(false);
+  if (reduced()) { await rest(); $('pause').hidden = true; $('clock').textContent = 'Reduced motion: the answer, no loop.'; return; }
+  $('pause').hidden = false;
+  loop();
+}
+$('pause').onclick = () => setPause(!paused);
+$('reduced').onchange = start;
+// Marks are placed in px, so a resize starts the pass again.
+let rz = 0;
+addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(start, 150); });
+start();
+</script>
+</body>
+</html>

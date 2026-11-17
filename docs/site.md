@@ -1,6 +1,6 @@
 # tabularui.com — site spec
 
-**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is built: `DataTable`'s totals row in the library, and its one use on the site (§13, 6a).
+**Status: approved, 2026-10-26 (owner).** D1–D9 were decided on 2026-10-25, and D3's plates on 2026-10-26. The approvals A1–A5 are given. Steps 1 to 5 of §13 are built, and `apps/site` is live at tabularui.com. The owner's VoiceOver pass (2026-10-28) found nothing to fix. D10–D13 were decided on 2026-11-02. D12 is built (§13, 6b and 6c). D11 is built: `DataTable`'s totals row in the library, and its one use on the site (§13, 6a). D6 was reopened on 2026-11-17: the hero's new motion is decided and **not built**.
 
 This spec replaces two earlier drafts, the site build prompt and the site patterns doc, which are retired. Every claim here points at a file in this repository or at a frame in the wireframes. Where neither supports a claim, it is marked as a proposal.
 
@@ -25,7 +25,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D3 | Grounds | Bands: rules only. Every page is the plain canvas, and every bordered panel is the paper (`--color-surface-sunken`) with a `--color-border` edge; the hero specimen's frame is one of them, with no texture (*changed 2026-11-16*: the page's tile, the hero's ruled sheet and then the hero's tile are gone). Plates: paper on the hero and in grids, dark on component pages. Closing band dark, ink on paper (*changed 2026-11-05*) |
 | D4 | Colour mode | Page light only; Foundations shows both modes side by side |
 | D5 | Stories and figures | Hero: duplicate payment. Explaining specimens: the H1 gap. Exact figures where parts meet a total |
-| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live |
+| D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live. *Reopened 2026-11-17, not built:* the hero is a sheet that plays on load and loops, with Pause |
 | D7 | Closing band | "Four agents checked a finance team's books and raised four issues for you to decide"; Home only (*changed 2026-11-16*) |
 | D8 | Nav | Site-built, inset, scrolls away |
 | D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
@@ -178,6 +178,26 @@ The headline's claim is that an agent stops. A hero that is already stopped, wai
 4. **The run log row's space is held by a dashed slot** reading "Run log row is written here after Post" (removed 2026-10-26, below). Dashed means placeholder (§7.8, "Border style"). The slot keeps the page from jumping when the row arrives, and says what Post will do before it's pressed.
 
 *Changed 2026-10-26 (owner review):* the hero is a teaser. Website heroes are rarely interactive, and visitors miss it. It rests on the waiting proposal with no buttons, and Replay, always shown, plays the run back to it. Post entry, Edit entry and Don't post (items 1–3) stay on the Agent block card. The dashed slot (item 4) is removed everywhere, because readers didn't understand it.
+
+*Reopened 2026-11-17 (owner). Decided, not built:* the hero moves on load and loops. Until it is built, the hero on the site is the teaser described above. The full motion spec, its sixteen decisions and the prototype are in `docs/explorations/hero-sheet-motion-spec.md`.
+
+- **What it shows.** The same story (D5) on a spreadsheet, because Excel and Google Sheets are what accountants and analysts already know. A mic is pressed, a sound wave runs while "Question: Did we pay any invoice twice?" arrives, the agent looks at one amount, reads down to its duplicate and flags it, and its card opens: "AI · Awaiting review", with Post entry and Don't post. Then Post entry is pressed, and the card reads "AI · Posted", "posted by you".
+- **Both of this decision's reasons still hold, differently.**
+  - *The frozen frame.* The prerendered HTML is the waiting card, and on load nothing moves for 2.5 seconds, so script never clears a frame a visitor is reading. The first thing that moves is the person's decision. From the second cycle on, the loop does cut back to an empty question bar, and that restart is the one thing to judge on the built page. If it reads as a jump, the fallback is to play once and rest, with Replay.
+  - *The agent stops.* Every cycle ends on the agent waiting for a person, and then on that person's decision.
+- **It loops, so it has a Pause button**, at the bottom right of the frame, in place of Replay. Pause is the hero's alone, and lasts for the visit to the page. Every other specimen keeps Play and Replay as §6 and §7 have them.
+- **Timing.** A pass reaches the card in 4.8 seconds. The card waits 2.5 seconds, on load and in every cycle, takes a focus ring on Post entry for 0.6, and is posted. Posted holds 2.5 seconds. A cycle is about 10.9 seconds.
+- **The sheet is six rows**, the header and five entries: the two duplicates and the three between them. Under 600px it shows three columns, and the invoice number and the amount are never truncated.
+- **The mic, Post entry, Don't post and the sheet's tabs are drawn as controls and are inert.** The library has no voice input, and the owner kept the mic knowing that. The Agent block card is still where a visitor decides for themself.
+- **What leaves the hero:** the proposed journal entry's table and the citation of the source file in the card. Both stay on the Agent block card.
+- **With reduced motion, without JavaScript and in the HTML,** the hero is the waiting card, and there is no Pause button.
+
+Before it is built:
+1. **The sheet's rows come from the export** (§5). Three of the five are placeholders typed for the prototype, as are the dates.
+2. **The dates and the IDs disagree.** The owner set the dates to December 2026. The entry IDs are July's and the card posts to period 2026-10, both real values from the dataset.
+3. **`docs/design-system.md` §7.8 needs a line** for the dashed outline around a row the agent is reading. Dashed means placeholder there today, and the owner accepted the second use.
+4. **An accessibility quick pass (2026-11-17) found five issues, and the owner set them aside for now.** The largest: the loop rebuilds content a screen reader may be reading. They are not in the motion spec and need a decision before §11 can be claimed for the hero.
+5. **§6, §7 "Motion" and the tests in §13** describe the hero as built. They change when it is.
 
 Specimens below the first screen play once as they scroll into view, from a frame nobody has seen yet, so nothing visibly rewinds (§6).
 
@@ -450,14 +470,14 @@ A test checks that every displayed total in an exact view equals the sum of its 
 **One player for every live specimen.** A specimen is a list of states, each with a time, rendered with real components. The last state is the **rest frame**: the decision the specimen exists to show.
 
 - **The prerendered HTML is the rest frame.** Visitors without JavaScript, search crawlers, link previews and reduced-motion users all see the decision.
-- **A specimen below the first screen plays once** when half of it first enters the viewport, from the first state to the rest frame, and then stops. Nothing loops.
-- **5 seconds or less.** A sequence that starts on its own and runs over 5 seconds needs a pause control (WCAG 2.2.2). Under 5 seconds it doesn't, so the cap removes the control instead of adding one.
+- **A specimen below the first screen plays once** when half of it first enters the viewport, from the first state to the rest frame, and then stops. Nothing loops. *(The hero will be the one exception: D6, reopened 2026-11-17, not built.)*
+- **5 seconds or less.** A sequence that starts on its own and runs over 5 seconds needs a pause control (WCAG 2.2.2). Under 5 seconds it doesn't, so the cap removes the control instead of adding one. *(The hero's loop, D6 as reopened, runs about 10.9 seconds and so carries a Pause button.)*
 - **Replay** is a library `Button`, `variant="outline"` `size="sm"`, inside the plate at the bottom right, named for its specimen: "Replay Agent block".
 - **Reduced motion:** the rest frame only. Replay jumps to the rest frame.
 - **One announcement.** A polite live region announces the final state once ("Posted"), never each step. It empties after it has been read, as `AgentReasoning` does with its own region.
 - **No randomness, no network, no AI.** A specimen is a script.
 
-**The hero** (D5, D6) is a teaser since 2026-10-26: it rests on the question and the waiting proposal, with no buttons and no slot, and Replay plays the run back to it. Everything below describes the **Agent block card**, which keeps the decision. (Until then it described the hero, and a dashed slot held the run log row's space.)
+**The hero** (D5, D6) is a teaser since 2026-10-26: it rests on the question and the waiting proposal, with no buttons and no slot, and Replay plays the run back to it. Everything below describes the **Agent block card**, which keeps the decision. (Until then it described the hero, and a dashed slot held the run log row's space.) *Reopened 2026-11-17, not built:* the hero becomes a looping sheet with Pause in place of Replay (D6).
 - Pressing Post entry changes the block's label to "AI · Posted", sets its `meta` to "posted by you", removes its actions, and writes a run log row beneath it, `passed` (D1, D2).
 - Replay then plays the run from the question back to the waiting proposal, in 5 seconds or less.
 - **Don't post** (decided 2026-10-26, owner) declines as Post accepts:
@@ -530,7 +550,7 @@ Every heading the site sets, `<h1>` to `<h4>`, is 500 since 2026-11-16 (owner): 
 
 **Mono shows data only:** IDs, file names, tokens and times. Labels are sans.
 
-**Motion** (built 2026-11-16, from `docs/explorations/site-motion-brainstorm.md`). Four small motions, beside the specimens' player (§6). Each answers something the visitor did, none plays on load or on scroll, and none loops. The values are written in place, as the library's are: there is no motion token.
+**Motion** (built 2026-11-16, from `docs/explorations/site-motion-brainstorm.md`). Four small motions, beside the specimens' player (§6). Each answers something the visitor did, none plays on load or on scroll, and none loops. *(The hero's loop is a separate decision, D6 as reopened on 2026-11-17, and is not built. It is the only motion that will start on load.)* The values are written in place, as the library's are: there is no motion token.
 - **A standalone link's word takes the ink** (owner, 2026-11-16, after two rounds of variants). The link rests at `--color-text-secondary`, as the nav's links do. On hover the underline appears at once, and the text darkens to `--color-text-primary` over 240ms, `ease-out`. The line is the first frame, so the hover never reads as late. The first version built that day drew the line in from transparent over 120ms, and people who tried it read the empty first frames as a latency bug. Both colours are neutral steps, so no hue arrives. A title that is a link (a card's title, previous and next) keeps its ink and only takes the underline (`titleLink`). `standaloneLink` in `src/lib/styles.ts`.
 - **Copy is ticked.** After a copy the check is revealed left to right in 140ms, and two seconds later the copy icon fades back in 120ms. One icon is in the DOM at a time, and the label and the announcement are unchanged.
 - **Play and Replay take a wash** (owner, 2026-11-16, chosen from five icon and five background candidates). When a run starts, the press tone (`--color-bg-active`) wipes across the button from the left in 140ms, the tick's own motion. It holds while the specimen plays and leaves to the right in 200ms when the run ends. It shows for every run, whether the button, the mouse over a pair or a card scrolling into view started it: the wash says a run is under way. It is the site's layer on the button's `::before` (`runWash` in `src/lib/styles.ts`), and the library's `Button` is unchanged. It is decoration: the plate shows the run and the live region says when it ends, so forced colours lose nothing.

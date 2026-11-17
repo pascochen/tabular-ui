@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero prototype: the grid idles</title>
+<!--
+  A throwaway prototype for docs/site.md D6 (reopened 2026-11-17). Not site code.
+  Direction C: a cell grid behind the whole hero. Cells take a neutral tint on a
+  fixed script that repeats, with a pause control (WCAG 2.2.2). The hero specimen
+  is the current one, redrawn by hand here.
+  - Colours are copied from packages/ui/src/styles/palette.css (light mode).
+  - Fonts are system stand-ins.
+-->
+<style>
+  :root {
+    --ledger-25: oklch(99.0% 0.003 85.0);
+    --ledger-50: oklch(97.5% 0.006 85.0);
+    --ledger-100: oklch(94.5% 0.007 85.0);
+    --ledger-200: oklch(89.0% 0.008 85.0);
+    --ledger-300: oklch(82.0% 0.007 85.0);
+    --ledger-600: oklch(53.0% 0.005 264.1);
+    --ledger-700: oklch(46.0% 0.010 264.1);
+    --ledger-950: oklch(21.0% 0.018 264.1);
+    --orchid-500: oklch(62.5% 0.158 318.4);
+    --orchid-700: oklch(46.0% 0.142 318.4);
+    --cw: 112px; --ch: 28px;
+    --line: var(--ledger-100);
+    --tint: var(--ledger-100);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ledger-25); color: var(--ledger-950); font: 13px/20px "Golos Text", system-ui, sans-serif; }
+
+  .band { position: relative; isolation: isolate; overflow: hidden; border-bottom: 1px solid var(--ledger-200); }
+  .grid {
+    position: absolute; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: var(--cw) var(--ch);
+  }
+  .grid.strong { --line: var(--ledger-200); }
+  .cell { position: absolute; width: var(--cw); height: var(--ch); background: var(--tint); opacity: 0; }
+  .cell.cursor { background: none; outline: 2px solid var(--ledger-950); outline-offset: -1px; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 84px 32px; }
+  .hero { display: grid; grid-template-columns: 5fr 7fr; gap: 32px; align-items: center; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+  h1 { font: 500 44px/1.1 Georgia, serif; margin: 0 0 16px; text-wrap: balance; }
+  .lead { font-size: 18px; line-height: 28px; color: var(--ledger-700); margin: 0 0 24px; }
+  .actions { display: flex; gap: 8px; }
+  .btn { height: 36px; padding: 0 14px; border: 1px solid var(--ledger-300); background: var(--ledger-25); font: 500 13px/1 inherit; color: var(--ledger-950); cursor: pointer; }
+  .btn.primary { background: var(--ledger-950); border-color: var(--ledger-950); color: var(--ledger-25); }
+  .btn.sm { height: 28px; padding: 0 10px; font-weight: 400; }
+  button:focus-visible { outline: 2px solid var(--ledger-950); outline-offset: 2px; }
+
+  .frame { border: 1px solid var(--ledger-200); background: var(--ledger-25); padding: 20px; display: grid; gap: 12px; }
+  .question { color: var(--ledger-700); margin: 0; } .question b { font-weight: 500; color: var(--ledger-950); }
+  .agent { border: 1px solid var(--ledger-200); border-left: 2px solid var(--orchid-500); padding: 10px 12px; display: grid; gap: 8px; }
+  .who { font-size: 11px; font-weight: 600; color: var(--orchid-700); text-transform: uppercase; letter-spacing: 0.04em; }
+  .agent p { margin: 0; } .sub { color: var(--ledger-700); }
+  code { font: 12px/20px "IBM Plex Mono", ui-monospace, monospace; }
+  .entry { border: 1px solid var(--ledger-200); padding: 8px 10px; }
+  .entry table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .entry th { font-weight: 400; font-size: 12px; color: var(--ledger-700); text-align: left; }
+  .entry td, .entry th { height: 24px; border-top: 1px solid var(--ledger-200); }
+  .entry tr:first-child th { border-top: 0; }
+  .num { text-align: right !important; }
+  .right { justify-self: end; }
+
+  .pause { position: absolute; right: 16px; bottom: 12px; }
+  .bar { max-width: 1200px; margin: 0 auto; padding: 20px 32px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; color: var(--ledger-700); }
+</style>
+</head>
+<body>
+<section class="band" id="band">
+  <div class="grid" id="grid"></div>
+  <div class="page">
+    <div class="hero">
+      <div>
+        <h1>A design system for the human in the loop</h1>
+        <p class="lead">Components that show how the agent reasoned, what it proposes and what a person approved.</p>
+        <div class="actions"><button class="btn primary">Open the demo ↗</button><button class="btn">Browse components</button></div>
+      </div>
+      <div class="frame">
+        <p class="question"><b>Question:</b> Did we pay any invoice twice?</p>
+        <div class="agent">
+          <span class="who">AI · Awaiting review</span>
+          <p>Yes. Invoice <code>MFL-58821</code> was entered twice and paid twice, $48,216.40 each time.</p>
+          <p class="sub">Found in <code>supplier_invoices_fy2026_h1.csv</code>. I can reverse the second entry, <code>API-KUS-2607-00011</code>, so the supplier owes it back.</p>
+          <div class="entry">
+            <div class="sub" style="font-size:12px">Proposed journal entry</div>
+            <div style="font-weight:600">Reverse the duplicate payment</div>
+            <div>Period 2026-10</div>
+            <table>
+              <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+              <tr><td><code>2000</code> Trade payables</td><td class="num">$48,216.40</td><td></td></tr>
+              <tr><td><code>6120</code> Freight and packing</td><td></td><td class="num">$48,216.40</td></tr>
+            </table>
+          </div>
+        </div>
+        <button class="btn sm right">↻ Replay</button>
+      </div>
+    </div>
+  </div>
+  <button class="btn sm pause" id="pause" aria-pressed="false">Pause background</button>
+</section>
+
+<div class="bar">
+  <label>Mode <select id="mode">
+    <option value="both" selected>Idle loop and pointer</option>
+    <option value="loop">Idle loop only</option>
+    <option value="pointer">Pointer only (no loop)</option>
+  </select></label>
+  <label>Mark <select id="markKind"><option value="tint" selected>Tint</option><option value="cursor">Cell cursor</option></select></label>
+  <label>A new cell every <select id="every"><option>300</option><option selected>450</option><option>700</option><option>1100</option></select> ms</label>
+  <label>Fade <select id="fade"><option>300</option><option selected>500</option><option>800</option></select> ms</label>
+  <label><input type="checkbox" id="strong"> Stronger grid lines</label>
+  <label><input type="checkbox" id="reduced"> Preview reduced motion</label>
+  <span id="count"></span>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const band = $('band'), grid = $('grid'), pauseBtn = $('pause');
+const CW = 112, CH = 28;
+const frac = (x) => x - Math.floor(x);
+let paused = false, k = 0, timer = 0;
+
+const reduced = () => $('reduced').checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mode = () => $('mode').value;
+
+/** One cell's life: in, hold, out, then removed. Web Animations, so pausing can hold it mid-fade. */
+function light(col, row, { fadeIn, hold, fadeOut }) {
+  const el = document.createElement('div');
+  el.className = 'cell' + ($('markKind').value === 'cursor' ? ' cursor' : '');
+  el.style.left = col * CW + 'px';
+  el.style.top = row * CH + 'px';
+  grid.append(el);
+  const total = fadeIn + hold + fadeOut;
+  const a = el.animate(
+    [{ opacity: 0, offset: 0 }, { opacity: 1, offset: fadeIn / total }, { opacity: 1, offset: (fadeIn + hold) / total }, { opacity: 0, offset: 1 }],
+    { duration: total, easing: 'linear' },
+  );
+  a.onfinish = () => { el.remove(); count(); };
+  if (paused) a.pause();
+  count();
+}
+const count = () => { $('count').textContent = `${grid.children.length} cells lit`; };
+
+/** The script: a fixed, repeating sequence of cells. No randomness. */
+function tick() {
+  if (!paused && mode() !== 'pointer' && !reduced()) {
+    const cols = Math.ceil(band.clientWidth / CW), rows = Math.ceil(band.clientHeight / CH);
+    const i = k++ % 48; // the sequence repeats after 48 cells
+    const fade = +$('fade').value;
+    light(Math.floor(frac(i * 0.618034) * cols), Math.floor(frac(i * 0.754878 + 0.3) * rows), { fadeIn: fade, hold: 600, fadeOut: fade * 1.4 });
+  }
+  timer = setTimeout(tick, +$('every').value);
+}
+
+/** Under the pointer: the tint arrives at once and fades over 400ms. */
+let lastCell = '';
+band.addEventListener('pointermove', (e) => {
+  if (mode() === 'loop') return;
+  const r = band.getBoundingClientRect();
+  const col = Math.floor((e.clientX - r.left) / CW), row = Math.floor((e.clientY - r.top) / CH);
+  if (`${col},${row}` === lastCell) return;
+  lastCell = `${col},${row}`;
+  light(col, row, reduced() ? { fadeIn: 0, hold: 400, fadeOut: 0 } : { fadeIn: 0, hold: 0, fadeOut: 400 });
+});
+
+pauseBtn.onclick = () => {
+  paused = !paused;
+  pauseBtn.textContent = paused ? 'Play background' : 'Pause background';
+  pauseBtn.setAttribute('aria-pressed', paused);
+  for (const a of grid.getAnimations({ subtree: true })) paused ? a.pause() : a.play();
+};
+$('strong').onchange = (e) => grid.classList.toggle('strong', e.target.checked);
+const sync = () => {
+  const off = reduced() || mode() === 'pointer';
+  pauseBtn.hidden = off; // no loop, so nothing to pause
+  if (off) grid.replaceChildren();
+  count();
+};
+$('reduced').onchange = sync; $('mode').onchange = sync;
+sync(); tick();
+</script>
+</body>
+</html>
