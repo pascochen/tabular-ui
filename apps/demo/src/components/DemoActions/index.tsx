@@ -65,7 +65,11 @@ export function AboutDemoButton({ className }: { className?: string }) {
 export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      {/*
+        Since 2026-11-16: 16px in place of Dialog's 12px (--pad-panel), so the edge sits further
+        from the text than the rows sit from each other. No token names a dialog's padding yet.
+      */}
+      <DialogContent className="p-4 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>About this demo</DialogTitle>
           <DialogDescription>
@@ -81,7 +85,7 @@ export function AboutDemoDialog({ open, onOpenChange }: { open: boolean; onOpenC
             </Fragment>
           ))}
         </dl>
-        {/* Wraps: the two links are 314px on one row, and a 320px screen leaves the footer 262px. */}
+        {/* Wraps: the two links are 314px on one row, and a 375px screen leaves the footer 309px. */}
         <DialogFooter className="flex-wrap">
           <a className={buttonVariants({ variant: 'outline' })} href={STORYBOOK_URL} target="_blank" rel="noreferrer">
             Open Storybook

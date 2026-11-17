@@ -23,7 +23,8 @@ App-local: only the public demo needs it.
 | Links use `buttonVariants` on a real `<a>` | They navigate. `Button render={<a/>}` would announce them as buttons (failure log) |
 | The dialog is a three-row list, not four paragraphs | Until 2026-11-16 the "You're…" line said the company was fictional and the people scripted, and two bold paragraphs said it again. The kind is now a column of its own (`Confirmation`'s grid), each fact is said once, and the body went from about 120 words to 70. What Kasane makes and where it sells is gone: nothing in the demo depends on it |
 | "Open Storybook", not "Storybook" | A link says what it does, and reads on its own in a screen reader's list of links |
-| The dialog's footer wraps | Its two links are 314px on one row, and at 320px wide the footer has 262px: the row pushed the list past the dialog's edge and clipped it. They share a row from 375px up, with 4px to spare |
+| The dialog's footer wraps | Its two links are 314px on one row, and at 320px wide the footer has 262px: the row pushed the list past the dialog's edge and clipped it. They share a row once the footer has 314px, which at 16px padding is a 380px screen: at 375px they stack |
+| The dialog's padding is 16px, not `Dialog`'s 12px | At 12px the padding, the gap between rows and the gap between header, list and footer were all 12px, so the edge read as one more row divider (owner, 2026-11-16). It's `p-4` on this dialog alone: no token names a dialog's padding, and the close button keeps `Dialog`'s 7px from the corner. Art direction and the system's own value are still to decide |
 | "Start over", not "Replay" | In the user tests (2026-11-02), testers expected Replay to start an animation. It returns to landing, and the label now says so |
 
 ## Not tested with users
