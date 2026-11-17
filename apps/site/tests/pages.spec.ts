@@ -802,13 +802,15 @@ test.describe('the footer', () => {
 });
 
 test.describe('standalone links', () => {
-  // A link that stands alone (footer, card title, jump index, section header)
-  // has no underline at rest (owner, 2026-10-27) and takes one on hover, in the
-  // colour it already has. Until 2026-11-09 the hover turned it ivy instead: a
-  // link is ink now (design-system.md §1), so a colour change would say nothing.
-  // A link inside a sentence is ink and always underlined. The nav's links are
-  // ghost buttons, not standalone links.
-  test('have no underline at rest, and take one on hover without changing colour', async ({ page }) => {
+  // A link that stands alone (footer, jump index, section header) has no
+  // underline at rest (owner, 2026-10-27). It rests at the secondary text
+  // colour and on hover takes the underline and the primary ink (owner,
+  // 2026-11-16: "the word takes the ink", docs/site.md §7, "Motion"). Until then
+  // it rested at the body colour and hover changed no colour. A card's title is
+  // a heading that links: it keeps its ink and only takes the underline. A link
+  // inside a sentence is ink and always underlined. The nav's links are ghost
+  // buttons, not standalone links.
+  test('have no underline at rest, and take one on hover as the word takes the ink', async ({ page }) => {
     await page.goto('/getting-started');
     const inSentence = await page.locator('main p a[href*="storybook"]').evaluate((el) => {
       const s = getComputedStyle(el);
@@ -817,23 +819,39 @@ test.describe('standalone links', () => {
     expect(inSentence.line).toBe('underline');
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    // The two inks, read from elements that state them: the footer's column
+    // heading is secondary, and the page's <h1> is primary.
+    const colorOf = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).color);
+    const secondary = await colorOf('footer p[id]');
+    const primary = await colorOf('h1');
+    expect(secondary).not.toBe(primary);
     const links = [
-      page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }),
-      page.locator('#components').getByRole('link', { name: 'All components in Storybook' }),
-      page.getByRole('navigation', { name: 'Components by moment' }).getByRole('link', { name: 'Agent plan' }),
-      page.getByRole('contentinfo').getByRole('link', { name: 'Vocabulary' }),
+      { link: page.locator('#chat-starter').getByRole('link', { name: 'Chat starter' }), rest: primary },
+      {
+        link: page.locator('#components').getByRole('link', { name: 'All components in Storybook' }),
+        rest: secondary,
+      },
+      {
+        link: page.getByRole('navigation', { name: 'Components by moment' }).getByRole('link', { name: 'Agent plan' }),
+        rest: secondary,
+      },
+      { link: page.getByRole('contentinfo').getByRole('link', { name: 'Vocabulary' }), rest: secondary },
     ];
-    for (const link of links) {
+    for (const { link, rest } of links) {
       const style = () =>
         link.evaluate((el) => {
           const s = getComputedStyle(el);
           return { color: s.color, line: s.textDecorationLine };
         });
       await page.mouse.move(0, 0);
-      const rest = await style();
-      expect(rest.line).toBe('none');
+      // Poll: the last link's ink may still be on its way back.
+      await expect.poll(style).toEqual({ color: rest, line: 'none' });
       await link.hover();
-      await expect.poll(style).toEqual({ color: rest.color, line: 'underline' });
+      await expect.poll(style).toEqual({ color: primary, line: 'underline' });
     }
   });
 

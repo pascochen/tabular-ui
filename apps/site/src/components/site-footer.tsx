@@ -63,11 +63,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
             {link.soon ? (
               <span className="text-site-small text-text-secondary">{link.label}</span>
             ) : (
-              <a
-                href={link.href}
-                {...(link.external ? newTab : {})}
-                className={`${standaloneLink} text-site-small text-text-body`}
-              >
+              <a href={link.href} {...(link.external ? newTab : {})} className={`${standaloneLink} text-site-small`}>
                 {link.label}
                 {link.external ? <ExternalMark /> : null}
               </a>
@@ -84,7 +80,8 @@ export function SiteFooter() {
     // The same space above and below, from the section rhythm: 40px on a phone,
     // 48px at tablet width, 64px from 1200px (owner, 2026-11-16). It was half a
     // section above and 32px below, which left the last links tight to the page's end.
-    <footer className="border-t border-border py-[calc(var(--site-section-y)/2+16px)]">
+    // Named for the page turn (index.css), as the nav is.
+    <footer className="border-t border-border py-[calc(var(--site-section-y)/2+16px)] [view-transition-name:site-footer]">
       {/* One column on a phone. At tablet width the brand takes its own row above
           four link columns, which at five across were about 130px wide; five
           across from lg. */}

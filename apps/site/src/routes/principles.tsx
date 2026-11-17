@@ -54,7 +54,7 @@ export default function Principles() {
       <Section>
         <Rail size="reading" className="flex flex-wrap items-baseline justify-between gap-[var(--site-gap)]">
           <p className="text-site-body text-text-secondary">Each component’s own decision sits on its card.</p>
-          <a href={componentGrid} className={`${standaloneLink} text-site-body text-text-body`}>
+          <a href={componentGrid} className={`${standaloneLink} text-site-body`}>
             See the {moments.length} moments and {components.length} components
           </a>
         </Rail>

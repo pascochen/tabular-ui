@@ -59,7 +59,8 @@ export function SiteNav() {
   );
 
   return (
-    <header className="px-2 pt-2 md:px-4 min-[1200px]:px-8 min-[1200px]:pt-4">
+    // Named for the page turn (index.css): the bar holds while the page changes.
+    <header className="px-2 pt-2 [view-transition-name:site-nav] md:px-4 min-[1200px]:px-8 min-[1200px]:pt-4">
       <nav
         aria-label="Main"
         className={`mx-auto flex max-w-[calc(var(--site-w-wide)+32px)] items-center gap-[var(--site-gap)] ${panel} px-2 py-2 md:px-4`}

@@ -59,7 +59,7 @@ function RulesFollowed({ name }: { name: string }) {
           </li>
         ))}
       </ul>
-      <a href={pages.principles.href} className={`${standaloneLink} self-start text-site-small text-text-body`}>
+      <a href={pages.principles.href} className={`${standaloneLink} self-start text-site-small`}>
         All {principles.length} principles
       </a>
     </section>
@@ -95,7 +95,7 @@ function ComponentList({ current }: { current: string }) {
                   '-ml-px flex min-h-[var(--h-row-sm)] items-center border-l-[length:var(--border-width-2)] pl-[var(--gap-group)] text-site-small',
                   active
                     ? 'border-fill-interactive font-semibold text-text-primary'
-                    : cn('border-transparent', standaloneLink, 'text-text-body'),
+                    : cn('border-transparent', standaloneLink),
                   focusRing,
                 )}
               >
@@ -239,10 +239,10 @@ export default function ComponentPage({ params }: Route.ComponentProps) {
               {usage(c.name)}
             </CodeView>
             <p className="flex flex-wrap gap-x-[var(--site-gap)] gap-y-[var(--gap-inline)] text-site-small text-text-secondary">
-              <a href={pages.gettingStarted.href} className={`${standaloneLink} text-text-body`}>
+              <a href={pages.gettingStarted.href} className={standaloneLink}>
                 Set up your app first
               </a>
-              <a href={storybookDocs(c.name)} {...newTab} className={`${standaloneLink} text-text-body`}>
+              <a href={storybookDocs(c.name)} {...newTab} className={standaloneLink}>
                 {c.title} in Storybook
                 <ExternalMark />
               </a>

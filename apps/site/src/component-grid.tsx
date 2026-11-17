@@ -110,7 +110,7 @@ export function ComponentsSection() {
             title={`${components.length} components`}
             lead="Grouped by the moment of a run where each one appears. The data comes from Kasane, a fictional printer maker."
             action={
-              <a href={external.storybook.href} {...newTab} className={`${standaloneLink} text-text-body`}>
+              <a href={external.storybook.href} {...newTab} className={standaloneLink}>
                 All components in Storybook
                 <ExternalMark />
               </a>
@@ -137,7 +137,7 @@ export function ComponentsSection() {
                     {moment.components.map((c) => (
                       <li key={c.name} className="text-site-small">
                         {c.built ? (
-                          <a href={`#${c.name}`} className={`${standaloneLink} text-text-body`}>
+                          <a href={`#${c.name}`} className={standaloneLink}>
                             {c.title}
                           </a>
                         ) : (

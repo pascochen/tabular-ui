@@ -2,6 +2,7 @@ import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
 import { Button } from 'tabular-ui';
 
 import { useAnnouncer, usePlayback } from './lib/playback';
+import { runWash } from './lib/styles';
 
 /** A polite live region: says a result once (docs/site.md §6). */
 export function LiveRegion({ message }: { message: string }) {
@@ -13,9 +14,25 @@ export function LiveRegion({ message }: { message: string }) {
 }
 
 /** The Replay control: a real button, named for what it replays (§11). */
-export function ReplayButton({ title, onClick }: { title: string; onClick: () => void }) {
+export function ReplayButton({
+  title,
+  onClick,
+  run,
+}: {
+  title: string;
+  onClick: () => void;
+  /** The run's state, for the wash (`runWash`). */
+  run?: 'playing' | 'ended';
+}) {
   return (
-    <Button size="sm" variant="outline" onClick={onClick} aria-label={`Replay ${title}`}>
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={onClick}
+      aria-label={`Replay ${title}`}
+      data-run={run}
+      className={runWash}
+    >
       <ArrowCounterClockwiseIcon aria-hidden="true" />
       Replay
     </Button>
@@ -42,7 +59,7 @@ export function Specimen({
   frames: number;
   children: (frame: number) => React.ReactNode;
 }) {
-  const { ref, frame, playing, play } = usePlayback({ frames });
+  const { ref, frame, playing, play, run } = usePlayback({ frames });
   const { announce, message } = useAnnouncer();
   return (
     <div ref={ref} className="flex flex-1 flex-col gap-[var(--gap-group)]">
@@ -55,7 +72,7 @@ export function Specimen({
         ) : null}
       </div>
       <div className="flex justify-end">
-        <ReplayButton title={title} onClick={() => play(() => announce(`${title} replayed.`))} />
+        <ReplayButton title={title} run={run} onClick={() => play(() => announce(`${title} replayed.`))} />
       </div>
       <LiveRegion message={message} />
     </div>

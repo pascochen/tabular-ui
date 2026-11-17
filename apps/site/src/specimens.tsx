@@ -124,7 +124,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
   // Four frames: the question, the answer, its sources, the entry. The hero rests and never autoplays (D6).
   // The Agent block card leaves out the sources, to keep its row's height (owner, 2026-11-02).
   const frames = live ? 3 : 4;
-  const { ref, frame, playing, play } = usePlayback({ frames, autoplay: !hero && !fixed });
+  const { ref, frame, playing, play, run } = usePlayback({ frames, autoplay: !hero && !fixed });
   const { announce, message } = useAnnouncer();
   const [outcome, setOutcome] = useState<Outcome>(fixed ?? 'waiting');
   const [entry, setEntry] = useState(defaults);
@@ -301,7 +301,7 @@ function Proposal({ hero = false, fixed }: { hero?: boolean; fixed?: 'waiting' |
       </div>
       {hero || (decided && live) ? (
         <div ref={replayRef} className="flex justify-end">
-          <ReplayButton title={hero ? 'the hero’s run' : 'Agent block'} onClick={replay} />
+          <ReplayButton title={hero ? 'the hero’s run' : 'Agent block'} run={run} onClick={replay} />
         </div>
       ) : null}
       <LiveRegion message={message} />
@@ -378,7 +378,7 @@ function AskEntities({
  * again with a new Question, and hands focus to the first option.
  */
 export function QuestionSpecimen() {
-  const { ref, frame, playing, play } = usePlayback({ frames: 2 });
+  const { ref, frame, playing, play, run } = usePlayback({ frames: 2 });
   const { announce, message } = useAnnouncer();
   const [answer, setAnswer] = useState<QuestionAnswer | null>(null);
   const [round, setRound] = useState(0);
@@ -406,7 +406,7 @@ export function QuestionSpecimen() {
       </div>
       {answer ? (
         <div className="flex justify-end">
-          <ReplayButton title="Question" onClick={replay} />
+          <ReplayButton title="Question" run={run} onClick={replay} />
         </div>
       ) : null}
       <LiveRegion message={message} />
@@ -477,7 +477,7 @@ function SendSummary({
  *   Send summary.
  */
 export function ConfirmationSpecimen() {
-  const { ref, frame, playing, play } = usePlayback({ frames: 2 });
+  const { ref, frame, playing, play, run } = usePlayback({ frames: 2 });
   const { announce, message } = useAnnouncer();
   const [outcome, setOutcome] = useState<SendOutcome>('waiting');
   const [round, setRound] = useState(0);
@@ -507,7 +507,7 @@ export function ConfirmationSpecimen() {
       </div>
       {outcome !== 'waiting' ? (
         <div className="flex justify-end">
-          <ReplayButton title="Confirmation" onClick={replay} />
+          <ReplayButton title="Confirmation" run={run} onClick={replay} />
         </div>
       ) : null}
       <LiveRegion message={message} />

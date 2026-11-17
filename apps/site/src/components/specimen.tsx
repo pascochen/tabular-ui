@@ -3,7 +3,7 @@ import { PlayIcon } from '@phosphor-icons/react';
 import { Button } from 'tabular-ui';
 
 import { componentPage, type SiteComponent } from '../content';
-import { focusRing, panel, standaloneLink } from '../lib/styles';
+import { focusRing, panel, runWash, titleLink } from '../lib/styles';
 import { cn } from '../lib/cn';
 import { useAnnouncer, usePlayback } from '../lib/playback';
 import { LiveRegion } from '../playback';
@@ -107,7 +107,7 @@ export function ComponentCard({
         {/* An <h4>: the card sits under its moment's <h3>, in Home's Components section. */}
         <h4 className="text-site-title-sm font-medium text-text-primary">
           {component.built ? (
-            <a href={componentPage(component.name)} className={standaloneLink}>
+            <a href={componentPage(component.name)} className={titleLink}>
               {component.title}
             </a>
           ) : (
@@ -183,7 +183,7 @@ export function Pair({
   caption: string;
   inert?: boolean;
 }) {
-  const { frame, playing, play } = usePlayback({ frames: states, autoplay: false });
+  const { frame, playing, play, run } = usePlayback({ frames: states, autoplay: false });
   const { announce, message } = useAnnouncer();
   // One run each time the mouse comes in. Armed again when it leaves.
   const armed = useRef(true);
@@ -225,6 +225,8 @@ export function Pair({
           size="sm"
           variant="outline"
           aria-label={`Play ${title}`}
+          data-run={run}
+          className={runWash}
           onClick={() => play(() => announce(`${title} played.`))}
         >
           <PlayIcon aria-hidden="true" />
