@@ -65,6 +65,18 @@ test('the trail is a named landmark around a list, and the slash is not read', a
   }
 });
 
+test('in the top nav, a crumb is the size of the page switcher after it', async ({ page }) => {
+  // AppBar sets no type size, so a trail that inherited took the document's 16px
+  // beside a 13px control. The collapsed shell is where the ancestors show.
+  await gotoStory(page, 'product-appshell--collapsed');
+  const trail = page.getByRole('navigation', { name: 'Breadcrumb' });
+  const sizes = await trail.evaluate((el) => ({
+    crumb: getComputedStyle(el.querySelector('[data-slot="breadcrumb-link"]')!).fontSize,
+    switcher: getComputedStyle(el.querySelector('button[aria-current="page"]')!).fontSize,
+  }));
+  expect(sizes.crumb).toBe(sizes.switcher);
+});
+
 test('in the page header the h1 is the current page, so the trail names none', async ({ page }) => {
   await gotoStory(page, 'product-breadcrumb--in-page-header');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tasks');

@@ -996,7 +996,8 @@ function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }:
       {breadcrumb ? (
         <div
           data-slot="app-shell-page-breadcrumb"
-          className="flex min-h-[var(--h-control)] min-w-0 items-center text-lg tracking-[var(--tracking-tight)]"
+          // The descendant variant outranks `Breadcrumb`'s own `text-base`.
+          className="flex min-h-[var(--h-control)] min-w-0 items-center tracking-[var(--tracking-tight)] [&_[data-slot=breadcrumb]]:text-lg"
         >
           {breadcrumb}
         </div>

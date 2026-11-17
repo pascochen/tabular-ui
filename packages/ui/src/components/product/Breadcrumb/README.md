@@ -14,7 +14,7 @@ Product. Composes `TruncatedText`. Where the page sits: its ancestors, each a li
 
 | Part | Renders | Notes |
 |---|---|---|
-| `Breadcrumb` | `<nav aria-label="Breadcrumb">` around an `<ol>` | Sets no type size: it takes the band's |
+| `Breadcrumb` | `<nav aria-label="Breadcrumb">` around an `<ol>` | `--text-base` by default. `AppShellPageHeader` raises it to the title's size |
 | `BreadcrumbItem` | `<li>` holding an `<a>`, then a slash | An ancestor. `render` swaps the `<a>` for a router's link |
 | `BreadcrumbPage` | `<li aria-current="page">` | The current page, last. Not a link |
 

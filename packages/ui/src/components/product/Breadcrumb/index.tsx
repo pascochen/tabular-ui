@@ -17,8 +17,11 @@ export type BreadcrumbProps = React.ComponentProps<'nav'>;
  * strongest thing on the line. The slash is `--color-text-tertiary`: a mark,
  * not text, and hidden from assistive technology, which hears a list.
  *
- * It sets no type size. It takes the size of the band it sits in: the page
- * title's in `AppShellPageHeader`, the body's in the top nav.
+ * `--text-base` by default, the size of the controls beside it in the top
+ * nav. A bare trail must not inherit: `AppBar` sets no size, and a trail
+ * that took the document's 16px sat a step above the page switcher after it
+ * (caught by the AppShell screenshots, 2026-11-17). `AppShellPageHeader`
+ * raises it to the title's size.
  *
  * Two ways to end the trail:
  *
@@ -28,7 +31,7 @@ export type BreadcrumbProps = React.ComponentProps<'nav'>;
  */
 function Breadcrumb({ 'aria-label': ariaLabel = 'Breadcrumb', className, children, ...props }: BreadcrumbProps) {
   return (
-    <nav data-slot="breadcrumb" aria-label={ariaLabel} className={cn('min-w-0', className)} {...props}>
+    <nav data-slot="breadcrumb" aria-label={ariaLabel} className={cn('min-w-0 text-base', className)} {...props}>
       {/* role="list": preflight's `list-style: none` drops list semantics in Safari. */}
       <ol role="list" className="flex min-w-0 items-center gap-[var(--gap-inline)]">
         {children}

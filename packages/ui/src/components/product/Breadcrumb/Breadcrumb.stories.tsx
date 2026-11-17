@@ -13,7 +13,7 @@ const meta = {
   parameters: { layout: 'padded' },
   decorators: [
     (Story) => (
-      <div className="text-base text-text-body">
+      <div className="text-text-body">
         <Story />
       </div>
     ),
