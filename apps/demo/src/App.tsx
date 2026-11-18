@@ -54,6 +54,9 @@ export function App() {
   const place = placeOf(view);
   // Which place's sheet is open, so one never stays open over the next view.
   const [sheetFor, setSheetFor] = useState<string | null>(null);
+  // New chat's panel is the one that closes (`views/NewChatPanel.tsx`). Open on
+  // arrival, and its own state, so closing it never hides another view's panel.
+  const [chatPanelOpen, setChatPanelOpen] = useState(true);
 
   return (
     <CloseContext.Provider value={{ state, dispatch }}>
@@ -107,6 +110,8 @@ export function App() {
           }
           panel={panelAsSheet ? undefined : slots.panel?.content}
           panelLabel={panelAsSheet ? undefined : slots.panel?.label}
+          panelOpen={view.kind === 'new-chat' ? chatPanelOpen : true}
+          onPanelOpenChange={setChatPanelOpen}
           contentWidth={slots.contentWidth}
         >
           {slots.body}
