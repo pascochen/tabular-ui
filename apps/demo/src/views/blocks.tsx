@@ -106,9 +106,15 @@ function PaymentTrail({ block }: { block: Extract<DmBlock, { type: 'paymentTrail
         return {
           id: e.entry,
           name: e.entry,
-          meta: `Entered ${e.entered}, ${e.amount}`,
+          meta: <span className="tabular-nums">{`Entered ${e.entered}, ${e.amount}`}</span>,
           status: e.duplicate ? ('failed' as const) : undefined,
-          children: [{ id: e.payment, name: e.payment, meta: `Paid ${e.paidOn}, ${e.method}` }],
+          children: [
+            {
+              id: e.payment,
+              name: e.payment,
+              meta: <span className="tabular-nums">{`Paid ${e.paidOn}, ${e.method}`}</span>,
+            },
+          ],
         };
       }),
     },
