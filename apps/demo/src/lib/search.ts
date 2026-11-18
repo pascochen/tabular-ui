@@ -4,6 +4,7 @@
 import type { CloseState } from './close-state';
 import {
   channels,
+  channelHistory,
   conversations,
   close,
   directMessages,
@@ -11,6 +12,7 @@ import {
   exceptions,
   memberName,
   people,
+  type ChannelId,
   type Ref,
   type SourceDocument,
 } from './kasane';
@@ -116,6 +118,22 @@ export function search(state: CloseState, query: string): SearchResult[] {
         });
       }
     });
+  }
+
+  // What was said in each channel before landing, replies included.
+  for (const [id, messages] of Object.entries(channelHistory)) {
+    messages
+      .flatMap((m) => [m, ...m.replies])
+      .forEach((m, i) => {
+        if (!matches(q, m.text)) return;
+        results.push({
+          group: 'Messages',
+          key: `channel-${id}-${i}`,
+          title: `${memberName(m.author)} in #${id}, ${m.at}`,
+          detail: m.text,
+          view: { kind: 'channel', channel: id as ChannelId },
+        });
+      });
   }
 
   // What was said in each direct message before landing, replies included.

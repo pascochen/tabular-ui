@@ -712,6 +712,67 @@ const closePeople = Object.fromEntries(
   }),
 );
 
+// Receivables, for #receivables: external customers only, as the aging file marks them.
+const yenMillions = (v) => `${v < 0 ? '−' : ''}¥${Math.round(Math.abs(v) / 1e6).toLocaleString('en-US')}m`;
+const PRIOR_CLOSED = arAging
+  .map((r) => r.period)
+  .filter((p) => p < LAST_CLOSED)
+  .sort()
+  .at(-1);
+const externalAging = (period) => arAging.filter((r) => r.period === period && r.is_intercompany === 'N');
+const arTotal = (period) => sum(externalAging(period).map((r) => num(r.total_open_jpy)));
+// A row's buckets in yen, at the rate its own yen total implies. What isn't past due takes the
+// remainder, unapplied credits included, so each row adds up to the file's yen total exactly.
+const agingInYen = (r) => {
+  const rate = num(r.total_open_jpy) / num(r.total_open);
+  const days1to60 = Math.round((num(r.past_due_1_30) + num(r.past_due_31_60)) * rate);
+  const over60 = Math.round((num(r.past_due_61_90) + num(r.past_due_91_180) + num(r.past_due_over_180)) * rate);
+  const total = num(r.total_open_jpy);
+  return { notDue: total - days1to60 - over60, days1to60, over60, total };
+};
+const AGING_COLUMNS = ['notDue', 'days1to60', 'over60', 'total'];
+const agingRows = entities
+  .map((e) => {
+    const rows = externalAging(LAST_CLOSED).filter((r) => r.entity_id === e.entity_id && num(r.total_open) !== 0);
+    const yen = rows.map(agingInYen);
+    return { entity: e.entity_id, ...Object.fromEntries(AGING_COLUMNS.map((c) => [c, sum(yen.map((y) => y[c]))])) };
+  })
+  .filter((r) => r.total !== 0);
+must(sum(agingRows.map((r) => r.total)) === arTotal(LAST_CLOSED), 'the aging table adds up to external receivables');
+const glAging = agingInYen(arAging.find((r) => r.customer_id === gl.customer_id && r.period === LAST_CLOSED));
+must(
+  glAging.over60 / agingRows.find((r) => r.entity_id === gl.entity_id || r.entity === gl.entity_id).over60 > 0.8,
+  "Great Lakes is nearly all of its company's receivables over 60 days past due",
+);
+
+// Payables, for #payables: the latest payment run in the file, to outside suppliers only.
+const externalPayments = supplierPayments.filter((p) => p.method !== 'Intercompany settlement');
+const lastRunDate = externalPayments
+  .map((p) => p.payment_date)
+  .sort()
+  .at(-1);
+must(lastRunDate < closeSource.scene.date, 'the latest payment run is before the scene');
+must(new Date(`${lastRunDate}T00:00:00Z`).getUTCDay() === 5, 'the latest payment run was on a Friday');
+const paymentRuns = entities
+  .map((e) => {
+    const paid = externalPayments.filter((p) => p.payment_date === lastRunDate && p.entity_id === e.entity_id);
+    must(
+      new Set(paid.map((p) => `${p.currency}|${p.method}`)).size <= 1,
+      `${e.entity_id}'s run is one currency, one method`,
+    );
+    return paid.length
+      ? {
+          entity: e.entity_id,
+          method: paid[0].method,
+          payments: paid.length,
+          amount: Math.round(sum(paid.map((p) => num(p.amount))) * 100) / 100,
+          currency: paid[0].currency,
+        }
+      : null;
+  })
+  .filter(Boolean);
+must(paymentRuns.length > 1, 'more than one company ran payments on the latest run date');
+
 // The figures the copy may use.
 const cutoffLine = readCsv('02_subledgers/sales_invoice_lines.csv').filter((l) => l.invoice_id === cutoff.invoice_id);
 must(cutoffLine.length === 1, `${cutoff.invoice_id} has one invoice line`);
@@ -785,6 +846,11 @@ const closeTokens = {
   dupNumber: dup[0].supplier_invoice_number,
   dupAmount: money(num(dup[0].gross_amount), dup[0].currency),
   saEntry: sa.je_id,
+  saEntity: sa.entity_id,
+  lastRunDate: shortDate(lastRunDate),
+  glLastReceipt: fmtDate(glLastReceipt),
+  lastClosedMonth: longMonth(LAST_CLOSED).replace(/ \d{4}$/, ''),
+  arTotalPrior: yenMillions(arTotal(PRIOR_CLOSED)),
   saAmount: money(num(sa.debit), sa.currency),
   glLimit: money(glLimit, 'USD'),
   glOverCount: String(glOverBeforeHold.length),
@@ -1285,7 +1351,6 @@ const newChat = {
 
 // Direct messages: each person's history before the visitor lands. The copy is authored; every
 // block is resolved here from the data, so the app renders what it's given and computes nothing.
-const yenMillions = (v) => `${v < 0 ? '−' : ''}¥${Math.round(Math.abs(v) / 1e6).toLocaleString('en-US')}m`;
 const pctAgainst = (actual, against) => {
   const pct = Math.round((actual / against - 1) * 1000) / 10;
   return { delta: `${pct > 0 ? '+' : pct < 0 ? '−' : ''}${Math.abs(pct).toFixed(1)}%`, deltaValue: pct };
@@ -1305,6 +1370,7 @@ const bridgeRows = [
   ...operatingBridge.steps.map((s) => ({ id: s.id, label: s.label, yen: s.value })),
 ];
 must(sum(bridgeRows.map((r) => r.yen)) === operatingBridge.actual, 'the H1 bridge adds up from budget to actual');
+const CALENDAR_STATUSES = ['passed', 'open', 'queued'];
 const supplierHeader = files.find((f) => f.name === P.supplierInvoices).firstLine.split(',');
 const blockOf = (b, where) => {
   switch (b.type) {
@@ -1372,6 +1438,110 @@ const blockOf = (b, where) => {
         `${b.finding} is a finding (${where})`,
       );
       return { type: 'thread', finding: b.finding };
+    case 'figures': {
+      // Receivables measures. A change is in the measure's own unit, and a rise in any of them is not good news.
+      const change = (now, before, unit, digits) => {
+        const d = Math.round((now - before) * 10 ** digits) / 10 ** digits;
+        return { delta: `${d > 0 ? '+' : d < 0 ? '−' : ''}${Math.abs(d).toFixed(digits)} ${unit}`, deltaValue: d };
+      };
+      const AR_FIGURES = {
+        'ar.total': () => ({ value: yenMillions(arTotal(LAST_CLOSED)) }),
+        'ar.dso': () => {
+          const [now, before] = [kpi('dso_days'), kpi('dso_days', PRIOR_CLOSED)];
+          return { value: `${now.toFixed(1)} days`, ...change(now, before, 'days', 1), higherIsBetter: false };
+        },
+        'ar.over30US': () => {
+          const [now, before] = [LAST_CLOSED, PRIOR_CLOSED].map((p) => kpi('ar_over_30_days_pct', p, gl.entity_id));
+          return { value: `${now.toFixed(1)}%`, ...change(now, before, 'pts', 1), higherIsBetter: false };
+        },
+      };
+      return {
+        type: 'tiles',
+        tiles: b.tiles.map((t) => {
+          must(t.figure in AR_FIGURES, `a receivables figure ${t.figure} (${where})`);
+          const figure = AR_FIGURES[t.figure]();
+          must(
+            !Number.isNaN(figure.deltaValue ?? 0) && !figure.value.includes('NaN'),
+            `${t.figure} is in the data (${where})`,
+          );
+          return { label: fill(t.label), ...figure, caption: fill(t.caption) };
+        }),
+      };
+    }
+    case 'aging':
+      return {
+        type: 'aging',
+        rows: agingRows,
+        total: Object.fromEntries(AGING_COLUMNS.map((c) => [c, sum(agingRows.map((r) => r[c]))])),
+      };
+    case 'limitHistory': {
+      // Great Lakes' month-end balance against its limit, the last months of the aging file.
+      const rows = glHistory.slice(-b.months);
+      must(
+        rows.length === b.months && rows.at(-1).period === LAST_CLOSED,
+        `${b.months} month-ends to ${LAST_CLOSED} (${where})`,
+      );
+      return {
+        type: 'limitHistory',
+        customer: gl.customer_name,
+        currency: gl.currency,
+        limit: glLimit,
+        rows: rows.map((r) => ({
+          month: fmtPeriod(r.period),
+          balance: r.open,
+          over: Math.round((r.open - glLimit) * 100) / 100,
+        })),
+      };
+    }
+    case 'paymentRuns':
+      must(calendarText.includes(b.cite), `close_calendar.md says "${b.cite}" (${where})`);
+      must(
+        new Set(paymentRuns.map((r) => r.currency)).size === paymentRuns.length,
+        `each company's run is in its own currency, so there is no total (${where})`,
+      );
+      return { type: 'paymentRuns', rows: paymentRuns };
+    case 'paymentTrail':
+      // The duplicate's trail: the supplier's number, each entry of it, and the payment against each.
+      return {
+        type: 'paymentTrail',
+        finding: 'duplicate-payment',
+        number: dup[0].supplier_invoice_number,
+        supplier: dupSupplierName,
+        entries: dup.map((d, i) => ({
+          entry: d.ap_invoice_id,
+          entered: fmtDate(d.invoice_date),
+          amount: money(num(d.gross_amount), d.currency),
+          payment: dupPayments[i].payment_id,
+          paidOn: fmtDate(dupPayments[i].payment_date),
+          method: dupPayments[i].method,
+          duplicate: i > 0,
+        })),
+      };
+    case 'calendar':
+      // Where the close stands, as the close calendar states it: each row cites the words it rests on.
+      return {
+        type: 'calendar',
+        rows: b.rows.map((r) => {
+          must(calendarText.includes(r.cite), `close_calendar.md says "${r.cite}" (${where})`);
+          must(CALENDAR_STATUSES.includes(r.status), `${r.item} is ${CALENDAR_STATUSES.join(', ')} (${where})`);
+          return { item: fill(r.item), when: fill(r.when), status: r.status };
+        }),
+      };
+    case 'controlRun':
+      // The approvals rule over H1's manual entries, one row a company. A company with no manual
+      // entry wasn't checked, so its row says so rather than passing.
+      return {
+        type: 'controlRun',
+        rows: entities.map((e) => {
+          const lines = manualRows.filter((l) => l.entity_id === e.entity_id);
+          const failed = [...new Set(lines.filter((l) => l.created_by === l.approved_by).map((l) => l.je_id))];
+          return {
+            entity: e.entity_id,
+            entries: new Set(lines.map((l) => l.je_id)).size,
+            failed: failed.map((id) => ({ entry: id, by: lines.find((l) => l.je_id === id).created_by })),
+          };
+        }),
+      };
     default:
       throw new Error(`Unknown block "${b.type}" (${where})`);
   }
@@ -1399,6 +1569,44 @@ const conversations = Object.fromEntries(
         inTime(m.at, where);
         const replies = (m.replies ?? []).map((r, j) => {
           must(r.author === key || r.author === 'visitor', `${where} reply ${j + 1} is by ${key} or the visitor`);
+          inTime(r.at, `${where} reply ${j + 1}`);
+          return { author: r.author, at: r.at, text: fill(r.text) };
+        });
+        return {
+          author: m.author,
+          at: m.at,
+          text: fill(m.text),
+          blocks: (m.blocks ?? []).map((b) => blockOf(b, where)),
+          replies,
+        };
+      }),
+    ];
+  }),
+);
+
+// Channels: what was said in each before the visitor lands, beside its finding. The same blocks,
+// and the same rule on time. An author is a member of the channel, a person or an agent.
+const { $comment: _historyComment, ...historySource } = closeSource.channelHistory;
+const channelHistory = Object.fromEntries(
+  Object.entries(historySource).map(([id, messages]) => {
+    const channel = closeSource.channels.find((c) => c.id === id);
+    must(channel, `#${id} (channel history) is a channel`);
+    let last = '00:00';
+    const inTime = (at, where) => {
+      must(
+        /^\d{2}:\d{2}$/.test(at) && at >= last && at < closeSource.scene.landingTime,
+        `${where} at ${at} is in order, before landing`,
+      );
+      last = at;
+    };
+    return [
+      id,
+      messages.map((m, i) => {
+        const where = `#${id} message ${i + 1}`;
+        must(channel.members.includes(m.author), `${where} is by a member of #${id}`);
+        inTime(m.at, where);
+        const replies = (m.replies ?? []).map((r, j) => {
+          must(channel.members.includes(r.author), `${where} reply ${j + 1} is by a member of #${id}`);
           inTime(r.at, `${where} reply ${j + 1}`);
           return { author: r.author, at: r.at, text: fill(r.text) };
         });
@@ -1451,6 +1659,7 @@ await writeJson('apps/demo/data/workspace.json', {
   channels: fillAll(closeSource.channels),
   directMessages: closeSource.directMessages,
   conversations,
+  channelHistory,
   typingMs: closeSource.typingMs,
   searchSuggestions: fillAll(closeSource.searchSuggestions),
   newChat,

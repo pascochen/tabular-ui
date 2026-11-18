@@ -20,7 +20,7 @@ import { agents, directMessages, type ChannelId } from './kasane';
  *
  * Only built views are reachable: a view that only says it isn't built yet is
  * a dead end (docs/reviews/demo-first-pass-2026-10-30.md, issue 1). Old URLs
- * (?view=sep-close, ?view=open-items, ?view=rev-check) open the default.
+ * (?view=sep-close, ?view=open-items, ?view=rev-check, ?view=cash, ?view=intercompany) open the default.
  */
 export type View =
   | { kind: 'new-chat' }
@@ -32,14 +32,7 @@ export type View =
   | { kind: 'agents' };
 
 /** The channels a visitor can open, in sidebar order. */
-export const BUILT_CHANNELS: readonly ChannelId[] = [
-  'close',
-  'cash',
-  'receivables',
-  'payables',
-  'revenue',
-  'intercompany',
-];
+export const BUILT_CHANNELS: readonly ChannelId[] = ['close', 'receivables', 'payables', 'revenue'];
 
 /** The places above the channels that are built, so open by their URL. */
 export const BUILT_PLACES: readonly ('search' | 'tasks' | 'sources')[] = ['search', 'tasks', 'sources'];

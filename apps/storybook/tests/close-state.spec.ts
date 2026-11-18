@@ -86,7 +86,7 @@ test('the Tasks count is the open findings: 4 at landing, 0 at the end, and wait
 test('a channel’s dot is its open finding, and clears when that resolves or starts waiting', () => {
   const landing = landingState();
   const dots = (s: CloseState) =>
-    (['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const).filter((c) => holdsOpen(s, c));
+    (['close', 'receivables', 'payables', 'revenue'] as const).filter((c) => holdsOpen(s, c));
   expect(dots(landing)).toEqual(['close', 'receivables', 'payables', 'revenue']);
   const end = closeReducer(landing, { type: 'skip', at: '14:00' });
   expect(dots(end)).toEqual([]);
@@ -94,15 +94,13 @@ test('a channel’s dot is its open finding, and clears when that resolves or st
 });
 
 test('a channel’s dot is solid while its finding waits on the visitor, and hollow once it doesn’t (§5)', () => {
-  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const channels = ['close', 'receivables', 'payables', 'revenue'] as const;
   const marks = (s: CloseState) => Object.fromEntries(channels.map((c) => [c, channelMark(s, c)]));
   expect(marks(landingState())).toEqual({
     close: 'open',
-    cash: null,
     receivables: 'open',
     payables: 'open',
     revenue: 'needs-review',
-    intercompany: null,
   });
   // Answered, the finding is still open but no longer the visitor's to act on.
   expect(marks(run({ type: 'answer', answer: 'reopen', at: '14:00' })).revenue).toBe('open');
@@ -114,7 +112,7 @@ test('a channel’s dot is solid while its finding waits on the visitor, and hol
 });
 
 test('a reply marks its channel unread until it’s opened, and everything before landing counts as read', () => {
-  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const channels = ['close', 'receivables', 'payables', 'revenue'] as const;
   const unread = (s: CloseState) => channels.filter((c) => isUnread(s, c));
   expect(unread(landingState())).toEqual([]);
   // A person typing isn't a reply: nothing is unread until it lands.
@@ -129,7 +127,7 @@ test('a reply marks its channel unread until it’s opened, and everything befor
 });
 
 test('Skip leaves the replies it applied unread, and Start over clears them', () => {
-  const channels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'] as const;
+  const channels = ['close', 'receivables', 'payables', 'revenue'] as const;
   const end = closeReducer(landingState(), { type: 'skip', at: '14:00' });
   expect(channels.filter((c) => isUnread(end, c))).toEqual(['close', 'receivables', 'payables']);
   const over = closeReducer(end, { type: 'reset' });
@@ -137,9 +135,9 @@ test('Skip leaves the replies it applied unread, and Start over clears them', ()
 });
 
 test('a post stays in the place it was written, and Start over clears it', () => {
-  const s = closeReducer(landingState(), { type: 'say', where: 'cash', text: ' A note ', at: '14:00' });
-  expect(s.posts).toEqual([{ where: 'cash', text: 'A note', at: '14:00' }]);
-  expect(closeReducer(s, { type: 'say', where: 'cash', text: '   ', at: '14:00' }).posts).toHaveLength(1);
+  const s = closeReducer(landingState(), { type: 'say', where: 'close', text: ' A note ', at: '14:00' });
+  expect(s.posts).toEqual([{ where: 'close', text: 'A note', at: '14:00' }]);
+  expect(closeReducer(s, { type: 'say', where: 'close', text: '   ', at: '14:00' }).posts).toHaveLength(1);
   expect(closeReducer(s, { type: 'reset' }).posts).toEqual([]);
 });
 

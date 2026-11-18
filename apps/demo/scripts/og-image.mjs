@@ -37,7 +37,7 @@ const page = await browser.newPage({
 
 await page.goto(server.resolvedUrls.local[0]);
 await page.getByRole('button', { name: 'Toggle sidebar' }).click();
-await page.getByRole('link', { name: /intercompany/ }).waitFor();
+await page.getByRole('link', { name: /revenue/ }).waitFor();
 await page.waitForFunction(() => document.fonts.status === 'loaded');
 
 // After the sidebar opens and the fonts load, because both rewrap the thread.

@@ -303,15 +303,8 @@ test('each finding sits in its channel, with its entity and period', () => {
   });
 });
 
-test('six channels, in the sidebar’s order, each with a topic and an owner', () => {
-  expect(close.channels.map((c) => c.id)).toEqual([
-    'close',
-    'cash',
-    'receivables',
-    'payables',
-    'revenue',
-    'intercompany',
-  ]);
+test('four channels, in the sidebar’s order, each with a topic and an owner', () => {
+  expect(close.channels.map((c) => c.id)).toEqual(['close', 'receivables', 'payables', 'revenue']);
   for (const c of close.channels) {
     expect(c.topic, c.id).toBeTruthy();
     expect(Object.keys(people), c.id).toContain(c.owner);
@@ -323,9 +316,9 @@ test('every channel’s owner belongs to it', () => {
   for (const c of close.channels) expect(c.members, c.id).toContain(c.owner);
 });
 
-test('the quiet channels hold no finding', () => {
+test('every channel holds a finding', () => {
   const quiet = close.channels.filter((c) => !close.exceptions.some((e) => e.channel === c.id)).map((c) => c.id);
-  expect(quiet).toEqual(['cash', 'intercompany']);
+  expect(quiet).toEqual([]);
 });
 
 test('direct messages are people only, and the visitor isn’t one of them', () => {
@@ -448,4 +441,84 @@ test('the period lines say what #close’s panel and the header show (D7)', () =
     locked: 'Locked 8 Oct 2026, business day 6',
     reopened: 'Reopened 16 Oct 2026',
   });
+});
+
+test('a channel’s history is by its members, in order, and ends before landing', () => {
+  type Said = { author: string; at: string; text: string };
+  type Block = { type: string; rows?: { entity: string; entries: number; failed: { entry: string }[] }[] };
+  const { scene, channelHistory } = read<{
+    scene: { landingTime: string };
+    channelHistory: Record<string, (Said & { blocks: Block[]; replies: Said[] })[]>;
+  }>('workspace.json');
+  expect(Object.keys(channelHistory)).toEqual(['close', 'receivables', 'payables']);
+  for (const [id, messages] of Object.entries(channelHistory)) {
+    const channel = close.channels.find((c) => c.id === id)!;
+    const said = messages.flatMap((m) => [m, ...m.replies]);
+    for (const m of said) {
+      expect(channel.members, `${id} ${m.at}`).toContain(m.author);
+      expect(m.text, `${id} ${m.at}`).not.toMatch(/[{}]/);
+    }
+    const times = said.map((m) => m.at);
+    expect(times).toEqual([...times].sort());
+    expect(times.at(-1)! < scene.landingTime).toBe(true);
+  }
+  // The approvals run: every manual entry the file holds, and the one failure is the finding's entry.
+  const run = channelHistory.close.flatMap((m) => m.blocks).find((b) => b.type === 'controlRun')!.rows!;
+  const finding = close.exceptions.find((e) => e.id === 'self-approved-entry')!;
+  const failed = run.flatMap((r) => r.failed.map((f) => f.entry));
+  expect(failed).toHaveLength(1);
+  expect(finding.summary).toContain(failed[0]);
+  expect(run.find((r) => r.failed.length)!.entity).toBe(finding.scope.slice(0, 3));
+});
+
+test('#receivables: the aging adds up to its total, and the limit history ends on the finding’s customer over its limit', () => {
+  type Aging = { notDue: number; days1to60: number; over60: number; total: number };
+  type Block =
+    | { type: 'aging'; rows: (Aging & { entity: string })[]; total: Aging }
+    | { type: 'limitHistory'; customer: string; limit: number; rows: { balance: number; over: number }[] }
+    | { type: 'tiles' };
+  const { channelHistory } = read<{ channelHistory: { receivables: { blocks: Block[] }[] } }>('workspace.json');
+  const blocks = channelHistory.receivables.flatMap((m) => m.blocks);
+  const aging = blocks.find((b) => b.type === 'aging') as Extract<Block, { type: 'aging' }>;
+  for (const column of ['notDue', 'days1to60', 'over60', 'total'] as const) {
+    expect(
+      aging.rows.reduce((a, r) => a + r[column], 0),
+      column,
+    ).toBe(aging.total[column]);
+  }
+  for (const r of [...aging.rows, aging.total]) expect(r.notDue + r.days1to60 + r.over60, 'a row').toBe(r.total);
+  const history = blocks.find((b) => b.type === 'limitHistory') as Extract<Block, { type: 'limitHistory' }>;
+  const finding = close.exceptions.find((e) => e.id === 'credit-limit')!;
+  expect(finding.summary).toContain(history.customer);
+  expect(finding.summary).toContain(`$${history.limit.toLocaleString('en-US')}`);
+  for (const r of history.rows) expect(r.over).toBeCloseTo(r.balance - history.limit, 2);
+  // Both directions show, or the variance column's colour says nothing.
+  expect(history.rows.some((r) => r.over < 0) && history.rows.some((r) => r.over > 0)).toBe(true);
+});
+
+test('#payables: each run is in its own currency, and the trail is the finding’s two entries, each paid', () => {
+  type Block =
+    | { type: 'paymentRuns'; rows: { entity: string; payments: number; amount: number; currency: string }[] }
+    | {
+        type: 'paymentTrail';
+        finding: string;
+        number: string;
+        entries: { entry: string; payment: string; amount: string; duplicate: boolean }[];
+      };
+  const { channelHistory } = read<{ channelHistory: { payables: { blocks: Block[] }[] } }>('workspace.json');
+  const blocks = channelHistory.payables.flatMap((m) => m.blocks);
+  const runs = blocks.find((b) => b.type === 'paymentRuns') as Extract<Block, { type: 'paymentRuns' }>;
+  // No two rows share a currency, which is why the table states no total amount.
+  expect(new Set(runs.rows.map((r) => r.currency)).size).toBe(runs.rows.length);
+  for (const r of runs.rows) expect(r.payments > 0 && r.amount > 0, r.entity).toBe(true);
+  const trail = blocks.find((b) => b.type === 'paymentTrail') as Extract<Block, { type: 'paymentTrail' }>;
+  const finding = close.exceptions.find((e) => e.id === trail.finding)!;
+  expect(finding.channel).toBe('payables');
+  expect(finding.summary).toContain(trail.number);
+  expect(trail.entries.map((e) => e.duplicate)).toEqual([false, true]);
+  for (const e of trail.entries) {
+    expect(finding.evidence).toContain(e.entry);
+    expect(finding.summary).toContain(e.amount);
+    expect(e.payment).toMatch(/^PAY-/);
+  }
 });
