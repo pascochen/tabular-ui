@@ -1,8 +1,5 @@
 <h1>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="brand/tabular-wordmark-dark.svg">
-    <img alt="Tabular UI" src="brand/tabular-wordmark.svg" width="153" height="26">
-  </picture>
+  <img alt="Tabular UI: the kit's controls in light and dark" src=".github/readme-cover.png">
 </h1>
 
 React components for software where an AI agent does the work and a person signs it off: finance, data and operations tools. They show how the agent reasoned, what it proposes and what a person approved, and they come with the dense tables, run logs, metric tiles and lineage views those tools are made of.
