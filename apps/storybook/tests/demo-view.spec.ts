@@ -32,8 +32,8 @@ test('#revenue, the landing page until 2026-11-12, keeps a URL of its own', () =
   expect(hrefFor({ kind: 'channel', channel: 'revenue' })).toBe('?view=revenue');
 });
 
-test('the six channels open by their URLs, in the sidebar’s order', () => {
-  expect(BUILT_CHANNELS).toEqual(['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany']);
+test('the four channels open by their URLs, in the sidebar’s order', () => {
+  expect(BUILT_CHANNELS).toEqual(['close', 'receivables', 'payables', 'revenue']);
   expect(parseView('?view=payables')).toEqual({ kind: 'channel', channel: 'payables' });
 });
 
@@ -42,6 +42,8 @@ test('old and unknown URLs open the default', () => {
     '?view=sep-close',
     '?view=open-items',
     '?view=rev-check',
+    '?view=cash',
+    '?view=intercompany',
     '?view=nope',
     '?dm=controller',
     '?dm=agent',

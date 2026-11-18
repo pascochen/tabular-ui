@@ -84,18 +84,6 @@
     "identity": 7
   },
   {
-    "kind": "person",
-    "key": "treasury",
-    "id": "E0013",
-    "name": "Ren Fujisawa",
-    "shortName": "Ren",
-    "title": "Treasury Manager",
-    "entity": "KJP",
-    "email": "ren.fujisawa@kasane.example",
-    "initials": "R",
-    "identity": 8
-  },
-  {
     "kind": "agent",
     "key": "cutoff-ai",
     "name": "Revenue AI",

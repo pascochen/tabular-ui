@@ -1,146 +1,16 @@
 import { Fragment, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import {
-  AttachmentRow,
-  ChannelMessage,
-  ChannelMessageList,
-  ChannelMessageReply,
-  ChatComposer,
-  CodeView,
-  DataTable,
-  MetricTile,
-  Sources,
-  StatusBadge,
-  type DataTableProps,
-} from 'tabular-ui';
+import { ChannelMessage, ChannelMessageList, ChannelMessageReply, ChatComposer } from 'tabular-ui';
 
-import { ThreadLink } from '../components/ThreadLink';
 import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
-import { notCheckedWith } from '../lib/close-state';
-import {
-  close,
-  conversations,
-  docsOf,
-  exceptions,
-  memberName,
-  people,
-  type DmBlock,
-  type DmReply,
-} from '../lib/kasane';
+import { close, conversations, memberName, people, type DmReply } from '../lib/kasane';
 import { SCRIPTED_NOTE } from '../lib/scripted-note';
-import { sourcesOf } from '../lib/sources';
 import { MemberAvatar } from '../shell/members';
+import { MessageBlock } from './blocks';
 
 const authorOf = (key: string) => ({ name: memberName(key), avatar: <MemberAvatar memberKey={key} /> });
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
-const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024)).toLocaleString('en-US')} KB`;
-
-type BridgeRow = Extract<DmBlock, { type: 'bridge' }>['rows'][number];
-type EntryRow = Extract<DmBlock, { type: 'entries' }>['rows'][number];
-
-/** A wrapped cell has no padding of its own: --pad-cell-y less the row's 1px rule, as the hero's entry does. */
-const wrapped = (text: string) => <span className="block py-[calc(var(--pad-cell-y)-1px)]">{text}</span>;
-
-const bridgeColumns: DataTableProps<BridgeRow>['columns'] = [
-  {
-    accessorKey: 'label',
-    header: 'H1 operating profit',
-    meta: { truncate: false },
-    cell: ({ getValue }) => wrapped(getValue<string>()),
-  },
-  { accessorKey: 'yen', header: 'Yen', size: 132, meta: { figure: { decimals: 0, unit: 'JPY' } } },
-];
-
-const entryColumns: DataTableProps<EntryRow>['columns'] = [
-  { accessorKey: 'entry', header: 'Entry', size: 150, meta: { content: 'mono' } },
-  {
-    accessorKey: 'date',
-    header: 'Entered',
-    size: 96,
-    // A text column, so the table doesn't set it: the two dates stack, digit over digit.
-    cell: ({ getValue }) => <span className="tabular-nums">{getValue<string>()}</span>,
-  },
-  {
-    accessorKey: 'description',
-    header: 'Description',
-    meta: { truncate: false },
-    cell: ({ getValue }) => wrapped(getValue<string>()),
-  },
-  { accessorKey: 'amount', header: 'Amount', size: 96, meta: { align: 'numeric' } },
-  {
-    id: 'check',
-    header: 'Check',
-    size: 104,
-    // The second entry is the one paid again. The first was the invoice.
-    cell: ({ row }) => (row.original.duplicate ? <StatusBadge status="failed">Duplicate</StatusBadge> : null),
-  },
-];
-
-function Block({ block, at }: { block: DmBlock; at: string }) {
-  switch (block.type) {
-    case 'tiles':
-      return (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-[var(--gap-group)]">
-          {block.tiles.map((t) => (
-            <MetricTile
-              key={t.label}
-              size="sm"
-              label={t.label}
-              value={t.value}
-              delta={t.delta}
-              deltaValue={t.deltaValue}
-              caption={t.caption}
-            />
-          ))}
-        </div>
-      );
-    case 'bridge':
-      return (
-        <DataTable
-          columns={bridgeColumns}
-          data={block.rows}
-          totals={{ label: block.total.label, stated: { yen: block.total.yen } }}
-        />
-      );
-    case 'entries':
-      return <DataTable columns={entryColumns} data={block.rows} />;
-    case 'code':
-      return (
-        <CodeView language="sql" label={block.label} showLineNumbers>
-          {block.code}
-        </CodeView>
-      );
-    case 'sources':
-      return <FindingSources finding={block.finding} />;
-    case 'attachment':
-      return (
-        <AttachmentRow
-          name={block.name}
-          size={block.bytes === undefined ? undefined : kb(block.bytes)}
-          timestamp={at}
-        />
-      );
-    case 'thread': {
-      const finding = exceptions.find((e) => e.id === block.finding)!;
-      return (
-        <div>
-          <ThreadLink task={finding} />
-        </div>
-      );
-    }
-  }
-}
-
-/** A finding's files, each opening at what it rests on, with what wasn't checked: as its card lists them. */
-function FindingSources({ finding }: { finding: string }) {
-  const { state } = useClose();
-  const e = exceptions.find((x) => x.id === finding)!;
-  return (
-    <Sources numbered={false} sources={sourcesOf(e)} notChecked={notCheckedWith(state, docsOf(e), e.notChecked)} />
-  );
-}
-
 /**
  * A direct message with a teammate: what was said before the visitor landed,
  * from `workspace.json`'s `conversations`, then whatever the visitor writes, and
@@ -183,7 +53,7 @@ export function DirectMessageView({ memberKey }: { memberKey: string }) {
             <div className="flex flex-col gap-[var(--gap-field)]">
               <p>{m.text}</p>
               {m.blocks.map((b, j) => (
-                <Block key={j} block={b} at={m.at} />
+                <MessageBlock key={j} block={b} at={m.at} />
               ))}
             </div>
           </ChannelMessage>

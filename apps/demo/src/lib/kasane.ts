@@ -82,7 +82,7 @@ export const close = {
 };
 
 export type Channel = (typeof close.channels)[number];
-export type ChannelId = 'close' | 'cash' | 'receivables' | 'payables' | 'revenue' | 'intercompany';
+export type ChannelId = 'close' | 'receivables' | 'payables' | 'revenue';
 
 export const channels = close.channels as (Channel & { id: ChannelId })[];
 
@@ -119,7 +119,18 @@ export function memberName(key: string): string {
 export const directMessages = close.directMessages;
 
 /** A figure as a `MetricTile` shows it, formatted by the export. */
-export type DmTile = { label: string; value: string; delta: string; deltaValue: number; caption: string };
+export type DmTile = {
+  label: string;
+  value: string;
+  /** With its number or not at all, as `MetricTile` takes it. A figure with nothing to compare has neither. */
+  delta?: string;
+  deltaValue?: number;
+  /** False where a rise is bad news: days outstanding, a share past due. */
+  higherIsBetter?: boolean;
+  caption: string;
+};
+/** One company's receivables by age, in yen. The three ages add up to `total`. */
+export type AgingFigures = { notDue: number; days1to60: number; over60: number; total: number };
 /** What a direct message carries under its text. The export resolves each from the data. */
 export type DmBlock =
   | { type: 'tiles'; tiles: DmTile[] }
@@ -142,12 +153,53 @@ export type DmBlock =
   | { type: 'sources'; finding: string }
   /** `bytes` only for a file the dataset holds: an invented one has no size to state. */
   | { type: 'attachment'; name: string; bytes?: number }
-  | { type: 'thread'; finding: string };
+  | { type: 'thread'; finding: string }
+  /** External receivables by company and age. `total` is the file's own, so the table can check its rows against it. */
+  | { type: 'aging'; rows: (AgingFigures & { entity: string })[]; total: AgingFigures }
+  /** One customer's month-end balance against its credit limit. `over` is negative while it is within the limit. */
+  | {
+      type: 'limitHistory';
+      customer: string;
+      currency: string;
+      limit: number;
+      rows: { month: string; balance: number; over: number }[];
+    }
+  /** One payment run a company, each in its own currency, so the amounts are never added. */
+  | {
+      type: 'paymentRuns';
+      rows: { entity: string; method: string; payments: number; amount: number; currency: string }[];
+    }
+  /** A supplier's invoice number, each entry of it, and the payment against each. */
+  | {
+      type: 'paymentTrail';
+      finding: string;
+      number: string;
+      supplier: string;
+      entries: {
+        entry: string;
+        entered: string;
+        amount: string;
+        payment: string;
+        paidOn: string;
+        method: string;
+        duplicate: boolean;
+      }[];
+    }
+  /** Where the close stands, as the close calendar states it. */
+  | { type: 'calendar'; rows: { item: string; when: string; status: 'passed' | 'open' | 'queued' }[] }
+  /** An agent's rule over the manual entries, one row a company. No entries: the rule didn't run there. */
+  | { type: 'controlRun'; rows: { entity: string; entries: number; failed: { entry: string; by: string }[] }[] };
 export type DmReply = { author: string; at: string; text: string };
 export type DmMessage = DmReply & { blocks: DmBlock[]; replies: DmReply[] };
 
 /** Each direct message's history before the visitor lands, by member. */
 export const conversations = close.conversations as Record<string, DmMessage[]>;
+
+/**
+ * What was said in a channel before the visitor lands, beside its finding. A
+ * channel with none has no entry. An author is a person or an agent.
+ */
+export const channelHistory = close.channelHistory as Partial<Record<ChannelId, DmMessage[]>>;
 
 export type TableColumn = { name: string; style?: 'id' | 'figure' };
 export type DocumentTable = {

@@ -90,6 +90,19 @@ test('what was said in a direct message before landing is found, replies include
   ]);
 });
 
+test('what was said in a channel before landing is found, replies included, and opens that channel', () => {
+  expect(inGroup('Marunouchi', 'Messages')).toEqual([
+    expect.objectContaining({ title: 'Mei Tachibana in #close, 09:22', view: { kind: 'channel', channel: 'close' } }),
+  ]);
+  expect(inGroup('aging is final', 'Messages').map((r) => r.view)).toEqual([
+    { kind: 'channel', channel: 'receivables' },
+  ]);
+  expect(inGroup('Four currencies', 'Messages').map((r) => r.title)).toEqual(['Kenta Ishiguro in #payables, 08:30']);
+  expect(inGroup('hear about it from us', 'Messages').map((r) => r.title)).toEqual([
+    'Daisuke Onodera in #close, 09:31',
+  ]);
+});
+
 test('what the visitor wrote is found, and links to where they wrote it', () => {
   const s = closeReducer(landingState(), {
     type: 'say',
@@ -104,8 +117,8 @@ test('a person is found by name or title, and links to their direct message, or 
   expect(inGroup('Kenta', 'People')[0].view).toEqual({ kind: 'dm', member: 'apLead' });
   expect(inGroup('Head of FP&A', 'People')[0].title).toBe('Mei Tachibana');
   expect(inGroup('Shun', 'People')[0].view).toEqual({ kind: 'channel', channel: 'close' });
-  // Ren owns #cash and belongs to it.
-  expect(inGroup('Ren Fujisawa', 'People')[0].view).toEqual({ kind: 'channel', channel: 'cash' });
+  // Ren owned #cash, which left the demo on 2026-11-18, and he left with it.
+  expect(inGroup('Ren Fujisawa', 'People')).toEqual([]);
 });
 
 test('results come in the groups’ order, and there’s no answer among them', () => {

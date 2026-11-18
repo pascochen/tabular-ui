@@ -658,7 +658,7 @@ function AccountantAccountFooter() {
  * name says it's an agent and no `agent` badge is needed beside it.
  */
 const accountingAgents = ['Revenue AI', 'Payments AI', 'Approvals AI', 'Credit AI'];
-/** The Kasane demo's six, in its order (since 2026-11-13; `close` and `payables` until then). */
+/** The Kasane demo's six of 2026-11-13, in its order. The demo keeps four since 2026-11-18; the story keeps six, to show a longer list. */
 const accountingChannels = ['close', 'cash', 'receivables', 'payables', 'revenue', 'intercompany'];
 /**
  * Colleagues only: the signed-in user (Daisuke) never appears as a direct

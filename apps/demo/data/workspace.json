@@ -19,13 +19,6 @@
       "members": ["visitor", "glAccountant", "fpaHead", "approvals-ai"]
     },
     {
-      "id": "cash",
-      "name": "cash",
-      "topic": "Cash, FX and debt",
-      "owner": "treasury",
-      "members": ["visitor", "treasury", "fpaHead"]
-    },
-    {
       "id": "receivables",
       "name": "receivables",
       "topic": "Receivables, credit and aging",
@@ -45,13 +38,6 @@
       "topic": "Sales and margin by product, region and customer",
       "owner": "fpaAnalyst",
       "members": ["visitor", "glAccountant", "fpaAnalyst", "fpaHead", "cutoff-ai"]
-    },
-    {
-      "id": "intercompany",
-      "name": "intercompany",
-      "topic": "Intercompany sales and transfer prices",
-      "owner": "visitor",
-      "members": ["visitor", "fpaHead"]
     }
   ],
   "directMessages": ["fpaHead", "apLead"],
@@ -236,6 +222,225 @@
         "at": "13:41",
         "text": "A change to a payment control needs your sign-off. Can I switch the new match on before the next run?",
         "blocks": [{ "type": "thread", "finding": "duplicate-payment" }],
+        "replies": []
+      }
+    ]
+  },
+  "channelHistory": {
+    "close": [
+      {
+        "author": "glAccountant",
+        "at": "08:42",
+        "text": "Where things stand before the auditors start on Monday.",
+        "blocks": [
+          {
+            "type": "calendar",
+            "rows": [
+              { "item": "September 2026 close, end of H1", "when": "8 Oct", "status": "passed" },
+              { "item": "H1 consolidation", "when": "", "status": "passed" },
+              { "item": "6+6 forecast", "when": "9 Oct", "status": "passed" },
+              { "item": "Q2 dealer rebate credit notes", "when": "14 Oct", "status": "passed" },
+              { "item": "October postings", "when": "To 15 Oct", "status": "open" },
+              { "item": "Auditors' interim review", "when": "19–30 Oct", "status": "queued" },
+              { "item": "Board meeting on H1 results", "when": "5 Nov", "status": "queued" },
+              { "item": "H1 earnings release", "when": "6 Nov", "status": "queued" },
+              { "item": "October close", "when": "9 Nov", "status": "queued" }
+            ]
+          }
+        ],
+        "replies": [
+          {
+            "author": "visitor",
+            "at": "08:51",
+            "text": "October stays open until 9 Nov. Nothing posts to September 2026 without my sign-off."
+          }
+        ]
+      },
+      {
+        "author": "approvals-ai",
+        "at": "09:03",
+        "text": "Checked 10 manual entries posted in H1, company by company, for a creator who also approved. One failed, in KUK.",
+        "blocks": [
+          {
+            "type": "controlRun",
+            "rows": [
+              { "entity": "KJP", "entries": 3, "failed": [] },
+              { "entity": "KUS", "entries": 3, "failed": [] },
+              { "entity": "KDE", "entries": 2, "failed": [] },
+              { "entity": "KUK", "entries": 2, "failed": [{ "entry": "JE-KUK-2608-00055", "by": "E3003" }] },
+              { "entity": "KCN", "entries": 0, "failed": [] }
+            ]
+          }
+        ],
+        "replies": []
+      },
+      {
+        "author": "fpaHead",
+        "at": "09:22",
+        "text": "Marunouchi Audit asked for the H1 manual journals before fieldwork, 19–30 Oct.",
+        "blocks": [],
+        "replies": []
+      },
+      {
+        "author": "glAccountant",
+        "at": "09:26",
+        "text": "This is the listing they’ll get.",
+        "blocks": [{ "type": "attachment", "name": "manual_journal_entries_fy2026_h1.csv", "bytes": 4875 }],
+        "replies": [
+          {
+            "author": "visitor",
+            "at": "09:31",
+            "text": "Send it as it is, with JE-KUK-2608-00055 in it. They should hear about it from us."
+          }
+        ]
+      }
+    ],
+    "receivables": [
+      {
+        "author": "arLead",
+        "at": "08:35",
+        "text": "September’s aging is final. Days sales outstanding is up on August: a strong month’s sales, and Great Lakes.",
+        "blocks": [
+          {
+            "type": "tiles",
+            "tiles": [
+              { "label": "Receivables", "value": "¥12,008m", "caption": "Group, external. August ¥10,339m" },
+              {
+                "label": "Days sales outstanding",
+                "value": "63.9 days",
+                "delta": "+6.5 days",
+                "deltaValue": 6.5,
+                "higherIsBetter": false,
+                "caption": "vs August"
+              },
+              {
+                "label": "US, over 30 days past due",
+                "value": "7.7%",
+                "delta": "+2.1 pts",
+                "deltaValue": 2.1,
+                "higherIsBetter": false,
+                "caption": "vs August"
+              }
+            ]
+          },
+          {
+            "type": "aging",
+            "rows": [
+              { "entity": "KJP", "notDue": 5658058421, "days1to60": 122272865, "over60": 0, "total": 5780331286 },
+              {
+                "entity": "KUS",
+                "notDue": 1649769545,
+                "days1to60": 397830821,
+                "over60": 78282807,
+                "total": 2125883173
+              },
+              { "entity": "KDE", "notDue": 995727403, "days1to60": 63721044, "over60": 3424593, "total": 1062873040 },
+              { "entity": "KUK", "notDue": 523520533, "days1to60": 101486103, "over60": 15548061, "total": 640554697 },
+              { "entity": "KCN", "notDue": 1894330567, "days1to60": 472888892, "over60": 31061429, "total": 2398280888 }
+            ],
+            "total": { "notDue": 10721406469, "days1to60": 1158199725, "over60": 128316890, "total": 12007923084 }
+          }
+        ],
+        "replies": [
+          { "author": "usCredit", "at": "08:47", "text": "Nearly all of the US’s over-60 column is Great Lakes." }
+        ]
+      },
+      {
+        "author": "usCredit",
+        "at": "09:18",
+        "text": "The month-ends behind that. On credit hold since 10 Sep 2026, and the last payment was 21 Jul 2026. The reserve is in the close memo.",
+        "blocks": [
+          {
+            "type": "limitHistory",
+            "customer": "Great Lakes Duplicating Supply",
+            "currency": "USD",
+            "limit": 600000,
+            "rows": [
+              { "month": "Jan 2026", "balance": 530989.9, "over": -69010.1 },
+              { "month": "Feb 2026", "balance": 280823.42, "over": -319176.58 },
+              { "month": "Mar 2026", "balance": 608984.69, "over": 8984.69 },
+              { "month": "Apr 2026", "balance": 637387.13, "over": 37387.13 },
+              { "month": "May 2026", "balance": 886057.04, "over": 286057.04 },
+              { "month": "Jun 2026", "balance": 795765.08, "over": 195765.08 },
+              { "month": "Jul 2026", "balance": 704159.94, "over": 104159.94 },
+              { "month": "Aug 2026", "balance": 1064974.94, "over": 464974.94 },
+              { "month": "Sep 2026", "balance": 1422722.93, "over": 822722.93 }
+            ]
+          },
+          { "type": "attachment", "name": "close_memo_2026-09.md", "bytes": 4805 }
+        ],
+        "replies": [
+          {
+            "author": "visitor",
+            "at": "09:30",
+            "text": "Keep the hold. Nothing ships to them until Legal decides on 30 Oct."
+          }
+        ]
+      }
+    ],
+    "payables": [
+      {
+        "author": "apLead",
+        "at": "08:30",
+        "text": "Last Friday’s runs for the subsidiaries, 9 Oct. Four currencies, so no total. KJP’s month-end run is on 30 Oct.",
+        "blocks": [
+          {
+            "type": "paymentRuns",
+            "rows": [
+              { "entity": "KUS", "method": "ACH", "payments": 2, "amount": 35312.96, "currency": "USD" },
+              {
+                "entity": "KDE",
+                "method": "SEPA credit transfer",
+                "payments": 1,
+                "amount": 60006.83,
+                "currency": "EUR"
+              },
+              { "entity": "KUK", "method": "BACS", "payments": 3, "amount": 79594.53, "currency": "GBP" },
+              { "entity": "KCN", "method": "Bank transfer", "payments": 2, "amount": 1286299.13, "currency": "CNY" }
+            ]
+          }
+        ],
+        "replies": [{ "author": "visitor", "at": "08:44", "text": "Thanks. Send me today’s before they release." }]
+      },
+      {
+        "author": "payments-ai",
+        "at": "09:03",
+        "text": "Matched 559 supplier invoices entered in H1 on supplier and invoice number. One number was entered twice, and each entry was paid.",
+        "blocks": [
+          {
+            "type": "paymentTrail",
+            "finding": "duplicate-payment",
+            "number": "MFL-58821",
+            "supplier": "Midwest Freight Logistics LLC",
+            "entries": [
+              {
+                "entry": "API-KUS-2607-00007",
+                "entered": "14 Jul 2026",
+                "amount": "$48,216.40",
+                "payment": "PAY-KUS-2608-0002",
+                "paidOn": "14 Aug 2026",
+                "method": "ACH",
+                "duplicate": false
+              },
+              {
+                "entry": "API-KUS-2607-00011",
+                "entered": "21 Jul 2026",
+                "amount": "$48,216.40",
+                "payment": "PAY-KUS-2608-0003",
+                "paidOn": "21 Aug 2026",
+                "method": "ACH",
+                "duplicate": true
+              }
+            ]
+          }
+        ],
+        "replies": []
+      },
+      {
+        "author": "apLead",
+        "at": "09:12",
+        "text": "Looking at both entries against the ledger now.",
+        "blocks": [],
         "replies": []
       }
     ]

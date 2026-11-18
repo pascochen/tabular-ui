@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { HashIcon } from '@phosphor-icons/react';
-import { ChannelMessage, ChannelMessageList, ChatComposer, EmptyState } from 'tabular-ui';
+import { ChannelMessage, ChannelMessageList, ChannelMessageReply, ChatComposer, EmptyState } from 'tabular-ui';
 
 import { ExceptionCard } from '../components/ExceptionCard';
 import { useHeroReplies } from '../components/HeroThread/useHeroReplies';
@@ -9,19 +9,50 @@ import { sceneNow } from '../lib/clock';
 import { useClose } from '../lib/close-context';
 import { awaitsVisitor } from '../lib/close-state';
 import { useDecisionInView, useExceptionLink } from '../lib/decision-in-view';
-import { channels, close, exceptions, memberName, type ChannelId, type Exception } from '../lib/kasane';
+import {
+  channelHistory,
+  channels,
+  close,
+  exceptions,
+  member,
+  memberName,
+  type ChannelId,
+  type DmMessage,
+  type Exception,
+} from '../lib/kasane';
 import { SCRIPTED_NOTE } from '../lib/scripted-note';
 import { MemberAvatar } from '../shell/members';
+import { MessageBlock } from './blocks';
 
 const titleOf = (id: string) => exceptions.find((e) => e.id === id)!.title;
 const channelOf = (id: string) => exceptions.find((e) => e.id === id)!.channel;
 
 const isHero = (e: Exception) => 'decision' in e && e.decision !== undefined;
 const dateTime = (at: string) => `${close.scene.date}T${at}`;
+const authorOf = (key: string) => ({ name: memberName(key), avatar: <MemberAvatar memberKey={key} /> });
+
+type Entry = { at: string; message: DmMessage } | { at: string; finding: Exception };
 
 /**
- * A channel: one message per finding it holds, with its replies inline, then
- * whatever the visitor writes, and the composer. The decision and the timeline
+ * A channel's morning in the order it was said: its history and its findings,
+ * by time. A message and a finding in the same minute keep the history first,
+ * so an agent's run comes before what it raised.
+ */
+function timelineOf(channel: ChannelId): Entry[] {
+  const said: Entry[] = (channelHistory[channel] ?? []).map((message) => ({ at: message.at, message }));
+  const found: Entry[] = exceptions
+    .filter((e) => e.channel === channel)
+    .map((finding) => ({ at: finding.postedAt, finding }));
+  // Stable, so equal times keep this order.
+  return [...said, ...found].sort((a, b) => a.at.localeCompare(b.at));
+}
+
+/**
+ * A channel: what was said before the visitor landed (`workspace.json`'s
+ * `channelHistory`) with one message per finding it holds among it, by time,
+ * each with its replies inline, then whatever the visitor writes, and the
+ * composer. A teammate's message carries the same blocks a direct message
+ * does, and an agent's is an `AgentBlock`, as its finding is. The decision and the timeline
  * change it all through the close state. A channel holding no finding shows its
  * topic.
  *
@@ -36,27 +67,67 @@ export function ChannelView({ channel }: { channel: ChannelId }) {
   useExceptionLink();
   const [heard, setHeard] = useState('');
   const c = channels.find((x) => x.id === channel)!;
-  const held = exceptions.filter((e) => e.channel === channel);
+  const entries = timelineOf(channel);
   const posts = state.posts.filter((p) => p.where === channel);
   // Only this channel's: elsewhere, the sidebar's unread mark says it when the reply lands.
   const typing = state.typing && channelOf(state.typing.exception) === channel ? state.typing : null;
   return (
     <div className="flex min-h-full flex-col gap-[var(--gap-group)]">
-      {held.length === 0 ? (
+      {entries.length === 0 ? (
         <EmptyState icon={HashIcon} title={`Nothing open in #${c.name}`} description={c.topic} />
       ) : null}
       <ChannelMessageList aria-label={`Messages in ${c.name}`}>
-        {held.map((e) => (
-          <ExceptionCard
-            key={e.id}
-            awaitsYou={awaitsVisitor(state, e.id)}
-            exception={e}
-            state={state.exceptions[e.id]}
-            // The decision the visitor makes: open on arrival, so the reply is there.
-            defaultRepliesOpen={isHero(e)}
-            extraReplies={isHero(e) ? heroReplies : undefined}
-          />
-        ))}
+        {entries.map((entry, i) => {
+          if ('finding' in entry) {
+            const e = entry.finding;
+            return (
+              <ExceptionCard
+                key={e.id}
+                awaitsYou={awaitsVisitor(state, e.id)}
+                exception={e}
+                state={state.exceptions[e.id]}
+                // The decision the visitor makes: open on arrival, so the reply is there.
+                defaultRepliesOpen={isHero(e)}
+                extraReplies={isHero(e) ? heroReplies : undefined}
+              />
+            );
+          }
+          const m = entry.message;
+          const before = entries[i - 1];
+          return (
+            <ChannelMessage
+              key={`said-${i}`}
+              author={authorOf(m.author)}
+              time={m.at}
+              dateTime={dateTime(m.at)}
+              // An agent's message is agent-authored content, whatever it holds.
+              authorship={member(m.author)?.kind === 'agent' ? memberName(m.author) : undefined}
+              // A run is the same author in the same minute (ChannelMessage README).
+              continued={
+                before !== undefined &&
+                'message' in before &&
+                before.message.author === m.author &&
+                before.message.at === m.at
+              }
+              replies={
+                m.replies.length > 0
+                  ? m.replies.map((r, j) => (
+                      <ChannelMessageReply key={j} author={authorOf(r.author)} time={r.at} dateTime={dateTime(r.at)}>
+                        {r.text}
+                      </ChannelMessageReply>
+                    ))
+                  : undefined
+              }
+            >
+              <div className="flex flex-col gap-[var(--gap-field)]">
+                <p>{m.text}</p>
+                {m.blocks.map((b, j) => (
+                  <MessageBlock key={j} block={b} at={m.at} />
+                ))}
+              </div>
+            </ChannelMessage>
+          );
+        })}
         {posts.map((p, i) => (
           <Fragment key={i}>
             <ChannelMessage
