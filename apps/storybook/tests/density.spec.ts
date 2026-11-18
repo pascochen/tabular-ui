@@ -614,19 +614,22 @@ test('a figure column at the table edge lines up without a sideways scroll', asy
  * that silently fell back to the sans would pass with nothing to check, and a
  * story marked for headings must render one, or the heading check would pass
  * on none. The four agent and chat stories are the ones whose headings moved.
+ *
+ * One test per story: as one test, eight story loads took 25.2s of the 30s
+ * timeout on main's CI run, and timed out twice on #212's.
  */
-test('the serif appears only at the metric tier, and every heading is the sans', async ({ page }) => {
-  const stories: [string, { serif: boolean; headings: boolean }][] = [
-    ['product-metrictile--sizes', { serif: true, headings: false }],
-    ['product-appshell--expanded', { serif: false, headings: true }],
-    ['product-confirmation--waiting', { serif: false, headings: true }],
-    ['product-question--waiting', { serif: false, headings: true }],
-    ['product-agentplan--ready', { serif: false, headings: true }],
-    ['product-chatstarter--long-question', { serif: false, headings: true }],
-    ['product-datatable--default', { serif: false, headings: false }],
-    ['foundational-button--variants', { serif: false, headings: false }],
-  ];
-  for (const [id, expected] of stories) {
+const TYPEFACE_STORIES: [string, { serif: boolean; headings: boolean }][] = [
+  ['product-metrictile--sizes', { serif: true, headings: false }],
+  ['product-appshell--expanded', { serif: false, headings: true }],
+  ['product-confirmation--waiting', { serif: false, headings: true }],
+  ['product-question--waiting', { serif: false, headings: true }],
+  ['product-agentplan--ready', { serif: false, headings: true }],
+  ['product-chatstarter--long-question', { serif: false, headings: true }],
+  ['product-datatable--default', { serif: false, headings: false }],
+  ['foundational-button--variants', { serif: false, headings: false }],
+];
+for (const [id, expected] of TYPEFACE_STORIES) {
+  test(`the serif appears only at the metric tier, and every heading is the sans — ${id}`, async ({ page }) => {
     await gotoStory(page, id);
     const { offenders, serifCount, serifHeadings, headingCount } = await page.evaluate(() => {
       const bad: string[] = [];
@@ -654,8 +657,8 @@ test('the serif appears only at the metric tier, and every heading is the sans',
     expect(serifHeadings, `a heading not in the sans in ${id}`).toEqual([]);
     if (expected.serif) expect(serifCount, `no serif text rendered in ${id}`).toBeGreaterThan(0);
     if (expected.headings) expect(headingCount, `no heading rendered in ${id}`).toBeGreaterThan(0);
-  }
-});
+  });
+}
 
 /**
  * §8.3 / §8.4 — every family loads under its registered name, roman and
