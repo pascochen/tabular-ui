@@ -42,6 +42,8 @@ for (const mode of MODES) {
     expect(geometry.link.top).toBe(geometry.title.top);
     expect(geometry.link.height).toBe(geometry.title.height);
     expect(geometry.linkSize).toBe(geometry.titleSize);
+    // The Default story's size: the band is chrome, not a headline (§8.1, 2026-11-17).
+    expect(geometry.titleSize).toBe('13px');
     // One typeface on the line: behind a trail the title is the sans (§8.3).
     expect(geometry.titleFamily).toBe(geometry.linkFamily);
     expect(geometry.titleFamily.split(',')[0]).toBe(geometry.sans.split(',')[0].replace(/'/g, '"'));

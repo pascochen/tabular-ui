@@ -37,7 +37,7 @@ export const Default: Story = {
 };
 
 /**
- * In the page header: ancestors only, at the title's size. The band's `<h1>`
+ * In the page header: ancestors only, at 13px, the title's size. The band's `<h1>`
  * is the current page, so there is no `BreadcrumbPage`, and the title is the
  * one 600 on the line. The title is sans here, as the trail is: one typeface
  * on the line.

@@ -20,8 +20,8 @@ export type BreadcrumbProps = React.ComponentProps<'nav'>;
  * `--text-base` by default, the size of the controls beside it in the top
  * nav. A bare trail must not inherit: `AppBar` sets no size, and a trail
  * that took the document's 16px sat a step above the page switcher after it
- * (caught by the AppShell screenshots, 2026-11-17). `AppShellPageHeader`
- * raises it to the title's size.
+ * (caught by the AppShell screenshots, 2026-11-17). In `AppShellPageHeader`
+ * it stays 13px, the title's size.
  *
  * Two ways to end the trail:
  *

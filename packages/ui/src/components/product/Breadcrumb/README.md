@@ -14,13 +14,13 @@ Product. Composes `TruncatedText`. Where the page sits: its ancestors, each a li
 
 | Part | Renders | Notes |
 |---|---|---|
-| `Breadcrumb` | `<nav aria-label="Breadcrumb">` around an `<ol>` | `--text-base` by default. `AppShellPageHeader` raises it to the title's size |
+| `Breadcrumb` | `<nav aria-label="Breadcrumb">` around an `<ol>` | `--text-base`, everywhere: in `AppShellPageHeader` that is the title's size |
 | `BreadcrumbItem` | `<li>` holding an `<a>`, then a slash | An ancestor. `render` swaps the `<a>` for a router's link |
 | `BreadcrumbPage` | `<li aria-current="page">` | The current page, last. Not a link |
 
 ## Two homes
 
-**The page header.** Pass ancestors only to `AppShellPageHeader`'s `breadcrumb`. The band's `<h1>` is the current page, so a `BreadcrumbPage` there would name it twice. The trail takes the title's size and tracking, and the last slash leads into the title. The trail and the `<h1>` are both the sans, as every heading is (§8.3), so the line reads in one face.
+**The page header.** Pass ancestors only to `AppShellPageHeader`'s `breadcrumb`. The band's `<h1>` is the current page, so a `BreadcrumbPage` there would name it twice. The trail keeps its 13px, which is the title's size, so the line reads as the Default story does, and the last slash leads into the title. The trail and the `<h1>` are both the sans, as every heading is (§8.3), so the line reads in one face.
 
 ```tsx
 <AppShellPageHeader
