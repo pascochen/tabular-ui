@@ -6,7 +6,7 @@ import { useClose } from '../lib/close-context';
 import { isReopened, isSourceOn } from '../lib/close-state';
 import { agents, close, documents, kasaneCompany, lastClosedMonth } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
-import { NEW_CHAT, citedIn } from '../lib/new-chat';
+import { NEW_CHAT, usedIn } from '../lib/new-chat';
 import { documentView } from '../lib/sources';
 import { hrefFor, onViewLinkClick, type View } from '../lib/view';
 import { useNoRoomForPanel } from '../lib/viewport';
@@ -55,7 +55,7 @@ const answers = (n: number) => (n === 1 ? '1 answer' : `${n} answers`);
  */
 export function NewChatPanel() {
   const { state } = useClose();
-  const cited = citedIn(state.posts.filter((p) => p.where === NEW_CHAT).map((p) => p.text));
+  const used = usedIn(state.posts.filter((p) => p.where === NEW_CHAT).map((p) => p.text));
 
   return (
     <>
@@ -93,7 +93,7 @@ export function NewChatPanel() {
           <ul role="list" className="flex flex-col gap-[var(--gap-field)] text-sm text-text-body">
             {documents.map((doc) => {
               const view = documentView(doc.slug);
-              const count = cited[doc.slug] ?? 0;
+              const count = used[doc.slug] ?? 0;
               return (
                 <li key={doc.slug} className="flex min-w-0 flex-col gap-[var(--gap-bonded)]">
                   <a

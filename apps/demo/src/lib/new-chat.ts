@@ -119,7 +119,7 @@ export const mentionsPosting = (text: string) =>
  * How many of the answers given rest on each file, by slug: what New chat's
  * panel marks as used. A question asked twice is answered twice, and counts twice.
  */
-export function citedIn(asked: readonly string[]): Record<string, number> {
+export function usedIn(asked: readonly string[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const text of asked) {
     for (const answer of scripted(text)?.answers ?? []) {

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 import {
-  citedIn,
+  usedIn,
   mentionsPosting,
   nearest,
   questions,
@@ -129,15 +129,15 @@ test('a mention of posting or reopening is caught, whichever way it is asked', (
 });
 
 test('the panel counts the answers that rest on a file, and nothing before a question', () => {
-  expect(citedIn([])).toEqual({});
+  expect(usedIn([])).toEqual({});
   // Text with no scripted answer cites nothing.
-  expect(citedIn(['what is the weather'])).toEqual({});
+  expect(usedIn(['what is the weather'])).toEqual({});
   const [first] = close.newChat.questions;
-  const once = citedIn([first.question]);
+  const once = usedIn([first.question]);
   for (const answer of first.answers) {
     for (const slug of answer.sources) expect(once[slug], slug).toBeGreaterThanOrEqual(1);
   }
   // Asked twice, answered twice.
-  const twice = citedIn([first.question, first.question]);
+  const twice = usedIn([first.question, first.question]);
   for (const slug of Object.keys(once)) expect(twice[slug], slug).toBe(once[slug] * 2);
 });
