@@ -114,3 +114,17 @@ export function nearest(text: string, limit: number): ScriptedQuestion[] {
  */
 export const mentionsPosting = (text: string) =>
   /\b(post|posts|posting|reverse|reversal|reopen|reopens|book it)\b/i.test(text);
+
+/**
+ * How many of the answers given rest on each file, by slug: what New chat's
+ * panel marks as used. A question asked twice is answered twice, and counts twice.
+ */
+export function citedIn(asked: readonly string[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const text of asked) {
+    for (const answer of scripted(text)?.answers ?? []) {
+      for (const slug of answer.sources) counts[slug] = (counts[slug] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
