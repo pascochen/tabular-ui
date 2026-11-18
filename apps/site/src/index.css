@@ -80,11 +80,16 @@
 }
 
 /* The site's layout values (docs/site.md §7): its own custom properties, under
-   --site- so none can shadow a library token. Space and width only. One
-   library token is redefined here on purpose, the serif family, so headings
-   and the metric tier take the trimmed faces above; --font-heading reads it. */
+   --site- so none can shadow a library token. Space and width only. Two
+   library tokens are redefined here on purpose. The serif family, so headings
+   and the metric tier take the trimmed faces above. And --font-heading, which
+   is the sans in the library: the site's headings are display text on reading
+   pages, so they take the serif (design-system.md §8.3, 2026-11-17). A
+   specimen's plate puts it back, below, so a component shows its headings as
+   the library draws them. */
 :root {
   --font-display: 'Tabular Serif', 'Source Serif 4 Variable', 'Source Serif 4', 'Georgia', serif;
+  --font-heading: var(--font-display);
   --site-pad-x: 16px;
   --site-section-y: 48px;
   --site-gap: 24px;
@@ -92,6 +97,14 @@
   --site-w-wide: 1344px;
   --site-w-reading: 1040px;
   --site-w-prose: 680px;
+}
+
+/* A specimen is the library as an app gets it: its headings are the sans. The
+   cards' and the hero's plates (SpecimenFrame), and a component page's
+   before/after pair (Pair). */
+[data-plate],
+[data-pair-plate] {
+  --font-heading: var(--font-sans);
 }
 
 @media (width >= 768px) {

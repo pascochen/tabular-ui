@@ -54,9 +54,7 @@ function TypographyKey({ figure }: { figure: string }) {
       label="What each family is for"
       rows={[
         {
-          mark: (
-            <span className="font-display text-site-title-sm font-medium text-text-primary">Explain the H1 gap</span>
-          ),
+          mark: <span className="text-md font-semibold text-text-primary">Explain the H1 gap</span>,
           meaning: 'Headings',
           name: '--font-heading',
         },
@@ -90,7 +88,7 @@ export default function Typography() {
         aside={<TypographyKey figure={money(bridge.actual)} />}
         current={pages.typography}
         title="Typography"
-        lead="A 13px base for dense tools, sized in rem. Three families: sans for reading, serif for headings and the single figure a tile exists to show, mono for identifiers."
+        lead="A 13px base for dense tools, sized in rem. Three families: sans for reading and headings, serif for the single figure a tile exists to show, mono for identifiers."
       />
 
       <Section labelledBy="scale-title">
@@ -128,7 +126,7 @@ export default function Typography() {
           <SectionHeader
             id="families-title"
             title="Families"
-            lead="The serif applies by element: every heading, and the metric tier. Text that isn’t a heading never goes serif."
+            lead="Headings are the sans, so a heading reads in the face of the text under it. The serif is the metric tier’s alone. This site points --font-heading at the serif, because its headings are display text on a reading page."
           />
           <ul role="list" className="grid grid-cols-1 gap-[var(--site-gap)] md:grid-cols-3">
             <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
@@ -136,8 +134,9 @@ export default function Typography() {
               <p className="text-site-lead text-text-primary">Body and interface text, at every size.</p>
             </li>
             <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
-              <TokenLabel name="--font-heading" detail={firstFamily('--font-display')} />
-              <h3 className="text-site-title font-medium text-text-primary">Every heading, by element</h3>
+              <TokenLabel name="--font-heading" detail={firstFamily('--font-sans')} />
+              {/* font-sans: the site's own headings are serif, and this one shows the library's. */}
+              <h3 className="font-sans text-site-title font-medium text-text-primary">Every heading, by element</h3>
             </li>
             <li className={`flex flex-col gap-[var(--gap-group)] ${panel} p-[var(--site-gap-tight)]`}>
               <TokenLabel name="--font-mono" detail={firstFamily('--font-mono')} />

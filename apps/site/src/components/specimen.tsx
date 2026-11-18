@@ -187,10 +187,17 @@ export function Pair({
           armed.current = true;
         }}
       >
-        <div data-theme="dark" inert={inert || undefined} className={plate}>
+        {/* data-pair-plate: the library's own heading family inside (index.css). */}
+        <div data-theme="dark" data-pair-plate="" inert={inert || undefined} className={plate}>
           {children(0)}
         </div>
-        <div data-theme="dark" inert={inert || playing || undefined} aria-busy={playing || undefined} className={plate}>
+        <div
+          data-theme="dark"
+          data-pair-plate=""
+          inert={inert || playing || undefined}
+          aria-busy={playing || undefined}
+          className={plate}
+        >
           <div className="grid grid-cols-1 items-center">
             <div className={cell}>{children(frame)}</div>
             {/* The before state always, so a stacked plate never grows when Play starts; the

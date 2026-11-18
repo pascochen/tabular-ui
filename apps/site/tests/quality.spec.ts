@@ -163,14 +163,46 @@ test.describe('fonts', () => {
       ).toHaveLength(1);
   });
 
+  // design-system.md §8.3 (2026-11-17): the library's headings are the sans,
+  // and the site points --font-heading at the serif for its own. A specimen
+  // shows the library as an app gets it, so a heading on a plate, a card's or
+  // the hero's (data-plate) or a component page's pair (data-pair-plate), is
+  // the sans. Home has card plates and the hero; Confirmation's page has a pair.
+  test('the site’s headings are the serif, and a specimen’s are the sans', async ({ page }) => {
+    for (const route of ['/', '/components/confirmation']) {
+      await open(page, route);
+      const headings = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((els) =>
+        els
+          .filter((h) => h.getClientRects().length > 0 && h.textContent?.trim())
+          .map((h) => ({
+            specimen: h.closest('[data-plate], [data-pair-plate]') != null,
+            family: getComputedStyle(h).fontFamily.split(',')[0].replace(/["']/g, ''),
+            text: h.textContent!.trim().slice(0, 30),
+          })),
+      );
+      const specimens = headings.filter((h) => h.specimen);
+      const site = headings.filter((h) => !h.specimen);
+      expect(specimens.length, `${route}: no specimen heading to check`).toBeGreaterThan(0);
+      expect(
+        specimens.filter((h) => h.family !== 'Golos Text Variable'),
+        `${route}: a specimen heading not in the sans`,
+      ).toEqual([]);
+      // The Typography page's --font-heading card shows the library's sans on purpose; it isn't on these routes.
+      expect(
+        site.filter((h) => h.family !== 'Tabular Serif'),
+        `${route}: a site heading not in the serif`,
+      ).toEqual([]);
+    }
+  });
+
   // §12: the site's serif is the package's file cut to 600, 500 and 400 by
   // scripts/serif-trim.py. A page that asked for another weight, or text that
   // fell through to the package's own serif, would fetch another serif file
   // on load. Specimens play as they scroll in, so each page is scrolled first.
   // Every site heading is 500 since 2026-11-16 (§7), and every page has an
   // <h1>, so each fetches the 500, preloaded, once. The 600 is fetched at most
-  // once, by a library heading or MetricTile's figure. The 400 waits for a
-  // citation.
+  // once, by MetricTile's figure, since the library's headings are the sans
+  // (2026-11-17). The 400 waits for a citation.
   test('every page draws its serif from the two trimmed files alone', async ({ page }) => {
     const fetched: string[] = [];
     page.on('request', (r) => {

@@ -40,7 +40,7 @@ export type MetricTileProps = MetricTileBase & MetricTileDelta;
  *
  * The one place in the system that uses the display tier: `--font-display`
  * (Source Serif 4) at `--text-metric` or `--text-metric-sm`, and nowhere
- * else (§8.3). Headings share the serif through `--font-heading`. Spacing
+ * else (§8.3). Headings are the sans since 2026-11-17. Spacing
  * drawn for 13px reads airy at 32px; the serif's display optical size
  * (§8.4) is drawn tighter, so `$847.2M` reads as a single quantity.
  *

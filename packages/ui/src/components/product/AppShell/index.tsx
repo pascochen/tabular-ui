@@ -989,9 +989,9 @@ function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }:
     >
       {/*
         The title's size and tracking, so the trail and the title share a
-        baseline and read as one line, in one typeface: the title gives up
-        the heading serif for the trail's sans (§8.3). The weight stays the
-        trail's own: the title is the one 600 on the line.
+        baseline and read as one line. Both are the sans, as every heading is
+        (§8.3). The weight stays the trail's own: the title is the one 600 on
+        the line.
       */}
       {breadcrumb ? (
         <div
@@ -1009,14 +1009,7 @@ function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }:
         with no ellipsis. TruncatedText adds the full title in a tooltip,
         below the title, only when it is cut off.
       */}
-      <h1
-        className={cn(
-          'flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-lg font-semibold tracking-[var(--tracking-tight)] text-text-primary',
-          // §8.3's one exception to the serif heading: behind a trail the
-          // title takes the trail's sans, so the line is one typeface.
-          breadcrumb ? 'font-sans' : null,
-        )}
-      >
+      <h1 className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-lg font-semibold tracking-[var(--tracking-tight)] text-text-primary">
         <TruncatedText side="bottom">{title}</TruncatedText>
       </h1>
       {actions ? <div className="flex shrink-0 items-center gap-[var(--gap-inline)]">{actions}</div> : null}
