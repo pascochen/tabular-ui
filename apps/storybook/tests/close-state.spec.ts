@@ -359,9 +359,13 @@ test('a settled finding names who settled it, and an unsettled one names nobody'
 
 test('Tasks groups a finding by whose move it is', () => {
   // The visitor's: a question, a proposal to confirm, and a question they skipped.
-  expect(['needs-answer', 'needs-confirmation', 'skipped'].map(taskGroup)).toEqual(['yours', 'yours', 'yours']);
+  expect((['needs-answer', 'needs-confirmation', 'skipped'] as const).map(taskGroup)).toEqual([
+    'yours',
+    'yours',
+    'yours',
+  ]);
   // Unsettled and not theirs, Waiting included: it isn't done.
-  expect(['agent-reading', 'rerunning', 'open', 'waiting'].map(taskGroup)).toEqual([
+  expect((['agent-reading', 'rerunning', 'open', 'waiting'] as const).map(taskGroup)).toEqual([
     'others',
     'others',
     'others',
