@@ -12,6 +12,7 @@ import { AgentsView } from './Agents';
 import { ChannelDetails, ChannelFacts } from './ChannelDetails';
 import { ChannelView } from './Channel';
 import { NewChatView } from './NewChat';
+import { NEW_CHAT_PANEL, NewChatPanel, NewChatPanelToggle } from './NewChatPanel';
 import { SearchView } from './Search';
 import { SourcesView } from './Sources';
 import { NoTaskPanel, TaskPanel, TasksView } from './Tasks';
@@ -32,7 +33,12 @@ export type ViewSlots = {
 
 export function slotsFor(view: View): ViewSlots {
   if (view.kind === 'new-chat') {
-    return { title: 'New chat', body: <NewChatView /> };
+    return {
+      title: 'New chat',
+      actions: <NewChatPanelToggle />,
+      body: <NewChatView />,
+      panel: { label: NEW_CHAT_PANEL, content: <NewChatPanel /> },
+    };
   }
   if (view.kind === 'tasks') {
     const task = selectedTask(view.task);
