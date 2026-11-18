@@ -12,6 +12,7 @@ import {
   notCheckedWith,
   openCount,
   settledBy,
+  taskGroup,
   taskStep,
   tasksSummary,
   landingState,
@@ -354,4 +355,17 @@ test('a settled finding names who settled it, and an unsettled one names nobody'
   expect(settledBy(end, 'duplicate-payment')).toMatchObject({ by: 'apLead' });
   expect(settledBy(end, 'credit-limit')).toBeUndefined();
   expect(settledBy(landingState(), 'revenue-cut-off')).toBeUndefined();
+});
+
+test('Tasks groups a finding by whose move it is', () => {
+  // The visitor's: a question, a proposal to confirm, and a question they skipped.
+  expect(['needs-answer', 'needs-confirmation', 'skipped'].map(taskGroup)).toEqual(['yours', 'yours', 'yours']);
+  // Unsettled and not theirs, Waiting included: it isn't done.
+  expect(['agent-reading', 'rerunning', 'open', 'waiting'].map(taskGroup)).toEqual([
+    'others',
+    'others',
+    'others',
+    'others',
+  ]);
+  expect(taskGroup('resolved')).toBe('done');
 });

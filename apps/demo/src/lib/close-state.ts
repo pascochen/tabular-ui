@@ -364,6 +364,33 @@ export function taskStep(state: CloseState, id: string): TaskStep {
   }
 }
 
+/**
+ * Tasks' three groups, by whose move a finding is, in the order the page shows
+ * them. `yours` is first so what waits on the visitor is never under the rest.
+ */
+export const TASK_GROUPS = ['yours', 'others', 'done'] as const;
+export type TaskGroup = (typeof TASK_GROUPS)[number];
+
+/**
+ * The group a step belongs to. A skipped question is still the visitor's: it
+ * stays open until someone decides, and the asking was of them. `others` is
+ * everything unsettled that isn't theirs: an agent reading, a check rerunning,
+ * a teammate's finding, one waiting on Legal. It names no owner, because the
+ * data names none for an open finding. Only `resolved` is done.
+ */
+export function taskGroup(step: TaskStep): TaskGroup {
+  switch (step) {
+    case 'needs-answer':
+    case 'needs-confirmation':
+    case 'skipped':
+      return 'yours';
+    case 'resolved':
+      return 'done';
+    default:
+      return 'others';
+  }
+}
+
 /** The proposal waiting for the visitor's confirmation: the entry for a reopen, the auditors' list otherwise. */
 export function heroProposal(state: CloseState) {
   return current(state).answer === 'reopen' ? close.hero.entry : close.hero.record;
