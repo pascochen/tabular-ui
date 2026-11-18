@@ -188,7 +188,8 @@ test.describe('docked — at and above the 1280px floor', () => {
       const cs = getComputedStyle(el);
       return [cs.fontSize, cs.lineHeight, cs.fontWeight];
     });
-    expect(style).toEqual(['16px', '24px', '600']);
+    // §8.1's page-title tier, --text-base: the band is chrome (16px until 2026-11-17).
+    expect(style).toEqual(['13px', '20px', '600']);
 
     // The header stays put: only the body below it scrolls.
     const overflow = await page

@@ -197,13 +197,13 @@ If none of the three sidebar slots is set, the shell has no sidebar, and neither
 
 ## Page title: `AppShellPageHeader`
 
-Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's `<h1>` at §8.1's page-title tier: `--text-lg` (16/24), 600, `--tracking-tight`, `--color-text-primary`. That is one step above the 14px section headings, so a 13px screen has somewhere for the eye to start. Page-level controls go in `actions`.
+Every page passes an `AppShellPageHeader` to `pageHeader`. It renders the page's `<h1>` at §8.1's page-title tier: `--text-base` (13/20), 600, `--color-text-primary`, the size of the panel header's title. The band is chrome, so weight, not size, says which name is the page. It was `--text-lg` (16/24) with `--tracking-tight` until 2026-11-17, and read as a headline over a dense dashboard. Page-level controls go in `actions`.
 
 ```tsx
 <AppShell pageHeader={<AppShellPageHeader title="Analysis" actions={<PageActions />} />} …>
 ```
 
-`breadcrumb` takes the page's ancestors, a `Breadcrumb` of `BreadcrumbItem`s with no `BreadcrumbPage`: the `<h1>` is the current page. The trail sits in front of the title at the title's size, in secondary text at 400, so the title is still where the eye starts. The trail and the title are both the sans, as every heading is since 2026-11-17 (§8.3), so the line reads in one typeface.
+`breadcrumb` takes the page's ancestors, a `Breadcrumb` of `BreadcrumbItem`s with no `BreadcrumbPage`: the `<h1>` is the current page. The trail sits in front of the title at its own `--text-base`, the title's size, in secondary text at 400, so the title is still where the eye starts. The trail and the title are both the sans, as every heading is since 2026-11-17 (§8.3), so the line reads in one typeface.
 
 ```tsx
 <AppShellPageHeader

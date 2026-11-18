@@ -1039,9 +1039,9 @@ Values are rem (assuming a 16px root); px equivalents shown for reading.
 --text-2xs        0.625rem  10px / 14px   uppercase column headers, micro-labels
 --text-xs         0.6875rem 11px / 16px   timestamps, secondary metadata
 --text-sm         0.75rem   12px / 16px   table cells, dense form labels, help text, error messages, tooltips
---text-base       0.8125rem 13px / 20px   body, default UI text
+--text-base       0.8125rem 13px / 20px   body, default UI text, page title
 --text-md         0.875rem  14px / 20px   section headings, emphasis
---text-lg         1rem      16px / 24px   page title
+--text-lg         1rem      16px / 24px   size="lg" tabs beside display type
 --text-xl         1.25rem   20px / 28px   modal titles, empty states — rare
                                           ─── display boundary ───
 --text-metric-sm  1.5rem    24px / 28px   secondary KPI, tile in a grid of 4+
@@ -1080,6 +1080,8 @@ So the smallest letters on a screen are `--text-xs` lowercase, the mono's a litt
 - **`--text-2xs` is uppercase.** In capitals it is the tallest of the small sizes. In lowercase it would be 5.3px, under everything above. Lint rejects a class string with `text-2xs` and no `uppercase`. Figures are the one exception, and they carry `tabular-nums` as §8.6 asks, which is what the rule looks for.
 
 Raising `--text-2xs` to 11px was compared in both modes and declined: every badge and header would be about 10% wider (`NEEDS REVIEW` 80px to 88px of text) for height the labels do not need. The 11px mono identifier is close to the floor and stays, on §8.3's side-by-side of 2026-11-07. See `docs/reviews/type-floor-2026-11-10.md`.
+
+**The page title is 13px (owner, 2026-11-17).** `AppShellPageHeader`'s `<h1>` is `--text-base` at 600, the size of the panel header's title beside it and of the `Breadcrumb` that leads it. The band is chrome: the trail and the title read as one 13px line, as `Breadcrumb`'s Default story draws it, and weight, not size, says which name is the page. It was `--text-lg` (16/24) with `--tracking-tight` until then, one step above the 14px section headings, and at 16px it read as a headline over a dense dashboard. A `--text-md` section heading in the page body is now a step larger than the `<h1>`. That is accepted: the title sits in the band, apart from the body, and the heading order is unchanged.
 
 13px base, not 14 or 16. The two metric sizes exist because a financial dashboard cannot work without them — a KPI tile rendering `¥34.4bn` at 20px is undersized for the one number the screen exists to show. Nothing above 32px.
 

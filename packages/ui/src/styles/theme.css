@@ -118,6 +118,9 @@
    2026-11-17" (owner decision): every h1–h6 is the sans, and the serif is
    the metric tier's. An app whose headings are display text points the
    token back at --font-display in its own @theme, as tabularui.com does.
+   The --text-base and --text-lg comments move "page title" from 16px to
+   13px, from §8.1 (comment only, no value changed, 2026-11-17, owner
+   decision).
    Tokens are added spec-first — write the
    section in docs/design-system.md, then transcribe here. A token that
    exists here and nowhere in the spec is a defect.
@@ -339,11 +342,11 @@
   --text-xs--line-height: 1rem;            /* 16px */
   --text-sm: 0.75rem;                      /* 12px — table cells, dense labels */
   --text-sm--line-height: 1rem;            /* 16px */
-  --text-base: 0.8125rem;                  /* 13px — body, default UI text */
+  --text-base: 0.8125rem;                  /* 13px — body, default UI text, page title */
   --text-base--line-height: 1.25rem;       /* 20px */
   --text-md: 0.875rem;                     /* 14px — section headings */
   --text-md--line-height: 1.25rem;         /* 20px */
-  --text-lg: 1rem;                         /* 16px — page title */
+  --text-lg: 1rem;                         /* 16px — size="lg" tabs */
   --text-lg--line-height: 1.5rem;          /* 24px */
   --text-xl: 1.25rem;                      /* 20px — modal titles — rare */
   --text-xl--line-height: 1.75rem;         /* 28px */

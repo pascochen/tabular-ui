@@ -950,8 +950,8 @@ export type AppShellPageHeaderProps = Omit<React.ComponentProps<'div'>, 'title'>
   title: string;
   /**
    * The page's ancestors: a `Breadcrumb` of `BreadcrumbItem`s, with no
-   * `BreadcrumbPage`. It leads the title on the same line, at the title's
-   * size, and the `<h1>` stays the current page.
+   * `BreadcrumbPage`. It leads the title on the same line, at the trail's
+   * own `--text-base`, and the `<h1>` stays the current page.
    */
   breadcrumb?: React.ReactNode;
   /** Trailing page-level controls — share, overflow menu. */
@@ -964,9 +964,9 @@ export type AppShellPageHeaderProps = Omit<React.ComponentProps<'div'>, 'title'>
  * The same band as the panel header beside it — `headerBand`, 49px — and
  * placed by the shell directly under the top nav, so the two rules form one
  * line across main and panel. The title is §8.1's page-title tier
- * (--text-lg, 16/24) at 600 with --tracking-tight (§8.8): one step above the
- * 14px section headings, so a 13px screen has somewhere for the eye to
- * start. Its side gutter is main's (`mainGutter`, picked by the shell's
+ * (--text-base, 13/20) at 600: the size of the panel header's title and of
+ * a `BreadcrumbPage`, so the band reads as chrome, not a headline (owner,
+ * 2026-11-17; --text-lg, 16/24, until then). Its side gutter is main's (`mainGutter`, picked by the shell's
  * `contentWidth`: --pad-content-x, or the frame tier once main is wide), so
  * the title starts on the same x as the page body below it, centred column
  * included. The rule still spans main.
@@ -988,17 +988,13 @@ function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }:
       {...props}
     >
       {/*
-        The title's size and tracking, so the trail and the title share a
-        baseline and read as one line. Both are the sans, as every heading is
-        (§8.3). The weight stays the trail's own: the title is the one 600 on
-        the line.
+        The trail keeps its own --text-base, the title's size, so the two share
+        a baseline and read as one line, as the Default story's trail does.
+        Both are the sans, as every heading is (§8.3). The weight stays the
+        trail's own: the title is the one 600 on the line.
       */}
       {breadcrumb ? (
-        <div
-          data-slot="app-shell-page-breadcrumb"
-          // The descendant variant outranks `Breadcrumb`'s own `text-base`.
-          className="flex min-h-[var(--h-control)] min-w-0 items-center tracking-[var(--tracking-tight)] [&_[data-slot=breadcrumb]]:text-lg"
-        >
+        <div data-slot="app-shell-page-breadcrumb" className="flex min-h-[var(--h-control)] min-w-0 items-center">
           {breadcrumb}
         </div>
       ) : null}
@@ -1009,7 +1005,7 @@ function AppShellPageHeader({ title, breadcrumb, actions, className, ...props }:
         with no ellipsis. TruncatedText adds the full title in a tooltip,
         below the title, only when it is cut off.
       */}
-      <h1 className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-lg font-semibold tracking-[var(--tracking-tight)] text-text-primary">
+      <h1 className="flex min-h-[var(--h-control)] min-w-0 flex-1 items-center text-base font-semibold text-text-primary">
         <TruncatedText side="bottom">{title}</TruncatedText>
       </h1>
       {actions ? <div className="flex shrink-0 items-center gap-[var(--gap-inline)]">{actions}</div> : null}
