@@ -3,7 +3,17 @@ import { AgentBlock, AppShellPanelBody, DataTable, Sources, cn, type DataTablePr
 import { TaskStepStatus } from '../components/ExceptionStatus';
 import { ThreadLink } from '../components/ThreadLink';
 import { useClose } from '../lib/close-context';
-import { heroProposal, notCheckedWith, settledBy, taskStep, tasksSummary, type CloseState } from '../lib/close-state';
+import {
+  heroProposal,
+  notCheckedWith,
+  settledBy,
+  TASK_GROUPS,
+  taskGroup,
+  taskStep,
+  tasksSummary,
+  type CloseState,
+  type TaskGroup,
+} from '../lib/close-state';
 import { checks, close, docsOf, exceptions, memberName, selectedTask, type Exception } from '../lib/kasane';
 import { linkClassName } from '../lib/link';
 import { sourcesOf } from '../lib/sources';
@@ -113,11 +123,18 @@ function Heading({ children }: { children: string }) {
   return <h2 className="text-md font-semibold text-text-primary tabular-nums">{children}</h2>;
 }
 
+const groupNames: Record<TaskGroup, string> = { yours: 'Yours', others: 'With others', done: 'Done' };
+
 /**
  * Tasks: the inbox. Every finding, whose move it is, and the way to the channel
  * that holds it. It stores nothing, so a decision made in #revenue shows here.
- * The rows keep the data's order: a row that sank as it resolved would move
- * under the reader.
+ *
+ * Grouped by whose move since 2026-11-18: the visitor's first, then what is
+ * with others, then what is done, so open and closed are on one page. Until
+ * then the rows kept the data's order and none moved as it resolved. Now a
+ * finding moves to its group when its step changes, and keeps the data's order
+ * inside it. "Yours" always shows, so an empty one says nothing waits on the
+ * visitor. The other two show only when they hold a finding.
  */
 export function TasksView() {
   const { state } = useClose();
@@ -126,20 +143,32 @@ export function TasksView() {
 
   return (
     <div className="flex flex-col gap-[var(--gap-section)]">
-      <section className="flex flex-col gap-[var(--gap-field)]">
-        {/* Once nothing is open the rows stay, each with its status. */}
-        <Heading>{tasksSummary(state)}</Heading>
-        <DataTable
-          columns={taskColumns}
-          data={exceptions}
-          // The selected row is §4's single-selection tint, never a new hue.
-          rowClassName={(row) => (row.original.id === selected ? 'bg-bg-interactive' : undefined)}
-          onRowClick={(row) => {
-            navigate(taskView(row.original));
-            openPanel();
-          }}
-        />
-      </section>
+      <Heading>{tasksSummary(state)}</Heading>
+      {TASK_GROUPS.map((group) => {
+        const tasks = exceptions.filter((e) => taskGroup(taskStep(state, e.id)) === group);
+        if (!tasks.length && group !== 'yours') return null;
+        return (
+          <section key={group} aria-labelledby={`tasks-${group}`} className="flex flex-col gap-[var(--gap-field)]">
+            <h3 id={`tasks-${group}`} className="text-sm font-medium text-text-secondary tabular-nums">
+              {groupNames[group]} {tasks.length}
+            </h3>
+            {tasks.length ? (
+              <DataTable
+                columns={taskColumns}
+                data={tasks}
+                // The selected row is §4's single-selection tint, never a new hue.
+                rowClassName={(row) => (row.original.id === selected ? 'bg-bg-interactive' : undefined)}
+                onRowClick={(row) => {
+                  navigate(taskView(row.original));
+                  openPanel();
+                }}
+              />
+            ) : (
+              <p className="text-sm text-text-secondary">Nothing waits on you.</p>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
