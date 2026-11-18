@@ -267,6 +267,12 @@ export { fileTypeIcons, fallbackFileIcon, fileExtension } from './components/pro
 export { CountBadge, type CountBadgeProps } from './components/product/CountBadge';
 export { AgentBlock, type AgentBlockProps } from './components/product/AgentBlock';
 export {
+  AgentCard,
+  AgentCardFinding,
+  type AgentCardProps,
+  type AgentCardFindingProps,
+} from './components/product/AgentCard';
+export {
   AgentReasoning,
   type AgentReasoningProps,
   type AgentReasoningStatus,

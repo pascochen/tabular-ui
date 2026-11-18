@@ -509,6 +509,27 @@
       ]
     },
     {
+      "name": "agent-card",
+      "type": "registry:component",
+      "title": "AgentCard",
+      "description": "One agent as a card: its glyph, its name, the rule it checks and what it found.",
+      "categories": ["product"],
+      "author": "Pascal Chenier",
+      "dependencies": ["@phosphor-icons/react@^2.1.10"],
+      "registryDependencies": [
+        "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/product/AgentCard/index.tsx",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/AgentCard/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "agent-plan",
       "type": "registry:component",
       "title": "AgentPlan",
@@ -1359,6 +1380,7 @@
       "registryDependencies": [
         "https://tabularui.com/r/account-menu.json",
         "https://tabularui.com/r/agent-block.json",
+        "https://tabularui.com/r/agent-card.json",
         "https://tabularui.com/r/agent-plan.json",
         "https://tabularui.com/r/agent-reasoning.json",
         "https://tabularui.com/r/announcement.json",

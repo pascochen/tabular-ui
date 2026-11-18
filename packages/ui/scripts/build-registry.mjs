@@ -64,6 +64,7 @@ const descriptions = {
   // Product
   AccountMenu: 'The signed-in user’s menu, with the colour mode choice.',
   AgentBlock: 'Agent-authored content, with its authorship rail and label.',
+  AgentCard: 'One agent as a card: its glyph, its name, the rule it checks and what it found.',
   AgentPlan: 'An agent’s plan and each step’s status. Sits inside an AgentBlock.',
   AgentReasoning: 'An agent’s collapsible reasoning, with a working state. Sits inside an AgentBlock.',
   AppBar: 'The top bar: brand, navigation and actions.',
