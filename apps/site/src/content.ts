@@ -54,6 +54,8 @@ export const external = {
   // each one shows "Demo (soon)", disabled.
   demo: { href: 'https://demo.tabularui.com', label: 'Demo', ready: true as boolean },
   github: { href: 'https://github.com/pascochen/tabular-ui', label: 'GitHub' },
+  // The Figma library on Figma Community, in the nav since 2026-11-18 (owner).
+  figma: { href: 'https://www.figma.com/community/file/1705066085945415032', label: 'Figma' },
   license: { href: 'https://github.com/pascochen/tabular-ui/blob/main/LICENSE', label: 'MIT license' },
   // The footer's About column links to the author (owner, 2026-10-27). The label
   // names the destination, as GitHub's does: it read "By Pascal" until 2026-11-15.

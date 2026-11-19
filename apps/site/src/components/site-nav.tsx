@@ -1,3 +1,4 @@
+import { FigmaLogoIcon, GithubLogoIcon, NotebookIcon } from '@phosphor-icons/react';
 import { useLocation } from 'react-router';
 import { Button, buttonVariants, Menu, MenuContent, MenuItem, MenuTrigger } from 'tabular-ui';
 
@@ -8,15 +9,24 @@ import { ExternalMark } from './layout';
 
 type Page = (typeof pages)[keyof typeof pages];
 
-// The system on the left, then on the right what takes you off to use it
-// (owner, 2026-10-27): Storybook, GitHub, and Get started, the one page of this
-// site there, with no arrow. Principles left the nav and the footer the same
-// day; each component page that carries a principle links to it. The disabled
-// "Demo (soon)" button left the nav too: where the demo goes, now that it's live
-// (2026-11-04), is still to decide. The hero and the closing band keep their demo action.
-const system = [pages.components, pages.foundations, pages.vocabulary].filter((page) => page.live);
-const setUp: Page[] = [pages.gettingStarted].filter((page) => page.live);
-const elsewhere = [external.storybook, external.github];
+// The system on the left, with Get started after Vocabulary, and on the right
+// the links off the site: GitHub, Storybook, then Figma (owner, 2026-11-18). From
+// 2026-10-27 Get started sat on the right, after Storybook and GitHub.
+// Principles left the nav and the footer on 2026-10-27; each component page
+// that carries a principle links to it. The disabled "Demo (soon)" button left
+// the nav too: where the demo goes, now that it's live (2026-11-04), is still to
+// decide. The hero and the closing band keep their demo action.
+const system: Page[] = [pages.components, pages.foundations, pages.vocabulary, pages.gettingStarted].filter(
+  (page) => page.live,
+);
+// Each link off the site leads with its mark (owner, 2026-11-18): GitHub's
+// logo, a notebook for Storybook, and Figma's logo. The icon is decoration:
+// the label names the link.
+const elsewhere = [
+  { ...external.github, Icon: GithubLogoIcon },
+  { ...external.storybook, Icon: NotebookIcon },
+  { ...external.figma, Icon: FigmaLogoIcon },
+];
 
 /**
  * The site's nav (docs/site.md D8): an inset bar with a 1px rule all round,
@@ -90,14 +100,14 @@ export function SiteNav() {
         <ul role="list" className="ml-auto hidden items-center gap-[var(--gap-inline)] lg:flex">
           {elsewhere.map((link) => (
             <li key={link.href}>
-              <a href={link.href} {...newTab} className={buttonVariants({ variant: 'ghost' })}>
+              {/* As Button draws a leading icon: bold, since 1em is under 16px
+                  (§11.2), and 6px on the icon's side for its inboard glyph (§7.4). */}
+              <a href={link.href} {...newTab} className={cn(buttonVariants({ variant: 'ghost' }), 'pl-1.5')}>
+                <link.Icon weight="bold" aria-hidden="true" />
                 {link.label}
                 <ExternalMark />
               </a>
             </li>
-          ))}
-          {setUp.map((page) => (
-            <li key={page.href}>{pageLink(page)}</li>
           ))}
         </ul>
 
@@ -109,7 +119,7 @@ export function SiteNav() {
           <Menu>
             <MenuTrigger render={<Button variant="outline">Menu</Button>} />
             <MenuContent align="end">
-              {/* The desktop order: the system, then Storybook, GitHub and Get started. */}
+              {/* The desktop order: the system and Get started, then GitHub, Storybook and Figma. */}
               {system.map((page) => (
                 <MenuItem key={page.href} render={<a href={page.href} />}>
                   {page.label}
@@ -117,13 +127,9 @@ export function SiteNav() {
               ))}
               {elsewhere.map((link) => (
                 <MenuItem key={link.href} render={<a href={link.href} {...newTab} />}>
+                  <link.Icon weight="bold" aria-hidden="true" />
                   {link.label}
                   <ExternalMark />
-                </MenuItem>
-              ))}
-              {setUp.map((page) => (
-                <MenuItem key={page.href} render={<a href={page.href} />}>
-                  {page.label}
                 </MenuItem>
               ))}
             </MenuContent>
