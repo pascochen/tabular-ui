@@ -248,17 +248,19 @@ test.describe('Components in the nav', () => {
     await expect(nav.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page');
   });
 
-  // Owner, 2026-10-27: the system on the left, then Storybook, GitHub and Get
-  // started on the right. Get started is a page of this site, so no arrow. The
+  // Owner, 2026-11-18: the system and Get started on the left, then GitHub,
+  // Storybook and Figma on the right. Get started is a page of this site, so no arrow. The
   // footer's Guide keeps the nav's names, destinations and order.
-  test('the system on the left, Get started on the right, and the footer in the same order', async ({ page }) => {
+  test('the system and Get started on the left, the other sites on the right, and the footer in the same order', async ({
+    page,
+  }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Main' });
     const [left, right] = await nav.getByRole('list').all();
-    await expect(left.getByRole('listitem')).toHaveText(['Components', 'Foundations', 'Vocabulary']);
-    await expect(right.getByRole('listitem')).toHaveText([/^Storybook/, /^GitHub/, 'Get started']);
-    await expect(right.getByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/getting-started');
-    await expect(right.getByRole('link', { name: 'Get started' })).not.toContainText('↗');
+    await expect(left.getByRole('listitem')).toHaveText(['Components', 'Foundations', 'Vocabulary', 'Get started']);
+    await expect(right.getByRole('listitem')).toHaveText([/^GitHub/, /^Storybook/, /^Figma/]);
+    await expect(left.getByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/getting-started');
+    await expect(left.getByRole('link', { name: 'Get started' })).not.toContainText('↗');
     const guide = page.getByRole('contentinfo').getByRole('list', { name: 'Guide' });
     await expect(guide.getByRole('link')).toHaveText(['Components', 'Vocabulary', 'Get started']);
     for (const name of ['Components', 'Vocabulary', 'Get started']) {
@@ -269,7 +271,7 @@ test.describe('Components in the nav', () => {
       );
     }
     await page.goto('/getting-started');
-    await expect(right.getByRole('link', { name: 'Get started' })).toHaveAttribute('aria-current', 'page');
+    await expect(left.getByRole('link', { name: 'Get started' })).toHaveAttribute('aria-current', 'page');
   });
 
   test('on a phone, the menu has the same links in the same order, and no demo', async ({ page }) => {
@@ -281,17 +283,34 @@ test.describe('Components in the nav', () => {
       'Components',
       'Foundations',
       'Vocabulary',
-      /^Storybook/,
-      /^GitHub/,
       'Get started',
+      /^GitHub/,
+      /^Storybook/,
+      /^Figma/,
     ]);
+    for (const name of [/^GitHub/, /^Storybook/, /^Figma/]) {
+      await expect(page.getByRole('menuitem', { name }).locator('svg[aria-hidden="true"]')).toHaveCount(1);
+    }
+  });
+
+  // Owner, 2026-11-18: each link off the site leads with its mark, hidden from
+  // assistive tech, so the link's name stays its label.
+  test('each link to another site leads with a hidden icon', async ({ page }) => {
+    await page.goto('/');
+    const [, right] = await page.getByRole('navigation', { name: 'Main' }).getByRole('list').all();
+    for (const link of await right.getByRole('link').all()) {
+      const first = link.locator(':scope > *').first();
+      await expect(first).toHaveJSProperty('tagName', 'svg');
+      await expect(first).toHaveAttribute('aria-hidden', 'true');
+    }
+    await expect(right.getByRole('link', { name: /^GitHub/ })).toHaveAccessibleName('GitHub (opens in a new tab)');
   });
 
   // Real gestures, because a target attribute is a claim about what a click does.
   // The other site is stubbed: this is about the tab, not whether Storybook is up.
   test.describe('a link to another site opens a new tab and leaves this page where it was', () => {
     test.beforeEach(async ({ context }) => {
-      await context.route(/^https:\/\/(storybook\.tabularui\.com|github\.com)\//, (route) =>
+      await context.route(/^https:\/\/(storybook\.tabularui\.com|github\.com|www\.figma\.com)\//, (route) =>
         route.fulfill({ contentType: 'text/html', body: '<title>Elsewhere</title>' }),
       );
     });
