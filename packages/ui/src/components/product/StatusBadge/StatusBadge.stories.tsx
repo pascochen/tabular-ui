@@ -67,7 +67,7 @@ export const InRunLog: Story = {
       { model: 'stg_sap__bkpf', status: 'running', rows: '412,880' },
       { model: 'int_fx_rates_daily', status: 'stale', rows: '1,204' },
       { model: 'fct_ap_aging', status: 'agent-proposed', rows: '92,410' },
-      { model: 'dim_calendar', status: 'queued', rows: '—' },
+      { model: 'dim_calendar', status: 'failed', rows: '365' },
       { model: 'stg_sap__bseg', status: 'skipped', rows: '—' },
     ];
     return (
