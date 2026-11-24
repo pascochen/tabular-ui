@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CheckIcon, PlayIcon } from '@phosphor-icons/react';
+import { ArrowLineRightIcon, ArrowRightIcon, CheckIcon, PlayIcon } from '@phosphor-icons/react';
 import { Button, DataTable, ProgressBar, Spinner } from 'tabular-ui';
 
 import { bridgeColumns, bridgeLines } from '../bridge';
@@ -29,7 +29,9 @@ export const meta: Route.MetaFunction = () =>
  * The three jobs (docs/explorations/motion-page-spec.md), each drawn with its
  * own mark and named by a timing the Timing section lists. The tracer is the
  * real Spinner, and it moves, as Vocabulary's working badge does: it is the
- * one mark that loops.
+ * one mark that loops. The fourth row is the lead's last claim, reduced
+ * motion, named by the media feature it answers (2026-11-24): it also brings
+ * the plate level with the intro, as the other keys are.
  */
 function MotionKey() {
   return (
@@ -52,6 +54,17 @@ function MotionKey() {
           mark: <Spinner className="size-[var(--size-icon-md)] text-text-body" />,
           meaning: 'Work in progress: it loops until the work ends',
           name: '1.2s linear',
+        },
+        {
+          mark: (
+            <ArrowLineRightIcon
+              aria-hidden="true"
+              weight="bold"
+              className="size-[var(--size-icon-md)] text-text-body"
+            />
+          ),
+          meaning: 'Reduced motion: the end state, at once',
+          name: 'prefers-reduced-motion',
         },
       ]}
     />
