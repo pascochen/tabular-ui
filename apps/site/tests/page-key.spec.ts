@@ -133,6 +133,10 @@ for (const route of Object.keys(keyed) as Route[]) {
             // A token resolves on the root; a role names a fill token; a status names a badge on the page.
             if (name.startsWith('--')) return root.getPropertyValue(name).trim() === '';
             if (route === '/vocabulary') return !document.querySelector(`main [data-status="${name}"]`);
+            // A media feature is known if it or its negation matches: an unknown one is neither, as
+            // both evaluate to unknown. Its text alone proves nothing: Chromium keeps a misspelt one.
+            if (route === '/foundations/motion' && name.startsWith('prefers-'))
+              return !matchMedia(`(${name})`).matches && !matchMedia(`(not (${name}))`).matches;
             // A timing names a motion the Timing section lists.
             if (route === '/foundations/motion')
               return !document.getElementById('timing-title')?.closest('section')?.textContent?.includes(name);
