@@ -25,7 +25,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
   },
   {
     title: 'Foundations',
-    links: [pages.color, pages.typography, pages.density]
+    links: [pages.color, pages.typography, pages.density, pages.motion]
       .filter((page) => page.live)
       .map(({ href, label }) => ({ href, label })),
   },

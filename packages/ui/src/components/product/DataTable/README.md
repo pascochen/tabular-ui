@@ -150,6 +150,10 @@ The row is 28px in every state. The rule sits inside the cell, under the figure,
 
 **A totals row needs a text column ahead of its first figure.** Without one, its label is for screen readers only. A filtered total then shows as a bare number, and a miss as an unlabelled red one.
 
+### The total is ruled
+
+Added 2026-11-24 (M3). When the rows on display come to sum while the table is on screen (a filter cleared, a row posted, a figure corrected), the double rule is drawn in left to right in 200ms: a cover in the cell's ground hides it and shrinks toward its right end. A table that loads balanced is still, and a rule that stops holding goes at once. Under reduced motion it appears. The rule itself, its geometry and its check are unchanged. `apps/storybook/tests/gestures.spec.ts`, with the `TotalWhileFiltered` story: clear the filter.
+
 ## Structure
 
 Headers are neutral (§0 rule 1: structure never takes a hue), uppercase `--text-2xs` with `--tracking-wide`, sticky, on `--color-surface`.
@@ -207,6 +211,12 @@ A negative takes U+2212 on screen and a hyphen on the clipboard (§8.6). Excel i
 - **One name on its own is awkward.** A drag or a double-click that starts on the button clicks it and selects nothing, as on any button, so start the drag in the cell's padding or the cell beside it.
 
 The limits are in §8.6: `¥` and comma-decimal locales, rendered rows only in a virtualized table, no header row, no single column, and a selection that starts outside the table keeps U+2212. A selection with no minus keeps the browser's HTML, which holds a `<button>` for the identifier, and that hasn't been pasted into Excel or Docs (§10). `apps/storybook/tests/data-table-copy.spec.ts` reads the clipboard, and the `SignedFigures` story has the figures.
+
+### Copied cells take a wash
+
+Added 2026-11-24 (`docs/explorations/motion-page-spec.md`, M2). A copy changed nothing on screen. Now the body cells a selection touches take the press tone, `--color-bg-active`, as one band: in from the left in 140ms, held 400ms, out to the right in 200ms. Each cell's share of the band is set from its place in it, so the cells read as one sweep. A polite `role="status"` region says "Copied" once, then empties. Under reduced motion the tone shows still for 600ms. A copy from a field in a cell takes no wash.
+
+The cells are marked with `data-copied` directly (`copyWash.ts`), not through state: a copy that re-rendered every row would cost more than it says. The tone sits under the text and over the row, so the selection stays visible through it. `apps/storybook/tests/gestures.spec.ts`.
 
 ## Columns with no visible header
 

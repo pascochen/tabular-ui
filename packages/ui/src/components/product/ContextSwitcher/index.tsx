@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { fadeBack, GestureKeyframes, tickIn } from '../../../lib/gestures';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
 import { popupRowInset } from '../../foundational/popupSurface';
@@ -151,13 +152,18 @@ function ContextSwitcher({
   const current = items.find((i) => i.id === currentId);
   const triggerId = useId();
   const [copied, setCopied] = useState(false);
+  // The copy icon fades back only after a copy: on first open it is simply there.
+  const [returned, setReturned] = useState(false);
   const copyAction = actions?.find((a) => a.type === 'copy-id');
   // No submenu, so the trailing edge holds the check instead of a chevron.
   const trailingCheck = !actions?.length;
 
   useEffect(() => {
     if (!copied) return;
-    const t = setTimeout(() => setCopied(false), COPIED_MS);
+    const t = setTimeout(() => {
+      setCopied(false);
+      setReturned(true);
+    }, COPIED_MS);
     return () => clearTimeout(t);
   }, [copied]);
 
@@ -233,7 +239,24 @@ function ContextSwitcher({
                       action.type === 'copy-id' ? (
                         // Stays open so "Copied" is seen where the click landed.
                         <MenuItem key={action.label} closeOnClick={false} onClick={copyId}>
-                          <CopyIcon weight="bold" aria-hidden="true" />
+                          {/*
+                            Copy is ticked, as the site's copy command is
+                            (docs/explorations/motion-page-spec.md, M4): the check
+                            is drawn in, and the copy icon fades back. One icon at
+                            a time; the key remounts it, which starts the
+                            animation. Under reduced motion they swap.
+                          */}
+                          {copied ? (
+                            <CheckIcon key="check" weight="bold" aria-hidden="true" className={tickIn} />
+                          ) : (
+                            <CopyIcon
+                              key={returned ? 'copy-back' : 'copy'}
+                              weight="bold"
+                              aria-hidden="true"
+                              className={returned ? fadeBack : undefined}
+                            />
+                          )}
+                          {copied || returned ? <GestureKeyframes /> : null}
                           {copied ? 'Copied' : action.label}
                         </MenuItem>
                       ) : (

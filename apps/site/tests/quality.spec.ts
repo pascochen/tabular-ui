@@ -476,17 +476,23 @@ test.describe('accessibility beyond axe', () => {
               ? 'Component list'
               : el.closest('[aria-labelledby="bridge-title"]')
                 ? 'Bridge table'
-                : el.textContent?.trim().slice(0, 40),
+                : el.closest('[aria-labelledby="copy-wash-title"]')
+                  ? 'Copy wash table'
+                  : el.textContent?.trim().slice(0, 40),
           ),
       );
       const hasBridge = route === '/components/lineage-tree';
+      // Motion's copy wash is shown on the bridge's lines, with no total (D11): its header sticks
+      // only inside its own scroller, as the bridge's does (2026-11-24).
+      const hasCopyTable = route === '/foundations/motion';
       expect(pinned).toEqual([
         'Skip to content',
         ...(isComponent ? ['Component list'] : []),
         ...(hasBridge ? ['Bridge table', 'Bridge table'] : []),
+        ...(hasCopyTable ? ['Copy wash table'] : []),
       ]);
-      if (hasBridge) {
-        const scroller = await page.locator('[aria-labelledby="bridge-title"] table').evaluate((table) => {
+      for (const owner of [hasBridge && 'bridge-title', hasCopyTable && 'copy-wash-title'].filter(Boolean)) {
+        const scroller = await page.locator(`[aria-labelledby="${owner}"] table`).evaluate((table) => {
           const el = table.parentElement!;
           return {
             overflows: el.scrollHeight > el.clientHeight,
@@ -578,7 +584,12 @@ test.describe('accessibility beyond axe', () => {
  * the checks on the links themselves.
  */
 test.describe('the Foundations pages, before and after hydration', () => {
-  for (const route of ['/foundations/color', '/foundations/typography', '/foundations/density']) {
+  for (const route of [
+    '/foundations/color',
+    '/foundations/typography',
+    '/foundations/density',
+    '/foundations/motion',
+  ]) {
     for (const state of ['before hydration', 'hydrated'] as const) {
       const hold = async (page: Page) => {
         if (state === 'before hydration') {
@@ -620,9 +631,14 @@ test.describe('the Foundations pages, before and after hydration', () => {
         const pinned = await page.evaluate(() =>
           [...document.querySelectorAll('body *')]
             .filter((el) => ['fixed', 'sticky'].includes(getComputedStyle(el).position))
-            .map((el) => el.textContent?.trim().slice(0, 40)),
+            .map((el) =>
+              el.closest('[aria-labelledby="copy-wash-title"]')
+                ? 'Copy wash table'
+                : el.textContent?.trim().slice(0, 40),
+            ),
         );
-        expect(pinned).toEqual(['Skip to content']);
+        // Motion's copy-wash table: its header sticks inside its own scroller, checked above.
+        expect(pinned).toEqual(['Skip to content', ...(route === '/foundations/motion' ? ['Copy wash table'] : [])]);
       });
 
       test(`${route}, ${state}: in forced colours, every plate and filled control keeps a visible edge`, async ({

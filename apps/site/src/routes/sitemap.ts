@@ -17,6 +17,7 @@ export function loader() {
     pages.color.href,
     pages.typography.href,
     pages.density.href,
+    pages.motion.href,
     pages.gettingStarted.href,
   ];
   const urls = paths.map((path) => `  <url><loc>${canonicalUrl(path)}</loc></url>`).join('\n');

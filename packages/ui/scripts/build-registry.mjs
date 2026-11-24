@@ -105,8 +105,9 @@ const descriptions = {
 const modules = {
   'lib/utils.ts': ['utils', 'cn(): joins class names and resolves Tailwind conflicts, aware of the type scale.'],
   'lib/theme.ts': ['theme-mode', 'useTheme(): sets data-theme on the page, follows the OS if asked, remembers it.'],
-  'lib/motion.ts': ['motion', 'useReducedMotion(): whether the user asked for less motion.'],
+  'lib/motion.ts': ['motion', 'useReducedMotion() and prefersReducedMotion(): whether the user asked for less motion.'],
   'lib/elapsed.ts': ['elapsed', 'Counts and formats the time a working state has run.'],
+  'lib/gestures.tsx': ['gestures', 'The tick, the wash and the rule: keyframes a mark is drawn in with.'],
   'components/foundational/controlBase.ts': [
     'control-base',
     'The classes every control shares: focus ring, disabled fade.',

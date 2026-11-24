@@ -809,6 +809,7 @@
       "dependencies": ["@phosphor-icons/react@^2.1.10"],
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/gestures.json",
         "https://tabularui.com/r/menu.json",
         "https://tabularui.com/r/popup-surface.json",
         "https://tabularui.com/r/tokens.json",
@@ -856,7 +857,10 @@
         "@tanstack/react-virtual@^3.14.26"
       ],
       "registryDependencies": [
+        "https://tabularui.com/r/announcement.json",
         "https://tabularui.com/r/button.json",
+        "https://tabularui.com/r/gestures.json",
+        "https://tabularui.com/r/motion.json",
         "https://tabularui.com/r/tokens.json",
         "https://tabularui.com/r/tooltip.json",
         "https://tabularui.com/r/utils.json"
@@ -866,6 +870,11 @@
           "path": "src/components/product/DataTable/CutTextTooltip.tsx",
           "type": "registry:file",
           "target": "@components/tabular-ui/components/product/DataTable/CutTextTooltip.tsx"
+        },
+        {
+          "path": "src/components/product/DataTable/copyWash.ts",
+          "type": "registry:file",
+          "target": "@components/tabular-ui/components/product/DataTable/copyWash.ts"
         },
         {
           "path": "src/components/product/DataTable/cutText.ts",
@@ -1144,6 +1153,7 @@
       "dependencies": ["@phosphor-icons/react@^2.1.10"],
       "registryDependencies": [
         "https://tabularui.com/r/badge.json",
+        "https://tabularui.com/r/gestures.json",
         "https://tabularui.com/r/spinner.json",
         "https://tabularui.com/r/tokens.json",
         "https://tabularui.com/r/utils.json"
@@ -1270,7 +1280,7 @@
       "name": "motion",
       "type": "registry:lib",
       "title": "motion",
-      "description": "useReducedMotion(): whether the user asked for less motion.",
+      "description": "useReducedMotion() and prefersReducedMotion(): whether the user asked for less motion.",
       "categories": ["lib"],
       "author": "Pascal Chenier",
       "registryDependencies": ["https://tabularui.com/r/tokens.json"],
@@ -1288,6 +1298,18 @@
       "registryDependencies": ["https://tabularui.com/r/tokens.json"],
       "files": [
         { "path": "src/lib/elapsed.ts", "type": "registry:file", "target": "@components/tabular-ui/lib/elapsed.ts" }
+      ]
+    },
+    {
+      "name": "gestures",
+      "type": "registry:lib",
+      "title": "gestures",
+      "description": "The tick, the wash and the rule: keyframes a mark is drawn in with.",
+      "categories": ["lib"],
+      "author": "Pascal Chenier",
+      "registryDependencies": ["https://tabularui.com/r/tokens.json"],
+      "files": [
+        { "path": "src/lib/gestures.tsx", "type": "registry:file", "target": "@components/tabular-ui/lib/gestures.tsx" }
       ]
     },
     {
@@ -1410,6 +1432,7 @@
         "https://tabularui.com/r/empty-state.json",
         "https://tabularui.com/r/field.json",
         "https://tabularui.com/r/filter-chip.json",
+        "https://tabularui.com/r/gestures.json",
         "https://tabularui.com/r/icon-button.json",
         "https://tabularui.com/r/inline-citation.json",
         "https://tabularui.com/r/input.json",

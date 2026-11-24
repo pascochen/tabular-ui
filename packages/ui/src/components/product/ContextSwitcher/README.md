@@ -95,6 +95,8 @@ Submenu timing, flip and keyboard are all Base UI's:
 
 There is no toast in the system. The item reads **"Copied"** for 1.5s with the menu kept open (`closeOnClick={false}`), and `announcement` goes to a polite `role="status"` region outside the portal. A rejected clipboard write leaves the label unchanged.
 
+**The check is ticked** (added 2026-11-24, `docs/explorations/motion-page-spec.md`, M4). After a copy the copy icon gives way to a check drawn left to right in 140ms, and when "Copied" ends the copy icon fades back in 120ms, as the site's copy command does. One icon at a time. Under reduced motion they swap in place. The keyframes are `lib/gestures.tsx`'s. `apps/storybook/tests/gestures.spec.ts`.
+
 ## Truncation
 
 Names truncate on the trigger and on every row through `TruncatedText`, so **only a name that is actually cut off** gets a tooltip. The component is shared; this switcher only picks the sides.

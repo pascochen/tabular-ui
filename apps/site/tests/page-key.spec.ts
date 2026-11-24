@@ -13,6 +13,7 @@ const keyed = {
   '/foundations/color': 'What each color marks',
   '/foundations/typography': 'What each family is for',
   '/foundations/density': 'The three caps',
+  '/foundations/motion': 'What motion is for',
   '/vocabulary': 'One word per state',
 } as const;
 
@@ -56,8 +57,9 @@ for (const route of Object.keys(keyed) as Route[]) {
         await expect(key(page, route)).toBeHidden();
       });
 
-      // Vocabulary's working badge spins, as it does in the product (owner, 2026-11-14). Nothing else in a head moves.
-      const spinners = route === '/vocabulary' ? 1 : 0;
+      // Vocabulary's working badge spins, as it does in the product (owner, 2026-11-14), and so does
+      // Motion's tracer, the one mark that loops (2026-11-24). Nothing else in a head moves.
+      const spinners = route === '/vocabulary' || route === '/foundations/motion' ? 1 : 0;
 
       test(`${state}: nothing in the head moves but a working badge's spinner`, async ({ page }) => {
         await hold(page, route, state);
@@ -131,6 +133,9 @@ for (const route of Object.keys(keyed) as Route[]) {
             // A token resolves on the root; a role names a fill token; a status names a badge on the page.
             if (name.startsWith('--')) return root.getPropertyValue(name).trim() === '';
             if (route === '/vocabulary') return !document.querySelector(`main [data-status="${name}"]`);
+            // A timing names a motion the Timing section lists.
+            if (route === '/foundations/motion')
+              return !document.getElementById('timing-title')?.closest('section')?.textContent?.includes(name);
             return root.getPropertyValue(`--color-fill-${name}`).trim() === '';
           });
         },

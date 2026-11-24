@@ -41,6 +41,8 @@ export const pages = {
   color: { href: '/foundations/color', label: 'Color', live: true },
   typography: { href: '/foundations/typography', label: 'Typography', live: true },
   density: { href: '/foundations/density', label: 'Density', live: true },
+  // The fourth Foundations page (owner, 2026-11-24): docs/explorations/motion-page-spec.md.
+  motion: { href: '/foundations/motion', label: 'Motion', live: true },
 } as const;
 
 /** A built component's own page (docs/site.md §3). */

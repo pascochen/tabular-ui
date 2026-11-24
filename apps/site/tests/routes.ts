@@ -28,6 +28,7 @@ export const routes = [
   '/foundations/color',
   '/foundations/typography',
   '/foundations/density',
+  '/foundations/motion',
   '/getting-started',
   '/404',
 ];

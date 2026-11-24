@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { expect } from 'storybook/test';
+
+import { Button } from '../../foundational/Button';
 
 import { StatusBadge } from './index';
 import { runStatuses, runStatusRowTreatment, type RunStatus } from './statuses';
@@ -135,5 +138,24 @@ export const DeprecatedRoleField: Story = {
       await expect(entry.spin).toBe(entry.working);
     }
     await expect(runStatuses.failed.tone).toBe('danger');
+  },
+};
+
+/**
+ * The tracer becomes a tick (docs/explorations/motion-page-spec.md, M1). Finish
+ * the run: the check is drawn in, left to right, in 140ms. Only on a change seen
+ * live: `Default` mounts passed and is still. Under reduced motion it swaps.
+ */
+export const TickedOnPass: Story = {
+  render: function TickedOnPassStory() {
+    const [status, setStatus] = useState<RunStatus>('running');
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--gap-inline)' }}>
+        <StatusBadge status={status} />
+        <Button size="sm" variant="outline" onClick={() => setStatus(status === 'running' ? 'passed' : 'running')}>
+          {status === 'running' ? 'Finish the run' : 'Run again'}
+        </Button>
+      </div>
+    );
   },
 };
