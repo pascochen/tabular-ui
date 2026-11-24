@@ -5,7 +5,7 @@ import { cn } from '../lib/cn';
 import { Rail, Section } from './layout';
 import { KeyedHead } from './page-key';
 
-const foundationPages = [pages.color, pages.typography, pages.density];
+const foundationPages = [pages.color, pages.typography, pages.density, pages.motion];
 
 /**
  * The Foundations pages' shared top (option A of the 2026-10-27 navigation
@@ -45,7 +45,8 @@ export function FoundationsHeader({
             <a
               href={page.href}
               aria-current={page === current ? 'page' : undefined}
-              className={cn(tabVariants({ size: 'lg' }))}
+              // Four links fit 320px only at 4px a side (2026-11-24, Motion added): 8px from 360px.
+              className={cn(tabVariants({ size: 'lg' }), 'max-[359px]:px-1')}
             >
               {page.label}
             </a>
@@ -71,7 +72,8 @@ export function FoundationsHeader({
                 <a
                   href={page.href}
                   aria-current={page === current ? 'page' : undefined}
-                  className={cn(tabVariants({ size: 'lg' }))}
+                  // Four links fit 320px only at 4px a side (2026-11-24, Motion added): 8px from 360px.
+                  className={cn(tabVariants({ size: 'lg' }), 'max-[359px]:px-1')}
                 >
                   {page.label}
                 </a>

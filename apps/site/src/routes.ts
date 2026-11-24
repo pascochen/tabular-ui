@@ -8,6 +8,7 @@ export default [
   route('foundations/color', 'routes/color.tsx'),
   route('foundations/typography', 'routes/typography.tsx'),
   route('foundations/density', 'routes/density.tsx'),
+  route('foundations/motion', 'routes/motion.tsx'),
   route('getting-started', 'routes/getting-started.tsx'),
   // A resource route, prerendered to build/client/sitemap.xml (docs/site.md §12).
   route('sitemap.xml', 'routes/sitemap.ts'),

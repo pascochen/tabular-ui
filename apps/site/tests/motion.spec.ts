@@ -1,4 +1,8 @@
+import { readFileSync } from 'node:fs';
+
 import { expect, test, type Locator, type Page } from '@playwright/test';
+
+import { motions, playerSource } from '../src/motion';
 
 /**
  * The site's four small motions (docs/site.md §7, "Motion"): the link whose
@@ -221,5 +225,27 @@ test.describe('the page turns', () => {
       await open(page, '/');
       expect(await turned(page, 'Vocabulary', '/vocabulary')).toBe('false');
     });
+  });
+});
+
+/**
+ * The Motion page (/foundations/motion, docs/explorations/motion-page-spec.md).
+ * Its Timing list is typed, because there is no motion token to read: so each
+ * entry names the file and the text that set its value, and this reads them.
+ * A duration changed in a component fails here until the list says the same.
+ */
+test.describe('the Motion page', () => {
+  test('every timing it lists is still written where it says', () => {
+    const root = new URL('../../../', import.meta.url);
+    for (const { file, text } of [...motions.map((m) => m.source), playerSource]) {
+      const source = readFileSync(new URL(file, root), 'utf8');
+      for (const t of text) expect(source, `${file} no longer has "${t}"`).toContain(t);
+    }
+  });
+
+  test('its Timing list has a row for each', async ({ page }) => {
+    await open(page, '/foundations/motion');
+    const list = page.getByRole('list', { name: 'Every motion' });
+    await expect(list.getByRole('listitem')).toHaveText(motions.map((m) => new RegExp(`^${m.name}`)));
   });
 });

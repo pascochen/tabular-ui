@@ -81,7 +81,7 @@ function RunLogRow({
         weight="bold"
         aria-hidden="true"
         className={cn(
-          'size-[var(--size-icon-xs)] shrink-0 text-text-tertiary transition-transform',
+          'size-[var(--size-icon-xs)] shrink-0 text-text-tertiary transition-transform motion-reduce:transition-none',
           isOpen && 'rotate-90',
           !expandable && 'invisible',
         )}

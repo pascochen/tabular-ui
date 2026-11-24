@@ -40,6 +40,10 @@ The status map's `working` flag says which statuses draw the `Spinner`. `spin` i
 
 §5 assigns some statuses a treatment that extends beyond the badge — a `--color-bg-danger` tint across a failed row, the `--color-bg-agent` ground and solid `--color-text-agent` left rail on an agent proposal (the rail `AgentBlock` draws, since 2026-10-21). A badge cannot tint the row it sits in, so those live in `runStatusRowTreatment`, which `DataTable`, `RunLogRow` and `AttachmentRow` read. A row that applies it pads with `--pad-cell-x`: the treatment takes the rail's 2px back off the left. Nothing else should.
 
+## A pass is ticked
+
+Added 2026-11-24 (`docs/explorations/motion-page-spec.md`, M1). When a status seen working (`running`, `agent-working`) becomes `passed`, the check mark is drawn in, left to right, in 140ms. Only on a change seen live: a badge that mounts passed is still, or a list of passed runs would tick on every load. A failure lands in place. Under reduced motion the mark swaps. `RunLogRow` gets it through the badge. The `TickedOnPass` story, and `apps/storybook/tests/gestures.spec.ts`.
+
 ## Labels
 
 The default label comes from the table. Pass children to override the text while keeping the icon and tone — useful when a screen has its own vocabulary ("halted" rather than "failed"). The role never changes: that is the contract.

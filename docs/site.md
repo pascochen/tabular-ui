@@ -28,7 +28,7 @@ This spec replaces two earlier drafts, the site build prompt and the site patter
 | D6 | Hero motion | Rests on the proposal; the visitor posts; Replay after. *Changed 2026-10-26:* the hero is a teaser with no buttons; the Agent block card is live. *Reopened 2026-11-17, built:* the hero is a sheet that plays on load and loops, with Pause |
 | D7 | Closing band | "Four agents checked a finance team's books and raised four issues for you to decide"; Home only (*changed 2026-11-16*) |
 | D8 | Nav | Site-built, inset, scrolls away |
-| D9 | Page set | Foundations: Color, Typography, Density; install command on each component page |
+| D9 | Page set | Foundations: Color, Typography, Density, Motion (since 2026-11-24); install command on each component page |
 | D10 | Library first | A reusable pattern ships in `packages/ui` first; the site's own components are a named list |
 | D11 | Double rule | Stays rare: `DataTable`'s totals row first, then one use on the site, on Lineage tree's page. Section rules stay 1px |
 | D12 | Foundations links | Bordered, selected in ink, still real links |
@@ -238,9 +238,12 @@ Changed 2026-11-04 (owner): the band names the four agents and the controller, t
    | Color | §1–§6 | Roles, neutral, ramps, surfaces and elevation |
    | Typography | §8 | Scale, families, display boundary, numerals |
    | Density | §7 | Spacing tiers and caps, control and row heights, shape, borders, shell widths |
+   | Motion | none yet | Feedback, ticked and washed, what never moves, timing. Added 2026-11-24 (owner) |
+
+   **Motion has no section to map to.** The owner asked for it on 2026-11-24, after Density. `docs/design-system.md` has no motion section and `theme.css` no motion token, so the page renders from §7 "Motion" below, §11.5's working indicator, and the components' own classes, listed in `src/motion.ts` with the file and text that set each value; `tests/motion.spec.ts` reads those files. A §12 in the spec would give it one source, as the other three have; that is a rules decision and waits for the owner. The spec the page was built from is `docs/explorations/motion-page-spec.md`.
 
 2. **Each built component's page carries its own install command**: one line, `pnpm dlx shadcn@latest add https://tabularui.com/r/<name>.json`, with a copy button. Its URL is built from the registry name, so it can't drift. *Since 2026-10-28* the line also adds the item of every other component its usage snippet imports, and the snippet imports from the folders the registry writes (`@/components/tabular-ui/components/product/<Name>`), not from `tabular-ui`, so the two together compile. **Getting started** (no wireframe) covers the setup in `packages/ui/README.md`. It's linked from the footer's Guide column and from beside each install command.
-3. **No Icons page while the icons are Phosphor's.** *Decided 2026-10-29 (owner):* they come from a popular library, so a page for §11 would document someone else's set. A fourth Foundations tab waits until the icons are custom.
+3. **No Icons page while the icons are Phosphor's.** *Decided 2026-10-29 (owner):* they come from a popular library, so a page for §11 would document someone else's set. ~~A fourth Foundations tab waits until the icons are custom.~~ *Since 2026-11-24 the fourth tab is Motion; an Icons page would be the fifth.*
 
 **D10. Library first — decided 2026-11-02 (owner).** A pattern a product could reuse ships in `packages/ui` first, as its own decision and PR. The site never shows a pattern the library can't produce, and a library component is never restyled in `apps/site`.
 
@@ -345,6 +348,7 @@ Every route is prerendered to static HTML at build time.
 | `/foundations/color` | Color | `79:537` |
 | `/foundations/typography` | Typography | none; same shell as Color |
 | `/foundations/density` | Density (§7): spacing tiers, control and row heights, shape, borders, shell widths | none; same shell as Color |
+| `/foundations/motion` | Motion (D9, 2026-11-24): feedback, an agent at work, what never moves, timing | none; same shell as Color |
 | `/getting-started` | Add components with the registry, add the tokens, set up the app root, use | none (D9) |
 | `/r/*` | Rewrite to `storybook.tabularui.com/r/*`, the shadcn registry | — |
 | anything else | 404 | none |
@@ -422,6 +426,15 @@ The wireframe's Surface 2, Rule, Text muted, Person mark, Inverse and State swat
 - Shape: square corners, and `--radius-full` for round marks (§7.7).
 - Border widths, and dashed as placeholder (§7.8).
 - Shell widths (§7.9).
+
+**Motion** (D9, added 2026-11-24, owner). From `docs/explorations/motion-page-spec.md`:
+- The key: the three jobs, Feedback, Continuity and Work in progress, each named by a timing the page lists. Its tracer is the real `Spinner` and moves, as Vocabulary's working badge does.
+- **Feedback**, live: the copy command, and a Play that fills a progress bar and wears the wash. *A switch and a turning caret were here until the same day (owner): not essential.*
+- **Ticked and washed** (added the same day, from the spec's M1 and M2): a run log whose passes are ticked, and the bridge's lines without their total to copy from (the cells take a wash). M3, the total drawn in, is in the library and not here: D11 keeps the site to one double rule. M4, the project switcher's ticked copy, was shown here and removed the same day (owner); it stays in the library and in the Timing list.
+- *An agent at work* (Thinking, files read, a plan, an answer, a confirmation) was a section here and was removed the same day (owner): those components are shown elsewhere on the site. Their motions stay in the Timing list.
+- **What never moves**: seven rules, each with its reason.
+- **Timing**: every motion that ships, as a ruled list like Density's, from `src/motion.ts`. A `DataTable` was tried and dropped the same day: its sticky head and sideways scroller failed the page's 2.4.11 and `scrollable-region-focusable` checks for a list that needs neither.
+- **The Foundations links at 320px.** Four links need 314px and 288px is there, so below 360px each takes 4px a side instead of 8px. From 360px they are unchanged.
 
 It also states that the site's own layout values are site-only (§7 of this spec).
 

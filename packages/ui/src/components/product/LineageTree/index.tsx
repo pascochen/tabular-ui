@@ -128,7 +128,10 @@ function LineageBranch({
             <CaretRightIcon
               weight="bold"
               aria-hidden="true"
-              className={cn('size-[var(--size-icon-xs)] transition-transform', isOpen && 'rotate-90')}
+              className={cn(
+                'size-[var(--size-icon-xs)] transition-transform motion-reduce:transition-none',
+                isOpen && 'rotate-90',
+              )}
             />
           </IconButton>
         ) : (

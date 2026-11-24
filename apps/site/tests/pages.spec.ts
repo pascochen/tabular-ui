@@ -432,7 +432,9 @@ test.describe('a component page', () => {
 
     // Scrolled to the install command, the list is still in view, 24px from the top.
     await page.getByRole('heading', { name: 'Install' }).scrollIntoViewIfNeeded();
-    await page.evaluate(() => window.scrollBy(0, 400));
+    // 200px, not 400 (2026-11-24): with a fourth Foundations link the footer is a row taller,
+    // and 400 reached the end of the list's column, where a sticky list rightly leaves.
+    await page.evaluate(() => window.scrollBy(0, 200));
     await expect.poll(async () => Math.round((await box(list)).y)).toBe(24);
 
     // At 1440px, wide enough for both, the reading column keeps its 1040px.
@@ -604,11 +606,12 @@ test.describe('the Foundations pages', () => {
     ['/foundations/color', 'Color'],
     ['/foundations/typography', 'Typography'],
     ['/foundations/density', 'Density'],
+    ['/foundations/motion', 'Motion'],
   ] as const) {
     test(`${route}: its pages come before the title, at 16px, with no section label`, async ({ page }) => {
       await page.goto(route);
       const nav = page.getByRole('navigation', { name: 'Foundations' });
-      await expect(nav.getByRole('link')).toHaveText(['Color', 'Typography', 'Density']);
+      await expect(nav.getByRole('link')).toHaveText(['Color', 'Typography', 'Density', 'Motion']);
       await expect(nav.getByRole('link', { name: current })).toHaveAttribute('aria-current', 'page');
       await expect(nav.locator('[aria-current]')).toHaveCount(1);
       for (const link of await nav.getByRole('link').all()) {
@@ -632,7 +635,8 @@ test.describe('the Foundations pages', () => {
       for (const [route, current, target, targetRoute] of [
         ['/foundations/color', 'Color', 'Typography', '/foundations/typography'],
         ['/foundations/typography', 'Typography', 'Density', '/foundations/density'],
-        ['/foundations/density', 'Density', 'Color', '/foundations/color'],
+        ['/foundations/density', 'Density', 'Motion', '/foundations/motion'],
+        ['/foundations/motion', 'Motion', 'Color', '/foundations/color'],
       ] as const) {
         const open = async (page: Page) => {
           if (state === 'before hydration') await page.route(/\.js$/, (r) => r.abort());
@@ -655,7 +659,7 @@ test.describe('the Foundations pages', () => {
         test(`${route}: every one is an <a> with an href, and goes to its page`, async ({ page }) => {
           const nav = await open(page);
           const tags = await nav.getByRole('link').evaluateAll((els) => els.map((el) => el.tagName));
-          expect(tags).toEqual(['A', 'A', 'A']);
+          expect(tags).toEqual(['A', 'A', 'A', 'A']);
           await expect(nav.locator('button, [role="tab"], [role="tablist"]')).toHaveCount(0);
           await nav.getByRole('link', { name: target }).click();
           await expect(page).toHaveURL(targetRoute);
@@ -773,7 +777,7 @@ test.describe('the footer', () => {
     await expect(footer).toContainText('Components for agent-written, human-verified work.');
     const column = (name: string) => footer.getByRole('list', { name });
     await expect(column('Guide').getByRole('listitem')).toHaveText(['Components', 'Vocabulary', 'Get started']);
-    await expect(column('Foundations').getByRole('listitem')).toHaveText(['Color', 'Typography', 'Density']);
+    await expect(column('Foundations').getByRole('listitem')).toHaveText(['Color', 'Typography', 'Density', 'Motion']);
     await expect(column('Live').getByRole('listitem')).toHaveText([/^Demo/, /^Storybook/]);
     await expect(column('About').getByRole('listitem')).toHaveText([/^LinkedIn/, /^MIT license/, /^GitHub/]);
     const about = column('About');

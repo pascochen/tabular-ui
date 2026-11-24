@@ -22,3 +22,8 @@ export function useReducedMotion() {
     () => false,
   );
 }
+
+/** The same question, asked once, at the moment of a gesture a script runs (`DataTable`'s copy wash). */
+export function prefersReducedMotion() {
+  return typeof matchMedia !== 'undefined' && matchMedia(query).matches;
+}

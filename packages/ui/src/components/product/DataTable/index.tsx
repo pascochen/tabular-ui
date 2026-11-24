@@ -16,8 +16,10 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 
+import { GestureKeyframes } from '../../../lib/gestures';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
+import { useCopyWash, washCell } from './copyWash';
 import { longestText, useCutTextStop } from './cutText';
 import { CutTextTooltip, TextCell } from './CutTextTooltip';
 import {
@@ -202,6 +204,34 @@ const TOTAL_CELL = 'border-t border-text-primary text-text-primary';
 // would read as three lines once the table scrolls.
 const NO_RULE = 'block pb-[3px]';
 const DOUBLE_RULE = 'block border-b-3 border-double border-text-primary';
+// The total is ruled (docs/explorations/motion-page-spec.md, M3): when the rows
+// come to sum while the table is on screen, a cover the cell's own ground hides
+// the rule and shrinks toward its right end in 200ms, so the rule is drawn left
+// to right. The rule itself is unchanged: the cover only ever reveals it. Never
+// on load, and never when a rule goes, which is removed at once. motion-safe:
+// under reduced motion the rule appears.
+const RULE_DRAWN = [
+  'relative',
+  "motion-safe:after:absolute motion-safe:after:inset-x-0 motion-safe:after:-bottom-[3px] motion-safe:after:h-[3px] motion-safe:after:content-['']",
+  'motion-safe:after:origin-right motion-safe:after:bg-surface',
+  'motion-safe:after:animate-[tui-unrule_200ms_ease-out_both]',
+].join(' ');
+
+/**
+ * Which columns have just come to sum. On mount, none: a table that loads
+ * balanced is still. The footing set is kept in state and compared during
+ * render, React's pattern for a value derived from a change of props.
+ */
+function useNewlyFooting(footing: string) {
+  const [seen, setSeen] = useState(footing);
+  const [drawn, setDrawn] = useState<string[]>([]);
+  if (footing !== seen) {
+    const before = new Set(seen.split(' '));
+    setSeen(footing);
+    setDrawn(footing.split(' ').filter((id) => id && !before.has(id)));
+  }
+  return drawn;
+}
 
 /**
  * The totals row, and a Difference row under it when a figure misses. A rule
@@ -213,6 +243,11 @@ const DOUBLE_RULE = 'block border-b-3 border-double border-text-primary';
 function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<TData, unknown>[] }) {
   const first = columns.findIndex((column) => row.cells.has(column.id));
   const misses = [...row.cells.values()].some((total) => total.difference !== null);
+  const footing = columns
+    .filter((column) => row.cells.get(column.id)?.foots)
+    .map((column) => column.id)
+    .join(' ');
+  const drawn = useNewlyFooting(footing);
   return (
     <tfoot className="sticky bottom-0 z-10">
       <tr>
@@ -237,7 +272,13 @@ function TotalsFoot<TData>({ row, columns }: { row: TotalsRow; columns: Column<T
               {/* Hidden words stay out of a copied selection: people paste these figures. */}
               {first === 0 && index === 0 ? <span className="sr-only select-none">{row.label}</span> : null}
               {total ? (
-                <span className={total.foots ? DOUBLE_RULE : NO_RULE}>
+                <span
+                  data-ruled={total.foots && drawn.includes(column.id) ? '' : undefined}
+                  className={cn(
+                    total.foots ? DOUBLE_RULE : NO_RULE,
+                    total.foots && drawn.includes(column.id) && RULE_DRAWN,
+                  )}
+                >
                   {total.text}
                   {total.foots ? <span className="sr-only select-none"> adds up</span> : null}
                 </span>
@@ -342,6 +383,7 @@ function DataTable<TData>({
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { wash, announcement } = useCopyWash();
   const rowProbe = useRef<HTMLDivElement>(null);
   const rowHeight = useRowHeight(rowProbe);
   const pressedAt = useRef<{ x: number; y: number } | null>(null);
@@ -446,6 +488,16 @@ function DataTable<TData>({
         className,
       )}
     >
+      {/* The tick, the wash and the rule (lib/gestures): the copy wash and the drawn total use them. */}
+      <GestureKeyframes />
+      {/* A copy says so once (copyWash.ts). Only while it says it: a status region in every
+          table would answer an app's own getByRole('status'), and its word would ride along in a
+          select-all. */}
+      {announcement !== null ? (
+        <span role="status" className="sr-only select-none">
+          {announcement}
+        </span>
+      ) : null}
       {/* Measures --h-row-sm for the virtualizer (useRowHeight). Paints nothing. */}
       <div
         ref={rowProbe}
@@ -463,7 +515,16 @@ function DataTable<TData>({
           footRows === 2 && 'scroll-pb-[calc(var(--h-row-sm)*2)]',
         )}
       >
-        <table className="w-full border-separate border-spacing-0 text-sm" onCopy={copyWithPlainSign}>
+        <table
+          className="w-full border-separate border-spacing-0 text-sm"
+          onCopy={(event) => {
+            copyWithPlainSign(event);
+            // What someone copies out of a field in a cell is theirs: no wash.
+            if (!(event.target as Element).closest('input, textarea, [contenteditable="true"]')) {
+              wash(event.currentTarget);
+            }
+          }}
+        >
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
@@ -639,6 +700,8 @@ function DataTable<TData>({
                           // --pad-cell-y) and a badge at 5px, which is exactly
                           // §7.3's "18px badge sits comfortably in a 28px row".
                           'h-[var(--h-row-sm)] border-b border-border px-[var(--pad-cell-x)] align-middle',
+                          // Copied cells take a wash (copyWash.ts). Inert until a copy.
+                          washCell,
                           // A badge alone in a cell hangs from the top of its line,
                           // not the text's baseline. On the baseline it reaches
                           // below the line by more than Golos Text's short descent

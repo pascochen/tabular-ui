@@ -1,3 +1,6 @@
+import { useState } from 'react';
+
+import { GestureKeyframes, tickIn } from '../../../lib/gestures';
 import { cn } from '../../../lib/utils';
 import { Badge } from '../../foundational/Badge';
 import { Spinner } from '../../foundational/Spinner';
@@ -32,12 +35,43 @@ export type StatusBadgeProps = Omit<BadgeProps, 'tone' | 'role' | 'shape' | 'chi
  */
 function StatusBadge({ status, children, hideIcon, className, ...props }: StatusBadgeProps) {
   const { label, tone, icon: Icon, working } = runStatuses[status];
+  const ticked = useTickOnPass(status);
   return (
     <Badge tone={tone} data-status={status} className={cn(className)} {...props}>
-      {hideIcon ? null : working ? <Spinner /> : <Icon weight="bold" aria-hidden="true" />}
+      {hideIcon ? null : working ? (
+        <Spinner />
+      ) : (
+        <Icon
+          weight="bold"
+          aria-hidden="true"
+          data-ticked={ticked || undefined}
+          className={ticked ? tickIn : undefined}
+        />
+      )}
+      {ticked ? <GestureKeyframes /> : null}
       {children ?? label}
     </Badge>
   );
+}
+
+/**
+ * The tracer becomes a tick (docs/explorations/motion-page-spec.md, M1): when
+ * work seen running ends `passed`, the check mark is drawn in, left to right,
+ * in 140ms. Only on a change seen live: a badge that mounts passed is still, or
+ * a list of fifty passed runs would tick on every load. A failure lands in
+ * place: nothing about it is "checked". Under reduced motion the mark swaps.
+ *
+ * The previous status is kept in state and compared during render, React's
+ * pattern for a value derived from a change of props.
+ */
+function useTickOnPass(status: RunStatus) {
+  const [previous, setPrevious] = useState(status);
+  const [ticked, setTicked] = useState(false);
+  if (status !== previous) {
+    setPrevious(status);
+    setTicked(status === 'passed' && !!runStatuses[previous].working);
+  }
+  return ticked;
 }
 
 export { StatusBadge };
