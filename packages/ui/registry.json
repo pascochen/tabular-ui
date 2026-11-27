@@ -1113,6 +1113,7 @@
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/status-badge.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [
