@@ -95,6 +95,44 @@ export const WithDetail: Story = {
 };
 
 /**
+ * A log 320px wide, as a phone gives it. A name too long for its row is cut,
+ * shows whole in a tooltip on hover and on keyboard focus, and opens the row
+ * in place to the full name, because no tooltip opens on touch. A name that
+ * fits leaves its row plain. The second row is open to its name; the failed
+ * row is open to its name, then its error.
+ */
+export const LongNames: Story = {
+  render: () => (
+    <div style={{ width: 320 }}>
+      <Log>
+        <RunLogRow status="passed" name="stg_sap__bkpf" timestamp="14:21:02" duration="1.8s" />
+        <RunLogRow
+          status="passed"
+          name="int_supplier_invoices__deduplicated_fy2026_h1"
+          timestamp="14:21:04"
+          duration="2.4s"
+          defaultOpen
+        />
+        <RunLogRow
+          status="passed"
+          name="int_supplier_payments__matched_to_invoices"
+          timestamp="14:21:06"
+          duration="3.1s"
+        />
+        <RunLogRow
+          status="failed"
+          name="stg_bank__export_kjp_2026_09_statement_lines"
+          timestamp="14:21:09"
+          duration="0.9s"
+          defaultOpen
+          detail="No header row: the columns can't be read."
+        />
+      </Log>
+    </div>
+  ),
+};
+
+/**
  * Without timestamps, as tabularui.com shows it. The badge is the first
  * content after the caret, so an open row's detail starts at the badge's x,
  * the agent-proposed row's included: its rail comes off the row's padding.

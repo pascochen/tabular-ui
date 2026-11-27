@@ -23,6 +23,13 @@ export type TruncatedTextProps = {
    * closes it.
    */
   showOnControlFocus?: boolean;
+  /**
+   * Called with each measurement that differs from the last: `true` once the
+   * text is cut off, `false` once it fits again. For a parent that offers
+   * another way to read the text where a tooltip can't open, on touch:
+   * `RunLogRow` opens the row to the full name.
+   */
+  onTruncatedChange?: (truncated: boolean) => void;
   className?: string;
 };
 
@@ -42,9 +49,26 @@ export type TruncatedTextProps = {
  * flex container itself clips with no ellipsis, which is why this is an
  * element of its own.
  */
-function TruncatedText({ children, side, sideOffset, showOnControlFocus = false, className }: TruncatedTextProps) {
+function TruncatedText({
+  children,
+  side,
+  sideOffset,
+  showOnControlFocus = false,
+  onTruncatedChange,
+  className,
+}: TruncatedTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [truncated, setTruncated] = useState(false);
+  // Read through a ref, so a new callback each render doesn't re-measure.
+  const onChange = useRef(onTruncatedChange);
+  useLayoutEffect(() => {
+    onChange.current = onTruncatedChange;
+  });
+  // The last value reported. Only a change is reported, and never the initial
+  // `false` before anything was measured: a parent that remounts this span
+  // (RunLogRow swaps a <div> row for a <button> one) hears the measured value
+  // again, not a reset to `false` that would swap it back.
+  const reported = useRef<boolean | null>(null);
   const [hoverOpen, setHoverOpen] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
 
@@ -53,7 +77,14 @@ function TruncatedText({ children, side, sideOffset, showOnControlFocus = false,
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const measure = () => setTruncated(el.scrollWidth > el.clientWidth);
+    const measure = () => {
+      const cut = el.scrollWidth > el.clientWidth;
+      setTruncated(cut);
+      if (reported.current !== cut) {
+        reported.current = cut;
+        onChange.current?.(cut);
+      }
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);

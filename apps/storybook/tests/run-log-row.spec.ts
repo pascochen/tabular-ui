@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { gotoStory, tabTo } from './helpers';
 
@@ -135,3 +135,60 @@ for (const c of edgeCases) {
     }
   });
 }
+
+/**
+ * A name cut off has to be readable, and a tooltip never opens on touch
+ * (failure log). Until 2026-11-27 a long name truncated with no tooltip and
+ * nothing to open: on a 375px phone, `read supplier_invoices_fy2026_h1.csv`
+ * kept 140px of the 238px it needed, and the rest couldn't be read at all.
+ * Now a cut row opens in place to the full name, the disclosure an error
+ * uses, and the name shows whole in a tooltip on keyboard focus. A row whose
+ * name fits stays plain: no control, no Tab stop.
+ */
+const story = 'product-runlogrow--long-names';
+const cutName = 'int_supplier_payments__matched_to_invoices';
+const row = (page: Page, i: number) => page.locator('[data-slot="run-log-row"]').nth(i);
+
+test.describe('a cut name, by touch', () => {
+  test.use({ hasTouch: true });
+
+  test('opens its row in place to the full name; a name that fits leaves its row plain', async ({ page }) => {
+    await gotoStory(page, story);
+
+    // Fits: a plain row, as before.
+    await expect(row(page, 0).locator('button')).toHaveCount(0);
+
+    // Cut: the visible name ends in an ellipsis, and the row is a closed disclosure.
+    const cut = row(page, 2);
+    const shown = cut.locator('[data-slot="truncated-text"]');
+    await expect(shown).toHaveText(cutName);
+    expect(await shown.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+    const control = cut.locator('button[aria-expanded]');
+    await expect(control).toHaveAttribute('aria-expanded', 'false');
+
+    await control.tap();
+    await expect(control).toHaveAttribute('aria-expanded', 'true');
+    const whole = cut.locator('[data-slot="run-log-name"]');
+    await expect(whole).toHaveText(cutName);
+    // Readable means on screen, whole: it wraps inside the log, never past it.
+    const [nameBox, logBox] = await Promise.all([whole.boundingBox(), cut.boundingBox()]);
+    expect(nameBox!.x + nameBox!.width).toBeLessThanOrEqual(logBox!.x + logBox!.width);
+    // The row itself keeps its 24px.
+    expect((await control.boundingBox())!.height).toBe(24);
+  });
+});
+
+test('a cut name shows whole in a tooltip on keyboard focus', async ({ page }) => {
+  await gotoStory(page, story);
+  const control = row(page, 2).locator('button[aria-expanded]');
+  expect(await tabTo(page, control)).toBe(true);
+  // The open one: Tab passed the row above, whose tooltip may still be fading.
+  await expect(page.locator('[data-slot="tooltip-content"][data-open]')).toHaveText(cutName);
+});
+
+test('an open failed row with a cut name shows the name, then its error', async ({ page }) => {
+  await gotoStory(page, story);
+  const detail = row(page, 3).locator('[data-slot="run-log-detail"]');
+  await expect(detail.locator('[data-slot="run-log-name"]')).toHaveText('stg_bank__export_kjp_2026_09_statement_lines');
+  await expect(detail).toHaveText(/statement_lines\s*No header row/);
+});
