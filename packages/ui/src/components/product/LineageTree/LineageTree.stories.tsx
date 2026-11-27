@@ -66,3 +66,47 @@ export const WithSelection: Story = {
 
 /** Collapsed to the root — the carets' `aria-expanded` and the nested lists carry the structure. */
 export const Collapsed: Story = { args: { nodes: NODES, defaultExpanded: ['fct_gl_entries'] } };
+
+/**
+ * A panel 343px wide, as a 375px phone gives it, with names as long as the
+ * close's models. A name too long for its row is cut, and shows whole in a
+ * tooltip on hover and on keyboard focus.
+ */
+export const LongNames: Story = {
+  render: function LongNamesStory() {
+    const [selected, setSelected] = useState<string>();
+    return (
+      <div style={{ width: 343 }}>
+        <LineageTree
+          selectedId={selected}
+          onSelect={(n) => setSelected(n.id)}
+          nodes={[
+            {
+              id: 'fct_supplier_payments',
+              name: 'fct_supplier_payments',
+              status: 'failed',
+              meta: '41k',
+              children: [
+                {
+                  id: 'int_supplier_payments__matched_to_invoices',
+                  name: 'int_supplier_payments__matched_to_invoices',
+                  status: 'failed',
+                  meta: '41k',
+                  children: [
+                    {
+                      id: 'stg_bank__export_kjp_2026_09_statement_lines',
+                      name: 'stg_bank__export_kjp_2026_09_statement_lines',
+                      status: 'passed',
+                      meta: '9.8k',
+                    },
+                    { id: 'stg_sap__bsak', name: 'stg_sap__bsak', status: 'passed', meta: '38k' },
+                  ],
+                },
+              ],
+            },
+          ]}
+        />
+      </div>
+    );
+  },
+};

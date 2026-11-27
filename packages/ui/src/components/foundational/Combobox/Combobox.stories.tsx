@@ -204,3 +204,40 @@ export const Sizes: Story = {
     </div>
   ),
 };
+
+const LONG_MODELS = [
+  'fct_supplier_payments',
+  'int_supplier_payments__matched_to_invoices',
+  'int_supplier_invoices__deduplicated_fy2026_h1_by_supplier_and_document',
+  'stg_bank__export_kjp_2026_09_statement_lines',
+  'stg_sap__bsak',
+];
+
+/**
+ * A field 343px wide, as a 375px phone gives it, with names as long as the
+ * close's models. The list keeps the field's width, and an option too long
+ * for it wraps rather than being cut.
+ */
+export const LongNames: Story = {
+  render: function LongNamesStory() {
+    const [query, setQuery] = useState('');
+    const items = useMemo(() => LONG_MODELS.filter((m) => m.toLowerCase().includes(query.toLowerCase())), [query]);
+    return (
+      <div style={{ width: 343 }}>
+        <Combobox items={items} onInputValueChange={setQuery}>
+          <ComboboxInput aria-label="Model" placeholder="Search models…" content="mono" />
+          <ComboboxContent>
+            <ComboboxList>
+              <ComboboxEmpty>No models match “{query}”.</ComboboxEmpty>
+              {items.map((item) => (
+                <ComboboxItem key={item} value={item}>
+                  {item}
+                </ComboboxItem>
+              ))}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>
+    );
+  },
+};

@@ -48,6 +48,13 @@ test('a link identifier copies, as AttachmentRow’s filename does', async ({ pa
   expect(await copyAllOf(page, ROOT)).toContain(name!);
 });
 
+test('AttachmentRow: a cut name that opens its row copies as a name that fits does', async ({ page }) => {
+  await gotoStory(page, 'product-attachmentrow--long-names');
+  await expect(page.locator(`${ROOT} button[aria-expanded]`).first()).toBeVisible();
+  // A block inside the disclosure wrote a blank line before its row.
+  expect(await copyAllOf(page, ROOT)).toContain('14:02\nbank_export_kjp_2026-09.csv\n412 KB\n14:05\nfailed');
+});
+
 test.describe('a disclosure’s label is not content', () => {
   for (const [id, label] of [
     ['product-agentreasoning--done', 'Thought for'],

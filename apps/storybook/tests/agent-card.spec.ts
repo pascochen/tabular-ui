@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { gotoStory, tokenPx } from './helpers';
+import { gotoStory, tabTo, tokenPx } from './helpers';
 
 /**
  * `AgentCard`'s geometry and its one rule about colour.
@@ -63,4 +63,34 @@ test('in a narrow card the title truncates and the status keeps its width', asyn
   const card = (await page.locator('[data-slot="agent-card"]').boundingBox())!;
   const box = (await status.boundingBox())!;
   expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width);
+});
+
+/**
+ * A finding's title cut off has to be readable (failure log). Until
+ * 2026-11-27 it truncated with nothing to read it by: on a 375px phone,
+ * "List INV-KJP-2609-00363 for the auditors?" kept 170 of its 267px. Now it
+ * shows whole in a tooltip on hover and on the link's keyboard focus. On
+ * touch the link opens the finding, which shows it.
+ */
+test.describe('a cut finding title', () => {
+  const TITLE = 'List INV-KJP-2609-00363 for the auditors?';
+  const tooltip = (page: import('@playwright/test').Page) => page.locator('[data-slot="tooltip-content"][data-open]');
+
+  test('shows whole in a tooltip on the link’s keyboard focus', async ({ page }) => {
+    await gotoStory(page, 'product-agentcard--long-titles');
+    const link = page.locator('[data-slot="agent-card-finding"]', { hasText: TITLE });
+    expect(await link.locator('[data-slot="truncated-text"]').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(
+      true,
+    );
+    expect(await tabTo(page, link)).toBe(true);
+    await expect(tooltip(page)).toHaveText(TITLE);
+  });
+
+  test('shows whole in a tooltip on hover; a title that fits shows none', async ({ page }) => {
+    await gotoStory(page, 'product-agentcard--long-titles');
+    await page.locator('[data-slot="agent-card-finding"] [data-slot="truncated-text"]', { hasText: TITLE }).hover();
+    await expect(tooltip(page)).toHaveText(TITLE);
+    await page.locator('[data-slot="truncated-text"]', { hasText: 'Duplicate payment' }).hover();
+    await expect(tooltip(page)).toHaveCount(0);
+  });
 });

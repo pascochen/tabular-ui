@@ -6,6 +6,7 @@ import { Button } from '../../foundational/Button';
 import { IconButton } from '../../foundational/IconButton';
 import { StatusBadge } from '../StatusBadge';
 import type { RunStatus } from '../StatusBadge/statuses';
+import { TruncatedText } from '../TruncatedText';
 
 export type LineageNode = {
   id: string;
@@ -41,6 +42,11 @@ export type LineageTreeProps = {
  *
  * Status is optional per node and comes from `StatusBadge`; the tree does not
  * decide what a failed model looks like.
+ *
+ * **A cut name can be read.** It shows whole in a tooltip on hover and on
+ * keyboard focus (`TruncatedText`). A tooltip never opens on touch, so
+ * activating a cut name opens a line under its row with the full name, as
+ * well as selecting the node. The row stays 24px.
  */
 function LineageTree({ nodes, defaultExpanded, selectedId, onSelect, className }: LineageTreeProps) {
   // The default is a rule, not a list of the ids present at mount: a node that
@@ -95,6 +101,11 @@ function LineageBranch({
   const hasChildren = !!node.children?.length;
   const isOpen = expanded.has(node.id);
   const isSelected = selectedId === node.id;
+  // Measured by TruncatedText, after layout and on every resize.
+  const [nameCut, setNameCut] = useState(false);
+  const [nameOpen, setNameOpen] = useState(false);
+  // Depth's share of the row's left padding, which the open name keeps too.
+  const indent = `calc(var(--pad-cell-x) + ${depth} * var(--gap-tree-indent))`;
 
   return (
     <li>
@@ -108,7 +119,7 @@ function LineageBranch({
         )}
         style={{
           // Indent scales with depth, so it cannot be a static utility.
-          paddingLeft: `calc(var(--pad-cell-x) + ${depth} * var(--gap-tree-indent))`,
+          paddingLeft: indent,
         }}
       >
         {hasChildren ? (
@@ -143,7 +154,12 @@ function LineageBranch({
         <Button
           variant="inline"
           aria-current={isSelected ? 'true' : undefined}
-          onClick={() => onSelect?.(node)}
+          onClick={() => {
+            // A cut name opens (or closes) in place, for touch, where no
+            // tooltip opens. One that fits only selects, as before.
+            if (nameCut || nameOpen) setNameOpen(!nameOpen);
+            onSelect?.(node);
+          }}
           className={cn(
             // `shrink` beats Button's shrink-0, or the name never truncates.
             'min-w-0 flex-1 shrink justify-start gap-[var(--gap-control-icon)] rounded-xs text-left',
@@ -151,14 +167,33 @@ function LineageBranch({
           )}
         >
           {/* §8.3 — identifiers in mono, one step below adjacent sans. */}
-          <span className={cn('truncate font-mono text-xs', isSelected ? 'text-text-primary' : 'text-text-body')}>
+          <TruncatedText
+            showOnControlFocus
+            onTruncatedChange={setNameCut}
+            className={cn('font-mono text-xs', isSelected ? 'text-text-primary' : 'text-text-body')}
+          >
             {node.name}
-          </span>
+          </TruncatedText>
           {node.meta ? <span className="shrink-0 text-xs text-text-secondary">{node.meta}</span> : null}
         </Button>
 
         {node.status ? <StatusBadge status={node.status} /> : null}
       </div>
+
+      {nameOpen ? (
+        // The name whole, under its row and in line with it, wrapping
+        // anywhere, since a model name has no spaces to break at. Hidden from
+        // assistive technology, which already reads the name whole from the
+        // button above: this repeats it for the eye.
+        <p
+          aria-hidden="true"
+          data-slot="lineage-tree-name"
+          className="pr-[var(--pad-cell-x)] pb-[var(--gap-bonded)] font-mono text-xs text-text-body [overflow-wrap:anywhere]"
+          style={{ paddingLeft: `calc(${indent} + var(--size-icon-sm) + var(--gap-control-icon))` }}
+        >
+          {node.name}
+        </p>
+      ) : null}
 
       {hasChildren && isOpen ? (
         <ul role="list">

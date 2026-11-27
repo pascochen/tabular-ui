@@ -158,9 +158,14 @@ function AccountMenu({
               <AvatarImage src={user.avatarSrc} alt="" animatedSrc={user.avatarAnimatedSrc} animate />
               <AvatarFallback identity={user.identity}>{user.initials}</AvatarFallback>
             </Avatar>
-            <div className="flex min-w-0 flex-col">
-              <span className="truncate text-base font-medium text-text-primary">{user.name}</span>
-              <span className="truncate text-sm text-text-secondary">{user.email}</span>
+            {/*
+              Wrapped, never cut: the header is where a name the trigger cut
+              is read, on touch too, where no tooltip opens. An address has no
+              spaces to break at, so it breaks anywhere.
+            */}
+            <div className="flex min-w-0 flex-col [overflow-wrap:anywhere]">
+              <span className="text-base font-medium text-text-primary">{user.name}</span>
+              <span className="text-sm text-text-secondary">{user.email}</span>
             </div>
           </div>
           <MenuSeparator />

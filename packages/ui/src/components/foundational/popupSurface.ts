@@ -101,6 +101,17 @@ export const popupItem = [
 ];
 
 /**
+ * For a list of options, where a label too long for the popup wraps rather
+ * than being cut (Select, Combobox; 2026-11-27). The row grows with it: one
+ * line is still `--h-row-sm`, because the padding is what the line leaves of
+ * the row (`1lh` is the item's own line height), and each further line adds
+ * one. Pair it with `[overflow-wrap:anywhere]` on the label, since an
+ * identifier has no spaces to break at. A cut option in the list that is
+ * there to show it could not be read at all on touch, where no tooltip opens.
+ */
+export const popupItemWraps = 'h-auto min-h-[var(--h-row-sm)] py-[calc((var(--h-row-sm)-1lh)/2)]';
+
+/**
  * Spaced density: Menu's opt-in `density="spaced"`, for a menu picked from
  * the shell rather than scanned over a table — the sidebar's context
  * switchers and account menu. Measured from Ferndesk's workspace switcher

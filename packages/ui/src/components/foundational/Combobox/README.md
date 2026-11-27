@@ -35,6 +35,10 @@ Popup, rows and group labels come from the shared `../popupSurface.ts` primitive
 
 The list caps at 18rem and scrolls. Base UI gives Combobox no scroll arrows (Select has them), so `ComboboxList` masks whichever edge still hides rows, over 24px (`--h-row-xs`), the band Select's arrows occupy. A small hook sets `data-overflow-y-start` / `data-overflow-y-end` on the list (ScrollArea's attribute names) from scroll, resize and content changes, so filtering a list down to fit removes the cue. `scroll-padding` matches the fade, so arrow keys never park the highlighted row in the faded band. Rationale in §4, *Scroll cue*.
 
+## Long options
+
+**An option is never cut** (2026-11-27). The list keeps the field's width, and an option too long for it wraps, anywhere, its row growing from 28px by a line at a time (`popupItemWraps` in `popupSurface.ts`). Until then it truncated with no way to read it, and a tooltip never opens on touch. Unlike Select's, the list does not widen past its field: a list as wide as its widest option would change width as typing filters it. The `LongNames` story, and `apps/storybook/tests/popup-long-options.spec.ts`.
+
 ## Multi-select chips
 
 `ComboboxChip` reuses **`chipVariants`** rather than being restyled from scratch. Base UI owns the chip's *behaviour* here — it is not our `Chip` component, which is a `<button>` with its own dismiss handling — but it must not look like a second kind of chip.

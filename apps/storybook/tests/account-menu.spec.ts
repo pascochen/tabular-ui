@@ -274,3 +274,37 @@ test('under reduced motion, neither avatar ever animates', async ({ page }) => {
   await expect(menu(page)).toBeVisible();
   await expect(page.locator('[data-slot="avatar-animated"]')).toHaveCount(0);
 });
+
+/**
+ * The trigger cuts a long name, and the menu header is where it is read, on
+ * touch too, where no tooltip opens. Until 2026-11-27 the header truncated
+ * both lines: on a 375px phone the longest address in the group,
+ * anna-lena.schwarzenberger-hoffmann@kasane.example, kept 299 of its 325px,
+ * and could be read nowhere. Both lines wrap now.
+ */
+test.describe('a long name', () => {
+  test.use({ viewport: { width: 375, height: 812 } });
+
+  test('the trigger cuts it, and the open menu shows the name and address whole', async ({ page }) => {
+    await gotoStory(page, 'product-accountmenu--long-name');
+    const cut = await trigger(page)
+      .locator('span.truncate')
+      .evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(cut).toBe(true);
+
+    await trigger(page).click();
+    const header = page.locator('[data-slot="account-menu-header"]');
+    await expect(header).toContainText('Anna-Lena Schwarzenberger-Hoffmann');
+    await expect(header).toContainText('anna-lena.schwarzenberger-hoffmann@kasane.example');
+    const lines = header.locator('div > span');
+    expect(await lines.count()).toBe(2);
+    for (const line of await lines.all()) {
+      expect(
+        await line.evaluate((el) => el.scrollWidth <= el.clientWidth),
+        (await line.textContent()) ?? undefined,
+      ).toBe(true);
+      const box = (await line.boundingBox())!;
+      expect(box.x + box.width).toBeLessThanOrEqual(375);
+    }
+  });
+});

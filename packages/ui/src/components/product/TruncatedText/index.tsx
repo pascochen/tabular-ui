@@ -27,7 +27,8 @@ export type TruncatedTextProps = {
    * Called with each measurement that differs from the last: `true` once the
    * text is cut off, `false` once it fits again. For a parent that offers
    * another way to read the text where a tooltip can't open, on touch:
-   * `RunLogRow` opens the row to the full name.
+   * `RunLogRow`, `AttachmentRow` and `LineageTree` open the row in place to
+   * the full name.
    */
   onTruncatedChange?: (truncated: boolean) => void;
   className?: string;
