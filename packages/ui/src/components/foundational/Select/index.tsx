@@ -101,7 +101,12 @@ function SelectContent({
           data-align-trigger={alignItemWithTrigger}
           className={cn(
             ...popupSurface,
-            'relative isolate max-h-(--available-height) w-(--anchor-width) min-w-32',
+            'relative isolate max-h-(--available-height)',
+            // At least the trigger's width, and wider for an option that needs
+            // it, up to the screen's edge. At the trigger's width alone, a long
+            // option was cut in the very list that is there to show it: 214 of
+            // its 360px at 375px (2026-11-27). Past the edge an option wraps.
+            'w-max min-w-[max(8rem,var(--anchor-width))] max-w-(--available-width)',
             'overflow-x-hidden overflow-y-auto',
             popupList,
             'data-[align-trigger=true]:animate-none',
@@ -135,7 +140,14 @@ function SelectItem({
       className={cn(selectItemVariants({ content: content ?? inherited }), className)}
       {...props}
     >
-      <SelectPrimitive.ItemText className="block min-w-0 flex-1 truncate">{children}</SelectPrimitive.ItemText>
+      {/*
+        Wrapped, never cut: the open list is where a value the trigger cut is
+        read, on touch too, where no tooltip opens. An identifier has no spaces
+        to break at, so it breaks anywhere.
+      */}
+      <SelectPrimitive.ItemText className="block min-w-0 flex-1 [overflow-wrap:anywhere]">
+        {children}
+      </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator render={<span className="pointer-events-none flex items-center justify-center" />}>
         <CheckIcon weight="bold" aria-hidden="true" />
       </SelectPrimitive.ItemIndicator>

@@ -519,6 +519,7 @@
       "registryDependencies": [
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [
@@ -632,9 +633,11 @@
       "author": "Pascal Chenier",
       "dependencies": ["@phosphor-icons/react@^2.1.10"],
       "registryDependencies": [
+        "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/progress-bar.json",
         "https://tabularui.com/r/status-badge.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [
@@ -982,6 +985,7 @@
         "https://tabularui.com/r/icon-button.json",
         "https://tabularui.com/r/status-badge.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [
@@ -1113,6 +1117,7 @@
         "https://tabularui.com/r/button.json",
         "https://tabularui.com/r/status-badge.json",
         "https://tabularui.com/r/tokens.json",
+        "https://tabularui.com/r/truncated-text.json",
         "https://tabularui.com/r/utils.json"
       ],
       "files": [

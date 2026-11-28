@@ -75,6 +75,8 @@ Each hover starts the loop from the first frame. See `Avatar`.
 
 Header (32px avatar, full name, email) → Your profile → **Theme**: Dark · Light · System → Workspace settings · Subscription and billing · Homepage → Sign out. Every group but the header and Theme is drawn only when one of its handlers is passed (see *Props*).
 
+**The header is where a cut name is read.** The row truncates `shortName ?? name` at the band's edge, with no tooltip: its own action, opening the menu, shows the full name and address in the header, by mouse, keyboard and touch alike. So the header never truncates. Both lines wrap, the address anywhere, since it has no spaces to break at (2026-11-27). Until then the header truncated both lines too, and on a 375px phone the group's longest address, `anna-lena.schwarzenberger-hoffmann@kasane.example`, kept 299 of its 325px and could be read nowhere. The `LongName` story, and `apps/storybook/tests/account-menu.spec.ts`.
+
 **Theme** is a `MenuRadioGroup` with its own `MenuLabel`, so it is announced as a group named "Theme" of three `menuitemradio` rows. **System** (added 2026-10-11) follows the OS setting, live; Dark and Light keep their places, and System goes last. The design sketch drew a sun/moon segmented control inside one row. That would be two buttons nested in a menu item, out of reach of the menu's arrow keys, and no foundational toggle group exists. The radio indicator sits in the same `--size-icon-sm` column as the other rows' icons, so "Dark" starts where "Your profile" does. Radio items keep the menu open, so the change is seen.
 
 **Workspace settings** moved here from `OrgSwitcher`'s submenu (2026-10-08), with the row's old Settings button removed. **Sign out** is neutral, as in the sketch; it is not destructive.

@@ -18,6 +18,10 @@ A filter is not state (§0 rule 1). A chip filtering for failed runs still carri
 
 Selection is the one exception and uses the interactive role, because selection *is* interactive (§4).
 
+## A long value
+
+The value is never cut (audited 2026-11-27, at 375px). `Chip` is `w-fit shrink-0` and doesn't wrap, so a long value widens the chip rather than truncating: in the `LongValues` story, at 343px as a 375px phone gives it, every value shows whole. The `truncate` on the value only acts if a caller caps the chip's width, and a caller that does owes the value a way to be read (`TruncatedText`, and something for touch). A value much longer than the bar runs past it instead: a 44-character model name makes a 350px chip, 7px past the 343px bar.
+
 ## Inherited from `Chip`
 
 Border and hover carry interactivity, not radius (§7.7). The dismiss X is its own button, a sibling of the chip's rather than nested in it. See `Chip`'s README.

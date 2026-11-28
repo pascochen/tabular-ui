@@ -5,7 +5,7 @@ import { useCallback, type ComponentProps } from 'react';
 import { cn } from '../../../lib/utils';
 import { chipVariants } from '../Chip/variants';
 import { inputVariants } from '../Input/variants';
-import { popupItem, popupLabel, popupList, popupSeparator, popupSurface } from '../popupSurface';
+import { popupItem, popupItemWraps, popupLabel, popupList, popupSeparator, popupSurface } from '../popupSurface';
 
 /**
  * Combobox — foundational. The last of the 14.
@@ -225,6 +225,8 @@ function ComboboxItem({ className, children, ...props }: ComboboxPrimitive.Item.
         'text-base',
         // Selection is the interactive role (§4) — same as Select items.
         'data-[selected]:bg-bg-interactive data-[selected]:text-text-primary',
+        // An option too long for the field wraps, and its row grows.
+        popupItemWraps,
         className,
       )}
       {...props}
@@ -234,7 +236,13 @@ function ComboboxItem({ className, children, ...props }: ComboboxPrimitive.Item.
       >
         <CheckIcon weight="bold" aria-hidden="true" />
       </ComboboxPrimitive.ItemIndicator>
-      <span className="flex-1 truncate">{children}</span>
+      {/*
+        Wrapped, never cut: a tooltip never opens on touch, and this list is
+        where the option is read. The list keeps the field's width, unlike
+        Select's: a list that widened to its widest option would change width
+        as typing filters it.
+      */}
+      <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{children}</span>
     </ComboboxPrimitive.Item>
   );
 }

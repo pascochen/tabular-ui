@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../foundational/Button';
 import { StatusBadge } from '../StatusBadge';
+import { TruncatedText } from '../TruncatedText';
 import { forcedColorsRowEdge, runStatusRowTreatment, type RunStatus } from '../StatusBadge/statuses';
 
 export type RunLogRowProps = {
@@ -14,7 +15,10 @@ export type RunLogRowProps = {
   timestamp?: string;
   /** Pre-formatted duration, e.g. "4.2s". */
   duration?: string;
-  /** Log output or error detail. Its presence is what makes the row expandable. */
+  /**
+   * Log output or error detail. Its presence makes the row expandable. A row
+   * whose `name` is cut off is expandable too, and opens to the full name.
+   */
   detail?: React.ReactNode;
   /** Controlled disclosure. Omit for uncontrolled. */
   open?: boolean;
@@ -36,6 +40,11 @@ export type RunLogRowProps = {
  * **Expands when given `detail`.** A failed run is useless without its error,
  * and sending the reader to a detail page loses their place in the log. The
  * collapsed row stays 24px; the detail renders in mono beneath it.
+ *
+ * **Expands when its name is cut off, too.** A name too long for the row
+ * truncates, with a tooltip on hover and on keyboard focus, as
+ * `TruncatedText` gives. A tooltip never opens on touch, so the row also
+ * opens in place to the full name, the same disclosure an error uses.
  */
 function RunLogRow({
   status,
@@ -49,8 +58,16 @@ function RunLogRow({
   className,
 }: RunLogRowProps) {
   const [uncontrolled, setUncontrolled] = useState(defaultOpen);
+  // Measured by TruncatedText, after layout and on every resize.
+  const [nameCut, setNameCut] = useState(false);
   const isOpen = open ?? uncontrolled;
-  const expandable = detail !== undefined;
+  const hasDetail = detail !== undefined;
+  // An open row stays a control until it is closed, so a resize that lets the
+  // name fit again can't strand an open row with no way to close it.
+  const expandable = hasDetail || nameCut || isOpen;
+  // The full name heads the detail while it's cut, and is the whole detail of
+  // a row with nothing else to show.
+  const nameInDetail = nameCut || !hasDetail;
   // A tint-only row's forced-colours edge (§5) goes round the row and its
   // open detail together, so the error sits inside its row's edge: the
   // wrapper draws it and the row draws none, one edge rather than two.
@@ -93,8 +110,14 @@ function RunLogRow({
 
       <StatusBadge status={status} />
 
-      {/* §8.3 — identifiers render mono, one step below the adjacent sans. */}
-      <span className="min-w-0 flex-1 truncate font-mono text-xs">{name}</span>
+      {/*
+        §8.3 — identifiers render mono, one step below the adjacent sans.
+        Cut off, the name shows whole in a tooltip on hover and on keyboard
+        focus of the row, and the row opens to it (touch has no tooltip).
+      */}
+      <TruncatedText showOnControlFocus onTruncatedChange={setNameCut} className="flex-1 font-mono text-xs">
+        {name}
+      </TruncatedText>
 
       {duration ? <span className="shrink-0 tabular-nums text-xs text-text-secondary">{duration}</span> : null}
     </>
@@ -141,7 +164,18 @@ function RunLogRow({
             'font-mono text-xs whitespace-pre-wrap text-text-secondary',
           )}
         >
-          {detail}
+          {nameInDetail ? (
+            // The identifier whole, wrapping anywhere, since a model name has
+            // no spaces to break at. Body colour, so it reads as the row's own
+            // name and not as log output.
+            <p
+              data-slot="run-log-name"
+              className={cn('text-text-body [overflow-wrap:anywhere]', hasDetail && 'mb-[var(--gap-bonded)]')}
+            >
+              {name}
+            </p>
+          ) : null}
+          {hasDetail ? detail : null}
         </div>
       ) : null}
     </div>

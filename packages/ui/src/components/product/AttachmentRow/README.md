@@ -19,12 +19,12 @@ One file — identified, with state — at 28px.
 
 | Prop | Type | Notes |
 |---|---|---|
-| `name` | `string` | Required. Mono, truncated |
+| `name` | `string` | Required. Mono. Cut off, it can still be read: see *A cut name* |
 | `size` / `timestamp` | `string` | **Pre-formatted.** The row formats neither bytes nor time |
 | `attachedBy` | `string` | The audit trail for evidence pinned to a record |
 | `status` | `RunStatus` | §5's vocabulary. Also drives the row treatment |
 | `progress` | `number` | 0–100. Replaces size/timestamp with a track |
-| `href` / `render` | `string` / element | Makes the filename a link; `render` swaps in a router link |
+| `href` / `render` | `string` / element | Makes the filename a link; `render` swaps in a router link. Where it leads must show the name whole |
 | `actions` | `ReactNode` | Trailing `IconButton`s |
 | `icon` | `Icon` | Overrides the glyph inferred from the extension |
 
@@ -35,6 +35,13 @@ elements. A list of these sits flush against `DataTable`, whose rows are the sam
 height.
 
 ## Mechanisms worth knowing
+
+**A cut name can be read** (2026-11-27). The name is a `TruncatedText`: cut, it shows whole in a tooltip on hover and while the link or disclosure it sits in has keyboard focus. A tooltip never opens on touch, so:
+
+- **A name that isn't a link** becomes a disclosure once it's cut (`Button variant="inline"`, `aria-expanded`), and the row opens in place to the full name, under the name, wrapping anywhere: `RunLogRow`'s approach. The row line stays 28px. A name that fits leaves a plain row, with no control and no Tab stop, and an open row stays a control until it is closed, so a resize can't strand it open.
+- **A linked name** stays a link, with nothing beside it: the tap opens the file, and **where it leads must show the name whole**. That is the caller's half of the contract, as `DataTable`'s README says of a linked cell.
+
+Until then a long name truncated with nothing to read it by: in a 343px list, as a 375px phone gives it, even `bank_export_kjp_2026-09.csv` lost 31 of its 178px. The disclosure and its text are `inline-block`, not `block`: a block inside the button wrote a blank line before its row in a copy. The `LongNames` story; `apps/storybook/tests/attachment-row.spec.ts` and `identifier-copy.spec.ts`.
 
 **The filename is the link. The row is not wholly clickable, deliberately.**
 shadcn's `Attachment` stretches an invisible `absolute inset-0` trigger across the

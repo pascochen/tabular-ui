@@ -73,7 +73,7 @@ export const Initials: Story = {
   render: () => <Footer user={{ ...mei, avatarSrc: undefined, avatarAnimatedSrc: undefined }} />,
 };
 
-/** A long name truncates at the band's edge; the menu header truncates both lines. */
+/** A long name truncates at the band's edge. Open the menu: the header shows the name and address whole, wrapping. */
 export const LongName: Story = {
   args: { user: mei, theme: 'dark', ...handlers },
   render: () => (

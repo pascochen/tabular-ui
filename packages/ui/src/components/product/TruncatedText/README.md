@@ -9,7 +9,7 @@ One line of text that truncates with an ellipsis and shows the full text in a to
 <TruncatedText side="inline-end" className="font-mono text-xs">{model}</TruncatedText>
 ```
 
-Used by `ContextSwitcher` (trigger and menu rows) and `AppShellPageHeader` (the page title). Not in a `DataTable` cell: the table does this itself, without adding an element to the row. See its README.
+Used by `ContextSwitcher` (trigger and menu rows), `AppShellPageHeader` (the page title), `RunLogRow`, `AttachmentRow` and `LineageTree` (the name), and `AgentCardFinding` (the title). Not in a `DataTable` cell: the table does this itself, without adding an element to the row. See its README.
 
 ## Props
 
@@ -18,7 +18,8 @@ Used by `ContextSwitcher` (trigger and menu rows) and `AppShellPageHeader` (the 
 | `children` | `string` | — | The text. A string because the tooltip repeats it; rich content would render twice and drift |
 | `side` | `Tooltip` side | `top` | Pick the side that covers nothing the user is scanning (see below) |
 | `sideOffset` | `number` | `4` | px. Raise it when the tooltip anchors to text inset inside a larger box, as `ContextSwitcher`'s rows do |
-| `showOnControlFocus` | `boolean` | `false` | Also open while the control the text sits in has **keyboard** focus. For a label inside a `Button`: the text never takes focus itself, so without it a keyboard user never sees what was cut off. Escape closes it. Used by `ChatStarter` |
+| `showOnControlFocus` | `boolean` | `false` | Also open while the control the text sits in has **keyboard** focus. For a label inside a `Button`: the text never takes focus itself, so without it a keyboard user never sees what was cut off. Escape closes it. Used by `ChatStarter`, `RunLogRow`, `AttachmentRow`, `LineageTree` and `AgentCardFinding` |
+| `onTruncatedChange` | `(truncated: boolean) => void` | — | Called when a measurement differs from the last: `true` once the text is cut, `false` once it fits. Never the initial `false` before a measurement, so a parent that remounts the span hears the measured value, not a reset. For a parent that gives another way to read the text where no tooltip opens, on touch: `RunLogRow`, `AttachmentRow` and `LineageTree` open the row in place to the full name |
 | `className` | `string` | — | Type, colour, flex sizing. The component brings only `min-w-0 truncate` |
 
 ## Mechanisms worth knowing

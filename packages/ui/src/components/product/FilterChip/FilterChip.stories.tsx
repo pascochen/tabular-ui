@@ -74,3 +74,17 @@ export const NeutralByDesign: Story = {
     </div>
   ),
 };
+
+/**
+ * A filter bar 343px wide, as a 375px phone gives it, with values as long as
+ * the close's models, suppliers and people.
+ */
+export const LongValues: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 'var(--gap-chip)', flexWrap: 'wrap', width: 343 }}>
+      <FilterChip field="Model" value="stg_bank__export_kjp_2026_09_statement_lines" onDismiss={() => {}} />
+      <FilterChip field="Supplier" value="Midwest Freight Logistics LLC" onDismiss={() => {}} />
+      <FilterChip field="Owner" value="Anna-Lena Schwarzenberger-Hoffmann" onDismiss={() => {}} />
+    </div>
+  ),
+};

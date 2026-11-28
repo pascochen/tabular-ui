@@ -29,8 +29,8 @@ type Story = StoryObj<typeof meta>;
 // A real <label>, so the wrapped trigger takes its name from it. A bare span
 // looks the same and leaves the trigger unnamed: in a real form, use the
 // product `Field`, which wires id and aria-describedby as well.
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-bonded)', width: 260 }}>
+const Field = ({ label, width = 260, children }: { label: string; width?: number; children: React.ReactNode }) => (
+  <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-bonded)', width }}>
     <span
       className="text-text-secondary"
       style={{ fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', fontWeight: 500 }}
@@ -187,7 +187,10 @@ export const States: Story = {
   ),
 };
 
-/** Long option labels truncate rather than widening the trigger. */
+/**
+ * A long value truncates rather than widening the trigger. Open it: the list
+ * is wider than the trigger, to the screen's edge, so the option shows whole.
+ */
 export const Truncation: Story = {
   render: () => (
     <Field label="Model">
@@ -200,6 +203,35 @@ export const Truncation: Story = {
             fct_gl_entries_reconciliation_daily_partitioned_v2
           </SelectItem>
           <SelectItem value="dim_accounts">dim_accounts</SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
+  ),
+};
+
+/**
+ * A trigger 343px wide, as a 375px phone gives it, with the close's longest
+ * model names. The value is cut in the trigger and read in the open list,
+ * where an option wider than the screen wraps rather than being cut.
+ */
+export const LongNames: Story = {
+  render: () => (
+    <Field label="Model" width={343}>
+      <Select defaultValue="int_supplier_invoices__deduplicated_fy2026_h1_by_supplier_and_document" content="mono">
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="fct_supplier_payments">fct_supplier_payments</SelectItem>
+          <SelectItem value="int_supplier_payments__matched_to_invoices">
+            int_supplier_payments__matched_to_invoices
+          </SelectItem>
+          <SelectItem value="int_supplier_invoices__deduplicated_fy2026_h1_by_supplier_and_document">
+            int_supplier_invoices__deduplicated_fy2026_h1_by_supplier_and_document
+          </SelectItem>
+          <SelectItem value="stg_bank__export_kjp_2026_09_statement_lines">
+            stg_bank__export_kjp_2026_09_statement_lines
+          </SelectItem>
         </SelectContent>
       </Select>
     </Field>
