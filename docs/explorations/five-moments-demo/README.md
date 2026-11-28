@@ -26,5 +26,4 @@ Still to run: **State inventory**, **Build brief (spec-first)** and **Break into
 
 - `AttachmentRow`'s "the file name is the link" appears in no scene ([`showing.md`](showing.md), R5).
 - Waiting's keyboard path after each new turn passes on reading the code. Confirm it in the built demo.
-- The recommendation to let Don't post still lead to the recovery request ([`decisions.md`](decisions.md), check 6) is waiting on the owner.
 - Replacing `apps/demo`: its URL, the site's links to it, the Kasane data and `og.png` ([`interview.md`](interview.md), open item 8).

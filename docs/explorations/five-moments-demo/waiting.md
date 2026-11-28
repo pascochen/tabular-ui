@@ -64,7 +64,7 @@ Throughout: name labels on `Question`, `AgentBlock` and `Confirmation` (and `Dat
 | Types an answer in the composer instead | The scoped reply. The wait stays open | R10 |
 | Clicks Skip | "Skipped by you. I'll keep September locked and list the amount for review." → the no-proposal path | R4 |
 | Clicks Choose for me | The agent's choice and its reason, then the proposal | R4 |
-| Clicks Don't post | "Not posted. The entry stays here." The label "AI · Not posted". The run still reaches the Confirmation [assumed: the recovery request doesn't depend on the posting] | Step 5 |
+| Clicks Don't post | "Not posted. The entry stays here." The label "AI · Not posted". The run still reaches the Confirmation: the recovery request doesn't depend on the posting ([`decisions.md`](decisions.md), check 6, approved) | Step 5 |
 | Clicks Don't send | "Not sent. The request stays here." The label "AI · Not sent" | Step 7 |
 
 ### Person
@@ -88,4 +88,4 @@ Throughout: name labels on `Question`, `AgentBlock` and `Confirmation` (and `Dat
 - **Checks before building:**
   - the `DataTable` entry at 375px;
   - the keyboard path after each new turn;
-  - whether Don't post should still lead to the recovery request.
+  - whether Don't post should still lead to the recovery request (yes: [`decisions.md`](decisions.md), check 6).
