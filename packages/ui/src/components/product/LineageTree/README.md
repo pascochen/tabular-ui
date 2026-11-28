@@ -24,6 +24,10 @@ Until 2026-10-28 it rendered `role="tree"`, `treeitem` and `aria-level`. Those r
 
 Nested lists with disclosure buttons promise only what they deliver, and keep what the roles were added for: depth is still announced. If a screen ever needs keyboard movement through a deep lineage, implement the full tree pattern (roving tabindex, arrow keys, typeahead, `aria-selected`) and test it. Never put the roles back without the behaviour.
 
+## A cut name can be read
+
+Since 2026-11-27. The name is a `TruncatedText`: cut, it shows whole in a tooltip on hover and while its button has keyboard focus. A tooltip never opens on touch, so activating a cut name also opens a line under its row with the full name, wrapping anywhere, in line with the name, as well as calling `onSelect`. Activating it again closes the line. The row stays 24px, and a name that fits only selects, as before. The line is `aria-hidden`: a screen reader already reads the name whole from the button above it. Until then, in a 343px panel, as a 375px phone gives it, `int_supplier_payments__matched_to_invoices` kept 202 of its 277px and the rest couldn't be read. A `meta` beside the name keeps its width, so a long one squeezes the name first. The `LongNames` story, and `apps/storybook/tests/lineage-tree.spec.ts`.
+
 ## Composition
 
 Status comes from `StatusBadge`; the tree does not decide what a failed model looks like. Selection uses `--color-bg-interactive` — selection *is* the interactive role, and §4 is explicit that no `--color-bg-selected` exists.

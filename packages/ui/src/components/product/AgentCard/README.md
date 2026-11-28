@@ -32,7 +32,7 @@ It takes no orchid and no rail either. Those are `AgentBlock`'s, and they mean t
 
 `children` is a ruled footer for what the agent found: one row per finding, its title and a `StatusBadge`. That status is the only hue on the card, and it is what tells four neutral cards apart at a glance. Leave `children` out for an agent that has raised nothing, and the footer and its rule are not drawn. Don't put a placeholder there: a status that states nothing is a guess.
 
-`AgentCardFinding` is that row: a `ghost` button's shape on a real `<a>`, the width of the card, the title at one end and `status` at the other. The title truncates before the status does. Its padding is `--pad-card` less the link's own 1px border, so the title starts where the tile does. `href` sets where it opens, and `render` swaps in a router link or an `<a>` with its own `onClick`.
+`AgentCardFinding` is that row: a `ghost` button's shape on a real `<a>`, the width of the card, the title at one end and `status` at the other. The title truncates before the status does, and a cut title can still be read: it shows whole in a tooltip on hover and on the link's keyboard focus (`TruncatedText`, since 2026-11-27). A tooltip never opens on touch, so the tap opens the finding, and **where the row leads must show the title whole**. Until then, on a 375px phone, "List INV-KJP-2609-00363 for the auditors?" kept 170 of its 267px with no way to read the rest. The `LongTitles` story, and `apps/storybook/tests/agent-card.spec.ts`. Its padding is `--pad-card` less the link's own 1px border, so the title starts where the tile does. `href` sets where it opens, and `render` swaps in a router link or an `<a>` with its own `onClick`.
 
 ## The name is the link
 

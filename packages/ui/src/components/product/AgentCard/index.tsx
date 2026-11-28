@@ -4,6 +4,7 @@ import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 
 import { cn } from '../../../lib/utils';
 import { buttonVariants } from '../../foundational/Button/variants';
+import { TruncatedText } from '../TruncatedText';
 
 export type AgentCardProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   /** The agent's glyph, the one its avatar and its sidebar row draw. */
@@ -94,7 +95,11 @@ function AgentCard({ icon: Glyph, name, href, render, rule, meta, children, clas
 }
 
 export type AgentCardFindingProps = {
-  /** The finding's title. It truncates before the status does. */
+  /**
+   * The finding's title. It truncates before the status does, and shows whole
+   * in a tooltip on hover and keyboard focus. Where the row leads must show
+   * the title whole: on touch, where no tooltip opens, that is how it is read.
+   */
   title: string;
   /** A `StatusBadge`: whose move the finding is. */
   status?: React.ReactNode;
@@ -123,7 +128,7 @@ function AgentCardFinding({ title, status, href, render, className }: AgentCardF
   );
   const content = (
     <>
-      <span className="min-w-0 truncate">{title}</span>
+      <TruncatedText showOnControlFocus>{title}</TruncatedText>
       {status}
     </>
   );

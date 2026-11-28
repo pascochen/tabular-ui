@@ -48,6 +48,8 @@ Set it on **`Select`**, the root — not on the trigger. `SelectContent` and `Se
 
 **Items are 28px (`--h-row-sm`)** regardless of trigger size, so a dropdown over a table shares the table's rhythm. A popup is transient and does not compete for permanent screen space the way a grid does, so it can afford the larger pointer target.
 
+**An option is never cut** (2026-11-27). The open list is at least the trigger's width and widens for an option that needs it, up to the screen's edge (`--available-width`). An option still too long wraps, anywhere, since an identifier has no spaces to break at, and its row grows from 28px by a line at a time (`popupItemWraps` in `popupSurface.ts`). The trigger still truncates its value: the open list is where that value is read, by mouse, keyboard and touch alike. Until then the list was the trigger's width and its options truncated, so at 375px a long model name was cut in the very list that is there to show it (214 of its 360px), and the trigger's value could be read nowhere. The `LongNames` story, and `apps/storybook/tests/popup-long-options.spec.ts`.
+
 ## Popup and states
 
 - **Raised surface**: `--color-surface-raised` + 1px `--color-border-strong`, `--radius-md`, **no shadow** — §4 expresses depth with a background step plus a border because shadows barely register on a `ledger-950` canvas. The vendored source shipped `shadow-md` and a `ring-1`; both are gone.

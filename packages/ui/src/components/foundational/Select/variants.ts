@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 import { controlBase, controlOverlay } from '../controlBase';
-import { popupItem } from '../popupSurface';
+import { popupItem, popupItemWraps } from '../popupSurface';
 
 /**
  * The trigger reads as a field, not as a button: its value is left-aligned and
@@ -62,6 +62,9 @@ export const selectItemVariants = cva(
     // is the interactive role and no --color-bg-selected exists by design.
     // Highlighted comes from popupItem, shared with Menu.
     'data-[selected]:bg-bg-interactive data-[selected]:text-text-primary',
+    // An option too long for the widest list wraps, and its row grows. One
+    // line is still --h-row-sm: the padding is what the line leaves of it.
+    popupItemWraps,
   ],
   {
     variants: {

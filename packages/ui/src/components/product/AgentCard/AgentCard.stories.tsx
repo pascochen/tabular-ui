@@ -152,3 +152,29 @@ export const Narrow: Story = {
     ),
   },
 };
+
+/**
+ * A card 343px wide, as a 375px phone gives it, with the close's longest
+ * finding titles. A title too long for its row is cut, and shows whole in a
+ * tooltip on hover and on keyboard focus.
+ */
+export const LongTitles: Story = {
+  decorators: [(Story) => <div style={{ width: 343 }}>{Story()}</div>],
+  args: {
+    name: 'Accounts Payable AI',
+    rule: 'Every supplier invoice is entered once and paid once.',
+    children: (
+      <>
+        <Finding title="Duplicate payment" status="needs-review">
+          Needs your answer
+        </Finding>
+        <Finding title="List INV-KJP-2609-00363 for the auditors?" status="needs-review">
+          Needs your answer
+        </Finding>
+        <Finding title="Reverse INV-KJP-2609-00363 in September?" status="passed">
+          Answered
+        </Finding>
+      </>
+    ),
+  },
+};

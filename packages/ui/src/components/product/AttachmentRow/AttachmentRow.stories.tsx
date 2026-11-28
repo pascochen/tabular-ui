@@ -217,3 +217,26 @@ export const Dense: Story = {
     </div>
   ),
 };
+
+/**
+ * A list 343px wide, as a 375px phone gives it, with names as long as the
+ * close's files. A name too long for its row is cut, and shows whole in a
+ * tooltip on hover and on keyboard focus. A tooltip never opens on touch, so
+ * a cut name that isn't a link opens the row in place to the full name. A
+ * linked name opens its file. A name that fits leaves its row plain.
+ */
+export const LongNames: Story = {
+  render: () => (
+    <div className="rounded-md border border-border" style={{ width: 343 }}>
+      <AttachmentRow name="manifest.json" size="12 KB" />
+      <AttachmentRow name="supplier_invoices_fy2026_h1.csv" size="2.4 MB" timestamp="14:02" />
+      <AttachmentRow name="bank_export_kjp_2026-09.csv" size="412 KB" timestamp="14:05" status="failed" />
+      <AttachmentRow
+        name="manual_journal_entries_fy2026_h1.csv"
+        size="88 KB"
+        href="#"
+        actions={rowActions('manual_journal_entries_fy2026_h1.csv')}
+      />
+    </div>
+  ),
+};
